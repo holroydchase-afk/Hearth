@@ -1,0 +1,116 @@
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+  n  | result |                                                                      description                                                                      
+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------
+   1 | ok     | Mom-side grandma cannot see post shared only with Dad-side grandparents
+   2 | ok     | can_view_post() is false for Mom-side grandma on Dad-side post
+   3 | ok     | ...nor its media rows
+   4 | ok     | ...nor its comments
+   5 | ok     | ...nor its reactions
+   6 | ok     | Mom-side grandma cannot see Dad's co-parent-only post
+   7 | ok     | Mom-side grandma CAN see Dad's "Everyone" post (she is in that circle)
+   8 | ok     | Mom-side grandma sees Mom-side grandparents post
+   9 | ok     | Mom-side grandma cannot see Mom's co-parent post
+  10 | ok     | Mom-side grandma sees only 1 circle in Dad's space (Everyone)
+  11 | ok     | Mom-side grandma cannot comment on a post she cannot see  [new row violates row-level security policy for table "comments"]
+  12 | ok     | Mom-side grandma cannot react to a post she cannot see  [new row violates row-level security policy for table "reactions"]
+  13 | ok     | Dad-side grandma sees Dad-side grandparents post
+  14 | ok     | Dad-side grandma sees both media items
+  15 | ok     | Dad-side grandma cannot see Mom-side grandparents post
+  16 | ok     | Dad-side grandma cannot see co-parent post
+  17 | ok     | Dad-side grandma sees no circles in Mom's space
+  18 | ok     | Dad-side grandma cannot see the Co-parent circle exists
+  19 | ok     | Viewer can comment on a visible post
+  20 | ok     | Viewer can change own reaction
+  21 | ok     | One reaction per person per post  [duplicate key value violates unique constraint "reactions_pkey"]
+  22 | ok     | Viewer cannot post when viewers_can_post = false  [new row violates row-level security policy for table "posts"]
+  23 | ok     | Viewer cannot post via create_post() either  [new row violates row-level security policy for table "posts"]
+  24 | ok     | Clients can never read wrapped media keys  [permission denied for table media_keys]
+  25 | ok     | Clients cannot read the purge queue  [permission denied for table storage_purge_queue]
+  26 | ok     | Viewer sees only own seen-receipts
+  27 | ok     | Viewer cannot change billing plan  [permission denied for table spaces]
+  28 | ok     | Co-parent sees exactly the co-parent post in the other household's space
+  29 | ok     | Co-parent sees only the Co-parent circle (cannot see Dad's family circles)
+  30 | ok     | Co-parent cannot list other members of Dad's circles
+  31 | ok     | Co-parent sees no other audience circles on the post
+  32 | ok     | Co-parent cannot enumerate Dad's viewers (grandparents)
+  33 | ok     | Co-parent cannot see Dad-side grandma's profile
+  34 | ok     | Blair sees all her own posts in her space
+  35 | ok     | Family-plan author sees "seen by" receipts
+  36 | ok     | Non-author cannot change a post's audience  [only the author can change the audience]
+  37 | ok     | Non-author delete on post_audiences affects 0 rows
+  38 | ok     | Non-author cannot edit post
+  39 | ok     | Co-parent (viewer) cannot create invites in the other space  [only space owners/adults can invite]
+  40 | ok     | Author sees all own posts
+  41 | ok     | Alex sees Blair's co-parent post
+  42 | ok     | Alex cannot see Blair's Mom-side grandparents post
+  43 | ok     | Alex sees only the Co-parent circle in Blair's space
+  44 | ok     | Free-plan author cannot read "seen by" receipts (paid feature)
+  45 | ok     | Owner cannot self-upgrade plan from client  [permission denied for table spaces]
+  46 | ok     | author_id not updatable  [permission denied for table posts]
+  47 | ok     | After widening to Everyone, Mom-side grandma sees the post
+  48 | ok     | ...and its media
+  49 | ok     | After narrowing back, Mom-side grandma loses access immediately
+  50 | ok     | ...and can_view_post() (used by sign-media) is false
+  51 | ok     | ...and media rows are gone from her view
+  52 | ok     | Moving co-parent post to grandparents revokes co-parent access
+  53 | ok     | ...and grants Dad-side grandpa access
+  54 | ok     | Removing grandpa from the circle revokes his access
+  55 | ok     | Cannot set an empty audience  [choose at least one circle]
+  56 | ok     | Deleting the last audience row of a published post is refused  [a published post needs at least one audience circle]
+  57 | ok     | Audience circle from another space is refused  [audience circle must belong to the post's space]
+  58 | ok     | Upload without exif_stripped=true is refused  [new row for relation "media_items" violates check constraint "media_items_exif_stripped_check"]
+  59 | ok     | Stripped photo upload is accepted
+  60 | ok     | Object key is derived server-side
+  61 | ok     | Free space can upload videos up to 10 this month
+  62 | ok     | Quota shows 10/10 used
+  63 | ok     | 11th video on free plan is refused  [free_video_cap_reached]
+  64 | ok     | Photos are not capped
+  65 | ok     | Other viewers never see pending (not yet finalized) media
+  66 | ok     | Non-author cannot upload to someone else's post  [cannot upload to this post]
+  67 | ok     | Clients cannot mark uploads ready (service-role only)  [permission denied for function mark_media_upload_result]
+  68 | ok     | Cannot publish before media finish uploading  [all media must finish uploading first]
+  69 | ok     | Drafts are invisible to the audience
+  70 | ok     | Author publishes once media is ready
+  71 | ok     | Published post is visible to its audience
+  72 | ok     | Family plan is not video-capped
+  73 | ok     | Invite code stored hashed, not plaintext
+  74 | ok     | Invite targeted at an email cannot be redeemed by someone else  [invite was sent to a different email]
+  75 | ok     | Before redeeming, new user sees nothing
+  76 | ok     | Invitee redeems code (case-insensitive)
+  77 | ok     | Invitee lands in the invited circle and sees its posts
+  78 | ok     | Invitee does not see posts for circles they were not invited to
+  79 | ok     | Viewer defaults to weekly email digest
+  80 | ok     | Single-use invite cannot be reused  [invite is invalid or expired]
+  81 | ok     | Cannot set notification prefs for a space you are not in  [new row violates row-level security policy for table "notification_prefs"]
+  82 | ok     | Expired invite is refused  [invite is invalid or expired]
+  83 | ok     | Soft-deleted post disappears for viewers
+  84 | ok     | ...and cannot be signed
+  85 | ok     | Account export returns the caller's own posts
+  86 | ok     | Export contains no one else's private posts
+  87 | ok     | Purge job hard-deletes soft-deleted posts
+  88 | ok     | Purge enqueues B2 objects for deletion
+  89 | ok     | anon has no table access  [permission denied for table posts]
+  90 | ok     | anon cannot call RPCs  [permission denied for function can_view_post]
+  91 | ok     | Co-parent cannot read the other household's monthly video counter  [permission denied for table spaces]
+  92 | ok     | Co-parent cannot read the other household's billing customer ref  [permission denied for table spaces]
+  93 | ok     | space_upload_quota() hides the upload count from members who cannot post
+  94 | ok     | Members can still read the space's name and plan
+  95 | ok     | Owner still sees the upload count
+  96 | ok     | A video declared as kind=photo is refused (free-tier cap bypass)  [new row for relation "media_items" violates check constraint "media_items_check1"]
+  97 | ok     | Co-parent cannot see a child the other household linked to its space but never shared
+  98 | ok     | ...nor the space_children link row
+  99 | ok     | Viewer still sees a child tagged in a post they can see
+ 100 | ok     | Non-guardian cannot read a child's birth date  [permission denied for table children]
+ 101 | ok     | ...nor via child_birth_date()
+ 102 | ok     | Space manager sees the linked child
+ 103 | ok     | Guardian reads the birth date via child_birth_date()
+ 104 | ok     | Viewer cannot publish a draft after viewers_can_post is turned off  [you cannot post in this space]
+ 105 | ok     | Removed member sees nothing in the space, including their own old posts
+ 106 | ok     | ...can_view_post() is false, so sign-media will not sign them
+ 107 | ok     | ...and new comments on them stay hidden
+ 108 | ok     | Removed member cannot re-target an old post's audience  [only the author can change the audience]
+ 109 | ok     | Removed member cannot publish an old draft into the space  [only the author can publish]
+ 110 | ok     | Commenter who lost access to a post cannot edit their comment on it
+
+
+RESULT: 110 passed, 0 failed

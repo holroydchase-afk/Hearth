@@ -1,0 +1,80 @@
+// Blocks shared by Help (viewers) and Me (posters): Bigger text, notice choice, privacy, sign out.
+import React, { useState } from 'react';
+import { useApp } from '../state/AppContext';
+import type { NotifyChoice } from '../state/prefs';
+import { Button, Card, Choice, Confirm, Notice, Txt } from '../ui/kit';
+
+export function BiggerText() {
+  const { prefs, setPrefs } = useApp();
+  return (
+    <Card>
+      <Choice
+        kind="switch"
+        label="Bigger text"
+        title="Bigger text"
+        detail={prefs.bigText ? 'Words are extra large.' : 'Tap to make the words bigger.'}
+        checked={prefs.bigText}
+        onPress={() => setPrefs({ bigText: !prefs.bigText })}
+      />
+    </Card>
+  );
+}
+
+const CHOICES: { id: NotifyChoice; title: string; saved: string }[] = [
+  { id: 'push', title: 'A sound on your phone when there are new photos (Recommended)', saved: 'Saved. Your phone will make a sound when there are new photos.' },
+  { id: 'evening', title: "An email every evening with the day's new photos", saved: "Saved. We'll email you every evening when there are new photos." },
+  { id: 'sunday', title: 'An email every Sunday morning', saved: "Saved. We'll email you on Sunday mornings when there are new photos." },
+];
+
+export function HowToTell() {
+  const { prefs, setPrefs } = useApp();
+  const [saved, setSaved] = useState<string | null>(null);
+  return (
+    <Card>
+      <Txt variant="title" role="header">How should we tell you about new photos?</Txt>
+      {CHOICES.map((c) => (
+        <Choice
+          key={c.id}
+          kind="radio"
+          label={c.title}
+          title={c.title}
+          checked={prefs.notify === c.id}
+          onPress={() => { setPrefs({ notify: c.id }); setSaved(c.saved); }}
+        />
+      ))}
+      {saved ? <Notice text={saved} tone="good" /> : null}
+    </Card>
+  );
+}
+
+export function Privacy({ who }: { who: string | null }) {
+  return (
+    <Card>
+      <Txt variant="title" role="header">Keeping your photos private</Txt>
+      <Txt>Your photos stay in the United States.</Txt>
+      <Txt>No one outside the family can see them. No ads, no strangers.</Txt>
+      <Txt>No computer program learns from your photos.</Txt>
+      <Txt>Photos don't show where they were taken.</Txt>
+      <Txt>{`${who ?? 'You'} can delete everything at any time.`}</Txt>
+    </Card>
+  );
+}
+
+export function SignOut() {
+  const { signOut } = useApp();
+  const [ask, setAsk] = useState(false);
+  return (
+    <>
+      <Button label="Sign out of Hearth" variant="secondary" onPress={() => setAsk(true)} />
+      <Confirm
+        visible={ask}
+        title="Sign out of Hearth?"
+        body="To come back, you'll need a new code from your email."
+        yes="Yes, sign out"
+        no="No, stay signed in"
+        onNo={() => setAsk(false)}
+        onYes={() => { setAsk(false); void signOut(); }}
+      />
+    </>
+  );
+}

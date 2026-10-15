@@ -1,0 +1,913 @@
+SET
+CREATE FUNCTION
+GRANT
+GRANT
+
+==== Fixture size
+ spaces |  posts  | audiences |  media  | circle_members | hot_space_posts | viewer_visible | db_size 
+--------+---------+-----------+---------+----------------+-----------------+----------------+---------
+  50000 | 1000000 |   1100000 | 1250000 |         300041 |           20000 |          17986 | 2027 MB
+
+
+==== EXPLAIN (ANALYZE, BUFFERS) of get_feed internals
+LOAD
+SET
+SET
+SET
+SET
+SET
+SET
+SET
+---- viewer (grandparent in Everyone + Grandparents), first page
+psql:tests/perf/bench.sql:66: NOTICE:  duration: 0.024 ms  plan:
+Query Text:  select md5(p || n)::uuid 
+Query Parameters: $1 = 'u', $2 = '200021'
+Result  (cost=0.00..0.03 rows=1 width=16) (actual time=0.021..0.021 rows=1 loops=1)
+psql:tests/perf/bench.sql:66: NOTICE:  duration: 0.009 ms  plan:
+Query Text: select set_config('request.jwt.claim.sub', perf.id('u', 200021)::text, false) 
+Result  (cost=0.00..0.01 rows=1 width=32) (actual time=0.007..0.007 rows=1 loops=1)
+psql:tests/perf/bench.sql:67: NOTICE:  duration: 0.010 ms  plan:
+Query Text:  select md5(p || n)::uuid 
+Query Parameters: $1 = 's', $2 = '1'
+Result  (cost=0.00..0.03 rows=1 width=16) (actual time=0.009..0.009 rows=1 loops=1)
+psql:tests/perf/bench.sql:67: NOTICE:  duration: 0.076 ms  plan:
+Query Text: v_uid is null or not exists (
+       select 1 from public.space_members sm join public.spaces s on s.id = sm.space_id and s.deleted_at is null
+       where sm.space_id = p_space and sm.user_id = v_uid)
+Result  (cost=12.76..12.77 rows=1 width=1) (actual time=0.071..0.071 rows=1 loops=1)
+  Buffers: shared hit=2 read=5 written=5
+  InitPlan 1 (returns $0)
+    ->  Nested Loop  (cost=0.71..12.76 rows=1 width=0) (actual time=0.070..0.070 rows=1 loops=1)
+          Buffers: shared hit=2 read=5 written=5
+          ->  Index Only Scan using space_members_pkey on space_members sm  (cost=0.42..4.44 rows=1 width=16) (actual time=0.044..0.044 rows=1 loops=1)
+                Index Cond: ((space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid) AND (user_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid))
+                Heap Fetches: 0
+                Buffers: shared hit=1 read=3 written=3
+          ->  Index Scan using spaces_pkey on spaces s  (cost=0.29..8.31 rows=1 width=16) (actual time=0.025..0.025 rows=1 loops=1)
+                Index Cond: (id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                Filter: (deleted_at IS NULL)
+                Buffers: shared hit=1 read=2 written=2
+psql:tests/perf/bench.sql:67: NOTICE:  duration: 1.606 ms  plan:
+Query Text: with circ as (
+    select cm.circle_id
+    from public.circle_members cm join public.circles c on c.id = cm.circle_id
+    where cm.user_id = v_uid and c.space_id = p_space and c.deleted_at is null
+  ), cand as (
+    select x.post_id as pid, x.feed_at as ts
+    from circ cross join lateral (
+      select pa.post_id, pa.feed_at from public.post_audiences pa
+      where pa.circle_id = circ.circle_id and pa.feed_at is not null
+        and (pa.feed_at, pa.post_id) < (v_ts, v_id)
+      order by pa.feed_at desc, pa.post_id desc
+      limit v_lim) x
+    union
+    select mine.id, mine.published_at from (
+      select p.id, p.published_at from public.posts p
+      where p.author_id = v_uid and p.space_id = p_space and p.status = 'published' and p.deleted_at is null
+        and (p.published_at, p.id) < (v_ts, v_id)
+      order by p.published_at desc, p.id desc
+      limit v_lim) mine
+  ), page as (
+    select pid, ts from cand order by ts desc, pid desc limit v_lim
+  )
+  select p.id, p.author_id, pr.display_name, p.caption, p.published_at,
+         coalesce((select jsonb_agg(jsonb_build_object(
+                            'media_id', m.id, 'kind', m.kind, 'width', m.width, 'height', m.height,
+                            'duration_ms', m.duration_ms, 'status', m.upload_status) order by m.position)
+                   from public.media_items m
+                   where m.post_id = p.id and (m.upload_status = 'ready' or p.author_id = v_uid)), '[]'::jsonb),
+         p.reaction_count,
+         exists (select 1 from public.reactions r where r.post_id = p.id and r.user_id = v_uid),
+         p.comment_count,
+         case when p.author_id = v_uid then aud.audience end,
+         case when p.author_id = v_uid then aud.seen end,
+         case when p.author_id = v_uid then aud.reach end
+  from page
+  join public.posts p     on p.id = page.pid and p.deleted_at is null and p.status = 'published'
+  join public.profiles pr on pr.id = p.author_id
+  left join lateral (
+    select (select jsonb_agg(jsonb_build_object(
+                     'circle_id', c.id, 'name', c.name,
+                     'member_count', (select count(*) from public.circle_members cm2 where cm2.circle_id = c.id))
+                   order by c.name, c.id)
+            from public.post_audiences pa join public.circles c on c.id = pa.circle_id and c.deleted_at is null
+            where pa.post_id = p.id and p.author_id = v_uid) as audience,
+           r.seen, r.reach
+    from (select count(*)::integer as reach, count(pv.user_id)::integer as seen
+          from (select distinct cm.user_id
+                from public.post_audiences pa
+                join public.circles c on c.id = pa.circle_id and c.deleted_at is null
+                join public.circle_members cm on cm.circle_id = pa.circle_id
+                where pa.post_id = p.id and cm.user_id <> p.author_id
+                  and p.author_id = v_uid) u                   -- one-time filter: skipped for non-authors
+          left join public.post_views pv on pv.post_id = p.id and pv.user_id = u.user_id) r
+  ) aud on true
+  order by page.ts desc, page.pid desc
+Nested Loop Left Join  (cost=57.46..632.00 rows=11 width=167) (actual time=0.488..1.580 rows=20 loops=1)
+  Buffers: shared hit=277 read=42 written=38
+  ->  Nested Loop  (cost=42.95..140.08 rows=11 width=94) (actual time=0.293..0.592 rows=20 loops=1)
+        Buffers: shared hit=162 read=18 written=16
+        ->  Nested Loop  (cost=42.53..135.14 rows=11 width=83) (actual time=0.255..0.442 rows=20 loops=1)
+              Buffers: shared hit=85 read=15 written=13
+              ->  Limit  (cost=42.11..42.13 rows=11 width=24) (actual time=0.239..0.250 rows=20 loops=1)
+                    Buffers: shared hit=9 read=11 written=11
+                    ->  Sort  (cost=42.11..42.13 rows=11 width=24) (actual time=0.239..0.246 rows=20 loops=1)
+                          Sort Key: pa.feed_at DESC, pa.post_id DESC
+                          Sort Method: quicksort  Memory: 27kB
+                          Buffers: shared hit=9 read=11 written=11
+                          ->  HashAggregate  (cost=41.81..41.92 rows=11 width=24) (actual time=0.214..0.222 rows=38 loops=1)
+                                Group Key: pa.post_id, pa.feed_at
+                                Batches: 1  Memory Usage: 24kB
+                                Buffers: shared hit=9 read=11 written=11
+                                ->  Append  (cost=9.31..41.75 rows=11 width=24) (actual time=0.118..0.200 rows=40 loops=1)
+                                      Buffers: shared hit=9 read=11 written=11
+                                      ->  Nested Loop  (cost=9.31..33.25 rows=10 width=24) (actual time=0.117..0.160 rows=40 loops=1)
+                                            Buffers: shared hit=8 read=9 written=9
+                                            ->  Nested Loop  (cost=8.88..28.52 rows=1 width=16) (actual time=0.091..0.115 rows=2 loops=1)
+                                                  Join Filter: (cm.circle_id = c.id)
+                                                  Rows Removed by Join Filter: 3
+                                                  Buffers: shared hit=1 read=9 written=9
+                                                  ->  Bitmap Heap Scan on circles c  (cost=4.44..16.13 rows=3 width=16) (actual time=0.058..0.079 rows=3 loops=1)
+                                                        Recheck Cond: (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                                                        Filter: (deleted_at IS NULL)
+                                                        Heap Blocks: exact=3
+                                                        Buffers: shared read=6 written=6
+                                                        ->  Bitmap Index Scan on circles_space_id_idx  (cost=0.00..4.44 rows=3 width=0) (actual time=0.046..0.046 rows=3 loops=1)
+                                                              Index Cond: (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                                                              Buffers: shared read=3 written=3
+                                                  ->  Materialize  (cost=4.44..12.30 rows=2 width=16) (actual time=0.010..0.011 rows=2 loops=3)
+                                                        Buffers: shared hit=1 read=3 written=3
+                                                        ->  Bitmap Heap Scan on circle_members cm  (cost=4.44..12.29 rows=2 width=16) (actual time=0.025..0.026 rows=2 loops=1)
+                                                              Recheck Cond: (user_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid)
+                                                              Heap Blocks: exact=1
+                                                              Buffers: shared hit=1 read=3 written=3
+                                                              ->  Bitmap Index Scan on circle_members_user_id_idx  (cost=0.00..4.44 rows=2 width=0) (actual time=0.022..0.022 rows=2 loops=1)
+                                                                    Index Cond: (user_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid)
+                                                                    Buffers: shared read=3 written=3
+                                            ->  Limit  (cost=0.43..4.63 rows=10 width=24) (actual time=0.017..0.020 rows=20 loops=2)
+                                                  Buffers: shared hit=7
+                                                  ->  Index Only Scan using post_audiences_feed_idx on post_audiences pa  (cost=0.43..4.63 rows=10 width=24) (actual time=0.016..0.018 rows=20 loops=2)
+                                                        Index Cond: ((circle_id = cm.circle_id) AND (ROW(feed_at, post_id) < ROW('infinity'::timestamp with time zone, '00000000-0000-0000-0000-000000000000'::uuid)))
+                                                        Heap Fetches: 0
+                                                        Buffers: shared hit=7
+                                      ->  Limit  (cost=0.42..8.45 rows=1 width=24) (actual time=0.036..0.036 rows=0 loops=1)
+                                            Buffers: shared hit=1 read=2 written=2
+                                            ->  Index Only Scan using posts_author_feed_idx on posts p_1  (cost=0.42..8.45 rows=1 width=24) (actual time=0.035..0.035 rows=0 loops=1)
+                                                  Index Cond: ((author_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid) AND (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid) AND (ROW(published_at, id) < ROW('infinity'::timestamp with time zone, '00000000-0000-0000-0000-000000000000'::uuid)))
+                                                  Heap Fetches: 0
+                                                  Buffers: shared hit=1 read=2 written=2
+              ->  Index Scan using posts_pkey on posts p  (cost=0.42..8.45 rows=1 width=59) (actual time=0.009..0.009 rows=1 loops=20)
+                    Index Cond: (id = pa.post_id)
+                    Filter: ((deleted_at IS NULL) AND (status = 'published'::public.post_status))
+                    Buffers: shared hit=76 read=4 written=2
+        ->  Index Scan using profiles_pkey on profiles pr  (cost=0.42..0.45 rows=1 width=27) (actual time=0.007..0.007 rows=1 loops=20)
+              Index Cond: (id = p.author_id)
+              Buffers: shared hit=77 read=3 written=3
+  ->  Subquery Scan on r  (cost=14.50..31.93 rows=1 width=40) (actual time=0.007..0.007 rows=1 loops=20)
+        Buffers: shared hit=3
+        ->  Aggregate  (cost=14.50..14.52 rows=1 width=8) (actual time=0.003..0.003 rows=1 loops=20)
+              ->  Merge Left Join  (cost=10.33..14.49 rows=2 width=16) (actual time=0.003..0.003 rows=0 loops=20)
+                    Merge Cond: (cm_1.user_id = pv.user_id)
+                    ->  Unique  (cost=9.91..9.92 rows=2 width=16) (actual time=0.002..0.002 rows=0 loops=20)
+                          ->  Sort  (cost=9.91..9.92 rows=2 width=16) (actual time=0.002..0.002 rows=0 loops=20)
+                                Sort Key: cm_1.user_id
+                                Sort Method: quicksort  Memory: 25kB
+                                ->  Result  (cost=1.27..9.90 rows=2 width=16) (actual time=0.000..0.000 rows=0 loops=20)
+                                      One-Time Filter: (p.author_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid)
+                                      ->  Nested Loop  (cost=1.27..9.90 rows=2 width=16) (never executed)
+                                            Join Filter: (c_1.id = pa_1.circle_id)
+                                            ->  Nested Loop  (cost=0.85..8.93 rows=2 width=48) (never executed)
+                                                  ->  Index Only Scan using post_audiences_pkey on post_audiences pa_1  (cost=0.43..4.45 rows=1 width=16) (never executed)
+                                                        Index Cond: (post_id = p.id)
+                                                        Heap Fetches: 0
+                                                  ->  Index Only Scan using circle_members_pkey on circle_members cm_1  (cost=0.42..4.46 rows=2 width=32) (never executed)
+                                                        Index Cond: (circle_id = pa_1.circle_id)
+                                                        Filter: (user_id <> p.author_id)
+                                                        Heap Fetches: 0
+                                            ->  Index Scan using circles_pkey on circles c_1  (cost=0.42..0.47 rows=1 width=16) (never executed)
+                                                  Index Cond: (id = cm_1.circle_id)
+                                                  Filter: (deleted_at IS NULL)
+                    ->  Index Only Scan using post_views_pkey on post_views pv  (cost=0.42..4.54 rows=7 width=16) (never executed)
+                          Index Cond: (post_id = p.id)
+                          Heap Fetches: 0
+        SubPlan 5
+          ->  Aggregate  (cost=17.39..17.40 rows=1 width=32) (actual time=0.003..0.003 rows=1 loops=20)
+                Buffers: shared hit=3
+                ->  Sort  (cost=12.90..12.91 rows=1 width=26) (actual time=0.002..0.002 rows=0 loops=20)
+                      Sort Key: c_2.name, c_2.id
+                      Sort Method: quicksort  Memory: 25kB
+                      Buffers: shared hit=3
+                      ->  Result  (cost=0.85..12.89 rows=1 width=26) (actual time=0.000..0.000 rows=0 loops=20)
+                            One-Time Filter: (p.author_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid)
+                            ->  Nested Loop  (cost=0.85..12.89 rows=1 width=26) (never executed)
+                                  ->  Index Only Scan using post_audiences_pkey on post_audiences pa_2  (cost=0.43..4.45 rows=1 width=16) (never executed)
+                                        Index Cond: (post_id = p.id)
+                                        Heap Fetches: 0
+                                  ->  Index Scan using circles_pkey on circles c_2  (cost=0.42..8.44 rows=1 width=26) (never executed)
+                                        Index Cond: (id = pa_2.circle_id)
+                                        Filter: (deleted_at IS NULL)
+                SubPlan 4
+                  ->  Aggregate  (cost=4.46..4.47 rows=1 width=8) (never executed)
+                        ->  Index Only Scan using circle_members_pkey on circle_members cm2  (cost=0.42..4.46 rows=2 width=0) (never executed)
+                              Index Cond: (circle_id = c_2.id)
+                              Heap Fetches: 0
+  SubPlan 1
+    ->  Aggregate  (cost=8.46..8.47 rows=1 width=32) (actual time=0.032..0.032 rows=1 loops=20)
+          Buffers: shared hit=71 read=24 written=22
+          ->  Index Scan using media_items_post_id_position_key on media_items m  (cost=0.43..8.45 rows=1 width=38) (actual time=0.015..0.016 rows=1 loops=20)
+                Index Cond: (post_id = p.id)
+                Filter: ((upload_status = 'ready'::public.upload_status) OR (p.author_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid))
+                Buffers: shared hit=63 read=23 written=21
+  SubPlan 2
+    ->  Index Only Scan using reactions_pkey on reactions r_1  (cost=0.29..4.30 rows=1 width=0) (actual time=0.006..0.006 rows=0 loops=20)
+          Index Cond: ((post_id = p.id) AND (user_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid))
+          Heap Fetches: 0
+          Buffers: shared hit=41
+psql:tests/perf/bench.sql:67: NOTICE:  duration: 8.113 ms  plan:
+Query Text: select count(*) from public.get_feed(perf.id('s', 1));
+Aggregate  (cost=12.75..12.76 rows=1 width=8) (actual time=8.109..8.110 rows=1 loops=1)
+  Buffers: shared hit=1228 read=75 written=71
+  ->  Function Scan on get_feed  (cost=0.25..10.25 rows=1000 width=0) (actual time=8.097..8.100 rows=20 loops=1)
+        Buffers: shared hit=1228 read=75 written=71
+ count 
+-------
+    20
+
+---- viewer, deep page (cursor at visible post #15,000)
+psql:tests/perf/bench.sql:69: NOTICE:  duration: 0.019 ms  plan:
+Query Text:  select md5(p || n)::uuid 
+Query Parameters: $1 = 's', $2 = '1'
+Result  (cost=0.00..0.03 rows=1 width=16) (actual time=0.018..0.018 rows=1 loops=1)
+psql:tests/perf/bench.sql:69: NOTICE:  duration: 0.023 ms  plan:
+Query Text: v_uid is null or not exists (
+       select 1 from public.space_members sm join public.spaces s on s.id = sm.space_id and s.deleted_at is null
+       where sm.space_id = p_space and sm.user_id = v_uid)
+Result  (cost=12.76..12.77 rows=1 width=1) (actual time=0.021..0.021 rows=1 loops=1)
+  Buffers: shared hit=7
+  InitPlan 1 (returns $0)
+    ->  Nested Loop  (cost=0.71..12.76 rows=1 width=0) (actual time=0.020..0.020 rows=1 loops=1)
+          Buffers: shared hit=7
+          ->  Index Only Scan using space_members_pkey on space_members sm  (cost=0.42..4.44 rows=1 width=16) (actual time=0.010..0.010 rows=1 loops=1)
+                Index Cond: ((space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid) AND (user_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid))
+                Heap Fetches: 0
+                Buffers: shared hit=4
+          ->  Index Scan using spaces_pkey on spaces s  (cost=0.29..8.31 rows=1 width=16) (actual time=0.009..0.009 rows=1 loops=1)
+                Index Cond: (id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                Filter: (deleted_at IS NULL)
+                Buffers: shared hit=3
+psql:tests/perf/bench.sql:69: NOTICE:  duration: 1.064 ms  plan:
+Query Text: with circ as (
+    select cm.circle_id
+    from public.circle_members cm join public.circles c on c.id = cm.circle_id
+    where cm.user_id = v_uid and c.space_id = p_space and c.deleted_at is null
+  ), cand as (
+    select x.post_id as pid, x.feed_at as ts
+    from circ cross join lateral (
+      select pa.post_id, pa.feed_at from public.post_audiences pa
+      where pa.circle_id = circ.circle_id and pa.feed_at is not null
+        and (pa.feed_at, pa.post_id) < (v_ts, v_id)
+      order by pa.feed_at desc, pa.post_id desc
+      limit v_lim) x
+    union
+    select mine.id, mine.published_at from (
+      select p.id, p.published_at from public.posts p
+      where p.author_id = v_uid and p.space_id = p_space and p.status = 'published' and p.deleted_at is null
+        and (p.published_at, p.id) < (v_ts, v_id)
+      order by p.published_at desc, p.id desc
+      limit v_lim) mine
+  ), page as (
+    select pid, ts from cand order by ts desc, pid desc limit v_lim
+  )
+  select p.id, p.author_id, pr.display_name, p.caption, p.published_at,
+         coalesce((select jsonb_agg(jsonb_build_object(
+                            'media_id', m.id, 'kind', m.kind, 'width', m.width, 'height', m.height,
+                            'duration_ms', m.duration_ms, 'status', m.upload_status) order by m.position)
+                   from public.media_items m
+                   where m.post_id = p.id and (m.upload_status = 'ready' or p.author_id = v_uid)), '[]'::jsonb),
+         p.reaction_count,
+         exists (select 1 from public.reactions r where r.post_id = p.id and r.user_id = v_uid),
+         p.comment_count,
+         case when p.author_id = v_uid then aud.audience end,
+         case when p.author_id = v_uid then aud.seen end,
+         case when p.author_id = v_uid then aud.reach end
+  from page
+  join public.posts p     on p.id = page.pid and p.deleted_at is null and p.status = 'published'
+  join public.profiles pr on pr.id = p.author_id
+  left join lateral (
+    select (select jsonb_agg(jsonb_build_object(
+                     'circle_id', c.id, 'name', c.name,
+                     'member_count', (select count(*) from public.circle_members cm2 where cm2.circle_id = c.id))
+                   order by c.name, c.id)
+            from public.post_audiences pa join public.circles c on c.id = pa.circle_id and c.deleted_at is null
+            where pa.post_id = p.id and p.author_id = v_uid) as audience,
+           r.seen, r.reach
+    from (select count(*)::integer as reach, count(pv.user_id)::integer as seen
+          from (select distinct cm.user_id
+                from public.post_audiences pa
+                join public.circles c on c.id = pa.circle_id and c.deleted_at is null
+                join public.circle_members cm on cm.circle_id = pa.circle_id
+                where pa.post_id = p.id and cm.user_id <> p.author_id
+                  and p.author_id = v_uid) u                   -- one-time filter: skipped for non-authors
+          left join public.post_views pv on pv.post_id = p.id and pv.user_id = u.user_id) r
+  ) aud on true
+  order by page.ts desc, page.pid desc
+Nested Loop Left Join  (cost=56.89..202.42 rows=3 width=167) (actual time=0.304..1.050 rows=20 loops=1)
+  Buffers: shared hit=279 read=28 written=24
+  ->  Nested Loop  (cost=42.38..68.26 rows=3 width=94) (actual time=0.149..0.330 rows=20 loops=1)
+        Buffers: shared hit=177 read=3 written=3
+        ->  Nested Loop  (cost=41.96..66.91 rows=3 width=83) (actual time=0.145..0.292 rows=20 loops=1)
+              Buffers: shared hit=97 read=3 written=3
+              ->  Limit  (cost=41.54..41.55 rows=3 width=24) (actual time=0.135..0.143 rows=20 loops=1)
+                    Buffers: shared hit=18 read=2 written=2
+                    ->  Sort  (cost=41.54..41.55 rows=3 width=24) (actual time=0.134..0.140 rows=20 loops=1)
+                          Sort Key: pa.feed_at DESC, pa.post_id DESC
+                          Sort Method: quicksort  Memory: 27kB
+                          Buffers: shared hit=18 read=2 written=2
+                          ->  HashAggregate  (cost=41.49..41.52 rows=3 width=24) (actual time=0.119..0.126 rows=38 loops=1)
+                                Group Key: pa.post_id, pa.feed_at
+                                Batches: 1  Memory Usage: 24kB
+                                Buffers: shared hit=18 read=2 written=2
+                                ->  Append  (cost=9.31..41.47 rows=3 width=24) (actual time=0.061..0.109 rows=40 loops=1)
+                                      Buffers: shared hit=18 read=2 written=2
+                                      ->  Nested Loop  (cost=9.31..33.01 rows=2 width=24) (actual time=0.061..0.093 rows=40 loops=1)
+                                            Buffers: shared hit=15 read=2 written=2
+                                            ->  Nested Loop  (cost=8.88..28.52 rows=1 width=16) (actual time=0.031..0.038 rows=2 loops=1)
+                                                  Join Filter: (cm.circle_id = c.id)
+                                                  Rows Removed by Join Filter: 3
+                                                  Buffers: shared hit=10
+                                                  ->  Bitmap Heap Scan on circles c  (cost=4.44..16.13 rows=3 width=16) (actual time=0.018..0.021 rows=3 loops=1)
+                                                        Recheck Cond: (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                                                        Filter: (deleted_at IS NULL)
+                                                        Heap Blocks: exact=3
+                                                        Buffers: shared hit=6
+                                                        ->  Bitmap Index Scan on circles_space_id_idx  (cost=0.00..4.44 rows=3 width=0) (actual time=0.013..0.013 rows=3 loops=1)
+                                                              Index Cond: (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                                                              Buffers: shared hit=3
+                                                  ->  Materialize  (cost=4.44..12.30 rows=2 width=16) (actual time=0.004..0.005 rows=2 loops=3)
+                                                        Buffers: shared hit=4
+                                                        ->  Bitmap Heap Scan on circle_members cm  (cost=4.44..12.29 rows=2 width=16) (actual time=0.007..0.007 rows=2 loops=1)
+                                                              Recheck Cond: (user_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid)
+                                                              Heap Blocks: exact=1
+                                                              Buffers: shared hit=4
+                                                              ->  Bitmap Index Scan on circle_members_user_id_idx  (cost=0.00..4.44 rows=2 width=0) (actual time=0.005..0.005 rows=2 loops=1)
+                                                                    Index Cond: (user_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid)
+                                                                    Buffers: shared hit=3
+                                            ->  Limit  (cost=0.43..4.47 rows=2 width=24) (actual time=0.022..0.025 rows=20 loops=2)
+                                                  Buffers: shared hit=5 read=2 written=2
+                                                  ->  Index Only Scan using post_audiences_feed_idx on post_audiences pa  (cost=0.43..4.47 rows=2 width=24) (actual time=0.021..0.023 rows=20 loops=2)
+                                                        Index Cond: ((circle_id = cm.circle_id) AND (ROW(feed_at, post_id) < ROW('2024-04-14 18:16:12.400342+00'::timestamp with time zone, '4be6a47e-b64f-2f7f-eb43-b7c01c16328c'::uuid)))
+                                                        Heap Fetches: 0
+                                                        Buffers: shared hit=5 read=2 written=2
+                                      ->  Limit  (cost=0.42..8.45 rows=1 width=24) (actual time=0.011..0.011 rows=0 loops=1)
+                                            Buffers: shared hit=3
+                                            ->  Index Only Scan using posts_author_feed_idx on posts p_1  (cost=0.42..8.45 rows=1 width=24) (actual time=0.011..0.011 rows=0 loops=1)
+                                                  Index Cond: ((author_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid) AND (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid) AND (ROW(published_at, id) < ROW('2024-04-14 18:16:12.400342+00'::timestamp with time zone, '4be6a47e-b64f-2f7f-eb43-b7c01c16328c'::uuid)))
+                                                  Heap Fetches: 0
+                                                  Buffers: shared hit=3
+              ->  Index Scan using posts_pkey on posts p  (cost=0.42..8.45 rows=1 width=59) (actual time=0.007..0.007 rows=1 loops=20)
+                    Index Cond: (id = pa.post_id)
+                    Filter: ((deleted_at IS NULL) AND (status = 'published'::public.post_status))
+                    Buffers: shared hit=79 read=1 written=1
+        ->  Index Scan using profiles_pkey on profiles pr  (cost=0.42..0.45 rows=1 width=27) (actual time=0.001..0.001 rows=1 loops=20)
+              Index Cond: (id = p.author_id)
+              Buffers: shared hit=80
+  ->  Subquery Scan on r  (cost=14.50..31.93 rows=1 width=40) (actual time=0.008..0.008 rows=1 loops=20)
+        ->  Aggregate  (cost=14.50..14.52 rows=1 width=8) (actual time=0.002..0.002 rows=1 loops=20)
+              ->  Merge Left Join  (cost=10.33..14.49 rows=2 width=16) (actual time=0.002..0.002 rows=0 loops=20)
+                    Merge Cond: (cm_1.user_id = pv.user_id)
+                    ->  Unique  (cost=9.91..9.92 rows=2 width=16) (actual time=0.002..0.002 rows=0 loops=20)
+                          ->  Sort  (cost=9.91..9.92 rows=2 width=16) (actual time=0.001..0.001 rows=0 loops=20)
+                                Sort Key: cm_1.user_id
+                                Sort Method: quicksort  Memory: 25kB
+                                ->  Result  (cost=1.27..9.90 rows=2 width=16) (actual time=0.000..0.000 rows=0 loops=20)
+                                      One-Time Filter: (p.author_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid)
+                                      ->  Nested Loop  (cost=1.27..9.90 rows=2 width=16) (never executed)
+                                            Join Filter: (c_1.id = pa_1.circle_id)
+                                            ->  Nested Loop  (cost=0.85..8.93 rows=2 width=48) (never executed)
+                                                  ->  Index Only Scan using post_audiences_pkey on post_audiences pa_1  (cost=0.43..4.45 rows=1 width=16) (never executed)
+                                                        Index Cond: (post_id = p.id)
+                                                        Heap Fetches: 0
+                                                  ->  Index Only Scan using circle_members_pkey on circle_members cm_1  (cost=0.42..4.46 rows=2 width=32) (never executed)
+                                                        Index Cond: (circle_id = pa_1.circle_id)
+                                                        Filter: (user_id <> p.author_id)
+                                                        Heap Fetches: 0
+                                            ->  Index Scan using circles_pkey on circles c_1  (cost=0.42..0.47 rows=1 width=16) (never executed)
+                                                  Index Cond: (id = cm_1.circle_id)
+                                                  Filter: (deleted_at IS NULL)
+                    ->  Index Only Scan using post_views_pkey on post_views pv  (cost=0.42..4.54 rows=7 width=16) (never executed)
+                          Index Cond: (post_id = p.id)
+                          Heap Fetches: 0
+        SubPlan 5
+          ->  Aggregate  (cost=17.39..17.40 rows=1 width=32) (actual time=0.005..0.005 rows=1 loops=20)
+                ->  Sort  (cost=12.90..12.91 rows=1 width=26) (actual time=0.004..0.004 rows=0 loops=20)
+                      Sort Key: c_2.name, c_2.id
+                      Sort Method: quicksort  Memory: 25kB
+                      ->  Result  (cost=0.85..12.89 rows=1 width=26) (actual time=0.000..0.000 rows=0 loops=20)
+                            One-Time Filter: (p.author_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid)
+                            ->  Nested Loop  (cost=0.85..12.89 rows=1 width=26) (never executed)
+                                  ->  Index Only Scan using post_audiences_pkey on post_audiences pa_2  (cost=0.43..4.45 rows=1 width=16) (never executed)
+                                        Index Cond: (post_id = p.id)
+                                        Heap Fetches: 0
+                                  ->  Index Scan using circles_pkey on circles c_2  (cost=0.42..8.44 rows=1 width=26) (never executed)
+                                        Index Cond: (id = pa_2.circle_id)
+                                        Filter: (deleted_at IS NULL)
+                SubPlan 4
+                  ->  Aggregate  (cost=4.46..4.47 rows=1 width=8) (never executed)
+                        ->  Index Only Scan using circle_members_pkey on circle_members cm2  (cost=0.42..4.46 rows=2 width=0) (never executed)
+                              Index Cond: (circle_id = c_2.id)
+                              Heap Fetches: 0
+  SubPlan 1
+    ->  Aggregate  (cost=8.46..8.47 rows=1 width=32) (actual time=0.022..0.022 rows=1 loops=20)
+          Buffers: shared hit=62 read=24 written=20
+          ->  Index Scan using media_items_post_id_position_key on media_items m  (cost=0.43..8.45 rows=1 width=38) (actual time=0.012..0.013 rows=1 loops=20)
+                Index Cond: (post_id = p.id)
+                Filter: ((upload_status = 'ready'::public.upload_status) OR (p.author_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid))
+                Buffers: shared hit=62 read=24 written=20
+  SubPlan 2
+    ->  Index Only Scan using reactions_pkey on reactions r_1  (cost=0.29..4.30 rows=1 width=0) (actual time=0.004..0.004 rows=0 loops=20)
+          Index Cond: ((post_id = p.id) AND (user_id = 'f88071d6-5aaf-7ca8-3011-f9bb438bd21e'::uuid))
+          Heap Fetches: 0
+          Buffers: shared hit=40 read=1 written=1
+psql:tests/perf/bench.sql:69: NOTICE:  duration: 3.329 ms  plan:
+Query Text: select count(*) from public.get_feed(perf.id('s', 1), '2024-04-14 18:16:12.400342+00', '4be6a47e-b64f-2f7f-eb43-b7c01c16328c', 20);
+Aggregate  (cost=12.75..12.76 rows=1 width=8) (actual time=3.325..3.326 rows=1 loops=1)
+  Buffers: shared hit=383 read=28 written=24
+  ->  Function Scan on get_feed  (cost=0.25..10.25 rows=1000 width=0) (actual time=3.318..3.321 rows=20 loops=1)
+        Buffers: shared hit=383 read=28 written=24
+ count 
+-------
+    20
+
+---- author, first page
+psql:tests/perf/bench.sql:71: NOTICE:  duration: 0.034 ms  plan:
+Query Text:  select md5(p || n)::uuid 
+Query Parameters: $1 = 'u', $2 = '1'
+Result  (cost=0.00..0.03 rows=1 width=16) (actual time=0.033..0.033 rows=1 loops=1)
+psql:tests/perf/bench.sql:71: NOTICE:  duration: 0.006 ms  plan:
+Query Text: select set_config('request.jwt.claim.sub', perf.id('u', 1)::text, false) 
+Result  (cost=0.00..0.01 rows=1 width=32) (actual time=0.004..0.004 rows=1 loops=1)
+psql:tests/perf/bench.sql:72: NOTICE:  duration: 0.008 ms  plan:
+Query Text:  select md5(p || n)::uuid 
+Query Parameters: $1 = 's', $2 = '1'
+Result  (cost=0.00..0.03 rows=1 width=16) (actual time=0.007..0.007 rows=1 loops=1)
+psql:tests/perf/bench.sql:72: NOTICE:  duration: 0.025 ms  plan:
+Query Text: v_uid is null or not exists (
+       select 1 from public.space_members sm join public.spaces s on s.id = sm.space_id and s.deleted_at is null
+       where sm.space_id = p_space and sm.user_id = v_uid)
+Result  (cost=12.76..12.77 rows=1 width=1) (actual time=0.018..0.018 rows=1 loops=1)
+  Buffers: shared hit=7
+  InitPlan 1 (returns $0)
+    ->  Nested Loop  (cost=0.71..12.76 rows=1 width=0) (actual time=0.017..0.017 rows=1 loops=1)
+          Buffers: shared hit=7
+          ->  Index Only Scan using space_members_pkey on space_members sm  (cost=0.42..4.44 rows=1 width=16) (actual time=0.009..0.009 rows=1 loops=1)
+                Index Cond: ((space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid) AND (user_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid))
+                Heap Fetches: 0
+                Buffers: shared hit=4
+          ->  Index Scan using spaces_pkey on spaces s  (cost=0.29..8.31 rows=1 width=16) (actual time=0.007..0.007 rows=1 loops=1)
+                Index Cond: (id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                Filter: (deleted_at IS NULL)
+                Buffers: shared hit=3
+psql:tests/perf/bench.sql:72: NOTICE:  duration: 3.432 ms  plan:
+Query Text: with circ as (
+    select cm.circle_id
+    from public.circle_members cm join public.circles c on c.id = cm.circle_id
+    where cm.user_id = v_uid and c.space_id = p_space and c.deleted_at is null
+  ), cand as (
+    select x.post_id as pid, x.feed_at as ts
+    from circ cross join lateral (
+      select pa.post_id, pa.feed_at from public.post_audiences pa
+      where pa.circle_id = circ.circle_id and pa.feed_at is not null
+        and (pa.feed_at, pa.post_id) < (v_ts, v_id)
+      order by pa.feed_at desc, pa.post_id desc
+      limit v_lim) x
+    union
+    select mine.id, mine.published_at from (
+      select p.id, p.published_at from public.posts p
+      where p.author_id = v_uid and p.space_id = p_space and p.status = 'published' and p.deleted_at is null
+        and (p.published_at, p.id) < (v_ts, v_id)
+      order by p.published_at desc, p.id desc
+      limit v_lim) mine
+  ), page as (
+    select pid, ts from cand order by ts desc, pid desc limit v_lim
+  )
+  select p.id, p.author_id, pr.display_name, p.caption, p.published_at,
+         coalesce((select jsonb_agg(jsonb_build_object(
+                            'media_id', m.id, 'kind', m.kind, 'width', m.width, 'height', m.height,
+                            'duration_ms', m.duration_ms, 'status', m.upload_status) order by m.position)
+                   from public.media_items m
+                   where m.post_id = p.id and (m.upload_status = 'ready' or p.author_id = v_uid)), '[]'::jsonb),
+         p.reaction_count,
+         exists (select 1 from public.reactions r where r.post_id = p.id and r.user_id = v_uid),
+         p.comment_count,
+         case when p.author_id = v_uid then aud.audience end,
+         case when p.author_id = v_uid then aud.seen end,
+         case when p.author_id = v_uid then aud.reach end
+  from page
+  join public.posts p     on p.id = page.pid and p.deleted_at is null and p.status = 'published'
+  join public.profiles pr on pr.id = p.author_id
+  left join lateral (
+    select (select jsonb_agg(jsonb_build_object(
+                     'circle_id', c.id, 'name', c.name,
+                     'member_count', (select count(*) from public.circle_members cm2 where cm2.circle_id = c.id))
+                   order by c.name, c.id)
+            from public.post_audiences pa join public.circles c on c.id = pa.circle_id and c.deleted_at is null
+            where pa.post_id = p.id and p.author_id = v_uid) as audience,
+           r.seen, r.reach
+    from (select count(*)::integer as reach, count(pv.user_id)::integer as seen
+          from (select distinct cm.user_id
+                from public.post_audiences pa
+                join public.circles c on c.id = pa.circle_id and c.deleted_at is null
+                join public.circle_members cm on cm.circle_id = pa.circle_id
+                where pa.post_id = p.id and cm.user_id <> p.author_id
+                  and p.author_id = v_uid) u                   -- one-time filter: skipped for non-authors
+          left join public.post_views pv on pv.post_id = p.id and pv.user_id = u.user_id) r
+  ) aud on true
+  order by page.ts desc, page.pid desc
+Nested Loop Left Join  (cost=52.02..1109.20 rows=20 width=167) (actual time=0.493..3.412 rows=20 loops=1)
+  Buffers: shared hit=2635 read=54 written=50
+  ->  Nested Loop  (cost=37.51..214.81 rows=20 width=94) (actual time=0.168..0.877 rows=20 loops=1)
+        Buffers: shared hit=178 read=3 written=3
+        ->  Nested Loop  (cost=37.09..205.82 rows=20 width=83) (actual time=0.163..0.812 rows=20 loops=1)
+              Buffers: shared hit=98 read=3 written=3
+              ->  Limit  (cost=36.67..36.72 rows=20 width=24) (actual time=0.154..0.364 rows=20 loops=1)
+                    Buffers: shared hit=19 read=2 written=2
+                    ->  Sort  (cost=36.67..36.74 rows=30 width=24) (actual time=0.154..0.361 rows=20 loops=1)
+                          Sort Key: pa.feed_at DESC, pa.post_id DESC
+                          Sort Method: quicksort  Memory: 26kB
+                          Buffers: shared hit=19 read=2 written=2
+                          ->  HashAggregate  (cost=35.63..35.93 rows=30 width=24) (actual time=0.139..0.348 rows=27 loops=1)
+                                Group Key: pa.post_id, pa.feed_at
+                                Batches: 1  Memory Usage: 24kB
+                                Buffers: shared hit=19 read=2 written=2
+                                ->  Append  (cost=9.31..35.48 rows=30 width=24) (actual time=0.077..0.124 rows=40 loops=1)
+                                      Buffers: shared hit=19 read=2 written=2
+                                      ->  Nested Loop  (cost=9.31..33.25 rows=10 width=24) (actual time=0.077..0.094 rows=20 loops=1)
+                                            Buffers: shared hit=12 read=2 written=2
+                                            ->  Nested Loop  (cost=8.88..28.52 rows=1 width=16) (actual time=0.060..0.069 rows=1 loops=1)
+                                                  Join Filter: (cm.circle_id = c.id)
+                                                  Rows Removed by Join Filter: 2
+                                                  Buffers: shared hit=8 read=2 written=2
+                                                  ->  Bitmap Heap Scan on circles c  (cost=4.44..16.13 rows=3 width=16) (actual time=0.016..0.022 rows=3 loops=1)
+                                                        Recheck Cond: (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                                                        Filter: (deleted_at IS NULL)
+                                                        Heap Blocks: exact=3
+                                                        Buffers: shared hit=6
+                                                        ->  Bitmap Index Scan on circles_space_id_idx  (cost=0.00..4.44 rows=3 width=0) (actual time=0.011..0.012 rows=3 loops=1)
+                                                              Index Cond: (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                                                              Buffers: shared hit=3
+                                                  ->  Materialize  (cost=4.44..12.30 rows=2 width=16) (actual time=0.014..0.014 rows=1 loops=3)
+                                                        Buffers: shared hit=2 read=2 written=2
+                                                        ->  Bitmap Heap Scan on circle_members cm  (cost=4.44..12.29 rows=2 width=16) (actual time=0.039..0.040 rows=1 loops=1)
+                                                              Recheck Cond: (user_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid)
+                                                              Heap Blocks: exact=1
+                                                              Buffers: shared hit=2 read=2 written=2
+                                                              ->  Bitmap Index Scan on circle_members_user_id_idx  (cost=0.00..4.44 rows=2 width=0) (actual time=0.037..0.037 rows=1 loops=1)
+                                                                    Index Cond: (user_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid)
+                                                                    Buffers: shared hit=1 read=2 written=2
+                                            ->  Limit  (cost=0.43..4.63 rows=10 width=24) (actual time=0.015..0.021 rows=20 loops=1)
+                                                  Buffers: shared hit=4
+                                                  ->  Index Only Scan using post_audiences_feed_idx on post_audiences pa  (cost=0.43..4.63 rows=10 width=24) (actual time=0.015..0.018 rows=20 loops=1)
+                                                        Index Cond: ((circle_id = cm.circle_id) AND (ROW(feed_at, post_id) < ROW('infinity'::timestamp with time zone, '00000000-0000-0000-0000-000000000000'::uuid)))
+                                                        Heap Fetches: 0
+                                                        Buffers: shared hit=4
+                                      ->  Limit  (cost=0.42..2.08 rows=20 width=24) (actual time=0.018..0.026 rows=20 loops=1)
+                                            Buffers: shared hit=7
+                                            ->  Index Only Scan using posts_author_feed_idx on posts p_1  (cost=0.42..38.86 rows=464 width=24) (actual time=0.018..0.023 rows=20 loops=1)
+                                                  Index Cond: ((author_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid) AND (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid) AND (ROW(published_at, id) < ROW('infinity'::timestamp with time zone, '00000000-0000-0000-0000-000000000000'::uuid)))
+                                                  Heap Fetches: 3
+                                                  Buffers: shared hit=7
+              ->  Index Scan using posts_pkey on posts p  (cost=0.42..8.45 rows=1 width=59) (actual time=0.022..0.022 rows=1 loops=20)
+                    Index Cond: (id = pa.post_id)
+                    Filter: ((deleted_at IS NULL) AND (status = 'published'::public.post_status))
+                    Buffers: shared hit=79 read=1 written=1
+        ->  Index Scan using profiles_pkey on profiles pr  (cost=0.42..0.45 rows=1 width=27) (actual time=0.003..0.003 rows=1 loops=20)
+              Index Cond: (id = p.author_id)
+              Buffers: shared hit=80
+  ->  Subquery Scan on r  (cost=14.50..31.93 rows=1 width=40) (actual time=0.110..0.110 rows=1 loops=20)
+        Buffers: shared hit=2372 read=49 written=45
+        ->  Aggregate  (cost=14.50..14.52 rows=1 width=8) (actual time=0.091..0.091 rows=1 loops=20)
+              Buffers: shared hit=2156 read=49 written=45
+              ->  Merge Left Join  (cost=10.33..14.49 rows=2 width=16) (actual time=0.080..0.089 rows=24 loops=20)
+                    Merge Cond: (cm_1.user_id = pv.user_id)
+                    Buffers: shared hit=2156 read=49 written=45
+                    ->  Unique  (cost=9.91..9.92 rows=2 width=16) (actual time=0.070..0.077 rows=24 loops=20)
+                          Buffers: shared hit=2096 read=48 written=44
+                          ->  Sort  (cost=9.91..9.92 rows=2 width=16) (actual time=0.070..0.073 rows=25 loops=20)
+                                Sort Key: cm_1.user_id
+                                Sort Method: quicksort  Memory: 25kB
+                                Buffers: shared hit=2096 read=48 written=44
+                                ->  Result  (cost=1.27..9.90 rows=2 width=16) (actual time=0.030..0.066 rows=25 loops=20)
+                                      One-Time Filter: (p.author_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid)
+                                      Buffers: shared hit=2096 read=48 written=44
+                                      ->  Nested Loop  (cost=1.27..9.90 rows=2 width=16) (actual time=0.030..0.064 rows=25 loops=20)
+                                            Join Filter: (c_1.id = pa_1.circle_id)
+                                            Buffers: shared hit=2096 read=48 written=44
+                                            ->  Nested Loop  (cost=0.85..8.93 rows=2 width=48) (actual time=0.026..0.031 rows=25 loops=20)
+                                                  Buffers: shared hit=84 read=44 written=40
+                                                  ->  Index Only Scan using post_audiences_pkey on post_audiences pa_1  (cost=0.43..4.45 rows=1 width=16) (actual time=0.022..0.022 rows=1 loops=20)
+                                                        Index Cond: (post_id = p.id)
+                                                        Heap Fetches: 0
+                                                        Buffers: shared hit=22 read=39 written=38
+                                                  ->  Index Only Scan using circle_members_pkey on circle_members cm_1  (cost=0.42..4.46 rows=2 width=32) (actual time=0.004..0.006 rows=23 loops=22)
+                                                        Index Cond: (circle_id = pa_1.circle_id)
+                                                        Filter: (user_id <> p.author_id)
+                                                        Rows Removed by Filter: 1
+                                                        Heap Fetches: 0
+                                                        Buffers: shared hit=62 read=5 written=2
+                                            ->  Index Scan using circles_pkey on circles c_1  (cost=0.42..0.47 rows=1 width=16) (actual time=0.001..0.001 rows=1 loops=504)
+                                                  Index Cond: (id = cm_1.circle_id)
+                                                  Filter: (deleted_at IS NULL)
+                                                  Buffers: shared hit=2012 read=4 written=4
+                    ->  Index Only Scan using post_views_pkey on post_views pv  (cost=0.42..4.54 rows=7 width=16) (actual time=0.009..0.009 rows=4 loops=20)
+                          Index Cond: (post_id = p.id)
+                          Heap Fetches: 0
+                          Buffers: shared hit=60 read=1 written=1
+        SubPlan 5
+          ->  Aggregate  (cost=17.39..17.40 rows=1 width=32) (actual time=0.017..0.018 rows=1 loops=20)
+                Buffers: shared hit=216
+                ->  Sort  (cost=12.90..12.91 rows=1 width=26) (actual time=0.006..0.006 rows=1 loops=20)
+                      Sort Key: c_2.name, c_2.id
+                      Sort Method: quicksort  Memory: 25kB
+                      Buffers: shared hit=149
+                      ->  Result  (cost=0.85..12.89 rows=1 width=26) (actual time=0.004..0.005 rows=1 loops=20)
+                            One-Time Filter: (p.author_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid)
+                            Buffers: shared hit=149
+                            ->  Nested Loop  (cost=0.85..12.89 rows=1 width=26) (actual time=0.004..0.004 rows=1 loops=20)
+                                  Buffers: shared hit=149
+                                  ->  Index Only Scan using post_audiences_pkey on post_audiences pa_2  (cost=0.43..4.45 rows=1 width=16) (actual time=0.002..0.002 rows=1 loops=20)
+                                        Index Cond: (post_id = p.id)
+                                        Heap Fetches: 0
+                                        Buffers: shared hit=61
+                                  ->  Index Scan using circles_pkey on circles c_2  (cost=0.42..8.44 rows=1 width=26) (actual time=0.002..0.002 rows=1 loops=22)
+                                        Index Cond: (id = pa_2.circle_id)
+                                        Filter: (deleted_at IS NULL)
+                                        Buffers: shared hit=88
+                SubPlan 4
+                  ->  Aggregate  (cost=4.46..4.47 rows=1 width=8) (actual time=0.005..0.005 rows=1 loops=22)
+                        Buffers: shared hit=67
+                        ->  Index Only Scan using circle_members_pkey on circle_members cm2  (cost=0.42..4.46 rows=2 width=0) (actual time=0.002..0.003 rows=24 loops=22)
+                              Index Cond: (circle_id = c_2.id)
+                              Heap Fetches: 0
+                              Buffers: shared hit=67
+  SubPlan 1
+    ->  Aggregate  (cost=8.46..8.47 rows=1 width=32) (actual time=0.014..0.014 rows=1 loops=20)
+          Buffers: shared hit=83 read=2 written=2
+          ->  Index Scan using media_items_post_id_position_key on media_items m  (cost=0.43..8.45 rows=1 width=38) (actual time=0.006..0.007 rows=1 loops=20)
+                Index Cond: (post_id = p.id)
+                Filter: ((upload_status = 'ready'::public.upload_status) OR (p.author_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid))
+                Buffers: shared hit=83 read=2 written=2
+  SubPlan 3
+    ->  Index Scan using reactions_user_id_idx on reactions r_1  (cost=0.29..7.30 rows=1 width=16) (actual time=0.016..0.017 rows=0 loops=1)
+          Index Cond: (user_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid)
+          Buffers: shared hit=2
+psql:tests/perf/bench.sql:72: NOTICE:  duration: 5.747 ms  plan:
+Query Text: select count(*) from public.get_feed(perf.id('s', 1));
+Aggregate  (cost=12.75..12.76 rows=1 width=8) (actual time=5.744..5.744 rows=1 loops=1)
+  Buffers: shared hit=2742 read=54 written=50
+  ->  Function Scan on get_feed  (cost=0.25..10.25 rows=1000 width=0) (actual time=5.735..5.738 rows=20 loops=1)
+        Buffers: shared hit=2742 read=54 written=50
+ count 
+-------
+    20
+
+---- author, deep page (cursor at own post #19,000)
+psql:tests/perf/bench.sql:74: NOTICE:  duration: 0.017 ms  plan:
+Query Text:  select md5(p || n)::uuid 
+Query Parameters: $1 = 's', $2 = '1'
+Result  (cost=0.00..0.03 rows=1 width=16) (actual time=0.015..0.015 rows=1 loops=1)
+psql:tests/perf/bench.sql:74: NOTICE:  duration: 0.023 ms  plan:
+Query Text: v_uid is null or not exists (
+       select 1 from public.space_members sm join public.spaces s on s.id = sm.space_id and s.deleted_at is null
+       where sm.space_id = p_space and sm.user_id = v_uid)
+Result  (cost=12.76..12.77 rows=1 width=1) (actual time=0.021..0.022 rows=1 loops=1)
+  Buffers: shared hit=7
+  InitPlan 1 (returns $0)
+    ->  Nested Loop  (cost=0.71..12.76 rows=1 width=0) (actual time=0.020..0.020 rows=1 loops=1)
+          Buffers: shared hit=7
+          ->  Index Only Scan using space_members_pkey on space_members sm  (cost=0.42..4.44 rows=1 width=16) (actual time=0.011..0.011 rows=1 loops=1)
+                Index Cond: ((space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid) AND (user_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid))
+                Heap Fetches: 0
+                Buffers: shared hit=4
+          ->  Index Scan using spaces_pkey on spaces s  (cost=0.29..8.31 rows=1 width=16) (actual time=0.008..0.008 rows=1 loops=1)
+                Index Cond: (id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                Filter: (deleted_at IS NULL)
+                Buffers: shared hit=3
+psql:tests/perf/bench.sql:74: NOTICE:  duration: 3.187 ms  plan:
+Query Text: with circ as (
+    select cm.circle_id
+    from public.circle_members cm join public.circles c on c.id = cm.circle_id
+    where cm.user_id = v_uid and c.space_id = p_space and c.deleted_at is null
+  ), cand as (
+    select x.post_id as pid, x.feed_at as ts
+    from circ cross join lateral (
+      select pa.post_id, pa.feed_at from public.post_audiences pa
+      where pa.circle_id = circ.circle_id and pa.feed_at is not null
+        and (pa.feed_at, pa.post_id) < (v_ts, v_id)
+      order by pa.feed_at desc, pa.post_id desc
+      limit v_lim) x
+    union
+    select mine.id, mine.published_at from (
+      select p.id, p.published_at from public.posts p
+      where p.author_id = v_uid and p.space_id = p_space and p.status = 'published' and p.deleted_at is null
+        and (p.published_at, p.id) < (v_ts, v_id)
+      order by p.published_at desc, p.id desc
+      limit v_lim) mine
+  ), page as (
+    select pid, ts from cand order by ts desc, pid desc limit v_lim
+  )
+  select p.id, p.author_id, pr.display_name, p.caption, p.published_at,
+         coalesce((select jsonb_agg(jsonb_build_object(
+                            'media_id', m.id, 'kind', m.kind, 'width', m.width, 'height', m.height,
+                            'duration_ms', m.duration_ms, 'status', m.upload_status) order by m.position)
+                   from public.media_items m
+                   where m.post_id = p.id and (m.upload_status = 'ready' or p.author_id = v_uid)), '[]'::jsonb),
+         p.reaction_count,
+         exists (select 1 from public.reactions r where r.post_id = p.id and r.user_id = v_uid),
+         p.comment_count,
+         case when p.author_id = v_uid then aud.audience end,
+         case when p.author_id = v_uid then aud.seen end,
+         case when p.author_id = v_uid then aud.reach end
+  from page
+  join public.posts p     on p.id = page.pid and p.deleted_at is null and p.status = 'published'
+  join public.profiles pr on pr.id = p.author_id
+  left join lateral (
+    select (select jsonb_agg(jsonb_build_object(
+                     'circle_id', c.id, 'name', c.name,
+                     'member_count', (select count(*) from public.circle_members cm2 where cm2.circle_id = c.id))
+                   order by c.name, c.id)
+            from public.post_audiences pa join public.circles c on c.id = pa.circle_id and c.deleted_at is null
+            where pa.post_id = p.id and p.author_id = v_uid) as audience,
+           r.seen, r.reach
+    from (select count(*)::integer as reach, count(pv.user_id)::integer as seen
+          from (select distinct cm.user_id
+                from public.post_audiences pa
+                join public.circles c on c.id = pa.circle_id and c.deleted_at is null
+                join public.circle_members cm on cm.circle_id = pa.circle_id
+                where pa.post_id = p.id and cm.user_id <> p.author_id
+                  and p.author_id = v_uid) u                   -- one-time filter: skipped for non-authors
+          left join public.post_views pv on pv.post_id = p.id and pv.user_id = u.user_id) r
+  ) aud on true
+  order by page.ts desc, page.pid desc
+Nested Loop Left Join  (cost=57.80..954.10 rows=17 width=167) (actual time=0.513..3.167 rows=20 loops=1)
+  Buffers: shared hit=2552 read=57 written=50
+  ->  Nested Loop  (cost=43.30..193.87 rows=17 width=94) (actual time=0.127..0.407 rows=20 loops=1)
+        Buffers: shared hit=176 read=4 written=3
+        ->  Nested Loop  (cost=42.88..186.23 rows=17 width=83) (actual time=0.122..0.356 rows=20 loops=1)
+              Buffers: shared hit=96 read=4 written=3
+              ->  Limit  (cost=42.45..42.49 rows=17 width=24) (actual time=0.112..0.134 rows=20 loops=1)
+                    Buffers: shared hit=20
+                    ->  Sort  (cost=42.45..42.49 rows=17 width=24) (actual time=0.111..0.122 rows=20 loops=1)
+                          Sort Key: pa.feed_at DESC, pa.post_id DESC
+                          Sort Method: quicksort  Memory: 26kB
+                          Buffers: shared hit=20
+                          ->  HashAggregate  (cost=41.93..42.10 rows=17 width=24) (actual time=0.098..0.108 rows=28 loops=1)
+                                Group Key: pa.post_id, pa.feed_at
+                                Batches: 1  Memory Usage: 24kB
+                                Buffers: shared hit=20
+                                ->  Append  (cost=9.31..41.85 rows=17 width=24) (actual time=0.044..0.084 rows=40 loops=1)
+                                      Buffers: shared hit=20
+                                      ->  Nested Loop  (cost=9.31..32.98 rows=1 width=24) (actual time=0.044..0.059 rows=20 loops=1)
+                                            Buffers: shared hit=14
+                                            ->  Nested Loop  (cost=8.88..28.52 rows=1 width=16) (actual time=0.029..0.037 rows=1 loops=1)
+                                                  Join Filter: (cm.circle_id = c.id)
+                                                  Rows Removed by Join Filter: 2
+                                                  Buffers: shared hit=10
+                                                  ->  Bitmap Heap Scan on circles c  (cost=4.44..16.13 rows=3 width=16) (actual time=0.017..0.021 rows=3 loops=1)
+                                                        Recheck Cond: (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                                                        Filter: (deleted_at IS NULL)
+                                                        Heap Blocks: exact=3
+                                                        Buffers: shared hit=6
+                                                        ->  Bitmap Index Scan on circles_space_id_idx  (cost=0.00..4.44 rows=3 width=0) (actual time=0.012..0.012 rows=3 loops=1)
+                                                              Index Cond: (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid)
+                                                              Buffers: shared hit=3
+                                                  ->  Materialize  (cost=4.44..12.30 rows=2 width=16) (actual time=0.004..0.004 rows=1 loops=3)
+                                                        Buffers: shared hit=4
+                                                        ->  Bitmap Heap Scan on circle_members cm  (cost=4.44..12.29 rows=2 width=16) (actual time=0.009..0.010 rows=1 loops=1)
+                                                              Recheck Cond: (user_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid)
+                                                              Heap Blocks: exact=1
+                                                              Buffers: shared hit=4
+                                                              ->  Bitmap Index Scan on circle_members_user_id_idx  (cost=0.00..4.44 rows=2 width=0) (actual time=0.007..0.008 rows=1 loops=1)
+                                                                    Index Cond: (user_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid)
+                                                                    Buffers: shared hit=3
+                                            ->  Limit  (cost=0.43..4.45 rows=1 width=24) (actual time=0.014..0.019 rows=20 loops=1)
+                                                  Buffers: shared hit=4
+                                                  ->  Index Only Scan using post_audiences_feed_idx on post_audiences pa  (cost=0.43..4.45 rows=1 width=24) (actual time=0.013..0.016 rows=20 loops=1)
+                                                        Index Cond: ((circle_id = cm.circle_id) AND (ROW(feed_at, post_id) < ROW('2023-11-23 20:09:35.400342+00'::timestamp with time zone, '62b60bc2-208a-05e7-3919-008eaece3fec'::uuid)))
+                                                        Heap Fetches: 0
+                                                        Buffers: shared hit=4
+                                      ->  Limit  (cost=0.42..8.79 rows=16 width=24) (actual time=0.012..0.020 rows=20 loops=1)
+                                            Buffers: shared hit=6
+                                            ->  Index Only Scan using posts_author_feed_idx on posts p_1  (cost=0.42..8.79 rows=16 width=24) (actual time=0.012..0.017 rows=20 loops=1)
+                                                  Index Cond: ((author_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid) AND (space_id = '8ddf8780-39b7-0767-c4a5-bcf4f0c4f65e'::uuid) AND (ROW(published_at, id) < ROW('2023-11-23 20:09:35.400342+00'::timestamp with time zone, '62b60bc2-208a-05e7-3919-008eaece3fec'::uuid)))
+                                                  Heap Fetches: 2
+                                                  Buffers: shared hit=6
+              ->  Index Scan using posts_pkey on posts p  (cost=0.42..8.45 rows=1 width=59) (actual time=0.010..0.010 rows=1 loops=20)
+                    Index Cond: (id = pa.post_id)
+                    Filter: ((deleted_at IS NULL) AND (status = 'published'::public.post_status))
+                    Buffers: shared hit=76 read=4 written=3
+        ->  Index Scan using profiles_pkey on profiles pr  (cost=0.42..0.45 rows=1 width=27) (actual time=0.002..0.002 rows=1 loops=20)
+              Index Cond: (id = p.author_id)
+              Buffers: shared hit=80
+  ->  Subquery Scan on r  (cost=14.50..31.93 rows=1 width=40) (actual time=0.112..0.112 rows=1 loops=20)
+        Buffers: shared hit=2311 read=30 written=27
+        ->  Aggregate  (cost=14.50..14.52 rows=1 width=8) (actual time=0.090..0.090 rows=1 loops=20)
+              Buffers: shared hit=2095 read=30 written=27
+              ->  Merge Left Join  (cost=10.33..14.49 rows=2 width=16) (actual time=0.078..0.088 rows=24 loops=20)
+                    Merge Cond: (cm_1.user_id = pv.user_id)
+                    Buffers: shared hit=2095 read=30 written=27
+                    ->  Unique  (cost=9.91..9.92 rows=2 width=16) (actual time=0.072..0.079 rows=24 loops=20)
+                          Buffers: shared hit=2034 read=30 written=27
+                          ->  Sort  (cost=9.91..9.92 rows=2 width=16) (actual time=0.072..0.073 rows=24 loops=20)
+                                Sort Key: cm_1.user_id
+                                Sort Method: quicksort  Memory: 25kB
+                                Buffers: shared hit=2034 read=30 written=27
+                                ->  Result  (cost=1.27..9.90 rows=2 width=16) (actual time=0.026..0.068 rows=24 loops=20)
+                                      One-Time Filter: (p.author_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid)
+                                      Buffers: shared hit=2034 read=30 written=27
+                                      ->  Nested Loop  (cost=1.27..9.90 rows=2 width=16) (actual time=0.026..0.066 rows=24 loops=20)
+                                            Join Filter: (c_1.id = pa_1.circle_id)
+                                            Buffers: shared hit=2034 read=30 written=27
+                                            ->  Nested Loop  (cost=0.85..8.93 rows=2 width=48) (actual time=0.017..0.022 rows=24 loops=20)
+                                                  Buffers: shared hit=98 read=30 written=27
+                                                  ->  Index Only Scan using post_audiences_pkey on post_audiences pa_1  (cost=0.43..4.45 rows=1 width=16) (actual time=0.014..0.014 rows=1 loops=20)
+                                                        Index Cond: (post_id = p.id)
+                                                        Heap Fetches: 0
+                                                        Buffers: shared hit=31 read=30 written=27
+                                                  ->  Index Only Scan using circle_members_pkey on circle_members cm_1  (cost=0.42..4.46 rows=2 width=32) (actual time=0.003..0.005 rows=22 loops=22)
+                                                        Index Cond: (circle_id = pa_1.circle_id)
+                                                        Filter: (user_id <> p.author_id)
+                                                        Rows Removed by Filter: 1
+                                                        Heap Fetches: 0
+                                                        Buffers: shared hit=67
+                                            ->  Index Scan using circles_pkey on circles c_1  (cost=0.42..0.47 rows=1 width=16) (actual time=0.001..0.001 rows=1 loops=484)
+                                                  Index Cond: (id = cm_1.circle_id)
+                                                  Filter: (deleted_at IS NULL)
+                                                  Buffers: shared hit=1936
+                    ->  Index Only Scan using post_views_pkey on post_views pv  (cost=0.42..4.54 rows=7 width=16) (actual time=0.005..0.005 rows=4 loops=20)
+                          Index Cond: (post_id = p.id)
+                          Heap Fetches: 0
+                          Buffers: shared hit=61
+        SubPlan 5
+          ->  Aggregate  (cost=17.39..17.40 rows=1 width=32) (actual time=0.020..0.020 rows=1 loops=20)
+                Buffers: shared hit=216
+                ->  Sort  (cost=12.90..12.91 rows=1 width=26) (actual time=0.007..0.007 rows=1 loops=20)
+                      Sort Key: c_2.name, c_2.id
+                      Sort Method: quicksort  Memory: 25kB
+                      Buffers: shared hit=149
+                      ->  Result  (cost=0.85..12.89 rows=1 width=26) (actual time=0.004..0.005 rows=1 loops=20)
+                            One-Time Filter: (p.author_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid)
+                            Buffers: shared hit=149
+                            ->  Nested Loop  (cost=0.85..12.89 rows=1 width=26) (actual time=0.004..0.005 rows=1 loops=20)
+                                  Buffers: shared hit=149
+                                  ->  Index Only Scan using post_audiences_pkey on post_audiences pa_2  (cost=0.43..4.45 rows=1 width=16) (actual time=0.002..0.002 rows=1 loops=20)
+                                        Index Cond: (post_id = p.id)
+                                        Heap Fetches: 0
+                                        Buffers: shared hit=61
+                                  ->  Index Scan using circles_pkey on circles c_2  (cost=0.42..8.44 rows=1 width=26) (actual time=0.001..0.001 rows=1 loops=22)
+                                        Index Cond: (id = pa_2.circle_id)
+                                        Filter: (deleted_at IS NULL)
+                                        Buffers: shared hit=88
+                SubPlan 4
+                  ->  Aggregate  (cost=4.46..4.47 rows=1 width=8) (actual time=0.005..0.005 rows=1 loops=22)
+                        Buffers: shared hit=67
+                        ->  Index Only Scan using circle_members_pkey on circle_members cm2  (cost=0.42..4.46 rows=2 width=0) (actual time=0.002..0.004 rows=23 loops=22)
+                              Index Cond: (circle_id = c_2.id)
+                              Heap Fetches: 0
+                              Buffers: shared hit=67
+  SubPlan 1
+    ->  Aggregate  (cost=8.46..8.47 rows=1 width=32) (actual time=0.024..0.024 rows=1 loops=20)
+          Buffers: shared hit=63 read=23 written=20
+          ->  Index Scan using media_items_post_id_position_key on media_items m  (cost=0.43..8.45 rows=1 width=38) (actual time=0.014..0.015 rows=1 loops=20)
+                Index Cond: (post_id = p.id)
+                Filter: ((upload_status = 'ready'::public.upload_status) OR (p.author_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid))
+                Buffers: shared hit=63 read=23 written=20
+  SubPlan 3
+    ->  Index Scan using reactions_user_id_idx on reactions r_1  (cost=0.29..7.30 rows=1 width=16) (actual time=0.005..0.005 rows=0 loops=1)
+          Index Cond: (user_id = 'e4774cdd-a079-3f86-414e-8b9140bb6db4'::uuid)
+          Buffers: shared hit=2
+psql:tests/perf/bench.sql:74: NOTICE:  duration: 5.506 ms  plan:
+Query Text: select count(*) from public.get_feed(perf.id('s', 1), '2023-11-23 20:09:35.400342+00', '62b60bc2-208a-05e7-3919-008eaece3fec', 20);
+Aggregate  (cost=12.75..12.76 rows=1 width=8) (actual time=5.502..5.503 rows=1 loops=1)
+  Buffers: shared hit=2656 read=57 written=50
+  ->  Function Scan on get_feed  (cost=0.25..10.25 rows=1000 width=0) (actual time=5.494..5.496 rows=20 loops=1)
+        Buffers: shared hit=2656 read=57 written=50
+ count 
+-------
+    20
+
+RESET
+SET
+SET
+
+==== Latency: 200 calls each (after 5 warm-up calls), limit 20
+            scenario             | calls | rows_per_page | p50_ms | p95_ms | p99_ms | max_ms 
+---------------------------------+-------+---------------+--------+--------+--------+--------
+ viewer   first page             |   200 |            20 |   0.46 |   0.61 |   0.78 |   0.89
+ viewer   deep page              |   200 |            20 |   0.46 |   0.69 |   0.97 |   2.25
+ author   first page             |   200 |            20 |   1.59 |   1.94 |   2.37 |   2.63
+ author   deep page              |   200 |            20 |   1.57 |   1.84 |   2.85 |   2.95
+ co-parent first page (sees 10%) |   200 |            20 |   0.41 |   0.69 |   0.73 |   0.76
+ co-parent deep page (#1,800)    |   200 |            20 |   0.41 |   0.66 |   0.75 |   0.81
+ small space viewer first page   |   200 |            18 |   0.41 |   0.49 |   0.66 |   0.71
+
+RESET

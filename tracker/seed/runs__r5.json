@@ -1,0 +1,9 @@
+{
+ "suite": "edge",
+ "at": "2026-10-15T00:55:00-04:00",
+ "label": "Day 1 baseline",
+ "passed": 5,
+ "failed": 0,
+ "results": {},
+ "note": "Only passed with type-checking turned off (S8)."
+}

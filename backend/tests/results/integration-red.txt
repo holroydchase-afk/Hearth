@@ -1,0 +1,126 @@
+running 4 tests from ./tests/integration/smoke_test.ts
+harness JSON has the documented shape ... ok (474µs)
+BETA-AUD-3 get_feed over HTTP: each user sees only posts shared with their circles ... FAILED (41ms)
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ...
+  create_post is idempotent on p_client_id ... FAILED (6ms)
+  upload + publish (idempotent) ... FAILED (5ms)
+  BETA-AUD-3 audience member sees it; a user only in another circle sees nothing on any path ... FAILED (3ms)
+  BETA-REPLY-1 toggle_heart ... FAILED (2ms)
+  BETA-REPLY-2 add_comment (idempotent) and get_comments ... FAILED (3ms)
+  BETA-AUD-5 delete_post: author only, gone everywhere, idempotent ... FAILED (3ms)
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... FAILED (due to 6 failed steps) (27ms)
+BETA-JOIN-4 (S10) rate limit survives failed requests on the real PostgREST ... FAILED (2ms)
+
+ ERRORS 
+
+BETA-AUD-3 get_feed over HTTP: each user sees only posts shared with their circles => ./tests/integration/smoke_test.ts:68:6
+error: Error: get_feed as grandma_chen: HTTP 404 {"code":"PGRST202","details":"Searched for the function public.get_feed with parameters p_limit, p_space or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":"Perhaps you meant to call the function public.purge_soft_deleted","message":"Could not find the function public.get_feed(p_limit, p_space) in the schema cache"}
+  if (!cond) throw new Error(msg);
+                   ^
+    at assert (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:12:20)
+    at ok (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:53:3)
+    at feedIds (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:57:3)
+    at async file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:69:16
+
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... create_post is idempotent on p_client_id => ./tests/integration/smoke_test.ts:85:11
+error: Error: create_post: HTTP 404 {"code":"PGRST202","details":"Searched for the function public.create_post with parameters p_caption, p_circle_ids, p_client_id, p_space or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":"Perhaps you meant to call the function public.create_post(p_caption, p_child_ids, p_circle_ids, p_space, p_taken_at)","message":"Could not find the function public.create_post(p_caption, p_circle_ids, p_client_id, p_space) in the schema cache"}
+  if (!cond) throw new Error(msg);
+                   ^
+    at assert (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:12:20)
+    at ok (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:53:3)
+    at file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:87:14
+    at async innerWrapped (ext:cli/40_test.js:300:5)
+    at async exitSanitizer (ext:cli/40_test.js:201:27)
+    at async Object.outerWrapped [as fn] (ext:cli/40_test.js:239:22)
+    at async TestContext.step (ext:cli/40_test.js:855:22)
+    at async file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:85:3
+
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... upload + publish (idempotent) => ./tests/integration/smoke_test.ts:96:11
+error: Error: prepare: HTTP 400 {"code":"22P02","details":null,"hint":null,"message":"invalid input syntax for type uuid: \"\""}
+  if (!cond) throw new Error(msg);
+                   ^
+    at assert (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:12:20)
+    at ok (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:53:3)
+    at file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:98:22
+    at async innerWrapped (ext:cli/40_test.js:300:5)
+    at async exitSanitizer (ext:cli/40_test.js:201:27)
+    at async Object.outerWrapped [as fn] (ext:cli/40_test.js:239:22)
+    at async TestContext.step (ext:cli/40_test.js:855:22)
+    at async file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:96:3
+
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... BETA-AUD-3 audience member sees it; a user only in another circle sees nothing on any path => ./tests/integration/smoke_test.ts:105:11
+error: Error: get_feed as grandma_rivera: HTTP 404 {"code":"PGRST202","details":"Searched for the function public.get_feed with parameters p_limit, p_space or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":"Perhaps you meant to call the function public.purge_soft_deleted","message":"Could not find the function public.get_feed(p_limit, p_space) in the schema cache"}
+  if (!cond) throw new Error(msg);
+                   ^
+    at assert (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:12:20)
+    at ok (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:53:3)
+    at feedIds (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:57:3)
+    at async file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:106:13
+    at async innerWrapped (ext:cli/40_test.js:300:5)
+    at async exitSanitizer (ext:cli/40_test.js:201:27)
+    at async Object.outerWrapped [as fn] (ext:cli/40_test.js:239:22)
+    at async TestContext.step (ext:cli/40_test.js:855:22)
+    at async file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:105:3
+
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... BETA-REPLY-1 toggle_heart => ./tests/integration/smoke_test.ts:124:11
+error: Error: heart: HTTP 404 {"code":"PGRST202","details":"Searched for the function public.toggle_heart with parameter p_post or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":null,"message":"Could not find the function public.toggle_heart(p_post) in the schema cache"}
+  if (!cond) throw new Error(msg);
+                   ^
+    at assert (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:12:20)
+    at ok (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:53:3)
+    at file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:125:18
+    at async innerWrapped (ext:cli/40_test.js:300:5)
+    at async exitSanitizer (ext:cli/40_test.js:201:27)
+    at async Object.outerWrapped [as fn] (ext:cli/40_test.js:239:22)
+    at async TestContext.step (ext:cli/40_test.js:855:22)
+    at async file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:124:3
+
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... BETA-REPLY-2 add_comment (idempotent) and get_comments => ./tests/integration/smoke_test.ts:131:11
+error: Error: comment: HTTP 404 {"code":"PGRST202","details":"Searched for the function public.add_comment with parameters p_body, p_client_id, p_post or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":"Perhaps you meant to call the function public.delete_comment","message":"Could not find the function public.add_comment(p_body, p_client_id, p_post) in the schema cache"}
+  if (!cond) throw new Error(msg);
+                   ^
+    at assert (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:12:20)
+    at ok (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:53:3)
+    at file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:133:16
+    at async innerWrapped (ext:cli/40_test.js:300:5)
+    at async exitSanitizer (ext:cli/40_test.js:201:27)
+    at async Object.outerWrapped [as fn] (ext:cli/40_test.js:239:22)
+    at async TestContext.step (ext:cli/40_test.js:855:22)
+    at async file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:131:3
+
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... BETA-AUD-5 delete_post: author only, gone everywhere, idempotent => ./tests/integration/smoke_test.ts:141:11
+error: Error: expected "42501", got "PGRST202"
+  if (a !== e) throw new Error(`${msg ? msg + ": " : ""}expected ${e}, got ${a}`);
+                     ^
+    at assertEquals (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:16:22)
+    at file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:142:5
+    at async innerWrapped (ext:cli/40_test.js:300:5)
+    at async exitSanitizer (ext:cli/40_test.js:201:27)
+    at async Object.outerWrapped [as fn] (ext:cli/40_test.js:239:22)
+    at async TestContext.step (ext:cli/40_test.js:855:22)
+    at async file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:141:3
+
+BETA-JOIN-4 (S10) rate limit survives failed requests on the real PostgREST => ./tests/integration/smoke_test.ts:151:6
+error: Error: attempt 1: expected [400,"22023"], got [404,"PGRST202"]
+  if (a !== e) throw new Error(`${msg ? msg + ": " : ""}expected ${e}, got ${a}`);
+                     ^
+    at assertEquals (file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:16:22)
+    at file:///home/claude/famapp/backend/tests/integration/smoke_test.ts:156:5
+
+ FAILURES 
+
+BETA-AUD-3 get_feed over HTTP: each user sees only posts shared with their circles => ./tests/integration/smoke_test.ts:68:6
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... create_post is idempotent on p_client_id => ./tests/integration/smoke_test.ts:85:11
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... upload + publish (idempotent) => ./tests/integration/smoke_test.ts:96:11
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... BETA-AUD-3 audience member sees it; a user only in another circle sees nothing on any path => ./tests/integration/smoke_test.ts:105:11
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... BETA-REPLY-1 toggle_heart => ./tests/integration/smoke_test.ts:124:11
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... BETA-REPLY-2 add_comment (idempotent) and get_comments => ./tests/integration/smoke_test.ts:131:11
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... BETA-AUD-5 delete_post: author only, gone everywhere, idempotent => ./tests/integration/smoke_test.ts:141:11
+BETA-JOIN-4 (S10) rate limit survives failed requests on the real PostgREST => ./tests/integration/smoke_test.ts:151:6
+
+FAILED | 1 passed | 3 failed (6 steps) (77ms)
+
+error: Test failed
+
+Stack backtrace:
+   0: <unknown>

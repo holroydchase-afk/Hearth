@@ -1,0 +1,10 @@
+[0m[38;5;245mrunning 3 tests from ./supabase/functions/sign-media/index_test.ts[0m
+upload then view round-trips the data key; URLs are 10-minute SigV4 ... [0m[32mok[0m [0m[38;5;245m(69ms)[0m
+view denied -> 404, no key lookups ... [0m[32mok[0m [0m[38;5;245m(381µs)[0m
+exif not stripped -> 422; no auth -> 401 ... [0m[32mok[0m [0m[38;5;245m(442µs)[0m
+[0m[38;5;245mrunning 2 tests from ./supabase/functions/sign-media/sigv4_test.ts[0m
+matches AWS documented presigned GET example ... [0m[32mok[0m [0m[38;5;245m(2ms)[0m
+uriEncode keeps unreserved, encodes others ... [0m[32mok[0m [0m[38;5;245m(78µs)[0m
+
+[0m[32mok[0m | 5 passed | 0 failed [0m[38;5;245m(147ms)[0m
+

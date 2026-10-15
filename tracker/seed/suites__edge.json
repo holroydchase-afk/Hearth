@@ -1,0 +1,43 @@
+{
+ "name": "Media signing function",
+ "kind": "auto",
+ "how": "cd backend && deno test --allow-env supabase/functions/sign-media/",
+ "order": 3,
+ "cases": [
+  {
+   "id": "EDGE-01",
+   "title": "upload then view round-trips the data key; URLs are 10-minute SigV4",
+   "area": "Media signing",
+   "tickets": [],
+   "where": "backend/supabase/functions/sign-media/"
+  },
+  {
+   "id": "EDGE-02",
+   "title": "view denied -> 404, no key lookups",
+   "area": "Media signing",
+   "tickets": [],
+   "where": "backend/supabase/functions/sign-media/"
+  },
+  {
+   "id": "EDGE-03",
+   "title": "exif not stripped -> 422; no auth -> 401",
+   "area": "Media signing",
+   "tickets": [],
+   "where": "backend/supabase/functions/sign-media/"
+  },
+  {
+   "id": "EDGE-04",
+   "title": "matches AWS documented presigned GET example",
+   "area": "Media signing",
+   "tickets": [],
+   "where": "backend/supabase/functions/sign-media/"
+  },
+  {
+   "id": "EDGE-05",
+   "title": "uriEncode keeps unreserved, encodes others",
+   "area": "Media signing",
+   "tickets": [],
+   "where": "backend/supabase/functions/sign-media/"
+  }
+ ]
+}

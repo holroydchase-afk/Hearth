@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Hearth",
+    "slug": "hearth",
+    "scheme": "hearth",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": { "image": "./assets/splash-icon.png", "resizeMode": "contain", "backgroundColor": "#F5F3F8" },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "family.hearth.app",
+      "associatedDomains": ["applinks:hearth.family"],
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Hearth lets you pick photos to share with your family.",
+        "NSPhotoLibraryAddUsageDescription": "Hearth saves family photos to your phone when you tap Save to my phone.",
+        "NSCameraUsageDescription": "Hearth can take a photo to share with your family."
+      }
+    },
+    "android": {
+      "package": "family.hearth.app",
+      "adaptiveIcon": { "foregroundImage": "./assets/adaptive-icon.png", "backgroundColor": "#F5F3F8" },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [{ "scheme": "https", "host": "hearth.family", "pathPrefix": "/join" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "web": { "favicon": "./assets/favicon.png", "output": "single", "bundler": "metro" },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font",
+      ["expo-image-picker", { "photosPermission": "Hearth lets you pick photos to share with your family." }],
+      ["expo-media-library", { "photosPermission": "Hearth saves family photos to your phone.", "savePhotosPermission": "Hearth saves family photos to your phone.", "isAccessMediaLocationEnabled": false }],
+      "expo-notifications"
+    ],
+    "experiments": { "typedRoutes": false }
+  }
+}

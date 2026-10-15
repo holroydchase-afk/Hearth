@@ -1,0 +1,104 @@
+{
+ "name": "Manual tests (people + real phones)",
+ "kind": "manual",
+ "how": "Run on a real phone, then log the result on this page.",
+ "order": 4,
+ "cases": [
+  {
+   "id": "M-01",
+   "title": "Grandparent finds the newest photo and comments",
+   "area": "Prototype",
+   "steps": "Hand your phone to a grandparent with the prototype open as their name. Ask them to find the newest photo and leave a comment. Don't help.",
+   "expected": "Done in under a minute with no help.",
+   "tickets": []
+  },
+  {
+   "id": "M-02",
+   "title": "Someone can tell who sees a post",
+   "area": "Prototype",
+   "steps": "Show an adult one of your posts. Ask: who can see this?",
+   "expected": "They answer correctly from the screen alone.",
+   "tickets": []
+  },
+  {
+   "id": "M-03",
+   "title": "Larger text is readable at arm's length",
+   "area": "Prototype",
+   "steps": "As a grandparent, turn on Larger text in Me. Hold the phone at arm's length.",
+   "expected": "Captions and comments readable without glasses (or with their usual pair).",
+   "tickets": []
+  },
+  {
+   "id": "M-04",
+   "title": "New circle end to end",
+   "area": "Prototype",
+   "steps": "Make a circle, add 2 people, share a photo only to it, then switch Viewing as to someone outside it.",
+   "expected": "Only the 2 people see it; the outsider sees nothing.",
+   "tickets": []
+  },
+  {
+   "id": "M-05",
+   "title": "Install from TestFlight link on iPhone",
+   "area": "iPhone",
+   "steps": "Open the TestFlight public link on an iPhone that has never had Hearth.",
+   "expected": "Installed and signed in by text link in under 3 minutes. Blocked until build #1.",
+   "tickets": []
+  },
+  {
+   "id": "M-06",
+   "title": "Android, no app: invite link opens web viewer",
+   "area": "Android",
+   "steps": "Text an invite link to an Android phone without the app. Open it.",
+   "expected": "Photos show in the browser; no app or password needed.",
+   "tickets": []
+  },
+  {
+   "id": "M-07",
+   "title": "iPhone to Android photo arrives full quality",
+   "area": "iPhone + Android",
+   "steps": "Post from an iPhone to a circle with an Android grandparent who chose Text message link.",
+   "expected": "Text arrives within a minute; photo opens sharp, not an MMS thumbnail.",
+   "tickets": []
+  },
+  {
+   "id": "M-08",
+   "title": "60-second video over cellular",
+   "area": "iPhone",
+   "steps": "On cellular (Wi-Fi off), share a 60s video.",
+   "expected": "Uploads in under 30s and plays on an older phone.",
+   "tickets": []
+  },
+  {
+   "id": "M-09",
+   "title": "Location removed from photos",
+   "area": "iPhone + Android",
+   "steps": "Share a photo taken with location on. Download it on another phone and check its info.",
+   "expected": "No GPS location in the file.",
+   "tickets": []
+  },
+  {
+   "id": "M-10",
+   "title": "Removed person loses access on their own phone",
+   "area": "Any",
+   "steps": "Remove someone from a circle while they have the post open.",
+   "expected": "Gone for them within 10 minutes; they can't reopen it.",
+   "tickets": []
+  },
+  {
+   "id": "M-11",
+   "title": "Co-parent separation with real accounts",
+   "area": "Any",
+   "steps": "Two real households. Co-parent opens every screen.",
+   "expected": "They never see the other side's circles, relatives, or posts not shared with them.",
+   "tickets": []
+  },
+  {
+   "id": "M-12",
+   "title": "Email digest arrives and links work",
+   "area": "Email",
+   "steps": "Set a tester to Daily email digest; post 2 photos.",
+   "expected": "One email that evening; links open the right photos.",
+   "tickets": []
+  }
+ ]
+}
