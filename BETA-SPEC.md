@@ -1,0 +1,116 @@
+# Hearth Beta Spec: single source of truth
+
+Owner: staff-pm. Updated Oct 15, 2026. Target: about 12 WV grandparents using Hearth by **Sun Nov 22, 2026**.
+
+Rules: no criterion, no build. qa-tdd writes each test red before app-engineer builds.
+- **Types:** `auto` means Playwright, SQL (RLS suite), or Deno. `manual` means a real phone or a real person, logged on the Test Log page.
+- **Priorities:** P0 blocks the current ring. P1 must close before the next ring.
+- **Platforms:** iPhone through TestFlight and Android through the Play internal track. Supported phones: Android 7+ and iOS 16.4+ on Expo SDK 56+; SDK 54/55 support iOS 15.1+. Pin the SDK after the phone inventory comes back.
+
+## 1. Get in (JOIN)
+| ID | Type | Pri | Given / When / Then |
+|---|---|---|---|
+| BETA-JOIN-1 | auto | P0 | **Given** a valid, unused invite for grandma@example.com, **When** she opens the invite link with the app installed and enters the 6-digit code emailed to her, **Then** she lands on the feed showing only posts shared to her circles, and no password field appears anywhere in the flow. |
+| BETA-JOIN-2 | manual | P0 | **Given** a first-time grandparent with the app installed and an invite text, **When** she taps the link with no help, **Then** she sees the first photo within 2 minutes (stopwatch). |
+| BETA-JOIN-3 | auto | P0 | **Given** an invite that is expired, already used, revoked, or addressed to a different email, **When** someone tries to redeem it, **Then** it is refused with a plain message ("This invite has expired. Ask Chase for a new one.") and no space data comes back. |
+| BETA-JOIN-4 | auto | P0 | **Given** invite codes stored in the database (S9) and repeated redemption attempts (S10), **When** a manager reads the invites table, or the same account or IP fails 10 times in 10 minutes, **Then** no hash that can be cracked offline is readable, and the 11th attempt is rejected. |
+| BETA-JOIN-5 | manual | P1 | **Given** a signed-in grandparent, **When** she force-quits the app, restarts the phone, and reopens after 7 days of no use, **Then** she is still signed in with no code requested. |
+| BETA-JOIN-6 | manual | P1 | **Given** a grandparent who has never installed a beta app, **When** she follows the printed guide (TestFlight then Hearth on iPhone; Play link on Android) with Chase on the phone, **Then** she is installed and signed in within 10 minutes. |
+
+## 2. Share (SHARE)
+| ID | Type | Pri | Given / When / Then |
+|---|---|---|---|
+| BETA-SHARE-1 | manual | P0 | **Given** a parent on the feed, **When** they share 1–10 photos, **Then** it takes 3 taps or fewer after picking (Share, pick, Post), and the post appears at the top of their feed in under 60 seconds with no help. |
+| BETA-SHARE-2 | auto | P0 | **Given** a fixture photo with GPS and maker EXIF, **When** it goes through the on-device pipeline, **Then** the uploaded file has no EXIF or GPS tags, and the server rejects any upload without `exif_stripped: true` (422). Manual confirmation: M-09. |
+| BETA-SHARE-3 | auto | P0 | **Given** a completed upload, **When** the B2 object is fetched directly with storage credentials, **Then** the bytes are ciphertext that does not decode as an image, and the wrapped key exists in the database. |
+| BETA-SHARE-4 | manual | P0 | **Given** a 5-photo post, **When** the network drops mid-upload (airplane mode) or the app is closed, **Then** the post shows "Waiting to send", finishes on its own within 1 minute of the signal returning or the app reopening, and creates no duplicate or partial post. |
+| BETA-SHARE-5 | auto | P0 | **Given** a 12 MP photo, **When** it is shared, **Then** viewers get a 2048 px long-edge image (±1 px) plus a thumbnail of about 40 KB, with orientation preserved. |
+| BETA-SHARE-6 | manual | P1 | **Given** a 60-second video on cellular, **When** it is shared, **Then** it uploads in under 60 s at 720p or below and plays on the oldest phone in the inventory. Videos over 60 s are refused with a plain message. |
+
+## 3. See (SEE)
+| ID | Type | Pri | Given / When / Then |
+|---|---|---|---|
+| BETA-SEE-1 | auto | P0 | **Given** the backend suite (110+ RLS cases) running on a **real** Supabase stack (S16), **When** the suite runs, **Then** it passes 3 times in a row: every member sees only posts shared to a circle they are in. |
+| BETA-SEE-2 | manual | P0 | **Given** an app already in memory on a mid-range phone, **When** a grandparent opens it 5 times, **Then** the newest photo is visible within 1 s (median of the 5 timed opens). |
+| BETA-SEE-3 | manual | P0 | **Given** the feed, **When** a grandparent taps a photo, **Then** it opens full screen, a swipe or the Next/Back buttons move between photos (no gesture-only actions), and a labeled Close button returns to the same feed position. |
+| BETA-SEE-4 | manual | P1 | **Given** a full-screen photo, **When** the grandparent pinches or double-taps, **Then** it zooms. A full-screen video plays with visible play and sound controls. |
+| BETA-SEE-5 | manual | P1 | **Given** a photo she can see (E10), **When** she taps "Save to phone", **Then** it appears in Photos or Gallery at 2048 px with no location data, and she gets a plain confirmation. |
+| BETA-SEE-6 | auto | P0 | **Given** a member removed from a circle, **When** they request that circle's posts or the media again, **Then** the database denies them immediately, and any media URL already issued expires within 10 minutes. Manual confirmation: M-10. |
+
+## 4. Choose who sees it (AUD)
+| ID | Type | Pri | Given / When / Then |
+|---|---|---|---|
+| BETA-AUD-1 | manual | P0 | **Given** any post or the share sheet, **When** an adult is asked "who can see this?", **Then** 3 of 3 adults answer correctly from the screen alone. The screen names the circle and the number of people in words, for example "Grandparents – Dad's side · 6 people" (M-02). |
+| BETA-AUD-2 | auto | P0 | **Given** a poster who last shared to circle A, **When** they open the share sheet, **Then** circle A is preselected and shown in words, never another user's default (B8), and Post is disabled if no audience is set. |
+| BETA-AUD-3 | auto | P0 | **Given** a post to circle A, **When** a user who is only in circle B tries the feed, the post ID, the media signer, push, or email, **Then** every path denies them or sends nothing (signer returns 403). |
+| BETA-AUD-4 | auto | P0 | **Given** two households sharing a child, **When** the co-parent separation suite runs (B2, S5, S11), **Then** neither side sees the other's circles, relatives, or posts unless a post was shared to the co-parent circle. |
+| BETA-AUD-5 | auto | P0 | **Given** a poster's own post, **When** they delete it and confirm, **Then** it is gone from every feed on the next refresh, and its media URLs are refused within 10 minutes. |
+| BETA-AUD-6 | manual | P1 | **Given** a posted photo, **When** the poster changes its audience, **Then** removed people lose it within 10 minutes, added people get it, and the screen says "Now shared with …". |
+
+## 5. Hear about it (NOTIFY)
+| ID | Type | Pri | Given / When / Then |
+|---|---|---|---|
+| BETA-NOTIFY-1 | manual | P0 | **Given** push turned on for a recipient, **When** 10 or more posts are made over Ring 1, **Then** the 90th-percentile delay between the server's `created_at` and the receipt logged on the device is 60 s or less. |
+| BETA-NOTIFY-2 | auto | P0 | **Given** a post to circle A, **When** notices go out, **Then** only circle A members get a push or email, and the payload has no image URL, no child's name, and no caption. |
+| BETA-NOTIFY-3 | manual | P0 | **Given** a push on the lock screen, **When** the grandparent taps it, **Then** the app opens directly to that post (cold and warm start). |
+| BETA-NOTIFY-4 | auto | P1 | **Given** 5 photos in one post, or 3 posts within 10 minutes, **When** notices go out, **Then** each recipient gets 1 notice, not 5 or 3. |
+| BETA-NOTIFY-5 | manual | P1 | **Given** a member who chose email or declined push, **When** a post is made, **Then** a daily digest arrives in the inbox, not spam, at Gmail, Yahoo/AOL, and Frontier test addresses, and its link opens the post in the app. |
+| BETA-NOTIFY-6 | auto | P1 | **Given** a poster's own post, **When** audience members open it, **Then** "Seen by N of M" counts only audience members, updates within 1 minute, and is visible only to the poster. |
+
+## 6. Say something back (REPLY)
+| ID | Type | Pri | Given / When / Then |
+|---|---|---|---|
+| BETA-REPLY-1 | auto | P0 | **Given** a visible post, **When** a member taps the labeled Heart button, **Then** the heart toggles in one tap, and the audience sees who hearted it. |
+| BETA-REPLY-2 | auto | P0 | **Given** a visible post, **When** a member comments, **Then** only that post's audience sees the comment, and a half-typed comment survives incoming hearts (B6). |
+| BETA-REPLY-3 | auto | P0 | **Given** a heart or comment on Chase's post, **When** it's saved, **Then** Chase gets a notice within 60 s (batched as in NOTIFY-4), and the person who reacted gets nothing about their own reaction. |
+| BETA-REPLY-4 | auto | P1 | **Given** a member removed from a circle, **When** they try to comment on, heart, or edit captions of its posts, **Then** the attempt is refused (S7, S12). |
+| BETA-REPLY-5 | manual | P1 | **Given** a grandparent with no help, **When** asked to find the newest photo and leave a comment, **Then** she does it in under 60 s (M-01). |
+
+**Count:** JOIN 6, SHARE 6, SEE 6, AUD 6, NOTIFY 6, REPLY 5 = 35 (24 P0, 11 P1).
+
+## Grandparent test (used by the Ring 2 gate)
+5 testers aged 65+. No help, 60 s cap per task. Pass means 5 of 5 tasks done.
+1. Open the newest photo full screen.
+2. Go to the next photo.
+3. Heart it.
+4. Leave a comment.
+5. Answer "who else can see this photo?"
+
+The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with the phone model and the time.
+
+## Not now
+- Web viewer or web fallback: a second client to build and secure. Revisit only if the phone inventory shows someone who can't run the app.
+- Web posting: the web viewer isn't in the beta.
+- Co-parent setup UI: no split household in Rings 0–3. The backend separation tests stay as BETA-AUD-4.
+- True background upload: retry on reopen (SHARE-4) covers the risk at much lower cost.
+- Albums, search, child tags (E9): Hearth works as a feed for 12 people.
+- Multiple spaces per user: one family space covers the beta.
+- Billing, paywall, and the video-cap messaging (E12): no money in the beta. The "willing to pay" question waits until after Thanksgiving.
+- SMS or text-link notices: needs Twilio (paid) and A2P registration. Push and email are enough.
+- Smart frames (E16) and other languages (E15): no tester has asked.
+- Editing photos or captions: delete and repost is fine for the beta.
+- Chat or DMs: families already have texting.
+- Invite status, resend, and cancel (E13): Chase handles invites by hand for 12 people.
+- Undo delete (E11): the delete confirm step (E1) is enough.
+- Purge and export worker: no deletions at scale in 5 weeks, and Chase can run them by hand.
+- Self-serve account deletion: Chase deletes on request. It's required before a public App Store launch.
+- Analytics or crash SDKs: they break the no-tracker promise. Use TestFlight crash reports and Play vitals instead.
+
+## Ring gates and evidence
+| Ring | Dates | Gate (all must be met) | Evidence |
+|---|---|---|---|
+| 0: Chase alone | Oct 28–29 | All P0 `auto` criteria green 3× on the hosted stack. S9, S10, S16 closed. ≥10 posts over ≥2 days with 0 lost. 0 crashes. MEDIA_KEK restore tested. External build submitted to Beta App Review. | Test Log runs (IDs); sent vs received counts; TestFlight/Play crash pages; restore note; App Store Connect status |
+| 1: + wife | Oct 30–Nov 5 | Wife passes JOIN-2 and SHARE-1 unaided. NOTIFY-1 p90 ≤ 60 s over ≥10 posts. 0 open P0. Beta App Review approved. Supabase Pro on. | Manual Test Log entries with times; latency log; ticket list; App Store Connect; Supabase billing page |
+| 2: 3–5 family | Nov 6–12 | Grandparent test 4/5. Android user installs from the Play link in < 10 min unaided. All P0 and P1 manual criteria pass on ≥1 iPhone and ≥1 Android. 0 open P0/P1. NOTIFY-5 inbox check passes. Guide final. | Test Log grandparent runs; install time; ticket list; inbox screenshots; printed guide PDF |
+| 3: WV grandparents | Nov 13–22 | Exit: 10 of 12 signed in and opened at least 1 post by Nov 22. 0 wrong-audience incidents. | Seen-by data; help-call log; P0 ticket list |
+
+**Beta success signals, measured Nov 23 to Dec 20:** 80% of grandparents open new posts within 24 h. 0 help calls after each person's first week. 0 wrong-audience incidents. Chase and his wife share 3+ times a week with no family group texts.
+
+## Amendments, Oct 15 pm (staff-pm; see REMAINING.md)
+- **BETA-SHARE-6 and the video half of BETA-SEE-4: out of beta.** iOS video location can't be stripped without a transcoder, so the app ships photos only (`VIDEO_POSTING_ENABLED=false`). It comes back in only if app-engineer shows on a device by Nov 5 that a transcode leaves no location in the file. Otherwise it goes to v1.0 (CORE-FEATURES CF-17).
+- **BETA-REPLY-1:** "the audience sees who hearted it" becomes "the audience sees the heart count, and the person who hearted sees 'You loved this'". Names wait for v1.0, because there is no RPC for them.
+- **BETA-JOIN-3 wording:** the app uses API.md's sentence ("This invite is too old or already used. Ask {inviter} for a new one."). The word "expired" is banned (UX-REVIEW). grandparent-ux confirms the final copy (GU-2).
+- **New BETA-JOIN-7 (auto, P0):** **Given** a signed-in user, **When** they tap "Delete my account" and confirm, **Then** they are signed out, `my_spaces` returns `[]`, and a deletion request is recorded. This is pulled forward from "Not now" because Beta App Review expects in-app account deletion.
+- **New BETA-OPS-1 (auto, P0, Ring 0):** **Given** a thrown error in the app, **When** it is reported, **Then** exactly 1 `client_errors` row is written with app version, OS and screen, and no caption, email, URL or key. The app has 0 third-party analytics or crash SDKs.
+- **Notification sending is P0 for Ring 0** (NOTIFY-2, NOTIFY-4, REPLY-3 are auto P0s). It wasn't built in the backend lane. Owner: app-engineer (AE-2).
+- **GRANDPARENT-GUIDE.md** must stop saying "nothing to download". The beta requires installing the app (GU-3).

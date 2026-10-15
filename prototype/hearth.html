@@ -1,0 +1,451 @@
+<title>Hearth Family Photos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-screen phone app — sticky top bar, scrolling feed, fixed bottom tab bar, bottom sheets for actions */
+:root{
+  --bg:#F5F3F8; --surface:#FFFFFF; --ink:#2A2135; --muted:#6C6377; --line:#E3DEEA;
+  --accent:#E59B2E; --accent-ink:#3B2500; --accent-soft:#FCEFD9;
+  --safe:#3F7356; --safe-soft:#E3F0E8; --danger:#B3402F; --scrim:rgba(30,22,40,.42);
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#16121B; --surface:#211B28; --ink:#F0EBF4; --muted:#A69DB0; --line:#352D3F;
+  --accent:#F0AE4E; --accent-ink:#2A1A00; --accent-soft:#3A2C17;
+  --safe:#8CC3A2; --safe-soft:#1F3328; --danger:#F08A78; --scrim:rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#16121B; --surface:#211B28; --ink:#F0EBF4; --muted:#A69DB0; --line:#352D3F;
+  --accent:#F0AE4E; --accent-ink:#2A1A00; --accent-soft:#3A2C17;
+  --safe:#8CC3A2; --safe-soft:#1F3328; --danger:#F08A78; --scrim:rgba(0,0,0,.6); color-scheme:dark}
+html{font-size:15px}
+html.big{font-size:19px}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1rem;line-height:1.45}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{max-width:560px;margin:0 auto;min-height:100%;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 10px;
+  border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--display);font-size:1.6rem;line-height:1;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--body);font-size:.8rem;color:var(--muted);margin-top:4px;letter-spacing:.02em}
+.viewas{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.viewas label{font-size:.73rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.viewas select{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 10px;max-width:170px}
+main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px;display:flex;flex-direction:column;gap:16px}
+.banner{background:var(--safe-soft);color:var(--safe);border-radius:var(--r);padding:10px 12px;font-size:.87rem;font-weight:500}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.phead{display:flex;align-items:center;gap:10px;padding:12px 12px 10px}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.87rem;flex:none;color:#fff}
+.who{flex:1;min-width:0}
+.who b{font-weight:600}
+.who span{display:block;color:var(--muted);font-size:.8rem}
+.iconbtn{background:none;border:0;color:var(--muted);padding:6px 8px;border-radius:8px;font-size:.8rem}
+.iconbtn:hover{color:var(--danger)}
+.media{display:grid;gap:2px;grid-template-columns:1fr}
+.media.two{grid-template-columns:1fr 1fr}
+.ph{aspect-ratio:4/3;max-width:100%;position:relative;overflow:hidden;background:var(--line);border:0;padding:0;display:block;width:100%}
+button.ph{cursor:zoom-in}
+.ph img,.ph video{width:100%;height:100%;object-fit:cover;display:block}
+.ph .tag{position:absolute;left:8px;bottom:8px;background:rgba(20,14,26,.6);color:#fff;font-size:.73rem;padding:3px 8px;border-radius:999px}
+.cap{padding:10px 12px 4px;overflow-wrap:anywhere}
+.aud{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 12px 10px;font-size:.8rem;color:var(--muted)}
+.chip{background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:3px 9px;font-size:.8rem;font-weight:500}
+.linkbtn{background:none;border:0;color:var(--accent);font-weight:600;padding:2px 4px;font-size:.8rem}
+.acts{display:flex;gap:6px;padding:0 12px 10px;flex-wrap:wrap}
+.react{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:4px 10px;font-size:.93rem}
+.react.on{border-color:var(--accent);background:var(--accent-soft)}
+.seen{font-size:.8rem;color:var(--muted);padding:0 12px 8px}
+.seen b{color:var(--ink);font-weight:600}
+.comments{border-top:1px solid var(--line);padding:8px 12px 12px;display:flex;flex-direction:column;gap:6px;font-size:.93rem}
+.comments p{margin:0;overflow-wrap:anywhere}
+.cform{display:flex;gap:8px;margin-top:4px}
+.cform input{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 12px}
+.btn{border:0;border-radius:999px;padding:9px 16px;font-weight:600;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.danger{background:var(--danger);color:var(--surface)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+h2{font-family:var(--display);font-weight:400;font-size:1.47rem;margin:4px 0 0;text-wrap:balance}
+.sub{color:var(--muted);font-size:.87rem;margin:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.row .grow{flex:1;min-width:0}
+.people{display:flex;flex-wrap:wrap;gap:6px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-size:.87rem;background:var(--bg)}
+.pill.on{background:var(--safe-soft);border-color:var(--safe);color:var(--safe);font-weight:600}
+.pill.pending{border-style:dashed}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);
+  padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px));
+  padding-top:6px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+.tabs .in{max-width:560px;margin:0 auto;display:flex;gap:4px}
+.tab{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.73rem;color:var(--muted);padding:6px 0;border-radius:10px}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--ink);font-weight:600}
+.tab.share svg{background:var(--accent);color:var(--accent-ink);border-radius:50%;padding:3px;width:28px;height:28px}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:560px;border-radius:20px 20px 0 0;max-height:88%;overflow:auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:16px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.sheet:focus{outline:none}
+.sheet h3{font-family:var(--display);font-weight:400;font-size:1.33rem;margin:0}
+.checks{display:flex;flex-direction:column;gap:6px}
+.check{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.check input{margin-top:3px;accent-color:var(--accent);width:18px;height:18px;flex:none}
+.check small{display:block;color:var(--muted)}
+textarea,.field{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--muted);background:none;width:100%}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.thumb{position:relative}
+.thumbs .ph{aspect-ratio:1;border-radius:8px}
+.thumb .x{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(20,14,26,.7);color:#fff;font-size:.87rem;line-height:1}
+.sms{background:var(--bg);border-radius:18px 18px 18px 4px;padding:10px 14px;font-size:.93rem;max-width:85%;overflow-wrap:anywhere}
+.code{font-family:ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;word-break:break-all;user-select:all}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:14px;font-size:.93rem;font-weight:500;width:max-content;max-width:calc(100vw - 32px);text-align:center}
+.empty{text-align:center;color:var(--muted);padding:30px 10px}
+ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.toggle{display:flex;gap:10px;align-items:center}
+.toggle input{width:20px;height:20px;accent-color:var(--accent)}
+.lightbox{position:fixed;inset:0;z-index:20;background:#0E0A12;color:#F0EBF4;display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.lightbox .bar{display:flex;align-items:center;gap:10px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
+.lightbox .bar span{flex:1;font-size:.87rem}
+.lightbox .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;touch-action:pan-y}
+.lightbox .stage > *{max-width:100%;max-height:100%;width:100%;aspect-ratio:4/3;object-fit:contain}
+.lightbox .nav{display:flex;justify-content:space-between;padding:10px max(16px,env(safe-area-inset-right,0px)) 14px max(16px,env(safe-area-inset-left,0px))}
+.lightbox button{background:rgba(255,255,255,.12);border:0;color:#F0EBF4;border-radius:999px;padding:8px 16px}
+.lightbox button:disabled{opacity:.3}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(30px);opacity:.6}}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">Hearth<small>The Holroyd kids · example family</small></div>
+    <div class="viewas"><label for="viewer">Viewing as</label><select id="viewer"></select></div>
+  </header>
+  <main id="view"></main>
+</div>
+<nav class="tabs" aria-label="Main"><div class="in">
+  <button class="tab" data-tab="feed"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+  <button class="tab share" data-tab="post"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg>Share</button>
+  <button class="tab" data-tab="circles"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="4"/><circle cx="16" cy="15" r="4"/></svg>Circles</button>
+  <button class="tab" data-tab="me"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Me</button>
+</div></nav>
+<div id="sheetRoot"></div>
+<div id="lightRoot"></div>
+<div id="toastRoot" aria-live="polite"></div>
+
+<script>
+// ---------- Example data (lives only in this browser tab) ----------
+const people = {
+  chase:{name:"Chase",role:"owner",color:"#7A4E9C",note:"You · Household A"},
+  alex:{name:"Alex",role:"poster",color:"#3F7356",note:"Co-parent · Household B"},
+  jo:{name:"Grandma Jo",role:"viewer",color:"#B5603A",note:"Chase's mom"},
+  walt:{name:"Pop Walt",role:"viewer",color:"#386A9A",note:"Chase's dad"},
+  kim:{name:"Aunt Kim",role:"viewer",color:"#9A3D62",note:"Chase's sister"},
+  ruth:{name:"Nana Ruth",role:"viewer",color:"#6B6A2E",note:"Alex's mom"}
+};
+// Who each poster can add to their circles. A co-parent only knows their own side plus the other parent.
+const contacts = { chase:["jo","walt","kim","ruth","alex"], alex:["ruth","chase"] };
+let circles = [
+  {id:"c1",owner:"chase",name:"Everyone",members:["jo","walt","kim","ruth","alex"]},
+  {id:"c2",owner:"chase",name:"My side",members:["jo","walt","kim"]},
+  {id:"c3",owner:"chase",name:"Alex's side",members:["ruth"]},
+  {id:"c4",owner:"chase",name:"Co-parent",members:["alex"]},
+  {id:"c5",owner:"alex",name:"Co-parent",members:["chase"]},
+  {id:"c6",owner:"alex",name:"My family",members:["ruth"]}
+];
+const notify = {chase:"push",alex:"push",jo:"text",walt:"daily",kim:"push",ruth:"weekly"};
+const grads = [
+  "radial-gradient(circle at 30% 35%,#F6C177 0 18%,transparent 19%),linear-gradient(160deg,#7FB77E,#3E7C59 60%,#2F5D46)",
+  "radial-gradient(circle at 70% 30%,#FFE3A3 0 14%,transparent 15%),linear-gradient(180deg,#9EC9F0,#E9D8C4)",
+  "radial-gradient(circle at 50% 60%,#F4A6A6 0 22%,transparent 23%),linear-gradient(135deg,#F7E3B5,#E59B2E)",
+  "linear-gradient(200deg,#C9B6E4,#7A4E9C 70%)",
+  "radial-gradient(circle at 25% 70%,#fff3 0 20%,transparent 21%),linear-gradient(120deg,#5D8AA8,#2E4A62)"
+];
+let posts = [
+  {id:"p1",by:"chase",when:"2h ago",caption:"Mia's first goal of the season. She did the whole celebration lap.",media:[{g:0,label:"Photo"},{g:1,label:"Photo"}],aud:["c1"],reacts:{jo:"❤️",ruth:"❤️",walt:"😮"},comments:[{by:"jo",t:"Look at that hustle!"}],seen:["jo","ruth","alex"]},
+  {id:"p2",by:"chase",when:"Yesterday",caption:"Leo on two wheels, no help. Sending to both grandma sides.",media:[{g:4,label:"Video · 0:24"}],aud:["c2","c3"],reacts:{kim:"😂"},comments:[],seen:["kim","jo"]},
+  {id:"p3",by:"chase",when:"Tue",caption:"Pickup swap this week: I have them Thursday, you take Saturday morning. Picture of the school calendar.",media:[{g:3,label:"Photo"}],aud:["c4"],reacts:{alex:"❤️"},comments:[{by:"alex",t:"Works. Thanks for the heads up."}],seen:["alex"]},
+  {id:"p4",by:"alex",when:"Mon",caption:"Mia's ear drops: 2x a day through Friday. Last dose was 7pm.",media:[{g:2,label:"Photo"}],aud:["c5"],reacts:{},comments:[],seen:[]},
+  {id:"p5",by:"chase",when:"Sun",caption:"Birthday dinner at Grandma Jo's.",media:[{g:2,label:"Photo"},{g:0,label:"Photo"}],aud:["c2"],reacts:{jo:"❤️",walt:"❤️"},comments:[{by:"walt",t:"Best cake yet."}],seen:["jo","walt"]}
+];
+let viewer = "chase", tab = "feed", draft = null, uid = 10;
+const lastAud = {};            // per person: the audience they used last
+const commentDrafts = {};      // per person+post: unsent comment text
+let returnFocus = null;
+
+// ---------- Helpers ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const av = id => `<span class="av" style="background:${people[id].color}" aria-hidden="true">${esc(people[id].name.split(" ").pop()[0])}</span>`;
+const circle = id => circles.find(c=>c.id===id);
+const mineCircles = () => circles.filter(c=>c.owner===viewer);
+const canPost = id => people[id].role!=="viewer";
+const plural = (n,w) => `${n} ${w}${n===1?"":"s"}`;
+function canSee(p, v){ return p.by===v || p.aud.some(cid => (circle(cid)?.members||[]).includes(v)); }
+function reach(p){ const s=new Set(); p.aud.forEach(cid=>(circle(cid)?.members||[]).forEach(m=>s.add(m))); s.delete(p.by); return [...s]; }
+const visibleCount = v => posts.filter(p=>p.by!==v && canSee(p,v)).length;
+function toast(msg){ const r=$("#toastRoot"); r.innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`; clearTimeout(toast.t); toast.t=setTimeout(()=>r.innerHTML="",3200); }
+function mediaInner(m){
+  if(m.url && m.type==="video") return `<video src="${m.url}" controls playsinline muted></video>`;
+  if(m.url) return `<img src="${m.url}" alt="Shared photo">`;
+  return `<span class="tag">Example · ${esc(m.label)}</span>`;
+}
+const mediaStyle = m => m.url ? "" : ` style="background:${grads[m.g]}"`;
+function feedMedia(p){
+  return p.media.map((m,i)=> m.type==="video"
+    ? `<div class="ph">${mediaInner(m)}</div>`
+    : `<button class="ph" data-open="${p.id}" data-i="${i}" aria-label="Open photo ${i+1} of ${p.media.length}"${mediaStyle(m)}>${mediaInner(m)}</button>`).join("");
+}
+function copyText(text, el){
+  const fallback = () => { if(el) getSelection().selectAllChildren(el); toast("Press and hold the link to copy it"); };
+  try { navigator.clipboard.writeText(text).then(()=>toast("Link copied"), fallback); } catch { fallback(); }
+}
+function newCode(){ const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<8;i++){ s+=a[Math.floor(Math.random()*a.length)]; if(i===3) s+="-"; } return s; }
+
+// ---------- Views ----------
+function render(){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+  $(".tab[data-tab=post]").hidden = !canPost(viewer);
+  $(".tab[data-tab=circles]").hidden = !canPost(viewer);
+  ({feed:renderFeed,circles:renderCircles,me:renderMe})[tab]();
+}
+
+function renderFeed(){
+  const vis = posts.filter(p=>canSee(p,viewer));
+  vis.forEach(p=>{ if(p.by!==viewer && !p.seen.includes(viewer)) p.seen.push(viewer); });
+  const hidden = posts.length - vis.length;
+  let h = "";
+  if(viewer!=="chase") h += `<div class="banner">You're seeing Hearth as ${esc(people[viewer].name)}. ${hidden?`${plural(hidden,"post")} ${hidden>1?"are":"is"} not shared with them, so they don't appear here.`:"Everything is shared with them."}</div>`;
+  if(!vis.length) h += `<div class="empty">Nothing shared with ${esc(people[viewer].name)} yet.</div>`;
+  vis.forEach(p=>{
+    const mine = p.by===viewer, r = reach(p), seen = p.seen.filter(id=>r.includes(id));
+    const counts = {}; Object.values(p.reacts).forEach(e=>counts[e]=(counts[e]||0)+1);
+    h += `<article class="post">
+      <div class="phead">${av(p.by)}<div class="who"><b>${esc(people[p.by].name)}</b><span>${esc(p.when)}</span></div>
+        ${mine?`<button class="iconbtn" data-del="${p.id}" aria-label="Delete post">Delete</button>`:""}</div>
+      <div class="media ${p.media.length>1?"two":""}">${feedMedia(p)}</div>
+      ${p.caption?`<div class="cap">${esc(p.caption)}</div>`:""}
+      <div class="aud">${mine?`Shared with ${p.aud.map(circle).filter(Boolean).map(c=>`<span class="chip">${esc(c.name)}</span>`).join("")}<button class="linkbtn" data-edit="${p.id}">Change</button>`:`<span>Shared with you</span>`}</div>
+      ${mine?`<div class="seen"><b>Seen by ${seen.length} of ${r.length}</b>${seen.length?` · ${seen.map(id=>esc(people[id].name)).join(", ")}`:""}</div>`:""}
+      <div class="acts">${["❤️","😂","😮"].map(e=>`<button class="react ${p.reacts[viewer]===e?"on":""}" data-react="${p.id}" data-e="${e}" aria-label="React ${e}" aria-pressed="${p.reacts[viewer]===e}">${e} ${counts[e]||""}</button>`).join("")}</div>
+      <div class="comments">${p.comments.map(c=>`<p><b>${esc(people[c.by].name)}</b> ${esc(c.t)}</p>`).join("")}
+        <form class="cform" data-comment="${p.id}"><input id="c-${p.id}" data-draft="${p.id}" value="${esc(commentDrafts[viewer+p.id]||"")}" placeholder="Add a comment" aria-label="Add a comment" maxlength="300"><button class="btn ghost" type="submit">Send</button></form></div>
+    </article>`;
+  });
+  $("#view").innerHTML = h;
+}
+
+function renderCircles(){
+  let h = `<div><h2>Your circles</h2><p class="sub">Circles decide who sees each post. Only you can see your circle names and who's in them.</p></div>`;
+  h += `<section class="card"><div class="row"><div class="grow"><b>Invite family</b><div class="sub">They join with a link on iPhone, Android or any browser. No password.</div></div><button class="btn" id="openInvite">Invite someone</button></div></section>`;
+  mineCircles().forEach(c=>{
+    h += `<section class="card"><div class="row"><div class="grow"><b>${esc(c.name)}</b><div class="sub">${plural(c.members.length,"person").replace("persons","people")}</div></div>
+      <button class="linkbtn" data-rename="${c.id}">Rename</button><button class="linkbtn" data-delcircle="${c.id}">Delete circle</button></div>
+      <div class="people">${(contacts[viewer]||[]).map(id=>{ const on=c.members.includes(id), pend=people[id].pending;
+        return `<button class="pill ${on?"on":""} ${pend?"pending":""}" data-toggle="${c.id}" data-p="${id}" aria-pressed="${on}">${esc(people[id].name)}${pend?" (invited)":""}</button>`; }).join("")}</div></section>`;
+  });
+  h += `<form class="card" id="newCircle"><label for="ncName"><b>New circle</b></label><div class="row"><input class="field grow" id="ncName" placeholder="e.g. Soccer parents" maxlength="40"><button class="btn" type="submit">Add</button></div></form>`;
+  $("#view").innerHTML = h;
+}
+
+function latestFor(v){ return posts.find(p=>p.by!==v && canSee(p,v)); }
+function renderMe(){
+  const p = people[viewer], n = notify[viewer], last = latestFor(viewer), count = visibleCount(viewer);
+  const opts = [["push","App notification","Instant, on iPhone or Android"],["text","Text message link","One short text per new post. No app needed, no group chat."],["daily","Daily email digest","One email each evening with everything new"],["weekly","Weekly email digest","Sunday morning roundup"]];
+  let preview = "Nothing new to tell you about yet.";
+  if(last){
+    const who = people[last.by].name, what = plural(last.media.length, last.media.some(m=>m.type==="video"||/Video/.test(m.label||""))?"video":"photo");
+    preview = n==="text" ? `Hearth: ${who} shared ${what}. See them: hearth.family/v/8RT1`
+      : n==="push" ? `${who} shared ${what}: "${last.caption.slice(0,40)}${last.caption.length>40?"…":""}"`
+      : `Your ${n} Hearth digest: ${plural(count,"post")} from your family. Open: hearth.family/d/3KP9`;
+  }
+  $("#view").innerHTML = `<div class="row">${av(viewer)}<div class="grow"><h2>${esc(p.name)}</h2><p class="sub">${esc(p.note)} · ${p.role==="viewer"?"Can view, react and comment":"Can share photos and videos"}</p></div></div>
+  <section class="card"><b>How should Hearth tell you about new photos?</b>
+    <div class="checks">${opts.map(o=>`<label class="check"><input type="radio" name="notify" id="n-${o[0]}" value="${o[0]}" ${n===o[0]?"checked":""}><span><b>${o[1]}</b><small>${o[2]}</small></span></label>`).join("")}</div>
+    <div class="sub">What ${esc(p.name)} gets:</div>
+    <div class="sms">${esc(preview)}</div></section>
+  <section class="card"><label class="toggle" for="bigText"><input type="checkbox" id="bigText" ${document.documentElement.classList.contains("big")?"checked":""}><span><b>Larger text</b><span class="sub" style="display:block">Easier reading on a small screen</span></span></label></section>
+  <section class="card"><b>Your family's privacy</b><ul class="plain">
+    <li>Photos and videos are stored on servers in the United States and encrypted with keys Hearth controls.</li>
+    <li>No photo is ever used to train AI, by us or any vendor. No face scanning.</li>
+    <li>No ads, no public profiles, no strangers. Only people you invite.</li>
+    <li>Location data is removed from photos on your phone, before upload.</li>
+    <li>Download everything or delete your account at any time.</li></ul></section>`;
+}
+
+// ---------- Sheets ----------
+function openSheet(html, label){
+  returnFocus = document.activeElement;
+  $("#sheetRoot").innerHTML = `<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(label)}" tabindex="-1">${html}</div></div>`;
+  $(".sheet").focus();
+}
+function closeSheet(){ $("#sheetRoot").innerHTML=""; if(returnFocus && document.contains(returnFocus)) returnFocus.focus(); returnFocus=null; }
+function audChecks(selected){
+  return `<div class="checks">${mineCircles().map(c=>`<label class="check"><input type="checkbox" id="a-${c.id}" value="${c.id}" ${selected.includes(c.id)?"checked":""}><span><b>${esc(c.name)}</b><small>${c.members.map(m=>esc(people[m].name)).join(", ")||"Nobody yet"}</small></span></label>`).join("")}</div>`;
+}
+function openEdit(pid){
+  const p = posts.find(x=>x.id===pid);
+  openSheet(`<h3>Who can see this?</h3><p class="sub">Changes take effect right away. Anyone you remove loses access to the post.</p>${audChecks(p.aud)}
+    <div class="row"><button class="btn ghost" data-close>Cancel</button><button class="btn" id="saveAud" data-pid="${pid}">Save</button></div>`, "Who can see this post");
+}
+function openCompose(){
+  const mine = mineCircles().map(c=>c.id);
+  const def = (lastAud[viewer]||[]).filter(id=>mine.includes(id));
+  draft = {files:[]};
+  openSheet(`<h3>Share with family</h3>
+    <button class="drop" id="pickBtn" type="button">Choose photos or videos<br><small>In this demo they stay on this device.</small></button>
+    <input type="file" id="pick" accept="image/*,video/*" multiple hidden>
+    <div class="thumbs" id="thumbs"></div>
+    <textarea id="caption" rows="2" placeholder="Say something (optional)" maxlength="500" aria-label="Caption"></textarea>
+    <b>Who can see it?</b>${audChecks(def.length?def:mine.slice(0,1))}
+    <p class="sub" id="reachNote"></p>
+    <div class="row"><button class="btn ghost" data-close>Cancel</button><button class="btn" id="share">Share</button></div>`, "Share with family");
+  updateReach();
+}
+function renderThumbs(){
+  $("#thumbs").innerHTML = draft.files.map((m,i)=>`<div class="thumb"><div class="ph">${mediaInner(m)}</div><button class="x" data-rm="${i}" aria-label="Remove item ${i+1}">×</button></div>`).join("");
+  updateReach();
+}
+function selectedAud(){ return [...document.querySelectorAll('.sheet .check input[type=checkbox]:checked')].map(i=>i.value); }
+function updateReach(){
+  const note = $("#reachNote"); if(!note) return;
+  const a = selectedAud(), r = reach({by:viewer,aud:a});
+  note.textContent = !a.length ? "Pick at least one circle."
+    : !r.length ? (a.length===1?"Nobody is in that circle yet. Add people in Circles.":"Nobody is in those circles yet. Add people in Circles.")
+    : `${plural(r.length,"person").replace("persons","people")} will see it: ${r.map(id=>people[id].name).join(", ")}.`;
+  const s=$("#share"); if(s) s.disabled = !r.length || !draft.files.length;
+}
+function openInvite(){
+  openSheet(`<h3>Invite someone</h3>
+    <label for="invName"><b>Their name</b></label><input class="field" id="invName" maxlength="40" placeholder="e.g. Uncle Ray">
+    <label for="invRole"><b>What they can do</b></label>
+    <select class="field" id="invRole"><option value="viewer">View, react and comment</option><option value="poster">Share photos too</option></select>
+    <b>Add them to</b>${audChecks([])}
+    <div class="row"><button class="btn ghost" data-close>Cancel</button><button class="btn" id="makeInvite">Create invite link</button></div>`, "Invite someone");
+}
+function confirmSheet(title, body, btnId, data){
+  openSheet(`<h3>${esc(title)}</h3><p class="sub">${esc(body)}</p>
+    <div class="row"><button class="btn ghost" data-close>Keep it</button><button class="btn danger" id="${btnId}" data-id="${data}">Delete</button></div>`, title);
+}
+
+// ---------- Photo viewer ----------
+let lb = null;
+function openViewer(pid, i){
+  returnFocus = document.activeElement; lb = {p:posts.find(x=>x.id===pid), i:+i}; drawViewer();
+}
+function drawViewer(){
+  if(!lb) { $("#lightRoot").innerHTML=""; return; }
+  const m = lb.p.media[lb.i], n = lb.p.media.length;
+  $("#lightRoot").innerHTML = `<div class="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" tabindex="-1">
+    <div class="bar"><span>${lb.i+1} of ${n} · ${esc(people[lb.p.by].name)}</span><button id="lbClose">Close</button></div>
+    <div class="stage" id="lbStage"><div style="${m.url?"":`background:${grads[m.g]};`}position:relative">${m.url?mediaInner(m):""}</div></div>
+    <div class="nav"><button id="lbPrev" aria-label="Previous" ${lb.i===0?"disabled":""}>Previous</button><button id="lbNext" aria-label="Next" ${lb.i===n-1?"disabled":""}>Next</button></div></div>`;
+  $(".lightbox").focus();
+}
+function step(d){ if(!lb) return; const j=lb.i+d; if(j<0||j>=lb.p.media.length) return; lb.i=j; drawViewer(); }
+function closeViewer(){ lb=null; drawViewer(); if(returnFocus && document.contains(returnFocus)) returnFocus.focus(); }
+let touchX=null;
+document.addEventListener("touchstart",e=>{ if(e.target.closest("#lbStage")) touchX=e.touches[0].clientX; },{passive:true});
+document.addEventListener("touchend",e=>{ if(touchX==null) return; const dx=e.changedTouches[0].clientX-touchX; touchX=null; if(Math.abs(dx)>40) step(dx<0?1:-1); });
+
+// ---------- Events ----------
+const sel = $("#viewer");
+sel.innerHTML = Object.entries(people).map(([id,p])=>`<option value="${id}">${esc(p.name)}</option>`).join("");
+sel.addEventListener("change",()=>{ viewer=sel.value; closeSheet(); if(!canPost(viewer)&&tab==="circles") tab="feed"; render(); window.scrollTo(0,0); });
+document.querySelector(".tabs").addEventListener("click",e=>{
+  const b=e.target.closest(".tab"); if(!b) return;
+  if(b.dataset.tab==="post") return openCompose();
+  tab=b.dataset.tab; render(); window.scrollTo(0,0);
+});
+document.addEventListener("keydown",e=>{
+  if(lb){ if(e.key==="Escape") closeViewer(); if(e.key==="ArrowRight") step(1); if(e.key==="ArrowLeft") step(-1); return; }
+  if(e.key==="Escape" && $(".sheet")) closeSheet();
+});
+document.addEventListener("input",e=>{ if(e.target.dataset.draft) commentDrafts[viewer+e.target.dataset.draft]=e.target.value; });
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.id==="lbClose") return closeViewer();
+  if(t.id==="lbNext") return step(1);
+  if(t.id==="lbPrev") return step(-1);
+  if(t.id==="scrim"||t.closest("[data-close]")) return closeSheet();
+  if(t.id==="pickBtn") return $("#pick").click();
+  const op=t.closest("[data-open]"); if(op) return openViewer(op.dataset.open, op.dataset.i);
+  const r=t.closest("[data-react]");
+  if(r){ const p=posts.find(x=>x.id===r.dataset.react); if(p.reacts[viewer]===r.dataset.e) delete p.reacts[viewer]; else p.reacts[viewer]=r.dataset.e; return renderFeed(); }
+  const ed=t.closest("[data-edit]"); if(ed) return openEdit(ed.dataset.edit);
+  const dl=t.closest("[data-del]"); if(dl) return confirmSheet("Delete this post?","It disappears for everyone right away, including photos and comments.","confirmDelete",dl.dataset.del);
+  if(t.id==="confirmDelete"){ posts=posts.filter(p=>p.id!==t.dataset.id); closeSheet(); renderFeed(); return toast("Post deleted"); }
+  const rm=t.closest("[data-rm]"); if(rm){ const [m]=draft.files.splice(+rm.dataset.rm,1); if(m?.url) URL.revokeObjectURL(m.url); return renderThumbs(); }
+  const tg=t.closest("[data-toggle]");
+  if(tg){
+    const c=circle(tg.dataset.toggle), id=tg.dataset.p, before=visibleCount(id);
+    const adding=!c.members.includes(id);
+    c.members = adding?[...c.members,id]:c.members.filter(m=>m!==id);
+    const after=visibleCount(id), name=people[id].name;
+    renderCircles();
+    if(!adding && before>after) return toast(`${name} can no longer see ${plural(before-after,"post")}`);
+    if(adding && after>before) return toast(`${name} can now see ${plural(after-before,"more post")}`);
+    return toast(adding?`Added ${name} to ${c.name}`:`Removed ${name} from ${c.name}`);
+  }
+  const rn=t.closest("[data-rename]");
+  if(rn){ const c=circle(rn.dataset.rename); openSheet(`<h3>Rename circle</h3><label for="renameInput" class="sub">New name</label><input class="field" id="renameInput" maxlength="40" value="${esc(c.name)}">
+    <div class="row"><button class="btn ghost" data-close>Cancel</button><button class="btn" id="saveRename" data-id="${c.id}">Save</button></div>`, "Rename circle"); return; }
+  if(t.id==="saveRename"){ const v=$("#renameInput").value.trim(), c=circle(t.dataset.id);
+    if(!v) return toast("Give the circle a name");
+    if(mineCircles().some(x=>x.id!==c.id && x.name.toLowerCase()===v.toLowerCase())) return toast(`You already have a circle called "${v}"`);
+    c.name=v; closeSheet(); renderCircles(); return toast("Circle renamed"); }
+  const dc=t.closest("[data-delcircle]");
+  if(dc){ const c=circle(dc.dataset.delcircle); const only=posts.filter(p=>p.aud.length===1&&p.aud[0]===c.id).length;
+    if(only) return toast(`"${c.name}" is the only audience for ${plural(only,"post")}. Change ${only===1?"that post":"those posts"} first, then delete the circle.`);
+    return confirmSheet(`Delete ${c.name}?`,"People in it stay in your family space and keep their other circles.","confirmDeleteCircle",c.id); }
+  if(t.id==="confirmDeleteCircle"){ const id=t.dataset.id; circles=circles.filter(c=>c.id!==id); posts.forEach(p=>p.aud=p.aud.filter(a=>a!==id)); closeSheet(); renderCircles(); return toast("Circle deleted"); }
+  if(t.id==="openInvite") return openInvite();
+  if(t.id==="makeInvite"){
+    const name=$("#invName").value.trim(); if(!name) return toast("Add their name first");
+    const id="u"+(++uid), role=$("#invRole").value, aud=selectedAud(), code=newCode();
+    people[id]={name,role,color:"#8A7F96",note:`Invited by ${people[viewer].name}`,pending:true};
+    (contacts[viewer]=contacts[viewer]||[]).push(id);
+    aud.forEach(cid=>circle(cid).members.push(id));
+    if(role==="poster") contacts[id]=[viewer];
+    $(".sheet").innerHTML = `<h3>Invite ready</h3><p class="sub">Text or email this link to ${esc(name)}. It opens on iPhone, Android or any web browser, needs no password, and expires in 7 days.</p>
+      <div class="code" id="invLink">hearth.family/join/${code}</div>
+      <div class="row"><button class="btn" id="copyInvite">Copy link</button><button class="btn ghost" data-close>Done</button></div>`;
+    renderCircles(); return;
+  }
+  if(t.id==="copyInvite") return copyText("https://"+$("#invLink").textContent, $("#invLink"));
+  if(t.id==="saveAud"){ const a=selectedAud(); if(!a.length) return toast("Pick at least one circle"); posts.find(x=>x.id===t.dataset.pid).aud=a; closeSheet(); renderFeed(); return toast("Audience updated"); }
+  if(t.id==="share"){
+    const a=selectedAud(); if(!a.length||!draft.files.length) return;
+    lastAud[viewer]=a;
+    posts.unshift({id:"p"+(++uid),by:viewer,when:"Just now",caption:$("#caption").value.trim(),media:draft.files,aud:a,reacts:{},comments:[],seen:[]});
+    const n=reach(posts[0]).length; closeSheet(); tab="feed"; render(); window.scrollTo(0,0);
+    return toast(`Shared with ${plural(n,"person").replace("persons","people")}`);
+  }
+});
+document.addEventListener("change",e=>{
+  if(e.target.id==="pick"){
+    [...e.target.files].slice(0,20).forEach(f=>draft.files.push({url:URL.createObjectURL(f),type:f.type.startsWith("video")?"video":"image"}));
+    e.target.value=""; renderThumbs();
+  }
+  if(e.target.closest(".sheet .check")) updateReach();
+  if(e.target.name==="notify"){ notify[viewer]=e.target.value; renderMe(); toast("Notification setting saved"); }
+  if(e.target.id==="bigText"){ document.documentElement.classList.toggle("big",e.target.checked); try{ localStorage.setItem("hearth.big", e.target.checked?"1":""); }catch{} }
+});
+document.addEventListener("submit",e=>{
+  e.preventDefault();
+  const f=e.target;
+  if(f.dataset.comment){ const i=f.querySelector("input"); const v=i.value.trim(); if(!v) return; posts.find(x=>x.id===f.dataset.comment).comments.push({by:viewer,t:v}); delete commentDrafts[viewer+f.dataset.comment]; renderFeed(); }
+  if(f.id==="newCircle"){ const v=$("#ncName").value.trim(); if(!v) return toast("Give the circle a name");
+    if(mineCircles().some(c=>c.name.toLowerCase()===v.toLowerCase())) return toast(`You already have a circle called "${v}"`);
+    circles.push({id:"c"+(++uid),owner:viewer,name:v,members:[]}); renderCircles(); toast(`Added ${v}`); }
+});
+try{ if(localStorage.getItem("hearth.big")) document.documentElement.classList.add("big"); }catch{}
+render();
+</script>

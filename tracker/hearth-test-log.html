@@ -1,0 +1,331 @@
+<title>Hearth Test Log</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: lab-notebook dashboard — summary row up top, then tabbed lists (cases, tickets, runs, log form); single column, max 900px */
+:root{
+  --bg:#F6F4F8; --surface:#FFFFFF; --ink:#251E2F; --muted:#696174; --line:#E2DDE8;
+  --accent:#C77F12; --accent-soft:#FBEED8;
+  --pass:#2F7350; --pass-soft:#E1F1E7; --fail:#B33A2B; --fail-soft:#FBE6E2; --warn:#8A6400; --warn-soft:#FAF0D2; --idle:#7B7386; --idle-soft:#EEEBF2;
+  --display:"Young Serif", Georgia, serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141118; --surface:#1F1A25; --ink:#EFEAF4; --muted:#A49CAE; --line:#342D3D;
+  --accent:#F0AE4E; --accent-soft:#3A2C17;
+  --pass:#86C9A2; --pass-soft:#1C3227; --fail:#F2917F; --fail-soft:#3B1F1B; --warn:#E8C25A; --warn-soft:#352B12; --idle:#A49CAE; --idle-soft:#2A2431; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141118; --surface:#1F1A25; --ink:#EFEAF4; --muted:#A49CAE; --line:#342D3D;
+  --accent:#F0AE4E; --accent-soft:#3A2C17;
+  --pass:#86C9A2; --pass-soft:#1C3227; --fail:#F2917F; --fail-soft:#3B1F1B; --warn:#E8C25A; --warn-soft:#352B12; --idle:#A49CAE; --idle-soft:#2A2431; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
+header h1{font-family:var(--display);font-weight:400;font-size:30px;margin:0;line-height:1.1;text-wrap:balance}
+header p{margin:6px 0 0;color:var(--muted);max-width:62ch}
+.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:.01em}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.tile .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.tile .s{font-size:12.5px;color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--idle-soft);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 12px;color:var(--muted);font-weight:600;white-space:nowrap}
+.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:13px}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.search{flex:1;min-width:160px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px}
+select.sel{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 10px}
+.group h3{font-family:var(--display);font-weight:400;font-size:19px;margin:8px 0 2px}
+.group .how{font-size:12.5px;color:var(--muted);margin:0 0 8px}
+.area{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:12px 0 4px}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.item{border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:10px 12px;width:100%;background:none;border:0;text-align:left}
+.row .id{padding-top:2px;color:var(--muted);min-width:64px}
+.row .t{min-width:0;overflow-wrap:anywhere}
+.row .meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.tk{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--muted)}
+.right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.pill.pass{background:var(--pass-soft);color:var(--pass)} .pill.fail{background:var(--fail-soft);color:var(--fail)}
+.pill.blocked{background:var(--warn-soft);color:var(--warn)} .pill.none,.pill.open{background:var(--idle-soft);color:var(--idle)}
+.pill.fixed{background:var(--pass-soft);color:var(--pass)}
+.trail{display:flex;gap:3px;align-items:center}
+.trail i{width:9px;height:9px;border-radius:2px;display:block;background:var(--idle-soft)}
+.trail i.pass{background:var(--pass)} .trail i.fail{background:var(--fail)} .trail i.blocked{background:var(--warn)}
+.detail{padding:0 12px 12px 86px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.detail dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0}
+.detail dt{color:var(--muted)} .detail dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.log{border-left:3px solid var(--line);padding:2px 0 2px 10px}
+.log.pass{border-color:var(--pass)} .log.fail{border-color:var(--fail)} .log.blocked{border-color:var(--warn)}
+.log small{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0}
+label.f{font-weight:600;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.field{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 12px}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{display:flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:600;font-size:14px}
+.radios input{accent-color:var(--accent)}
+.btn{border:0;border-radius:999px;padding:10px 18px;font-weight:700;background:var(--accent);color:#2A1A00;align-self:flex-start}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.linkbtn{background:none;border:0;color:var(--fail);font-size:12.5px;padding:0}
+.note{font-size:13px;color:var(--muted)}
+.empty{padding:22px;text-align:center;color:var(--muted)}
+.status{font-size:13px;color:var(--muted)}
+.runs .row{grid-template-columns:1fr auto}
+@media (max-width:560px){ .detail{padding-left:12px} .row .id{min-width:0} .row{grid-template-columns:1fr auto} .row .id{grid-column:1 / -1} }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Hearth Test Log</h1>
+    <p>Every test case, bug and test run for the Hearth MVP. Tests are written before each fix, so every bug shows a failing run and then a passing one. Family testers log real-phone results under "Log a test".</p>
+  </header>
+  <section class="summary" id="summary" aria-label="Summary"></section>
+  <p class="status" id="status">Loading test data…</p>
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="tab-cases" aria-selected="true" data-tab="cases">Test cases</button>
+    <button role="tab" id="tab-tickets" aria-selected="false" data-tab="tickets">Bugs &amp; features</button>
+    <button role="tab" id="tab-runs" aria-selected="false" data-tab="runs">Runs</button>
+    <button role="tab" id="tab-log" aria-selected="false" data-tab="log">Log a test</button>
+  </nav>
+  <section id="view" role="tabpanel"></section>
+</div>
+
+<script>
+const S = { suites:{}, tickets:[], runs:[], logs:[], names:{}, me:null, canWrite:null, isOwner:false };
+const UI = { tab:"cases", suite:"all", status:"all", q:"", open:new Set(), tstatus:"open", tlayer:"all", draft:{case:"", result:"", device:"", notes:""} };
+try { const t = localStorage.getItem("htl.tab"); if (t) UI.tab = t; } catch {}
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = iso => { try { return new Date(iso).toLocaleString([], {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"}); } catch { return iso; } };
+const SUITE_LABEL = { prototype:"Prototype", backend:"Backend", edge:"Media signing", manual:"Manual" };
+
+// ---------- derived state ----------
+function suitesSorted(){ return Object.entries(S.suites).sort((a,b)=>(a[1].order||9)-(b[1].order||9)); }
+function runsFor(suite){ return S.runs.filter(r=>r.suite===suite).sort((a,b)=>a.at.localeCompare(b.at)); }
+function logsFor(cid){ return S.logs.filter(l=>l.caseId===cid).sort((a,b)=>b.at.localeCompare(a.at)); }
+function caseStatus(suiteId, c){
+  if (S.suites[suiteId]?.kind === "manual") { const l = logsFor(c.id)[0]; return l ? l.result : "none"; }
+  const rs = runsFor(suiteId).filter(r=>r.results && r.results[c.id]);
+  return rs.length ? rs[rs.length-1].results[c.id] : "none";
+}
+function trail(suiteId, c){
+  if (S.suites[suiteId]?.kind === "manual") return logsFor(c.id).slice(0,6).reverse().map(l=>l.result);
+  return runsFor(suiteId).filter(r=>r.results && r.results[c.id]).map(r=>r.results[c.id]);
+}
+function caseIndex(){ const m = {}; for (const [sid, s] of suitesSorted()) for (const c of s.cases||[]) m[c.id] = {sid, c}; return m; }
+const pillText = { pass:"Pass", fail:"Fail", blocked:"Blocked", none:"Not run" };
+
+// ---------- render ----------
+function render(){
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===UI.tab));
+  renderSummary();
+  ({cases:renderCases, tickets:renderTickets, runs:renderRuns, log:renderLog})[UI.tab]();
+}
+function renderSummary(){
+  const tiles = [];
+  for (const [sid, s] of suitesSorted()) {
+    const cases = s.cases||[], st = cases.map(c=>caseStatus(sid,c));
+    const p = st.filter(x=>x==="pass").length, f = st.filter(x=>x==="fail").length, b = st.filter(x=>x==="blocked").length, n = cases.length;
+    const sub = s.kind==="manual" ? `${n-p-f-b} not run yet${f?` · ${f} failing`:""}` : (f ? `${f} failing` : "All passing");
+    tiles.push(`<div class="tile"><span class="k">${esc(SUITE_LABEL[sid]||s.name)}</span><span class="v">${p}/${n}</span>
+      <div class="bar" aria-hidden="true"><i style="width:${n?p/n*100:0}%;background:var(--pass)"></i><i style="width:${n?f/n*100:0}%;background:var(--fail)"></i><i style="width:${n?b/n*100:0}%;background:var(--warn)"></i></div>
+      <span class="s">${esc(sub)}</span></div>`);
+  }
+  const fixed = S.tickets.filter(t=>t.status==="fixed").length, open = S.tickets.length - fixed;
+  if (S.tickets.length) tiles.push(`<div class="tile"><span class="k">Bugs &amp; features</span><span class="v">${fixed} fixed</span>
+    <div class="bar" aria-hidden="true"><i style="width:${fixed/S.tickets.length*100}%;background:var(--pass)"></i></div><span class="s">${open} open in the backlog</span></div>`);
+  $("#summary").innerHTML = tiles.join("");
+}
+
+function renderCases(){
+  const chips = [["all","All"], ...suitesSorted().map(([id])=>[id, SUITE_LABEL[id]||id])];
+  let h = `<div class="filters" style="margin:14px 0">
+    ${chips.map(([v,l])=>`<button class="chip" data-suite="${v}" aria-pressed="${UI.suite===v}">${esc(l)}</button>`).join("")}
+    <select class="sel" id="fStatus" aria-label="Filter by result">
+      ${[["all","Any result"],["fail","Failing"],["none","Not run yet"],["pass","Passing"],["blocked","Blocked"]].map(([v,l])=>`<option value="${v}" ${UI.status===v?"selected":""}>${l}</option>`).join("")}
+    </select>
+    <input class="search" id="fQ" type="search" placeholder="Search cases, IDs or tickets" value="${esc(UI.q)}" aria-label="Search cases"></div>`;
+  const q = UI.q.trim().toLowerCase(); let shown = 0;
+  for (const [sid, s] of suitesSorted()) {
+    if (UI.suite!=="all" && UI.suite!==sid) continue;
+    const cases = (s.cases||[]).filter(c => {
+      const st = caseStatus(sid,c);
+      if (UI.status!=="all" && st!==UI.status) return false;
+      if (q && !(`${c.id} ${c.title} ${c.area} ${(c.tickets||[]).join(" ")}`.toLowerCase().includes(q))) return false;
+      return true;
+    });
+    if (!cases.length) continue;
+    shown += cases.length;
+    h += `<div class="group"><h3>${esc(s.name)}</h3><p class="how">${esc(s.how||"")}</p>`;
+    const areas = [...new Set(cases.map(c=>c.area))];
+    for (const a of areas) {
+      h += `<div class="area">${esc(a)}</div><div class="list">`;
+      for (const c of cases.filter(c=>c.area===a)) {
+        const st = caseStatus(sid,c), tr = trail(sid,c), open = UI.open.has(c.id);
+        h += `<div class="item"><button class="row" data-case="${esc(c.id)}" aria-expanded="${open}">
+          <span class="id mono">${esc(c.id)}</span>
+          <span class="t">${esc(c.title)}${(c.tickets||[]).length?`<span class="meta">${c.tickets.map(t=>`<span class="tk">${esc(t)}</span>`).join("")}</span>`:""}</span>
+          <span class="right"><span class="pill ${st}">${pillText[st]}</span>${tr.length?`<span class="trail" title="Results over time, oldest first">${tr.map(r=>`<i class="${r}"></i>`).join("")}</span>`:""}</span></button>
+          ${open?caseDetail(sid,c):""}</div>`;
+      }
+      h += `</div>`;
+    }
+    h += `</div>`;
+  }
+  if (!shown) h += `<div class="empty">${Object.keys(S.suites).length ? "No cases match these filters." : "No test cases loaded yet."}</div>`;
+  $("#view").innerHTML = h;
+}
+function caseDetail(sid, c){
+  const runs = runsFor(sid).filter(r=>r.results && r.results[c.id]);
+  const logs = logsFor(c.id);
+  return `<div class="detail"><dl>
+    ${c.steps?`<dt>Steps</dt><dd>${esc(c.steps)}</dd>`:""}
+    ${c.expected?`<dt>Expected</dt><dd>${esc(c.expected)}</dd>`:""}
+    ${c.where?`<dt>Test file</dt><dd class="mono">${esc(c.where)}</dd>`:""}
+    ${runs.length?`<dt>Runs</dt><dd>${runs.map(r=>`${esc(fmt(r.at))}: <b>${pillText[r.results[c.id]]}</b>`).join(" → ")}</dd>`:""}
+    ${(c.tickets||[]).length?`<dt>Tickets</dt><dd>${c.tickets.map(t=>{const k=S.tickets.find(x=>x.id===t);return k?`${esc(t)}: ${esc(k.title)}`:esc(t)}).join("<br>")}</dd>`:""}
+  </dl>
+  ${logs.length?logs.map(logHTML).join(""):`<span class="note">No manual results logged for this case.</span>`}
+  <button class="chip" data-logfor="${esc(c.id)}" style="align-self:flex-start">Log a result for ${esc(c.id)}</button></div>`;
+}
+function logHTML(l){
+  const who = S.names[l.by] || (l.by && l.by===S.me ? "You" : "A tester");
+  const del = (S.isOwner || (l.by && l.by===S.me)) ? ` · <button class="linkbtn" data-dellog="${esc(l._id)}">Delete</button>` : "";
+  return `<div class="log ${esc(l.result)}"><b>${pillText[l.result]||esc(l.result)}</b> · ${esc(l.device||"Device not given")}${l.notes?`<div>${esc(l.notes)}</div>`:""}<small>${esc(who)} · ${esc(fmt(l.at))}${del}</small></div>`;
+}
+
+function renderTickets(){
+  const idx = caseIndex();
+  let h = `<div class="filters" style="margin:14px 0">
+    ${[["open","Open"],["fixed","Fixed"],["all","All"]].map(([v,l])=>`<button class="chip" data-tstatus="${v}" aria-pressed="${UI.tstatus===v}">${l}</button>`).join("")}
+    <select class="sel" id="fLayer" aria-label="Filter by layer">${[["all","All layers"],["prototype","Prototype"],["backend","Backend"],["edge","Media signing"]].map(([v,l])=>`<option value="${v}" ${UI.tlayer===v?"selected":""}>${l}</option>`).join("")}</select></div>`;
+  const items = S.tickets.filter(t=>(UI.tstatus==="all"||t.status===UI.tstatus)&&(UI.tlayer==="all"||t.layer===UI.tlayer));
+  const sev = {High:0, Medium:1, Low:2};
+  items.sort((a,b)=>(a.status===b.status?0:a.status==="open"?-1:1) || (sev[a.severity]-sev[b.severity]) || a.id.localeCompare(b.id, undefined, {numeric:true}));
+  if (!items.length) { $("#view").innerHTML = h + `<div class="empty">Nothing here.</div>`; return; }
+  h += `<div class="list">`;
+  for (const t of items) {
+    const tests = (t.tests||[]).map(id=>idx[id] ? {id, st:caseStatus(idx[id].sid, idx[id].c), tr:trail(idx[id].sid, idx[id].c)} : null).filter(Boolean);
+    const allPass = tests.length && tests.every(x=>x.st==="pass");
+    const redGreen = tests.some(x=>x.tr.includes("fail")) && allPass;
+    const proof = !tests.length ? (t.status==="open" ? "Needs a failing test first" : "Covered by the security suite totals")
+      : `${tests.length} test${tests.length>1?"s":""}: ${allPass?"all passing":tests.filter(x=>x.st!=="pass").length+" not passing"}${redGreen?" · failed first, then passed":""}`;
+    h += `<div class="item"><div class="row">
+      <span class="id mono">${esc(t.id)}</span>
+      <span class="t">${esc(t.title)}<span class="meta"><span class="tk">${esc(t.kind)}</span><span class="tk">${esc(SUITE_LABEL[t.layer]||t.layer)}</span><span class="tk">${esc(t.severity)}</span>${tests.slice(0,6).map(x=>`<span class="tk">${esc(x.id)}</span>`).join("")}${tests.length>6?`<span class="tk">+${tests.length-6}</span>`:""}</span>
+        <span class="note">${esc(proof)}</span></span>
+      <span class="right"><span class="pill ${t.status}">${t.status==="fixed"?"Fixed":"Open"}</span></span></div></div>`;
+  }
+  $("#view").innerHTML = h + `</div>`;
+}
+
+function renderRuns(){
+  const runs = [...S.runs].sort((a,b)=>b.at.localeCompare(a.at));
+  if (!runs.length) { $("#view").innerHTML = `<div class="empty">No runs recorded yet.</div>`; return; }
+  $("#view").innerHTML = `<div class="list runs" style="margin-top:14px">${runs.map(r=>{
+    const n = r.passed + r.failed;
+    return `<div class="item"><div class="row"><span class="t"><b>${esc(SUITE_LABEL[r.suite]||r.suite)}</b> · ${esc(r.label)}<br><span class="note">${esc(fmt(r.at))}${r.note?` · ${esc(r.note)}`:""}</span>
+      <div class="bar" style="margin-top:6px" aria-hidden="true"><i style="width:${n?r.passed/n*100:0}%;background:var(--pass)"></i><i style="width:${n?r.failed/n*100:0}%;background:var(--fail)"></i></div></span>
+      <span class="right"><span class="pill ${r.failed?"fail":"pass"}">${r.passed}/${n} pass</span></span></div></div>`;
+  }).join("")}</div>`;
+}
+
+function renderLog(){
+  const d = UI.draft;
+  const opts = suitesSorted().sort((a,b)=>(a[1].kind==="manual"?-1:0)-(b[1].kind==="manual"?-1:0))
+    .map(([sid,s])=>`<optgroup label="${esc(s.name)}">${(s.cases||[]).map(c=>`<option value="${esc(c.id)}" ${d.case===c.id?"selected":""}>${esc(c.id)} · ${esc(c.title.slice(0,70))}</option>`).join("")}</optgroup>`).join("");
+  const sel = caseIndex()[d.case];
+  const readOnly = S.canWrite === false;
+  const recent = [...S.logs].sort((a,b)=>b.at.localeCompare(a.at)).slice(0,30);
+  $("#view").innerHTML = `<form class="card" id="logForm" style="margin-top:14px">
+    <h2>Log a test result</h2>
+    ${readOnly?`<p class="note">You can view results but not log them. Ask Chase to share this page with you as an editor.</p>`:""}
+    <label class="f" for="lCase">Test case<select class="field" id="lCase" required><option value="">Choose a case</option>${opts}</select></label>
+    ${sel&&sel.c.steps?`<div class="note"><b>Steps:</b> ${esc(sel.c.steps)}<br><b>Expected:</b> ${esc(sel.c.expected)}</div>`:""}
+    <fieldset style="border:0;padding:0;margin:0"><legend class="f" style="font-weight:600;font-size:14px;margin-bottom:6px">Result</legend><div class="radios">
+      ${[["pass","Pass"],["fail","Fail"],["blocked","Blocked"]].map(([v,l])=>`<label><input type="radio" name="lRes" id="lRes-${v}" value="${v}" ${d.result===v?"checked":""}>${l}</label>`).join("")}</div></fieldset>
+    <label class="f" for="lDevice">Phone and app<input class="field" id="lDevice" maxlength="80" placeholder="e.g. iPhone 13, iOS 18, TestFlight build 1" value="${esc(d.device)}"></label>
+    <label class="f" for="lNotes">What happened<textarea class="field" id="lNotes" rows="3" maxlength="1000" placeholder="Required for Fail or Blocked: what you saw and what you expected">${esc(d.notes)}</textarea></label>
+    <button class="btn" type="submit" id="lSave" ${readOnly?"disabled":""}>Save result</button>
+    <span class="note" id="lMsg" role="status"></span></form>
+    <div class="group"><h3>Recent results</h3>${recent.length?`<div class="list" style="padding:10px 12px;display:flex;flex-direction:column;gap:10px">${recent.map(l=>`<div><span class="mono">${esc(l.caseId)}</span> ${logHTML(l)}</div>`).join("")}</div>`:`<div class="empty">No manual results yet. The first one you save shows up here for everyone.</div>`}</div>`;
+}
+
+// ---------- events ----------
+document.addEventListener("click", async e => {
+  const t = e.target;
+  const tb = t.closest(".tabs button"); if (tb) { UI.tab = tb.dataset.tab; try { localStorage.setItem("htl.tab", UI.tab); } catch {} return render(); }
+  const sc = t.closest("[data-suite]"); if (sc) { UI.suite = sc.dataset.suite; return renderCases(); }
+  const ts = t.closest("[data-tstatus]"); if (ts) { UI.tstatus = ts.dataset.tstatus; return renderTickets(); }
+  const lf = t.closest("[data-logfor]"); if (lf) { UI.draft.case = lf.dataset.logfor; UI.tab = "log"; render(); window.scrollTo(0,0); return; }
+  const dl = t.closest("[data-dellog]"); if (dl) { const db = await claude.use("db"); try { await db?.collection("logs").doc(dl.dataset.dellog).delete(); } catch (err) { setStatus("Couldn't delete that result. You may not have permission."); } return; }
+  const rc = t.closest("[data-case]"); if (rc) { const id = rc.dataset.case; UI.open.has(id) ? UI.open.delete(id) : UI.open.add(id); return renderCases(); }
+});
+document.addEventListener("input", e => {
+  const id = e.target.id;
+  if (id==="fQ") { UI.q = e.target.value; const pos = e.target.selectionStart; renderCases(); const el=$("#fQ"); el.focus(); el.setSelectionRange(pos,pos); }
+  if (id==="lDevice") UI.draft.device = e.target.value;
+  if (id==="lNotes") UI.draft.notes = e.target.value;
+});
+document.addEventListener("change", e => {
+  const id = e.target.id;
+  if (id==="fStatus") { UI.status = e.target.value; renderCases(); }
+  if (id==="fLayer") { UI.tlayer = e.target.value; renderTickets(); }
+  if (id==="lCase") { UI.draft.case = e.target.value; renderLog(); }
+  if (e.target.name==="lRes") UI.draft.result = e.target.value;
+});
+document.addEventListener("submit", async e => {
+  e.preventDefault();
+  if (e.target.id !== "logForm") return;
+  const d = UI.draft, msg = $("#lMsg");
+  if (!d.case) return msg.textContent = "Choose which test case you ran.";
+  if (!d.result) return msg.textContent = "Choose Pass, Fail or Blocked.";
+  if (d.result!=="pass" && !d.notes.trim()) return msg.textContent = "Add a note about what went wrong so it can be fixed.";
+  const db = await claude.use("db");
+  if (!db) return msg.textContent = "Saving needs you signed in to Claude. Open this page from your Claude account.";
+  $("#lSave").disabled = true; msg.textContent = "Saving…";
+  try {
+    await db.collection("logs").add({ caseId:d.case, result:d.result, device:d.device.trim().slice(0,80), notes:d.notes.trim().slice(0,1000), at:new Date().toISOString(), by:S.me||null });
+    UI.draft = { case:"", result:"", device:d.device, notes:"" };
+    renderLog(); $("#lMsg").textContent = "Saved. Thanks for testing.";
+  } catch (err) {
+    $("#lSave").disabled = false;
+    msg.textContent = err?.code==="invalid_argument" ? "This page is view-only for you, so results can't be saved. Ask Chase to make you an editor." : "Couldn't save. Check your connection and try again.";
+    if (err?.code==="invalid_argument") { S.canWrite = false; }
+  }
+});
+function setStatus(s){ $("#status").textContent = s; $("#status").hidden = !s; }
+
+// ---------- data ----------
+render();
+(async () => {
+  if (!window.claude?.use) { setStatus("Open this page in Claude to load the test data."); return; }
+  const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+  if (!db) { setStatus("Sign in to Claude to see the test data."); return; }
+  if (user) { try { S.me = await user.id(); S.isOwner = await user.isOwner(); S.canWrite = await user.can("data.write"); } catch {} }
+  let loaded = 0; const done = () => { if (++loaded >= 3) setStatus(""); };
+  const onErr = () => setStatus("Lost the live connection. Reload the page to see the latest results.");
+  db.collection("suites").onSnapshot(s => { S.suites = Object.fromEntries(s.docs.map(d=>[d.id, d.data()])); done(); render(); }, onErr);
+  db.collection("tickets").onSnapshot(s => { S.tickets = s.docs.flatMap(d=>d.data().items||[]); done(); render(); }, onErr);
+  db.collection("runs").onSnapshot(s => { S.runs = s.docs.map(d=>({...d.data(), _id:d.id})); done(); render(); }, onErr);
+  db.collection("logs").onSnapshot(async s => {
+    S.logs = s.docs.map(d=>({...d.data(), _id:d.id}));
+    const ids = [...new Set(S.logs.map(l=>l.by).filter(Boolean))];
+    if (user && ids.length) { try { const ps = await user.profiles(ids); for (const id of ids) S.names[id] = ps[id]?.name || ""; } catch {} }
+    if (UI.tab !== "log" || !document.activeElement?.closest("#logForm")) render(); else renderSummary();
+  }, onErr);
+})();
+</script>

@@ -1,0 +1,273 @@
+{
+ "name": "Prototype (browser tests)",
+ "kind": "auto",
+ "how": "cd e2e && npx playwright test   (iPhone-size Chromium, light + dark)",
+ "order": 1,
+ "cases": [
+  {
+   "id": "VIS-01",
+   "title": "Owner sees every post in the family space",
+   "area": "Who sees what",
+   "tickets": [
+    "T1"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "VIS-02",
+   "title": "Grandma Jo sees only posts shared with her circles",
+   "area": "Who sees what",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "VIS-03",
+   "title": "Nana Ruth (other side) does not see \"My side\" posts",
+   "area": "Who sees what",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "VIS-04",
+   "title": "Co-parent sees Everyone + co-parent posts only",
+   "area": "Who sees what",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "VIS-05",
+   "title": "Changing a post audience revokes access right away",
+   "area": "Who sees what",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "VIS-06",
+   "title": "Removing someone from a circle revokes access and says how many posts",
+   "area": "Who sees what",
+   "tickets": [
+    "E8"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "VIS-07",
+   "title": "Co-parent cannot see the other household's relatives in Circles",
+   "area": "Who sees what",
+   "tickets": [
+    "B2"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "VIS-08",
+   "title": "Co-parent never sees the other parent's circle names",
+   "area": "Who sees what",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "ROLE-01",
+   "title": "Viewers get a clean tab bar with no Share or Circles",
+   "area": "Roles",
+   "tickets": [
+    "B5",
+    "B10"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "ROLE-02",
+   "title": "Viewer can react and comment; the poster sees it",
+   "area": "Roles",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "POST-01",
+   "title": "Share a photo to one circle",
+   "area": "Sharing",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "POST-02",
+   "title": "Share stays disabled until a photo or video is picked",
+   "area": "Sharing",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "POST-03",
+   "title": "Picking only an empty circle explains why Share is off",
+   "area": "Sharing",
+   "tickets": [
+    "B4"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "POST-04",
+   "title": "Remove a picked photo before sharing",
+   "area": "Sharing",
+   "tickets": [
+    "E6"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "POST-05",
+   "title": "Audience defaults to what that same person used last",
+   "area": "Sharing",
+   "tickets": [
+    "B8"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "POST-06",
+   "title": "Videos upload and show a player",
+   "area": "Sharing",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "POST-07",
+   "title": "Delete your own post, with a confirm step",
+   "area": "Sharing",
+   "tickets": [
+    "E1"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "CIR-01",
+   "title": "Create a circle; duplicate names are rejected",
+   "area": "Circles",
+   "tickets": [
+    "B7"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "CIR-02",
+   "title": "Rename a circle",
+   "area": "Circles",
+   "tickets": [
+    "E7"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "CIR-03",
+   "title": "Deleting a circle is blocked when a post would lose its only audience",
+   "area": "Circles",
+   "tickets": [
+    "E7"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "INV-01",
+   "title": "Copy invite link never crashes, even without clipboard access",
+   "area": "Invites",
+   "tickets": [
+    "B1"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "INV-02",
+   "title": "Invite lands the new person in the chosen circles",
+   "area": "Invites",
+   "tickets": [
+    "E3"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "NOTE-01",
+   "title": "Text-message preview names the real poster",
+   "area": "Notifications",
+   "tickets": [
+    "B3"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "NOTE-02",
+   "title": "Notification choice is kept per person",
+   "area": "Notifications",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "COM-01",
+   "title": "A half-typed comment survives reacting to another post",
+   "area": "Comments",
+   "tickets": [
+    "B6"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "VIEW-01",
+   "title": "Tap a photo to open it full screen; swipe through; Escape closes",
+   "area": "Viewing",
+   "tickets": [
+    "E2"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "VIEW-02",
+   "title": "Poster sees \"Seen by\" on their posts",
+   "area": "Viewing",
+   "tickets": [
+    "E4"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "A11Y-01",
+   "title": "Sheets take focus and close with Escape",
+   "area": "Accessibility",
+   "tickets": [
+    "B9"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "A11Y-02",
+   "title": "Larger text option for grandparents",
+   "area": "Accessibility",
+   "tickets": [
+    "E5"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "A11Y-03",
+   "title": "No sideways scrolling on a small phone",
+   "area": "Accessibility",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "A11Y-04",
+   "title": "No script errors through a full walkthrough",
+   "area": "Accessibility",
+   "tickets": [
+    "T2"
+   ],
+   "where": "e2e/tests/hearth.spec.js"
+  },
+  {
+   "id": "SEC-01",
+   "title": "Captions and comments can't inject code",
+   "area": "Security",
+   "tickets": [],
+   "where": "e2e/tests/hearth.spec.js"
+  }
+ ]
+}

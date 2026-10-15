@@ -1,0 +1,563 @@
+{
+ "items": [
+  {
+   "id": "B1",
+   "kind": "bug",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Copying the invite link crashed when the phone blocks clipboard access",
+   "tests": [
+    "INV-01"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B2",
+   "kind": "bug",
+   "layer": "prototype",
+   "severity": "High",
+   "status": "fixed",
+   "title": "Co-parent could see the other household's relatives in Circles",
+   "tests": [
+    "VIS-07"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B3",
+   "kind": "bug",
+   "layer": "prototype",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "Notification preview always said 'Chase shared photos of Mia'",
+   "tests": [
+    "NOTE-01"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B4",
+   "kind": "bug",
+   "layer": "prototype",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "Choosing an empty circle said 'Pick at least one circle'",
+   "tests": [
+    "POST-03"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B5",
+   "kind": "bug",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Grandparents saw a dead Share button and gaps in the tab bar",
+   "tests": [
+    "ROLE-01"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B6",
+   "kind": "bug",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "A half-typed comment was wiped when anyone reacted",
+   "tests": [
+    "COM-01"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B7",
+   "kind": "bug",
+   "layer": "prototype",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "Duplicate circle names were allowed",
+   "tests": [
+    "CIR-01"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B8",
+   "kind": "bug",
+   "layer": "prototype",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "Share sheet's default audience carried over between people",
+   "tests": [
+    "POST-05"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B9",
+   "kind": "bug",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Sheets didn't take focus or close with Escape",
+   "tests": [
+    "A11Y-01"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B10",
+   "kind": "bug",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Hidden tabs reappeared outside the artifact preview (CSS beat the hidden attribute). Found by ROLE-01 during the fix run.",
+   "tests": [
+    "ROLE-01"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "E1",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "High",
+   "status": "fixed",
+   "title": "Delete your own post, with a confirm step",
+   "tests": [
+    "POST-07"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "E2",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "High",
+   "status": "fixed",
+   "title": "Tap a photo for full screen, swipe or arrow between photos",
+   "tests": [
+    "VIEW-01"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "E3",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "High",
+   "status": "fixed",
+   "title": "Invite flow: name, role and circles chosen up front, then a link to text",
+   "tests": [
+    "INV-01",
+    "INV-02"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "E4",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "'Seen by 3 of 5' on your own posts",
+   "tests": [
+    "VIEW-02"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "E5",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Larger text setting for grandparents",
+   "tests": [
+    "A11Y-02"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "E6",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Remove a picked photo before sharing",
+   "tests": [
+    "POST-04"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "E7",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Rename and delete circles; deleting is blocked if a post would lose its only audience",
+   "tests": [
+    "CIR-02",
+    "CIR-03"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "E8",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Removing someone from a circle says how many posts they lost",
+   "tests": [
+    "VIS-06"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "T1",
+   "kind": "test fix",
+   "layer": "prototype",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "Test selector also matched the Share tab (shared 'post' class). Renamed the tab's class in the app and tightened the test.",
+   "tests": [
+    "VIS-01"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "T2",
+   "kind": "test fix",
+   "layer": "prototype",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "Blocked web fonts were counted as script errors in tests",
+   "tests": [
+    "A11Y-04"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "S1",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "High",
+   "status": "fixed",
+   "title": "Someone removed from the family space kept access to their own old posts: new comments, photos and keys",
+   "tests": [
+    "SQL-105",
+    "SQL-108",
+    "SQL-109"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "S2",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "A view-only member could publish a draft after posting was turned off for viewers",
+   "tests": [
+    "SQL-104",
+    "SQL-109"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "S3",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "A video labeled as a photo slipped past the 10-video free cap",
+   "tests": [
+    "SQL-096"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "S4",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Co-parent could read billing details and the space's video count",
+   "tests": [
+    "SQL-091",
+    "SQL-092",
+    "SQL-093"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "S5",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Co-parent could see a child linked to the other household (e.g. a new half-sibling) with nothing shared",
+   "tests": [
+    "SQL-097",
+    "SQL-098",
+    "SQL-099",
+    "SQL-100",
+    "SQL-101",
+    "SQL-102",
+    "SQL-103"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "S6",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "Children's birth dates were readable by all members",
+   "tests": [
+    "SQL-100",
+    "SQL-101",
+    "SQL-103"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "S7",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "Could edit your comment on a post you can no longer see",
+   "tests": [
+    "SQL-110"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "S8",
+   "kind": "bug",
+   "layer": "edge",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "Edge function failed type-checking on current Deno, so the documented test command didn't run",
+   "tests": [
+    "EDGE-01",
+    "EDGE-02",
+    "EDGE-03",
+    "EDGE-04",
+    "EDGE-05"
+   ],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "S9",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Medium",
+   "status": "open",
+   "title": "Space managers can read invite code hashes; 8-character codes are crackable offline in about a day. Salt or lengthen codes.",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "S10",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Medium",
+   "status": "open",
+   "title": "No rate limit on redeeming invite codes",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "S11",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Medium",
+   "status": "open",
+   "title": "A guardian can unlink their child from the other household's space",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "S12",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Low",
+   "status": "open",
+   "title": "Removed members can still edit captions on their old posts",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "S13",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Low",
+   "status": "open",
+   "title": "Members of a deleted circle can still see each other's profiles",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "S14",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Low",
+   "status": "open",
+   "title": "Free-tier video cap is per space; someone can make extra spaces",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "S15",
+   "kind": "bug",
+   "layer": "edge",
+   "severity": "Low",
+   "status": "open",
+   "title": "Media can be marked ready without its key saved, which breaks that post (fails closed)",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "S16",
+   "kind": "task",
+   "layer": "backend",
+   "severity": "High",
+   "status": "open",
+   "title": "Rerun the backend suite on a real Supabase stack before launch (today's runs use a stand-in)",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "E9",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "High",
+   "status": "open",
+   "title": "Filter the feed by child (tag Mia / Leo on a post)",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "E10",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "High",
+   "status": "open",
+   "title": "Save a photo to your phone (grandparents print them)",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "E11",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "open",
+   "title": "Undo for 10 seconds after deleting a post",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "E12",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "open",
+   "title": "Tell people about the 60-second video limit and free-tier video count when they pick a video",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "E13",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "open",
+   "title": "Invite status: joined or pending, plus resend and cancel",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "E14",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Medium",
+   "status": "open",
+   "title": "Upload progress and automatic retry on bad cell signal",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "E15",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Low",
+   "status": "open",
+   "title": "Multilingual app (Spanish first)",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "E16",
+   "kind": "enhancement",
+   "layer": "prototype",
+   "severity": "Low",
+   "status": "open",
+   "title": "Send a circle's photos to a smart frame",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  }
+ ]
+}

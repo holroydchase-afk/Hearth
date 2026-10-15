@@ -1,0 +1,1744 @@
+{
+  "config": {
+    "configFile": "/home/claude/famapp/e2e/playwright.config.js",
+    "rootDir": "/home/claude/famapp/e2e/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "results/latest.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/claude/famapp/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/home/claude/famapp/e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 15000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "hearth.spec.js",
+      "file": "hearth.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "VIS-01 Owner sees every post in the family space",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 415,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m5\u001b[39m\nReceived: \u001b[31m6\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m5\u001b[39m\nReceived: \u001b[31m6\u001b[39m\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:26:47",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 47,
+                      "line": 26
+                    },
+                    "snippet": "  24 | test('VIS-01 Owner sees every post in the family space', async ({ page }) => {\n  25 |   await open(page);\n> 26 |   expect(await page.locator('.post').count()).toBe(5);\n     |                                               ^\n  27 | });\n  28 |\n  29 | test('VIS-02 Grandma Jo sees only posts shared with her circles', async ({ page }) => {"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 47,
+                        "line": 26
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m5\u001b[39m\nReceived: \u001b[31m6\u001b[39m\n\n  24 | test('VIS-01 Owner sees every post in the family space', async ({ page }) => {\n  25 |   await open(page);\n> 26 |   expect(await page.locator('.post').count()).toBe(5);\n     |                                               ^\n  27 | });\n  28 |\n  29 | test('VIS-02 Grandma Jo sees only posts shared with her circles', async ({ page }) => {\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:26:47"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:22.816Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-VIS-01-Owner-sees-every-post-in-the-family-space/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 47,
+                    "line": 26
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-a564f317602c6a6c775a",
+          "file": "hearth.spec.js",
+          "line": 24,
+          "column": 1
+        },
+        {
+          "title": "VIS-02 Grandma Jo sees only posts shared with her circles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 240,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:24.439Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-4a5fbeac6c57f14577c9",
+          "file": "hearth.spec.js",
+          "line": 29,
+          "column": 1
+        },
+        {
+          "title": "VIS-03 Nana Ruth (other side) does not see \"My side\" posts",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 198,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:24.790Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-d75f454d985d70e021ae",
+          "file": "hearth.spec.js",
+          "line": 36,
+          "column": 1
+        },
+        {
+          "title": "VIS-04 Co-parent sees Everyone + co-parent posts only",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 176,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:25.020Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-1d59d8e6f6c7fd8b7eef",
+          "file": "hearth.spec.js",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "VIS-05 Changing a post audience revokes access right away",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 578,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:25.213Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-67689af876feb20f2067",
+          "file": "hearth.spec.js",
+          "line": 50,
+          "column": 1
+        },
+        {
+          "title": "VIS-06 Removing someone from a circle revokes access and says how many posts (E8)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5225,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.toast')\nExpected substring: \u001b[32m\"Grandma Jo can no longer see 2 posts\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.toast')\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.toast')\nExpected substring: \u001b[32m\"Grandma Jo can no longer see 2 posts\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.toast')\u001b[22m\n\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:63:40",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 40,
+                      "line": 63
+                    },
+                    "snippet": "  61 |   await open(page); await tab(page, 'circles');\n  62 |   await page.locator('.card', { hasText: 'My side' }).getByRole('button', { name: 'Grandma Jo' }).click();\n> 63 |   await expect(page.locator('.toast')).toContainText('Grandma Jo can no longer see 2 posts');\n     |                                        ^\n  64 |   await viewAs(page, 'Grandma Jo');\n  65 |   expect((await captions(page)).join('|')).not.toContain('Birthday dinner');\n  66 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 40,
+                        "line": 63
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.toast')\nExpected substring: \u001b[32m\"Grandma Jo can no longer see 2 posts\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.toast')\u001b[22m\n\n\n  61 |   await open(page); await tab(page, 'circles');\n  62 |   await page.locator('.card', { hasText: 'My side' }).getByRole('button', { name: 'Grandma Jo' }).click();\n> 63 |   await expect(page.locator('.toast')).toContainText('Grandma Jo can no longer see 2 posts');\n     |                                        ^\n  64 |   await viewAs(page, 'Grandma Jo');\n  65 |   expect((await captions(page)).join('|')).not.toContain('Birthday dinner');\n  66 | });\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:63:40"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:25.804Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-VIS-06-Removing-som-95cab-and-says-how-many-posts-E8-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 40,
+                    "line": 63
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-64265d065194d72743ab",
+          "file": "hearth.spec.js",
+          "line": 60,
+          "column": 1
+        },
+        {
+          "title": "VIS-07 Co-parent cannot see the other household's relatives in Circles (B2)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 317,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: not \u001b[32m\"Grandma Jo\"\u001b[39m\nReceived string:        \u001b[31m\"Your circles\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mCircles decide who sees each post. Only you can see your circle names and who's in them.\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mCo-parent\u001b[39m\n\u001b[31m1 person\u001b[39m\n\u001b[31mChase\u001b[39m\n\u001b[31m\u001b[7mGrandma Jo\u001b[27m\u001b[39m\n\u001b[31mPop Walt\u001b[39m\n\u001b[31mAunt Kim\u001b[39m\n\u001b[31mNana Ruth\u001b[39m\n\u001b[31mMy family\u001b[39m\n\u001b[31m1 person\u001b[39m\n\u001b[31mChase\u001b[39m\n\u001b[31mGrandma Jo\u001b[39m\n\u001b[31mPop Walt\u001b[39m\n\u001b[31mAunt Kim\u001b[39m\n\u001b[31mNana Ruth\u001b[39m\n\u001b[31mNew circle\u001b[39m\n\u001b[31mAdd\u001b[39m\n\u001b[31mInvite family\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mSend this link by text or email. It works on iPhone, Android, or any web browser. No password, and it expires in 7 days.\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mhearth.family/join/K7Q2-MX4P\u001b[39m\n\u001b[31mCopy link\u001b[39m\n\u001b[31mCode: K7Q2-MX4P\"\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: not \u001b[32m\"Grandma Jo\"\u001b[39m\nReceived string:        \u001b[31m\"Your circles\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mCircles decide who sees each post. Only you can see your circle names and who's in them.\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mCo-parent\u001b[39m\n\u001b[31m1 person\u001b[39m\n\u001b[31mChase\u001b[39m\n\u001b[31m\u001b[7mGrandma Jo\u001b[27m\u001b[39m\n\u001b[31mPop Walt\u001b[39m\n\u001b[31mAunt Kim\u001b[39m\n\u001b[31mNana Ruth\u001b[39m\n\u001b[31mMy family\u001b[39m\n\u001b[31m1 person\u001b[39m\n\u001b[31mChase\u001b[39m\n\u001b[31mGrandma Jo\u001b[39m\n\u001b[31mPop Walt\u001b[39m\n\u001b[31mAunt Kim\u001b[39m\n\u001b[31mNana Ruth\u001b[39m\n\u001b[31mNew circle\u001b[39m\n\u001b[31mAdd\u001b[39m\n\u001b[31mInvite family\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mSend this link by text or email. It works on iPhone, Android, or any web browser. No password, and it expires in 7 days.\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mhearth.family/join/K7Q2-MX4P\u001b[39m\n\u001b[31mCopy link\u001b[39m\n\u001b[31mCode: K7Q2-MX4P\"\u001b[39m\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:71:73",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 73,
+                      "line": 71
+                    },
+                    "snippet": "  69 |   await open(page); await viewAs(page, 'Alex'); await tab(page, 'circles');\n  70 |   const t = await page.locator('#view').innerText();\n> 71 |   for (const n of ['Grandma Jo', 'Pop Walt', 'Aunt Kim']) expect(t).not.toContain(n);\n     |                                                                         ^\n  72 |   expect(t).toContain('Nana Ruth');\n  73 | });\n  74 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 73,
+                        "line": 71
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: not \u001b[32m\"Grandma Jo\"\u001b[39m\nReceived string:        \u001b[31m\"Your circles\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mCircles decide who sees each post. Only you can see your circle names and who's in them.\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mCo-parent\u001b[39m\n\u001b[31m1 person\u001b[39m\n\u001b[31mChase\u001b[39m\n\u001b[31m\u001b[7mGrandma Jo\u001b[27m\u001b[39m\n\u001b[31mPop Walt\u001b[39m\n\u001b[31mAunt Kim\u001b[39m\n\u001b[31mNana Ruth\u001b[39m\n\u001b[31mMy family\u001b[39m\n\u001b[31m1 person\u001b[39m\n\u001b[31mChase\u001b[39m\n\u001b[31mGrandma Jo\u001b[39m\n\u001b[31mPop Walt\u001b[39m\n\u001b[31mAunt Kim\u001b[39m\n\u001b[31mNana Ruth\u001b[39m\n\u001b[31mNew circle\u001b[39m\n\u001b[31mAdd\u001b[39m\n\u001b[31mInvite family\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mSend this link by text or email. It works on iPhone, Android, or any web browser. No password, and it expires in 7 days.\u001b[39m\n\u001b[31m\u001b[39m\n\u001b[31mhearth.family/join/K7Q2-MX4P\u001b[39m\n\u001b[31mCopy link\u001b[39m\n\u001b[31mCode: K7Q2-MX4P\"\u001b[39m\n\n  69 |   await open(page); await viewAs(page, 'Alex'); await tab(page, 'circles');\n  70 |   const t = await page.locator('#view').innerText();\n> 71 |   for (const n of ['Grandma Jo', 'Pop Walt', 'Aunt Kim']) expect(t).not.toContain(n);\n     |                                                                         ^\n  72 |   expect(t).toContain('Nana Ruth');\n  73 | });\n  74 |\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:71:73"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:31.971Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-VIS-07-Co-parent-ca-084af--s-relatives-in-Circles-B2-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 73,
+                    "line": 71
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-b140b81cd2060e1264a0",
+          "file": "hearth.spec.js",
+          "line": 68,
+          "column": 1
+        },
+        {
+          "title": "VIS-08 Co-parent never sees the other parent's circle names",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 334,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:33.235Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-efd7448c7c6887b6a258",
+          "file": "hearth.spec.js",
+          "line": 75,
+          "column": 1
+        },
+        {
+          "title": "ROLE-01 Viewers get a clean tab bar with no Share or Circles (B5)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5157,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeHidden\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.tab[data-tab=post]')\nExpected: hidden\nReceived: visible\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeHidden\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.tab[data-tab=post]')\u001b[22m\n\u001b[2m    9 × locator resolved to <button disabled id=\"t-post\" data-tab=\"post\" class=\"tab post\">…</button>\u001b[22m\n\u001b[2m      - unexpected value \"visible\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeHidden\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.tab[data-tab=post]')\nExpected: hidden\nReceived: visible\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeHidden\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.tab[data-tab=post]')\u001b[22m\n\u001b[2m    9 × locator resolved to <button disabled id=\"t-post\" data-tab=\"post\" class=\"tab post\">…</button>\u001b[22m\n\u001b[2m      - unexpected value \"visible\"\u001b[22m\n\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:87:53",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 53,
+                      "line": 87
+                    },
+                    "snippet": "  85 | test('ROLE-01 Viewers get a clean tab bar with no Share or Circles (B5)', async ({ page }) => {\n  86 |   await open(page); await viewAs(page, 'Pop Walt');\n> 87 |   await expect(page.locator('.tab[data-tab=post]')).toBeHidden();\n     |                                                     ^\n  88 |   await expect(page.locator('.tab[data-tab=circles]')).toBeHidden();\n  89 |   const boxes = await page.locator('.tab:visible').evaluateAll(els => els.map(e => e.getBoundingClientRect().width));\n  90 |   expect(boxes.length).toBe(2);"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 53,
+                        "line": 87
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeHidden\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.tab[data-tab=post]')\nExpected: hidden\nReceived: visible\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeHidden\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.tab[data-tab=post]')\u001b[22m\n\u001b[2m    9 × locator resolved to <button disabled id=\"t-post\" data-tab=\"post\" class=\"tab post\">…</button>\u001b[22m\n\u001b[2m      - unexpected value \"visible\"\u001b[22m\n\n\n  85 | test('ROLE-01 Viewers get a clean tab bar with no Share or Circles (B5)', async ({ page }) => {\n  86 |   await open(page); await viewAs(page, 'Pop Walt');\n> 87 |   await expect(page.locator('.tab[data-tab=post]')).toBeHidden();\n     |                                                     ^\n  88 |   await expect(page.locator('.tab[data-tab=circles]')).toBeHidden();\n  89 |   const boxes = await page.locator('.tab:visible').evaluateAll(els => els.map(e => e.getBoundingClientRect().width));\n  90 |   expect(boxes.length).toBe(2);\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:87:53"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:33.680Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-ROLE-01-Viewers-get-0cb5a-ith-no-Share-or-Circles-B5-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 53,
+                    "line": 87
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-d4d594269ce3621396b8",
+          "file": "hearth.spec.js",
+          "line": 85,
+          "column": 1
+        },
+        {
+          "title": "ROLE-02 Viewer can react and comment; the poster sees it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 428,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:39.770Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-68d27c35e801dd42dfc6",
+          "file": "hearth.spec.js",
+          "line": 94,
+          "column": 1
+        },
+        {
+          "title": "POST-01 Share a photo to one circle",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 701,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:40.341Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-729a8a85e5187698a8b5",
+          "file": "hearth.spec.js",
+          "line": 104,
+          "column": 1
+        },
+        {
+          "title": "POST-02 Share stays disabled until a photo or video is picked",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 228,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:41.056Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-f7507db24a80d49dfe82",
+          "file": "hearth.spec.js",
+          "line": 117,
+          "column": 1
+        },
+        {
+          "title": "POST-03 Picking only an empty circle explains why Share is off (B4)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5750,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#reachNote')\nExpected substring: \u001b[32m\"\u001b[7mNobody is in that\u001b[27m circle\u001b[7m yet\u001b[27m\"\u001b[39m\nReceived string:    \u001b[31m\"\u001b[7mPick at least one\u001b[27m circle\u001b[7m.\u001b[27m\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#reachNote')\u001b[22m\n\u001b[2m    9 × locator resolved to <p class=\"sub\" id=\"reachNote\">Pick at least one circle.</p>\u001b[22m\n\u001b[2m      - unexpected value \"Pick at least one circle.\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#reachNote')\nExpected substring: \u001b[32m\"\u001b[7mNobody is in that\u001b[27m circle\u001b[7m yet\u001b[27m\"\u001b[39m\nReceived string:    \u001b[31m\"\u001b[7mPick at least one\u001b[27m circle\u001b[7m.\u001b[27m\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#reachNote')\u001b[22m\n\u001b[2m    9 × locator resolved to <p class=\"sub\" id=\"reachNote\">Pick at least one circle.</p>\u001b[22m\n\u001b[2m      - unexpected value \"Pick at least one circle.\"\u001b[22m\n\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:131:44",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 44,
+                      "line": 131
+                    },
+                    "snippet": "  129 |   await page.locator('.sheet label', { hasText: 'Everyone' }).locator('input').uncheck();\n  130 |   await page.locator('.sheet label', { hasText: 'Soccer parents' }).locator('input').check();\n> 131 |   await expect(page.locator('#reachNote')).toContainText('Nobody is in that circle yet');\n      |                                            ^\n  132 |   await expect(page.locator('#share')).toBeDisabled();\n  133 | });\n  134 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 44,
+                        "line": 131
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('#reachNote')\nExpected substring: \u001b[32m\"\u001b[7mNobody is in that\u001b[27m circle\u001b[7m yet\u001b[27m\"\u001b[39m\nReceived string:    \u001b[31m\"\u001b[7mPick at least one\u001b[27m circle\u001b[7m.\u001b[27m\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('#reachNote')\u001b[22m\n\u001b[2m    9 × locator resolved to <p class=\"sub\" id=\"reachNote\">Pick at least one circle.</p>\u001b[22m\n\u001b[2m      - unexpected value \"Pick at least one circle.\"\u001b[22m\n\n\n  129 |   await page.locator('.sheet label', { hasText: 'Everyone' }).locator('input').uncheck();\n  130 |   await page.locator('.sheet label', { hasText: 'Soccer parents' }).locator('input').check();\n> 131 |   await expect(page.locator('#reachNote')).toContainText('Nobody is in that circle yet');\n      |                                            ^\n  132 |   await expect(page.locator('#share')).toBeDisabled();\n  133 | });\n  134 |\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:131:44"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:41.302Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-POST-03-Picking-onl-65ae6-plains-why-Share-is-off-B4-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 44,
+                    "line": 131
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-ce40c6caa9f654eb5a2f",
+          "file": "hearth.spec.js",
+          "line": 124,
+          "column": 1
+        },
+        {
+          "title": "POST-04 Remove a picked photo before sharing (E6)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 15043,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 61,
+                        "line": 139
+                      },
+                      "message": "Error: locator.click: Test timeout of 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Remove item 1' })\u001b[22m\n\n\n  137 |   await page.setInputFiles('#pick', [FIX('park.png'), FIX('cake.png')]);\n  138 |   await expect(page.locator('#thumbs .ph')).toHaveCount(2);\n> 139 |   await page.getByRole('button', { name: 'Remove item 1' }).click();\n      |                                                             ^\n  140 |   await expect(page.locator('#thumbs .ph')).toHaveCount(1);\n  141 | });\n  142 |\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:139:61"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T11:59:47.931Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-POST-04-Remove-a-picked-photo-before-sharing-E6-/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-7fd4a4c65dfce71dc4c8",
+          "file": "hearth.spec.js",
+          "line": 135,
+          "column": 1
+        },
+        {
+          "title": "POST-05 Audience defaults to what that same person used last (B8)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5773,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.sheet input[type=checkbox]:checked')\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.sheet input[type=checkbox]:checked')\u001b[22m\n\u001b[2m    9 × locator resolved to 0 elements\u001b[22m\n\u001b[2m      - unexpected value \"0\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.sheet input[type=checkbox]:checked')\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.sheet input[type=checkbox]:checked')\u001b[22m\n\u001b[2m    9 × locator resolved to 0 elements\u001b[22m\n\u001b[2m      - unexpected value \"0\"\u001b[22m\n\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:150:69",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 69,
+                      "line": 150
+                    },
+                    "snippet": "  148 |   await page.locator('#share').click();\n  149 |   await viewAs(page, 'Alex'); await tab(page, 'post');\n> 150 |   await expect(page.locator('.sheet input[type=checkbox]:checked')).toHaveCount(1); // Alex's own default\n      |                                                                     ^\n  151 |   await page.locator('[data-close]').first().click();\n  152 |   await viewAs(page, 'Chase'); await tab(page, 'post');\n  153 |   await expect(page.locator('.sheet label', { hasText: 'My side' }).locator('input')).toBeChecked();"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 69,
+                        "line": 150
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.sheet input[type=checkbox]:checked')\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m0\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.sheet input[type=checkbox]:checked')\u001b[22m\n\u001b[2m    9 × locator resolved to 0 elements\u001b[22m\n\u001b[2m      - unexpected value \"0\"\u001b[22m\n\n\n  148 |   await page.locator('#share').click();\n  149 |   await viewAs(page, 'Alex'); await tab(page, 'post');\n> 150 |   await expect(page.locator('.sheet input[type=checkbox]:checked')).toHaveCount(1); // Alex's own default\n      |                                                                     ^\n  151 |   await page.locator('[data-close]').first().click();\n  152 |   await viewAs(page, 'Chase'); await tab(page, 'post');\n  153 |   await expect(page.locator('.sheet label', { hasText: 'My side' }).locator('input')).toBeChecked();\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:150:69"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:00:03.984Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-POST-05-Audience-de-6842f-t-same-person-used-last-B8-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 69,
+                    "line": 150
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-51a6b3aa609ce43b01eb",
+          "file": "hearth.spec.js",
+          "line": 143,
+          "column": 1
+        },
+        {
+          "title": "POST-06 Videos upload and show a player",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 309,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:00:10.900Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-e74ec6136bcc2a81236a",
+          "file": "hearth.spec.js",
+          "line": 157,
+          "column": 1
+        },
+        {
+          "title": "POST-07 Delete your own post, with a confirm step (E1)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 7,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 15026,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 84,
+                        "line": 166
+                      },
+                      "message": "Error: locator.click: Test timeout of 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.post').filter({ hasText: 'Birthday dinner' }).getByRole('button', { name: 'Delete post' })\u001b[22m\n\n\n  164 |   await open(page);\n  165 |   await expect(post(page, 'ear drops').getByRole('button', { name: 'Delete post' })).toHaveCount(0);\n> 166 |   await post(page, 'Birthday dinner').getByRole('button', { name: 'Delete post' }).click();\n      |                                                                                    ^\n  167 |   await page.getByRole('button', { name: 'Keep it' }).click();\n  168 |   await expect(post(page, 'Birthday dinner')).toHaveCount(1);\n  169 |   await post(page, 'Birthday dinner').getByRole('button', { name: 'Delete post' }).click();\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:166:84"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:00:11.344Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-POST-07-Delete-your-own-post-with-a-confirm-step-E1-/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-f615c2ed5570ff85d445",
+          "file": "hearth.spec.js",
+          "line": 163,
+          "column": 1
+        },
+        {
+          "title": "CIR-01 Create a circle; duplicate names are rejected (B7)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5441,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.toast')\nExpected substring: \u001b[32m\"already have a circle called\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.toast')\u001b[22m\n\u001b[2m    6 × locator resolved to <div class=\"toast\" role=\"status\">Added cousins</div>\u001b[22m\n\u001b[2m      - unexpected value \"Added cousins\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.toast')\nExpected substring: \u001b[32m\"already have a circle called\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.toast')\u001b[22m\n\u001b[2m    6 × locator resolved to <div class=\"toast\" role=\"status\">Added cousins</div>\u001b[22m\n\u001b[2m      - unexpected value \"Added cousins\"\u001b[22m\n\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:182:40",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 40,
+                      "line": 182
+                    },
+                    "snippet": "  180 |   await expect(page.locator('.card', { hasText: 'Cousins' })).toHaveCount(1);\n  181 |   await page.fill('#ncName', 'cousins'); await page.locator('#newCircle button').click();\n> 182 |   await expect(page.locator('.toast')).toContainText('already have a circle called');\n      |                                        ^\n  183 |   await expect(page.locator('.card b', { hasText: /^Cousins$/i })).toHaveCount(1);\n  184 | });\n  185 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 40,
+                        "line": 182
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.toast')\nExpected substring: \u001b[32m\"already have a circle called\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.toast')\u001b[22m\n\u001b[2m    6 × locator resolved to <div class=\"toast\" role=\"status\">Added cousins</div>\u001b[22m\n\u001b[2m      - unexpected value \"Added cousins\"\u001b[22m\n\n\n  180 |   await expect(page.locator('.card', { hasText: 'Cousins' })).toHaveCount(1);\n  181 |   await page.fill('#ncName', 'cousins'); await page.locator('#newCircle button').click();\n> 182 |   await expect(page.locator('.toast')).toContainText('already have a circle called');\n      |                                        ^\n  183 |   await expect(page.locator('.card b', { hasText: /^Cousins$/i })).toHaveCount(1);\n  184 | });\n  185 |\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:182:40"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:00:27.214Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-CIR-01-Create-a-cir-98947-cate-names-are-rejected-B7-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 40,
+                    "line": 182
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-99fede5d30a479dd79b8",
+          "file": "hearth.spec.js",
+          "line": 177,
+          "column": 1
+        },
+        {
+          "title": "CIR-02 Rename a circle (E7)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 15026,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 95,
+                        "line": 188
+                      },
+                      "message": "Error: locator.click: Test timeout of 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.card').filter({ hasText: 'My side' }).getByRole('button', { name: 'Rename' })\u001b[22m\n\n\n  186 | test('CIR-02 Rename a circle (E7)', async ({ page }) => {\n  187 |   await open(page); await tab(page, 'circles');\n> 188 |   await page.locator('.card', { hasText: 'My side' }).getByRole('button', { name: 'Rename' }).click();\n      |                                                                                               ^\n  189 |   await page.fill('#renameInput', \"Chase's family\"); await page.locator('#saveRename').click();\n  190 |   await expect(page.locator('#view')).toContainText(\"Chase's family\");\n  191 |   await tab(page, 'feed');\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:188:95"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:00:33.655Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-CIR-02-Rename-a-circle-E7-/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-31bf1866a1ffd4b897a6",
+          "file": "hearth.spec.js",
+          "line": 186,
+          "column": 1
+        },
+        {
+          "title": "CIR-03 Deleting a circle is blocked when a post would lose its only audience (E7)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 10,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 15032,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 104,
+                        "line": 197
+                      },
+                      "message": "Error: locator.click: Test timeout of 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.card').filter({ hasText: 'Co-parent' }).getByRole('button', { name: 'Delete circle' })\u001b[22m\n\n\n  195 | test('CIR-03 Deleting a circle is blocked when a post would lose its only audience (E7)', async ({ page }) => {\n  196 |   await open(page); await tab(page, 'circles');\n> 197 |   await page.locator('.card', { hasText: 'Co-parent' }).getByRole('button', { name: 'Delete circle' }).click();\n      |                                                                                                        ^\n  198 |   await expect(page.locator('.toast')).toContainText('only audience for 1 post');\n  199 |   await page.fill('#ncName', 'Temp'); await page.locator('#newCircle button').click();\n  200 |   await page.locator('.card', { hasText: 'Temp' }).getByRole('button', { name: 'Delete circle' }).click();\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:197:104"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:00:49.685Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-CIR-03-Deleting-a-c-83f94--lose-its-only-audience-E7-/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-8ddd9495878a0789471b",
+          "file": "hearth.spec.js",
+          "line": 195,
+          "column": 1
+        },
+        {
+          "title": "INV-01 Copy invite link never crashes, even without clipboard access (B1)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 15031,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 62,
+                        "line": 210
+                      },
+                      "message": "Error: locator.click: Test timeout of 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Invite someone' })\u001b[22m\n\n\n  208 |   await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { value: undefined }));\n  209 |   await tab(page, 'circles');\n> 210 |   await page.getByRole('button', { name: 'Invite someone' }).click();\n      |                                                              ^\n  211 |   await page.fill('#invName', 'Uncle Ray');\n  212 |   await page.locator('#makeInvite').click();\n  213 |   await page.getByRole('button', { name: 'Copy link' }).click();\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:210:62"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:01:05.714Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-INV-01-Copy-invite--c65dc-ithout-clipboard-access-B1-/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-f6013d15c2d8b873342c",
+          "file": "hearth.spec.js",
+          "line": 206,
+          "column": 1
+        },
+        {
+          "title": "INV-02 Invite lands the new person in the chosen circles (E3)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 15037,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 62,
+                        "line": 220
+                      },
+                      "message": "Error: locator.click: Test timeout of 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Invite someone' })\u001b[22m\n\n\n  218 | test('INV-02 Invite lands the new person in the chosen circles (E3)', async ({ page }) => {\n  219 |   await open(page); await tab(page, 'circles');\n> 220 |   await page.getByRole('button', { name: 'Invite someone' }).click();\n      |                                                              ^\n  221 |   await page.fill('#invName', 'Uncle Ray');\n  222 |   await page.selectOption('#invRole', 'viewer');\n  223 |   await page.locator('.sheet label', { hasText: 'My side' }).locator('input').check();\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:220:62"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:01:21.765Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-INV-02-Invite-lands-c216a-n-in-the-chosen-circles-E3-/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-293bedd338cfb933f569",
+          "file": "hearth.spec.js",
+          "line": 218,
+          "column": 1
+        },
+        {
+          "title": "NOTE-01 Text-message preview names the real poster (B3)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 13,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5318,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.sms')\nExpected substring: \u001b[32m\"Alex shared\"\u001b[39m\nReceived string:    \u001b[31m\"Hearth: Chase shared 2 photos of Mia. See them: hearth.family/v/8RT1\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.sms')\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"sms\">Hearth: Chase shared 2 photos of Mia. See them: h…</div>\u001b[22m\n\u001b[2m      - unexpected value \"Hearth: Chase shared 2 photos of Mia. See them: hearth.family/v/8RT1\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.sms')\nExpected substring: \u001b[32m\"Alex shared\"\u001b[39m\nReceived string:    \u001b[31m\"Hearth: Chase shared 2 photos of Mia. See them: hearth.family/v/8RT1\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.sms')\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"sms\">Hearth: Chase shared 2 photos of Mia. See them: h…</div>\u001b[22m\n\u001b[2m      - unexpected value \"Hearth: Chase shared 2 photos of Mia. See them: hearth.family/v/8RT1\"\u001b[22m\n\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:234:38",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 38,
+                      "line": 234
+                    },
+                    "snippet": "  232 |   await open(page); await tab(page, 'me');\n  233 |   await page.locator('#n-text').check();\n> 234 |   await expect(page.locator('.sms')).toContainText('Alex shared');   // newest post Chase didn't write\n      |                                      ^\n  235 |   await viewAs(page, 'Alex'); await page.locator('#n-text').check();\n  236 |   await expect(page.locator('.sms')).toContainText('Chase shared');\n  237 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 38,
+                        "line": 234
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.sms')\nExpected substring: \u001b[32m\"Alex shared\"\u001b[39m\nReceived string:    \u001b[31m\"Hearth: Chase shared 2 photos of Mia. See them: hearth.family/v/8RT1\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.sms')\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"sms\">Hearth: Chase shared 2 photos of Mia. See them: h…</div>\u001b[22m\n\u001b[2m      - unexpected value \"Hearth: Chase shared 2 photos of Mia. See them: hearth.family/v/8RT1\"\u001b[22m\n\n\n  232 |   await open(page); await tab(page, 'me');\n  233 |   await page.locator('#n-text').check();\n> 234 |   await expect(page.locator('.sms')).toContainText('Alex shared');   // newest post Chase didn't write\n      |                                      ^\n  235 |   await viewAs(page, 'Alex'); await page.locator('#n-text').check();\n  236 |   await expect(page.locator('.sms')).toContainText('Chase shared');\n  237 | });\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:234:38"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:01:37.823Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-NOTE-01-Text-messag-afc91-w-names-the-real-poster-B3-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 38,
+                    "line": 234
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-70f92753b2d688ce7167",
+          "file": "hearth.spec.js",
+          "line": 231,
+          "column": 1
+        },
+        {
+          "title": "NOTE-02 Notification choice is kept per person",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 488,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:01:44.166Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-b3e3f44d1be96b35db17",
+          "file": "hearth.spec.js",
+          "line": 239,
+          "column": 1
+        },
+        {
+          "title": "COM-01 A half-typed comment survives reacting to another post (B6)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 14,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5256,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.post').filter({ hasText: 'two wheels' }).locator('input')\nExpected: \u001b[32m\"So proud\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.post').filter({ hasText: 'two wheels' }).locator('input')\u001b[22m\n\u001b[2m    9 × locator resolved to <input id=\"c-p2\" maxlength=\"300\" aria-label=\"Add a comment\" placeholder=\"Add a comment\"/>\u001b[22m\n\u001b[2m      - unexpected value \"\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.post').filter({ hasText: 'two wheels' }).locator('input')\nExpected: \u001b[32m\"So proud\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.post').filter({ hasText: 'two wheels' }).locator('input')\u001b[22m\n\u001b[2m    9 × locator resolved to <input id=\"c-p2\" maxlength=\"300\" aria-label=\"Add a comment\" placeholder=\"Add a comment\"/>\u001b[22m\n\u001b[2m      - unexpected value \"\"\u001b[22m\n\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:253:59",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 59,
+                      "line": 253
+                    },
+                    "snippet": "  251 |   await post(page, 'two wheels').locator('input').fill('So proud');\n  252 |   await post(page, 'first goal').getByRole('button', { name: /React ❤️/ }).click();\n> 253 |   await expect(post(page, 'two wheels').locator('input')).toHaveValue('So proud');\n      |                                                           ^\n  254 | });\n  255 |\n  256 | test('VIEW-01 Tap a photo to open it full screen; swipe through; Escape closes (E2)', async ({ page }) => {"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 59,
+                        "line": 253
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.post').filter({ hasText: 'two wheels' }).locator('input')\nExpected: \u001b[32m\"So proud\"\u001b[39m\nReceived: \u001b[31m\"\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.post').filter({ hasText: 'two wheels' }).locator('input')\u001b[22m\n\u001b[2m    9 × locator resolved to <input id=\"c-p2\" maxlength=\"300\" aria-label=\"Add a comment\" placeholder=\"Add a comment\"/>\u001b[22m\n\u001b[2m      - unexpected value \"\"\u001b[22m\n\n\n  251 |   await post(page, 'two wheels').locator('input').fill('So proud');\n  252 |   await post(page, 'first goal').getByRole('button', { name: /React ❤️/ }).click();\n> 253 |   await expect(post(page, 'two wheels').locator('input')).toHaveValue('So proud');\n      |                                                           ^\n  254 | });\n  255 |\n  256 | test('VIEW-01 Tap a photo to open it full screen; swipe through; Escape closes (E2)', async ({ page }) => {\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:253:59"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:01:44.765Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-COM-01-A-half-typed-9100d-eacting-to-another-post-B6-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 59,
+                    "line": 253
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-b05a7f4fd4311fd85cf1",
+          "file": "hearth.spec.js",
+          "line": 249,
+          "column": 1
+        },
+        {
+          "title": "VIEW-01 Tap a photo to open it full screen; swipe through; Escape closes (E2)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 15,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5263,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('dialog', { name: 'Photo viewer' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: 'Photo viewer' })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('dialog', { name: 'Photo viewer' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: 'Photo viewer' })\u001b[22m\n\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:260:19",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 19,
+                      "line": 260
+                    },
+                    "snippet": "  258 |   await post(page, 'first goal').locator('.ph').first().click();\n  259 |   const v = page.getByRole('dialog', { name: 'Photo viewer' });\n> 260 |   await expect(v).toBeVisible();\n      |                   ^\n  261 |   await expect(v).toContainText('1 of 2');\n  262 |   await v.getByRole('button', { name: 'Next' }).click();\n  263 |   await expect(v).toContainText('2 of 2');"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 19,
+                        "line": 260
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('dialog', { name: 'Photo viewer' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('dialog', { name: 'Photo viewer' })\u001b[22m\n\n\n  258 |   await post(page, 'first goal').locator('.ph').first().click();\n  259 |   const v = page.getByRole('dialog', { name: 'Photo viewer' });\n> 260 |   await expect(v).toBeVisible();\n      |                   ^\n  261 |   await expect(v).toContainText('1 of 2');\n  262 |   await v.getByRole('button', { name: 'Next' }).click();\n  263 |   await expect(v).toContainText('2 of 2');\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:260:19"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:01:50.850Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-VIEW-01-Tap-a-photo-c5f83-e-through-Escape-closes-E2-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 19,
+                    "line": 260
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-9fcd38c881cccd82a3c3",
+          "file": "hearth.spec.js",
+          "line": 256,
+          "column": 1
+        },
+        {
+          "title": "VIEW-02 Poster sees \"Seen by\" on their posts (E4)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 16,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5208,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.post').filter({ hasText: 'first goal' })\nTimeout: 5000ms\n\u001b[32m- Expected substring  -  1\u001b[39m\n\u001b[31m+ Received string     + 10\u001b[39m\n\n\u001b[32m- Seen by 3 of 5\u001b[39m\n\u001b[31m+\u001b[39m\n\u001b[31m+       CChase2h ago\u001b[39m\n\u001b[31m+       Example · PhotoExample · Photo\u001b[39m\n\u001b[31m+       Mia's first goal of the season. She did the whole celebration lap.\u001b[39m\n\u001b[31m+       Shared with EveryoneChange\u001b[39m\n\u001b[31m+       Can see this: Grandma Jo, Pop Walt, Aunt Kim, Nana Ruth, Alex\u001b[39m\n\u001b[31m+       ❤️ 2😂 😮 1\u001b[39m\n\u001b[31m+       Grandma Jo Look at that hustle!\u001b[39m\n\u001b[31m+         Send\u001b[39m\n\u001b[31m+ \u001b[43m    \u001b[49m\u001b[39m\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.post').filter({ hasText: 'first goal' })\u001b[22m\n\u001b[2m    9 × locator resolved to <article class=\"post\">…</article>\u001b[22m\n\u001b[2m      - unexpected value \"\u001b[22m\n\u001b[2m      CChase2h ago\u001b[22m\n\u001b[2m      Example · PhotoExample · Photo\u001b[22m\n\u001b[2m      Mia's first goal of the season. She did the whole celebration lap.\u001b[22m\n\u001b[2m      Shared with EveryoneChange\u001b[22m\n\u001b[2m      Can see this: Grandma Jo, Pop Walt, Aunt Kim, Nana Ruth, Alex\u001b[22m\n\u001b[2m      ❤️ 2😂 😮 1\u001b[22m\n\u001b[2m      Grandma Jo Look at that hustle!\u001b[22m\n\u001b[2m        Send\u001b[22m\n\u001b[2m    \"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.post').filter({ hasText: 'first goal' })\nTimeout: 5000ms\n\u001b[32m- Expected substring  -  1\u001b[39m\n\u001b[31m+ Received string     + 10\u001b[39m\n\n\u001b[32m- Seen by 3 of 5\u001b[39m\n\u001b[31m+\u001b[39m\n\u001b[31m+       CChase2h ago\u001b[39m\n\u001b[31m+       Example · PhotoExample · Photo\u001b[39m\n\u001b[31m+       Mia's first goal of the season. She did the whole celebration lap.\u001b[39m\n\u001b[31m+       Shared with EveryoneChange\u001b[39m\n\u001b[31m+       Can see this: Grandma Jo, Pop Walt, Aunt Kim, Nana Ruth, Alex\u001b[39m\n\u001b[31m+       ❤️ 2😂 😮 1\u001b[39m\n\u001b[31m+       Grandma Jo Look at that hustle!\u001b[39m\n\u001b[31m+         Send\u001b[39m\n\u001b[31m+ \u001b[43m    \u001b[49m\u001b[39m\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.post').filter({ hasText: 'first goal' })\u001b[22m\n\u001b[2m    9 × locator resolved to <article class=\"post\">…</article>\u001b[22m\n\u001b[2m      - unexpected value \"\u001b[22m\n\u001b[2m      CChase2h ago\u001b[22m\n\u001b[2m      Example · PhotoExample · Photo\u001b[22m\n\u001b[2m      Mia's first goal of the season. She did the whole celebration lap.\u001b[22m\n\u001b[2m      Shared with EveryoneChange\u001b[22m\n\u001b[2m      Can see this: Grandma Jo, Pop Walt, Aunt Kim, Nana Ruth, Alex\u001b[22m\n\u001b[2m      ❤️ 2😂 😮 1\u001b[22m\n\u001b[2m      Grandma Jo Look at that hustle!\u001b[22m\n\u001b[2m        Send\u001b[22m\n\u001b[2m    \"\u001b[22m\n\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:270:42",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 42,
+                      "line": 270
+                    },
+                    "snippet": "  268 | test('VIEW-02 Poster sees \"Seen by\" on their posts (E4)', async ({ page }) => {\n  269 |   await open(page);\n> 270 |   await expect(post(page, 'first goal')).toContainText('Seen by 3 of 5');\n      |                                          ^\n  271 |   await viewAs(page, 'Grandma Jo');\n  272 |   await expect(post(page, 'first goal')).not.toContainText('Seen by');\n  273 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 42,
+                        "line": 270
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.post').filter({ hasText: 'first goal' })\nTimeout: 5000ms\n\u001b[32m- Expected substring  -  1\u001b[39m\n\u001b[31m+ Received string     + 10\u001b[39m\n\n\u001b[32m- Seen by 3 of 5\u001b[39m\n\u001b[31m+\u001b[39m\n\u001b[31m+       CChase2h ago\u001b[39m\n\u001b[31m+       Example · PhotoExample · Photo\u001b[39m\n\u001b[31m+       Mia's first goal of the season. She did the whole celebration lap.\u001b[39m\n\u001b[31m+       Shared with EveryoneChange\u001b[39m\n\u001b[31m+       Can see this: Grandma Jo, Pop Walt, Aunt Kim, Nana Ruth, Alex\u001b[39m\n\u001b[31m+       ❤️ 2😂 😮 1\u001b[39m\n\u001b[31m+       Grandma Jo Look at that hustle!\u001b[39m\n\u001b[31m+         Send\u001b[39m\n\u001b[31m+ \u001b[43m    \u001b[49m\u001b[39m\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.post').filter({ hasText: 'first goal' })\u001b[22m\n\u001b[2m    9 × locator resolved to <article class=\"post\">…</article>\u001b[22m\n\u001b[2m      - unexpected value \"\u001b[22m\n\u001b[2m      CChase2h ago\u001b[22m\n\u001b[2m      Example · PhotoExample · Photo\u001b[22m\n\u001b[2m      Mia's first goal of the season. She did the whole celebration lap.\u001b[22m\n\u001b[2m      Shared with EveryoneChange\u001b[22m\n\u001b[2m      Can see this: Grandma Jo, Pop Walt, Aunt Kim, Nana Ruth, Alex\u001b[22m\n\u001b[2m      ❤️ 2😂 😮 1\u001b[22m\n\u001b[2m      Grandma Jo Look at that hustle!\u001b[22m\n\u001b[2m        Send\u001b[22m\n\u001b[2m    \"\u001b[22m\n\n\n  268 | test('VIEW-02 Poster sees \"Seen by\" on their posts (E4)', async ({ page }) => {\n  269 |   await open(page);\n> 270 |   await expect(post(page, 'first goal')).toContainText('Seen by 3 of 5');\n      |                                          ^\n  271 |   await viewAs(page, 'Grandma Jo');\n  272 |   await expect(post(page, 'first goal')).not.toContainText('Seen by');\n  273 | });\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:270:42"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:01:57.157Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-VIEW-02-Poster-sees-Seen-by-on-their-posts-E4-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 42,
+                    "line": 270
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-c293514fa52e65bce783",
+          "file": "hearth.spec.js",
+          "line": 268,
+          "column": 1
+        },
+        {
+          "title": "A11Y-01 Sheets take focus and close with Escape (B9)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 17,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 265,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:279:19",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 19,
+                      "line": 279
+                    },
+                    "snippet": "  277 |   await open(page); await tab(page, 'post');\n  278 |   const inSheet = await page.evaluate(() => !!document.activeElement.closest('.sheet'));\n> 279 |   expect(inSheet).toBe(true);\n      |                   ^\n  280 |   await page.keyboard.press('Escape');\n  281 |   await expect(page.locator('.sheet')).toHaveCount(0);\n  282 | });"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 19,
+                        "line": 279
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  277 |   await open(page); await tab(page, 'post');\n  278 |   const inSheet = await page.evaluate(() => !!document.activeElement.closest('.sheet'));\n> 279 |   expect(inSheet).toBe(true);\n      |                   ^\n  280 |   await page.keyboard.press('Escape');\n  281 |   await expect(page.locator('.sheet')).toHaveCount(0);\n  282 | });\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:279:19"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:02:03.476Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-A11Y-01-Sheets-take-focus-and-close-with-Escape-B9-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 19,
+                    "line": 279
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-be293fddbf58c5e49ef7",
+          "file": "hearth.spec.js",
+          "line": 276,
+          "column": 1
+        },
+        {
+          "title": "A11Y-02 Larger text option for grandparents (E5)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 18,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 15052,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 15000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 34,
+                        "line": 287
+                      },
+                      "message": "Error: locator.check: Test timeout of 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#bigText')\u001b[22m\n\n\n  285 |   await open(page); await viewAs(page, 'Grandma Jo'); await tab(page, 'me');\n  286 |   const before = await page.evaluate(() => parseFloat(getComputedStyle(document.body).fontSize));\n> 287 |   await page.locator('#bigText').check();\n      |                                  ^\n  288 |   const after = await page.evaluate(() => parseFloat(getComputedStyle(document.body).fontSize));\n  289 |   expect(after).toBeGreaterThanOrEqual(before + 3);\n  290 | });\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:287:34"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:02:04.789Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-A11Y-02-Larger-text-option-for-grandparents-E5-/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-7e7f4de6268d7387d617",
+          "file": "hearth.spec.js",
+          "line": 284,
+          "column": 1
+        },
+        {
+          "title": "A11Y-03 No sideways scrolling on a small phone (light)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 19,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 398,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:02:20.826Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-e731db3a4b153df73526",
+          "file": "hearth.spec.js",
+          "line": 293,
+          "column": 3
+        },
+        {
+          "title": "A11Y-03 No sideways scrolling on a small phone (dark)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 19,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 330,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:02:21.349Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-23b139f71e404ec4f5b3",
+          "file": "hearth.spec.js",
+          "line": 293,
+          "column": 3
+        },
+        {
+          "title": "A11Y-04 No script errors through a full walkthrough",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 19,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 857,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:312:18",
+                    "location": {
+                      "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                      "column": 18,
+                      "line": 312
+                    },
+                    "snippet": "  310 |       if (await b.isVisible()) await b.click();\n  311 |     }\n> 312 |   expect(errors).toEqual([]);\n      |                  ^\n  313 | });\n  314 |\n  315 | test('SEC-01 Captions and comments can\\'t inject code', async ({ page }) => {"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                        "column": 18,
+                        "line": 312
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"Failed to load resource: net::ERR_FAILED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  310 |       if (await b.isVisible()) await b.click();\n  311 |     }\n> 312 |   expect(errors).toEqual([]);\n      |                  ^\n  313 | });\n  314 |\n  315 | test('SEC-01 Captions and comments can\\'t inject code', async ({ page }) => {\n    at /home/claude/famapp/e2e/tests/hearth.spec.js:312:18"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:02:21.704Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/claude/famapp/e2e/test-results/hearth-A11Y-04-No-script-errors-through-a-full-walkthrough/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/claude/famapp/e2e/tests/hearth.spec.js",
+                    "column": 18,
+                    "line": 312
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-63d4095b20a5a4b2bc94",
+          "file": "hearth.spec.js",
+          "line": 304,
+          "column": 1
+        },
+        {
+          "title": "SEC-01 Captions and comments can't inject code",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 15000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 20,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 289,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-15T12:02:23.488Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1ae66384bd7f228c01f0-57b27071def0f4a8ac6b",
+          "file": "hearth.spec.js",
+          "line": 315,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-15T11:59:21.761Z",
+    "duration": 182205.304,
+    "expected": 13,
+    "skipped": 0,
+    "unexpected": 20,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,15 @@
+running 4 tests from ./tests/integration/smoke_test.ts
+harness JSON has the documented shape ... ok (586µs)
+BETA-AUD-3 get_feed over HTTP: each user sees only posts shared with their circles ... ok (63ms)
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ...
+  create_post is idempotent on p_client_id ... ok (16ms)
+  upload + publish (idempotent) ... ok (22ms)
+  BETA-AUD-3 audience member sees it; a user only in another circle sees nothing on any path ... ok (35ms)
+  BETA-REPLY-1 toggle_heart ... ok (21ms)
+  BETA-REPLY-2 add_comment (idempotent) and get_comments ... ok (15ms)
+  BETA-AUD-5 delete_post: author only, gone everywhere, idempotent ... ok (21ms)
+create -> publish -> heart -> comment -> delete, as two users, with visibility proven over HTTP ... ok (134ms)
+BETA-JOIN-4 (S10) rate limit survives failed requests on the real PostgREST ... ok (42ms)
+
+ok | 4 passed (6 steps) | 0 failed (245ms)
+
