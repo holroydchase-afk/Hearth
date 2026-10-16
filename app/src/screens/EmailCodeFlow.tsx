@@ -4,7 +4,7 @@ import { messageFor } from '../errors/messages';
 import { useApp } from '../state/AppContext';
 import { Button, Field, Notice, Txt } from '../ui/kit';
 
-export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: () => Promise<void>; inviter?: string | null }) {
+export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: (email: string) => Promise<void>; inviter?: string | null }) {
   const { deps } = useApp();
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [email, setEmail] = useState('');
@@ -42,7 +42,7 @@ export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: () => Promi
     setMsg(null);
     try {
       await deps.api.verifyCode(email.trim(), code.replace(/\D/g, ''));
-      await onSignedIn();
+      await onSignedIn(email.trim());
     } catch (e) {
       setMsg(messageFor(e, { inviter }));
     } finally {

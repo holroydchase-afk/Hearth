@@ -15,9 +15,10 @@ export function JoinScreen({ code }: { code: string }) {
   const [step, setStep] = useState<Step>('checking');
   const [preview, setPreview] = useState<InvitePreview | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [triedEmail, setTriedEmail] = useState<string | null>(null);
   const started = useRef(false);
 
-  const redeem = async (inviter: string | null) => {
+  const redeem = async (inviter: string | null, email: string | null = null) => {
     setStep('joining');
     try {
       await app.deps.api.redeemInvite(code);
@@ -32,6 +33,8 @@ export function JoinScreen({ code }: { code: string }) {
         return;
       }
       setMsg(messageFor(e, { inviter, action: 'join' }));
+      // BETA-JOIN-3 keeps "wrong email" and "old invite" identical on the server, so say both here.
+      setTriedEmail(isApiError(e) && e.code === '22023' ? email : null);
       setStep('bad');
     }
   };
@@ -65,10 +68,17 @@ export function JoinScreen({ code }: { code: string }) {
         <Card>
           <Txt variant="title">{`Photos from ${who ?? 'your family'}`}</Txt>
           <Txt>Type your email. We'll send you a 6-number code.</Txt>
-          <EmailCodeFlow inviter={who} onSignedIn={() => redeem(who)} />
+          <EmailCodeFlow inviter={who} onSignedIn={(email) => redeem(who, email)} />
         </Card>
       ) : null}
-      {step === 'bad' && msg ? (
+      {step === 'bad' && triedEmail ? (
+        <Card>
+          <Txt variant="title">{`This invite didn't open for ${triedEmail}.`}</Txt>
+          <Txt>{`It may be old or already used, or ${who ?? 'your family'} sent it to a different email. Try that email, or ask ${who ?? 'the person who invited you'} for a new invite.`}</Txt>
+          <Button label="Try a different email" onPress={() => { void app.signOut().then(() => { setTriedEmail(null); setStep('signin'); }); }} />
+        </Card>
+      ) : null}
+      {step === 'bad' && msg && !triedEmail ? (
         <Card>
           <Txt variant="title">{msg}</Txt>
           <Txt>That's okay, it happens.</Txt>
