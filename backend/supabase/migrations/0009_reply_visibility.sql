@@ -31,6 +31,7 @@ $fn$;
 create or replace function public.reply_scope(p_post uuid) returns text
 language sql stable security definer set search_path = '' as $fn$
   select case
+    when not public.can_view_post(p_post) then null     -- not found: says nothing about the family's setting
     when exists (select 1 from public.posts p where p.id = p_post and p.author_id = auth.uid())
       or exists (select 1 from public.posts p join public.space_members sm on sm.space_id = p.space_id
                  where p.id = p_post and sm.user_id = auth.uid() and sm.role in ('owner', 'adult'))
@@ -41,6 +42,39 @@ language sql stable security definer set search_path = '' as $fn$
                  join public.circle_members v on v.circle_id = c.id and v.user_id = auth.uid()
                  where pa.post_id = p_post) then 'group'
     else 'parents' end
+$fn$;
+
+-- privacy-security review: the raw counters on posts would give hidden replies away.
+-- App users read every posts column except reaction_count and comment_count.
+do $do$
+declare cols text;
+begin
+  select string_agg(quote_ident(column_name), ', ' order by ordinal_position) into cols
+  from information_schema.columns
+  where table_schema = 'public' and table_name = 'posts' and column_name not in ('reaction_count', 'comment_count');
+  revoke select on public.posts from authenticated, anon;
+  execute format('grant select (%s) on public.posts to authenticated', cols);
+end $do$;
+
+-- privacy-security review: replying must not make someone's profile visible to a relative
+-- who isn't allowed to read that reply.
+create or replace function public.can_see_profile(p_user uuid) returns boolean
+language sql stable security definer set search_path = '' as $fn$
+  select p_user = auth.uid()
+  or exists (
+    select 1 from public.space_members me
+    join public.space_members them on them.space_id = me.space_id
+    join public.spaces s on s.id = me.space_id and s.deleted_at is null
+    where me.user_id = auth.uid() and them.user_id = p_user
+      and (me.role in ('owner','adult') or them.role in ('owner','adult')))
+  or exists (
+    select 1 from public.circle_members a
+    join public.circle_members b on b.circle_id = a.circle_id
+    where a.user_id = auth.uid() and b.user_id = p_user)
+  or exists (select 1 from public.comments c
+             where c.author_id = p_user and c.deleted_at is null and public.can_see_reply(c.post_id, p_user))
+  or exists (select 1 from public.reactions r
+             where r.user_id = p_user and public.can_see_reply(r.post_id, p_user))
 $fn$;
 
 drop policy comments_select on public.comments;

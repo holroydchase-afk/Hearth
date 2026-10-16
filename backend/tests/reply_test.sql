@@ -199,6 +199,37 @@ select tests.lives(format($$select public.set_reply_audience(%L, 'parents')$$, :
 select tests.ok_sql(format('select tests.comments_seen(%L) = 0', :p_a_all), 'AUD-10: back to parents-only immediately');
 
 -- ======================================================================
+-- privacy-security review: no side doors
+-- ======================================================================
+:as_gpa_riv
+select tests.throws_code(format('select reaction_count from public.posts where id = %L', :p_a_gp),
+                         'AUD-8 review: the raw heart counter on posts is not readable (42501)', '42501');
+select tests.throws_code(format('select comment_count from public.posts where id = %L', :p_a_gp),
+                         'AUD-8 review: the raw comment counter on posts is not readable (42501)', '42501');
+select tests.ok_sql(format($$select caption is not null from public.posts where id = %L$$, :p_a_gp),
+                    'AUD-8 review: ...while the post itself still reads fine');
+:as_gma_chen
+select tests.ok_sql(format('select public.reply_scope(%L) is null', :p_a_gp),
+                    'AUD-8 review: reply_scope on a post you can''t see says nothing ("not found")');
+-- a relative from another group who replied must not become visible through that reply
+:as_admin
+insert into auth.users (id, email, raw_user_meta_data) values ('f0000000-0000-0000-0000-0000000000c9', 'cousin@example.com', '{"display_name":"Cousin Pat"}');
+insert into public.space_members (space_id, user_id, role, invited_by) values (:space_a, 'f0000000-0000-0000-0000-0000000000c9', 'viewer', :alex);
+insert into public.circles (id, space_id, name, created_by) values ('33333333-0000-0000-0000-0000000000c9', :space_a, 'Cousins', :alex);
+insert into public.circle_members (circle_id, user_id) values ('33333333-0000-0000-0000-0000000000c9', 'f0000000-0000-0000-0000-0000000000c9');
+insert into public.posts (id, space_id, author_id, caption) values ('55555555-0000-0000-0000-0000000000c9', :space_a, :alex, 'Both groups');
+insert into public.post_audiences (post_id, circle_id) values ('55555555-0000-0000-0000-0000000000c9', :c_a_gp), ('55555555-0000-0000-0000-0000000000c9', '33333333-0000-0000-0000-0000000000c9');
+update public.posts set status = 'published' where id = '55555555-0000-0000-0000-0000000000c9';
+insert into public.comments (post_id, author_id, body) values ('55555555-0000-0000-0000-0000000000c9', 'f0000000-0000-0000-0000-0000000000c9', 'Hi from the cousins');
+insert into public.reactions (post_id, user_id, emoji) values ('55555555-0000-0000-0000-0000000000c9', 'f0000000-0000-0000-0000-0000000000c9', '❤️');
+:as_gma_riv
+select tests.ok_sql($$select not exists (select 1 from public.profiles where id = 'f0000000-0000-0000-0000-0000000000c9')$$,
+                    'AUD-8 review: a relative in another group who replied stays invisible (no profile leak)');
+:as_alex
+select tests.ok_sql($$select exists (select 1 from public.profiles where id = 'f0000000-0000-0000-0000-0000000000c9')$$,
+                    'AUD-8 review: ...while the parent still sees who replied');
+
+-- ======================================================================
 -- Summary
 -- ======================================================================
 reset role;
