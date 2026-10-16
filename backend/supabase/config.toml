@@ -247,6 +247,16 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# JOIN-2: sign-in emails carry the 6-number code, no link (tests/templates/templates_test.ts).
+# deploy.sh pushes the same subjects and files to the hosted project.
+[auth.email.template.magic_link]
+subject = "Your Hearth code: {{ .Token }}"
+content_path = "./supabase/templates/magic_link.html"
+
+[auth.email.template.confirmation]
+subject = "Your Hearth code: {{ .Token }}"
+content_path = "./supabase/templates/confirmation.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"
