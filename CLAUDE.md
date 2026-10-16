@@ -7,6 +7,7 @@ Hearth is a private family photo app for split families and for grandparents who
 ## Read first
 - `ANCHORS.md`: why Hearth exists, milestones, anchors (A1–A3), ideas log. Add new anchors and ideas there as Chase names them; never delete built features to satisfy one.
 - `HANDOFF.md`: current state and what's next. Start here every session.
+- `MILESTONE-1.md`: Chase's setup steps and the 2-day demo for milestone 1 (incl. the $99 Apple answer).
 - `REMAINING.md`: the critical path to the Ring 0 gate (Oct 29) and the beta.
 - `BETA-SPEC.md`: 35 acceptance criteria (BETA-*), the scope source of truth.
 - `API.md`: the app↔backend contract. Change the contract tests before changing it.
