@@ -82,7 +82,7 @@ test('core loop: share → Jo sees it → Ruth does not → heart → comment �
   await expect(page.getByText('♥ You love this')).toBeVisible();
   await page.getByLabel('Write something back to Chase').fill('Look at those cheeks!');
   await page.getByRole('button', { name: 'Send' }).click();
-  await expect(page.getByText('Sent. Chase will see it.')).toBeVisible();
+  await expect(page.getByText('Sent. Everyone this photo was shared with can read it.')).toBeVisible(); // BETA-REPLY-6
   // Full screen and back (BETA-SEE-3).
   await page.getByRole('button', { name: 'Open photo 1 of 1 full screen' }).click();
   await expect(page.getByText(/^From Chase · /)).toBeVisible();
