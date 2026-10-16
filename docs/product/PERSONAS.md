@@ -1,62 +1,48 @@
-# Hearth personas (composites; not real family members)
+# Hearth people: Chase's real family (Oct 16, 2026)
 
-> **Checked against `STORY.md` (staff-pm, Oct 16).** These composites contradict the real family in places; the story wins:
-> - Story: "every grandpa has an Android; everyone else has an iPhone." June (a grandma) is on a Galaxy, and Earl (a grandpa) has a flip phone and an iPad. The Android test target should be a grandpa.
-> - Megan's "see that Grandma opened it" conflicts with anchor A2 (Seen by is waiting on Chase).
-> - Rob's co-parent split isn't in Chase's story: the divorces are among the grandparents, plus stepparents (Chase's stepmom) and a dating parent. There is no stepparent or new-partner persona, and no great-grandparent.
-> - The "Where they show up" column uses the old Rings; milestones replace them.
+Hearth is built for this family first (milestones in `docs/product/ANCHORS.md`, story in `docs/product/STORY.md`). Use these names in specs and reviews. Each person is named the way the kids say it.
 
-| Persona | Role | Phone | Needs most | Where they show up |
-|---|---|---|---|---|
-| Megan, 35 | Organizer parent, posts most | iPhone 15 | Share once, know Grandma saw it | Rings 0–1 |
-| Rob, 41 | Co-parent, split family | Galaxy S23 | Nothing ever leaks to his ex | Backend tests; interviews after Thanksgiving |
-| June, 76 | WV grandma | 4-yr-old Galaxy A, big text | Big photos, no learning curve | Ring 3; grandparent test |
-| Earl, 79 | WV grandpa | Flip phone + iPad Air 2 (iPadOS 15) | Morning email with big photos | Ring 3; old-device support |
-| Linda, 64 | "Other side" grandma | iPhone 13 | Feel included, not ranked | Ring 2 |
-| Kim, 33 | Busy aunt, night-shift nurse | iPhone 14 | Photos without buzzing | Ring 2 |
-| Tammy, 50 | WV family helper | Galaxy A54 | A guide she can follow on a Sunday visit | Ring 3 setup |
+**Still to confirm with Chase** (marked "?" below): phones, how comfortable each person is with tech, the most tech-savvy relative (milestone 3), anyone who will never install an app, and which side Gigi and Bebar are on.
 
-## Megan, 35: organizer parent
-- **Situation:** runs 5 group texts and re-sends the same photo 4 times. Android in-laws get blurry MMS. She quit Facebook for the kids.
-- **Needs:** share once in 3 taps, and see that Grandma opened it.
-- **Breaks it for her:** managing settings, or any doubt about who sees a photo.
-- **Quote:** "I just want to send it once and know Grandma got it."
+## Who's who
 
-## Rob, 41: co-parent
-- **Situation:** has the kids every other week and recently remarried. His ex's parents still want photos.
-- **Needs:** share with both sets of grandparents while his ex never sees his new family. Separate logistics with his ex.
-- **Breaks it for him:** one leak, ever.
-- **Quote:** "If my ex sees something she wasn't meant to, I'm done with the app."
-- **In the beta:** not in any ring yet. Backend tests protect him. He's the first interview for willingness to pay.
+| Kids call them | Name | Role | Side / household | Phone | Notes |
+|---|---|---|---|---|---|
+| Dad | Chase | Parent, posts most | — | iPhone | Founder. Stay-at-home dad near Charlotte; milestone 1 |
+| Mom | Mom | Parent, posts | — | iPhone | From Charleston, WV; works remotely; milestone 2 |
+| Gammy | Gammy | Grandparent (Chase's mom) | Chase's side, her own household | iPhone? | Divorced from Grandaddy; her own household |
+| Grandaddy | Grandaddy | Grandparent (Chase's dad) | Chase's side, with Grandmomma | Android | Divorced from Gammy |
+| Grandmomma | Grandmomma | Grandparent (Chase's stepmom) | Chase's side, with Grandaddy | iPhone? | Chase sends her videos separately today and hopes nobody feels slighted |
+| Memaw | Sue | Grandparent (Mom's mom) | Mom's side, her own household | iPhone? | Divorced from Pawpaw |
+| Pawpaw | Pawpaw | Grandparent (Mom's dad) | Mom's side, with Granny | Android | Divorced from Sue |
+| Granny | Granny | Grandparent (Mom's stepmom) | Mom's side, with Pawpaw | iPhone? | |
+| Gigi | Gigi | Great-grandparent | ? side | ? | |
+| Bebar | Bebar | Great-grandparent | ? side | Android? | "Every grandpa has an Android." Possible smart-frame person (milestone 6)? |
 
-## June, 76: WV grandma
-- **Phone and habits:** Galaxy A with large text and spotty LTE. Yahoo email checked every few days. Uses Facebook only for grandkids. Scam-wary, calls her son instead of reading instructions, and gets embarrassed.
-- **Needs:** big photos, one tap, save to print.
-- **Breaks it for her:** passwords, small buttons, the words feed, upload or circle, anything scammy.
-- **Quote:** "Just show me the babies."
+The phones come from the story: "every grandpa has an Android and everyone else has an iPhone."
 
-## Earl, 79: WV grandpa
-- **Phone and habits:** flip phone, doesn't text. Reads email every morning on an iPad Air 2 that can't update past iPadOS 15 (below Expo's current iOS 16.4 minimum). Wears hearing aids, has big hands, and prints photos at Walmart.
-- **Needs:** a morning email with large tappable photos, and videos that work without sound.
-- **Breaks it for him:** anything on the flip phone, tiny text, an app his iPad can't install.
-- **Quote:** "June shows me on the iPad."
+## What the family needs (from the story)
 
-## Linda, 64: other-side grandma
-- **Situation:** comfortable on her iPhone, a heavy Facebook liker, hurt about being left out of a group text.
-- **Needs:** to feel equally included, hearts and comments, maybe a way to post her own photos.
-- **Breaks it for her:** seeing which group she's in. Grandparents never see group names.
-- **Quote:** "I don't want to be the last to know."
+- **Divorced households on the same side.** Gammy and Grandaddy (with Grandmomma) are both "Chase's side" but are separate households, and so are Memaw and Pawpaw (with Granny). "People who won't sit in the same room certainly won't comment on each other's photos." A post may go to both households; what one household writes must not reach the other unless that's how the groups are set up.
+- **Every grandpa is on Android.** Grandaddy, Pawpaw and probably Bebar must get the same full-quality photo (and later video) as everyone else.
+- **Stepparents are full grandparents.** Grandmomma and Granny should never feel second-tier (A2): no rankings, no "seen by" that singles anyone out.
+- **New partners.** A grandparent may find a new partner. They may join later, or may be kept out; groups have to handle both without drama.
+- **Great-grandparents.** Gigi and Bebar may never install an app. A smart frame or an email is the likely way in.
+- **The parents' guilt.** Chase and Mom want to share often without spamming, and without worrying who sees what (A1).
 
-## Kim, 33: busy aunt
-- **Situation:** night-shift nurse with every group text muted.
-- **Needs:** a weekly email or quiet alerts; several photos send one notice. Quiet hours are in the backlog.
-- **Quote:** "Love them, but stop buzzing me at work."
+## Old composite names → real people
 
-## Tammy, 50: WV helper
-- **Situation:** lives 10 minutes from June and Earl; the family's tech person.
-- **Needs:** the printed guide and a way to see who's set up.
-- **Breaks it for her:** needing Chase on the phone for every setup.
-- **Quote:** "Tell me what to tap and I'll do it Sunday after church."
+Older docs and test names still use the composites. Read them as:
+
+| Composite | Now |
+|---|---|
+| Megan (organizer parent) | Chase (and Mom) |
+| June (least-techy WV grandma) | the least-techy grandparent: ? (Chase to say) |
+| Earl (never installs an app) | likely Gigi or Bebar: ? |
+| Linda (other-side grandma, feels left out) | any stepparent or other-household grandparent: Grandmomma, Granny, Memaw |
+| Rob (co-parent ex) | retired: the splits are among the grandparents, not the parents |
+| Kim (busy aunt) | retired unless Chase names someone |
+| Tammy (local helper) | retired unless Chase names someone |
 
 ## Not for: the sharer to the world
 Followers, likes, public profiles, filters. The answer is no.
