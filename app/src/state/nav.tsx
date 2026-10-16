@@ -6,6 +6,8 @@ export interface Nav {
   close(): void;
   goPhotos(): void;
   goSignIn(): void;
+  /** Open an invite by its code (BETA-JOIN-8). */
+  goJoin(code: string): void;
 }
 
 export const NavContext = createContext<Nav | null>(null);
