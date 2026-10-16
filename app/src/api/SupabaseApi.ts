@@ -116,6 +116,7 @@ export class SupabaseApi implements HearthApi {
   markSeen = (p: string) => this.rpc<void>('mark_seen', { p_post: p });
   registerPushToken = (token: string, platform: PushPlatform) =>
     this.rpc<void>('register_push_token', { p_token: token, p_platform: platform });
+  requestAccountDeletion = () => this.rpc<void>('request_account_deletion', {});
   myProfile = () => this.rpc<unknown>('my_profile', {}).then((d) => one<MyProfile>(d));
   setMyName = (name: string) => this.rpc<void>('set_my_name', { p_name: name });
   reportClientError = (r: ClientErrorReport) =>

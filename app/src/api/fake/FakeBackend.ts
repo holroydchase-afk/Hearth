@@ -341,6 +341,18 @@ export class FakeBackend {
     this.changed();
   }
 
+  /** Same as request_account_deletion: out of every space (a sole owner keeps the space), content hidden. */
+  requestAccountDeletion(user: string | null): void {
+    const me = this.requireUser(user);
+    for (const c of Object.values(this.state.comments)) if (c.author === me) delete this.state.comments[c.id];
+    this.state.hearts = this.state.hearts.filter((h) => h.user !== me);
+    for (const t of Object.keys(this.state.pushTokens ?? {})) if (this.state.pushTokens![t]!.user === me) delete this.state.pushTokens![t];
+    this.state.members = this.state.members.filter((m) => m.user !== me
+      || (m.role === 'owner' && !this.state.members.some((o) => o.space === m.space && o.role === 'owner' && o.user !== me)));
+    this.state.circleMembers = this.state.circleMembers.filter((cm) => cm.user !== me);
+    this.changed();
+  }
+
   myProfile(user: string | null): MyProfile {
     const me = this.requireUser(user);
     const u = this.state.users[me]!;
@@ -600,6 +612,7 @@ export class FakeApi implements HearthApi {
   markSeen = (p: string) => this.run(() => this.be.markSeen(this.userId, p));
   registerPushToken = (t: string, platform: PushPlatform) => this.run(() => this.be.registerPushToken(this.userId, t, platform));
   reportClientError = (r: ClientErrorReport) => this.run(() => this.be.reportClientError(r));
+  requestAccountDeletion = () => this.run(() => this.be.requestAccountDeletion(this.userId));
   myProfile = () => this.run(() => this.be.myProfile(this.userId));
   setMyName = (n: string) => this.run(() => this.be.setMyName(this.userId, n));
   setNotificationPrefs = (space: string, p: NotificationPrefs) => this.run(() => this.be.setNotificationPrefs(this.userId, space, p));

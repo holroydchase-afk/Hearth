@@ -3,7 +3,7 @@ import React from 'react';
 import { useApp } from '../state/AppContext';
 import { Button, Card, Screen, Txt } from '../ui/kit';
 import { AppGate } from './AppGate';
-import { BiggerText, HowToTell, Privacy, SignOut } from './Preferences';
+import { BiggerText, DeleteAccount, HowToTell, Privacy, SignOut } from './Preferences';
 
 export function HelpScreen() {
   const app = useApp();
@@ -28,6 +28,7 @@ export function HelpScreen() {
         <Txt>You can look at photos and write back.</Txt>
       </Card>
       <SignOut />
+      <DeleteAccount />
     </Screen>
   );
 }

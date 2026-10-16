@@ -78,6 +78,9 @@ export interface HearthApi {
   registerPushToken(token: string, platform: PushPlatform): Promise<void>;
   setNotificationPrefs(space: string, prefs: NotificationPrefs): Promise<void>;
 
+  // --- account deletion (BETA-JOIN-7) ---
+  requestAccountDeletion(): Promise<void>;
+
   // --- names (BETA-NOTIFY-7, JOIN-1) ---
   myProfile(): Promise<MyProfile>;
   setMyName(name: string): Promise<void>;

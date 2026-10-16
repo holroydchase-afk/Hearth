@@ -3,7 +3,7 @@ import { useApp } from '../state/AppContext';
 import { Card, Screen, Txt } from '../ui/kit';
 import { AppGate } from './AppGate';
 import { NoticeTiming } from './NoticeTiming';
-import { BiggerText, HowToTell, Privacy, SignOut } from './Preferences';
+import { BiggerText, DeleteAccount, HowToTell, Privacy, SignOut } from './Preferences';
 
 export function MeScreen() {
   const app = useApp();
@@ -20,6 +20,7 @@ export function MeScreen() {
       <Privacy who={app.helper} />
       <NoticeTiming />
       <SignOut />
+      <DeleteAccount />
     </Screen>
   );
 }
