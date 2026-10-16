@@ -202,6 +202,38 @@ describe('retry with backoff', () => {
   });
 });
 
+describe('BETA-SHARE-4: a 5-photo post survives the app being killed at any step', () => {
+  const five = Array.from({ length: 5 }, (_, i) => ({ uri: `file:///${i}.jpg`, kind: 'photo' as const }));
+  const stages: [string, Hook][] = [
+    ['while creating the post', { createPost: HANG }],
+    ['after 3 of 5 photos uploaded', { putObject: (real, n) => (n > 3 ? HANG() : real()) }],
+    ['while finishing the photos', { finalizeMedia: HANG }],
+    ['while publishing', { publishPost: HANG }],
+  ];
+  it.each(stages)('BETA-SHARE-4: killed %s -> reopening gives exactly 1 published post with all 5 photos', async (_stage, hooks) => {
+    const s = setup();
+    const api1 = wrap(s.be.clientFor(CHASE), hooks);
+    const q1 = await UploadQueue.open(s.deps(api1));
+    await q1.enqueue({ ...s.input, items: five });
+    const hookName = Object.keys(hooks)[0] as keyof HearthApi;
+    await until(() => (api1.calls[hookName] ?? 0) > 0);
+    for (let i = 0; i < 20; i++) await tick();
+    q1.stop(); // the app is killed: nothing in flight ever answers
+    const q2 = await UploadQueue.open(s.deps(s.be.clientFor(CHASE)));
+    await q2.idle();
+    const live = s.live();
+    expect(live).toHaveLength(1);
+    expect(live[0]!.status).toBe('published');
+    const media = Object.values(s.be.state.media).filter((m) => m.post === live[0]!.id);
+    expect(media).toHaveLength(5);
+    expect(media.every((m) => m.status === 'ready')).toBe(true);
+    expect(q2.jobs()[0]!.state).toBe('published');
+    // the audience sees one post, never a half-made one
+    const feed = await s.be.clientFor(FIXTURE.users.jo.id).getFeed({ space: FIXTURE.space.id, limit: 50 });
+    expect(feed.filter((p) => p.author_id === CHASE && p.caption === s.input.caption)).toHaveLength(1);
+  });
+});
+
 describe('permanent failures', () => {
   it('a rule error (e.g. not allowed) stops retrying and says so', async () => {
     const s = setup();
