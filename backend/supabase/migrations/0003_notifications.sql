@@ -75,8 +75,9 @@ create trigger notify_heart after insert on public.reactions
 -- ---------------------------------------------------------------------------
 -- Claims every pending notice that may go out at p_now and marks it sent.
 -- Batching (BETA-NOTIFY-4): one row per (recipient, channel). A recipient gets at
--- most one push per 10 minutes, one email per day (weekly digest: per 7 days);
--- anything newer waits and goes out together when the window ends.
+-- most one push per 10 minutes; anything newer waits and goes out together.
+-- Email goes out when the Help screen promises (Eastern time; the POC family is all
+-- in WV/NC): daily = once each evening from 6 pm, weekly = once from Sunday 8 am.
 -- Channel: push if wanted and a phone is registered; else email if a digest is
 -- chosen or push was wanted but no phone exists; else 'none' (closed, not sent).
 -- Access is re-checked at claim time: someone removed from the group gets nothing.
@@ -121,18 +122,34 @@ language sql security definer set search_path = '' as $$
                 when c.want_push or c.digest <> 'off' then 'email'
                 else 'none' end as ch
     from cand c
+  ), clock as (
+    select (p_now at time zone 'America/New_York') as l
+  ), slots as (
+    -- the most recent 6 pm and the most recent Sunday 8 am, Eastern, at or before p_now
+    select (case when l >= date_trunc('day', l) + interval '18 hours' then date_trunc('day', l) + interval '18 hours'
+                 else date_trunc('day', l) - interval '6 hours' end) at time zone 'America/New_York' as evening,
+           (case when l >= date_trunc('day', l) - extract(dow from l) * interval '1 day' + interval '8 hours'
+                 then date_trunc('day', l) - extract(dow from l) * interval '1 day' + interval '8 hours'
+                 else date_trunc('day', l) - extract(dow from l) * interval '1 day' - interval '7 days' + interval '8 hours'
+            end) at time zone 'America/New_York' as sunday
+    from clock
   ), windowed as (
+    -- since: nothing on this channel may have gone out at or after this moment
     select k.*,
-           case when k.ch = 'push' then interval '10 minutes'
-                when k.digest = 'weekly' and not k.want_push then interval '7 days'
-                else interval '1 day' end as win
+           case when k.ch = 'push' then p_now - interval '10 minutes'
+                when k.digest = 'weekly' and not k.want_push then (select sunday from slots)
+                else (select evening from slots) end as since
     from classified k
   ), ready as (
     select g.recipient_id, g.ch
-    from (select w.recipient_id, w.ch, min(w.win) as win from windowed w where w.ch <> 'none' group by 1, 2) g
-    where not exists (select 1 from public.notification_outbox s
+    from (select w.recipient_id, w.ch, max(w.since) as since,
+                 -- an email goes out at the first slot after a notice was queued
+                 bool_or(w.ch = 'push' or w.created_at <= w.since) as due
+          from windowed w where w.ch <> 'none' group by 1, 2) g
+    where g.due
+      and not exists (select 1 from public.notification_outbox s
                       where s.recipient_id = g.recipient_id and s.channel = g.ch
-                        and s.sent_at > p_now - g.win)
+                        and s.sent_at >= g.since)
   ), mark as (
     update public.notification_outbox o
     set sent_at = p_now, channel = w.ch

@@ -131,6 +131,9 @@ begin
   get diagnostics n = row_count;
   return n;
 end $$;
+-- Pretend the pending notices were queued at p_at (the simulated clock).
+create function tests.queued_at(p_at timestamptz) returns void language sql as $$
+  update public.notification_outbox set created_at = p_at where sent_at is null $$;
 create function tests.batch_count(p_user uuid) returns int language sql as $$
   select count(*)::int from tests.batches where recipient_id = p_user $$;
 
@@ -144,7 +147,8 @@ insert into public.push_tokens (user_id, expo_token, platform) values
   (:alex,    'ExponentPushToken[alex]',    'ios'),
   (:gma_riv, 'ExponentPushToken[gma_riv]', 'android'),
   (:gpa_riv, 'ExponentPushToken[gpa_riv]', 'ios');
-select tests.setv('t0', $$select now() + interval '1 minute'$$);
+-- Simulated clock: fixed, so results never depend on the real date. Mon Nov 2, 2026, noon Eastern.
+select tests.setv('t0', $$select '2026-11-02 12:00 America/New_York'::timestamptz$$);
 
 -- ======================================================================
 -- BETA-NOTIFY-2: only the audience; no image, caption or child's name
@@ -168,7 +172,7 @@ select tests.ok_sql($$select bool_and(b::text not like '%tooth%' and b::text not
                                       and b::text not like '%secret-%' and b::text not like '%http%')
                       from tests.batches b$$,
                     'BETA-NOTIFY-2: the claimed payload has no caption, no child''s name and no media key or URL');
-select tests.ok_sql($$select tests.claim(now() + interval '1 hour') = 0$$,
+select tests.ok_sql(format($$select tests.claim(%L::timestamptz + interval '1 hour') = 0$$, tests.v('t0')),
                     'BETA-NOTIFY-2: a claimed notice is never sent twice');
 
 -- removed from the group before the sender runs -> nothing
@@ -254,27 +258,41 @@ delete from public.notification_outbox;
 insert into public.notification_prefs (user_id, space_id, push, email_digest) values
   (:gma_riv, :space_a, false, 'daily'),
   (:gpa_riv, :space_a, false, 'off');
-select tests.setv('t3', format($$select %L::timestamptz + interval '5 days'$$, tests.v('t0')));
+-- Emails go out at the times the Help screen promises (Eastern):
+-- "every evening" = 6 pm, "every Sunday morning" = 8 am.
 select tests.mkpost(:alex, :c_a_gp, 1, 'z');
-select tests.setv('n', format($$select tests.claim(%L)$$, tests.v('t3')));
+select tests.queued_at('2026-11-07 10:00 America/New_York');
+select tests.ok_sql($$select tests.claim('2026-11-07 12:00 America/New_York') = 0$$,
+                    'BETA-NOTIFY-5: a daily email waits for the evening (nothing at noon)');
+select tests.ok_sql(format('select exists (select 1 from public.notification_outbox where recipient_id = %L and channel = ''none'' and sent_at is not null)', :gpa_riv),
+                    'prefs: push off and email off -> nothing sent, and the notice is closed out (no pile-up)');
+select tests.setv('n', $$select tests.claim('2026-11-07 18:05 America/New_York')$$);
 select tests.ok_sql($$select tests.v('n') = '1' and (select channel = 'email' and email = 'grandma.rivera@example.com'
                                                     and push_tokens = '{}' from tests.batches)$$,
-                    'BETA-NOTIFY-5: push off + daily email -> an email notice, no push tokens');
-select tests.ok_sql(format('select tests.batch_count(%L) = 0 and exists (select 1 from public.notification_outbox where recipient_id = %L and sent_at is not null)', :gpa_riv, :gpa_riv),
-                    'prefs: push off and email off -> nothing sent, and the notice is closed out (no pile-up)');
+                    'BETA-NOTIFY-5: push off + daily email -> one email at 6 pm, no push tokens');
 :as_admin
 select tests.mkpost(:alex, :c_a_gp, 1, 'z2');
-select tests.ok_sql(format($$select tests.claim(%L::timestamptz + interval '2 hours') = 0
-                             and tests.claim(%L::timestamptz + interval '25 hours') = 1$$, tests.v('t3'), tests.v('t3')),
-                    'BETA-NOTIFY-5: the daily email waits a day between digests');
+select tests.queued_at('2026-11-07 19:00 America/New_York');
+select tests.ok_sql($$select tests.claim('2026-11-07 20:00 America/New_York') = 0
+                         and tests.claim('2026-11-08 17:59 America/New_York') = 0
+                         and tests.claim('2026-11-08 18:01 America/New_York') = 1$$,
+                    'BETA-NOTIFY-5: one evening email per day; later photos wait for the next evening');
+:as_admin
+update public.notification_prefs set email_digest = 'weekly' where user_id = :gma_riv;
+select tests.mkpost(:alex, :c_a_gp, 1, 'w');
+select tests.queued_at('2026-11-14 19:00 America/New_York');
+select tests.ok_sql($$select tests.claim('2026-11-14 20:00 America/New_York') = 0
+                         and tests.claim('2026-11-15 07:59 America/New_York') = 0
+                         and tests.claim('2026-11-15 08:30 America/New_York') = 1$$,
+                    'BETA-NOTIFY-5: the Sunday email waits for Sunday 8 am');
 :as_admin
 delete from public.notification_prefs;
 delete from public.push_tokens where user_id = :gma_riv;
 select tests.mkpost(:alex, :c_a_gp, 1, 'z3');
-select tests.setv('n', format($$select tests.claim(%L::timestamptz + interval '3 days')$$, tests.v('t3')));
+select tests.setv('n', $$select tests.claim('2026-11-16 18:30 America/New_York')$$);
 select tests.ok_sql(format($$select tests.v('n')::int >= 1
                              and (select channel = 'email' from tests.batches where recipient_id = %L)$$, :gma_riv),
-                    'prefs: push wanted but no phone registered -> falls back to email');
+                    'prefs: push wanted but no phone registered -> falls back to the evening email');
 
 -- ======================================================================
 -- Sender-only functions are not callable by app users
@@ -299,7 +317,7 @@ select tests.throws_code($$select public.forget_push_tokens(array['ExponentPushT
 :as_admin
 delete from public.notification_outbox;
 select tests.mkpost(:alex, :c_a_gp, 1, 'r');
-select tests.setv('t4', format($$select %L::timestamptz + interval '10 days'$$, tests.v('t0')));
+select tests.setv('t4', $$select '2026-11-20 19:00 America/New_York'::timestamptz$$);
 select tests.claim(tests.v('t4')::timestamptz);
 select public.release_notifications((select array_agg(o) from tests.batches, unnest(outbox_ids) o));
 select tests.ok_sql(format($$select tests.claim(%L::timestamptz + interval '1 minute') = 2$$, tests.v('t4')),
