@@ -1,67 +1,128 @@
-# Hearth: work remaining to Ring 0 (Thu Oct 29) and beta (Sun Nov 22)
+# Hearth: work remaining, by milestone
 
-Owner: staff-pm. Written Thu Oct 15, 2026, 1 pm. Scope and acceptance criteria still live in `BETA-SPEC.md`. This file covers who does what, in what order. Product scope beyond the beta is in `CORE-FEATURES.md`.
+Owner: staff-pm. Rewritten Fri Oct 16, 2026 (overnight) around the milestones in `ANCHORS.md`, which supersede the Ring 0–3 plan. Scope and acceptance criteria live in `BETA-SPEC.md` (see its "Milestone map and trace" table for which BETA-* each milestone needs). Product scope beyond that is in `CORE-FEATURES.md`.
 
-**Bottom line:** Nov 22 still holds. Oct 29 holds only if four things happen by Mon Oct 19: the code is in a GitHub repo, Apple enrollment is confirmed, the accounts and domain exist, and the push/email sender is started. The backend is done and fast. The real gap is the work nobody has started yet: **nothing sends notifications**, **nothing has run on a real phone**, and **the code lives in a container that can disappear.**
+**Bottom line:** Milestone 1 (Chase uses Hearth end to end) is mostly blocked on Chase, not code. Backend, notification sender and app are built and green locally; nothing is deployed and nothing has run on a real phone. The shortest path: deploy to the one existing Supabase project, run the app on Chase's iPhone, post for 2 days. Milestone 2 (Mom posting too) adds the email sender domain, invite links and a build she can install.
 
-Sizes: **S** = under half an agent-day · **M** = about 1 agent-day · **L** = 2–3 agent-days. On a $20 plan, assume about 1 agent-day per calendar day, and assume half of those get cut off by the usage limit. That gives roughly 7–8 real agent-days between Oct 16 and Oct 28. The Ring 0 list below is sized to fit in 7.
+**Dates.** The ring dates (Ring 0 gate Oct 29, Ring 1 Nov 5, Ring 2 Nov 12) are **dropped**: they were gates for rings that no longer exist. Milestones have no dates. **Nov 22 / Thanksgiving (Nov 26) is kept only as a soft target** for milestones 3–4, because Thanksgiving is the one in-person setup chance with WV family. Whether it's still a target is a decision for Chase.
+
+Sizes: **S** = under half an agent-day · **M** = about 1 agent-day · **L** = 2–3 agent-days. $20 plan: one lane at a time.
 
 ---
 
-## Where things stand (verified Oct 15, 1 pm)
+## Where things stand (Oct 16, overnight)
 
 | Area | State | Evidence |
 |---|---|---|
-| Backend API (API.md) | Done | 110 RLS + 130 API SQL tests green; Deno smoke 4/4 over real PostgREST; `get_feed` p95 1.94 ms at 1M posts (`backend/tests/perf/RESULTS.md`) |
-| S9, S10 | Fixed | `0002_beta_api.sql` + `api_test.sql`. **The tracker still shows them open** (qa-tdd: QA-5) |
-| S16 (real Supabase stack) | Open | `ci.yml` is written but has never run. Docker can't pull images here |
-| App | Finishing | `tsc --noEmit` is clean as of 1 pm. The app README claims 179 Jest tests green and 19/19 contract tests against real PostgREST; the Jest hang is being fixed now |
-| **Notification sending** | **Not built** | `push_tokens` and `notification_prefs` tables exist. There is no sender (push or email), no RPC to save a token or a preference, and the app keeps preferences on the phone only (app README, "API.md gaps" #5) |
-| Real phones | Never run | Only the web build has been exercised. Image resize, file bytes, save-to-phone, OTP email, deep links and push are all unverified on a device |
-| Video | Off in the app | iOS videos carry location that can't be stripped without a transcoder. `VIDEO_POSTING_ENABLED=false` |
-| Infrastructure | None | No repo, no hosted project, no domain, no backups, no staging. Code exists in this container plus zips |
+| Backend API | Done locally | 110 RLS + 130 API + 46 NOTIFY SQL tests green; Deno 17; `get_feed` p95 < 2 ms at 1M posts |
+| Notification sender (AE-2) | Built, not deployed | Migration 0003 outbox + batching; `notify` edge function (Expo Push + Resend). No cron yet |
+| App | Built, web only | Jest 179 + 1 skipped; typecheck clean; web e2e 1 passed (was 3/3; check). App does not yet call `register_push_token` / `set_notification_prefs` |
+| Repo + CI | Repo exists (github.com/holroydchase-afk/Hearth) | CI green status unverified; S16 open until it is |
+| Hosted stack | One Supabase project exists, nothing deployed | Blocked on network allow-list + `SUPABASE_ACCESS_TOKEN` (HANDOFF item 3) |
+| Real phones | Never run | Resize, EXIF scan, save to phone, OTP, links, push all unverified on a device |
+| Video | Off (`VIDEO_POSTING_ENABLED=false`) | iOS location can't be stripped without a transcoder |
 
 ---
 
-## Critical path (in order; a slip in any line moves Oct 29)
+## Milestone 1: Chase uses it end to end
 
-| # | Date | Item | Owner | Blocks |
+**Gate (all must be met; evidence in BETA-SPEC "Milestone gates"):** every M1 `auto` criterion green 3× against the hosted project; M1 `manual` criteria logged as passing on Chase's iPhone; ≥10 posts over ≥2 days from Chase's iPhone to a second test account, 0 lost; 0 crashes; `MEDIA_KEK` written down in 2 places.
+
+"End to end" needs a receiver. Chase uses a second account (a second email) on a second device or the web build to receive, heart and comment, so NOTIFY-3 and REPLY-3 can be exercised alone.
+
+### Critical path (in order)
+
+| # | Item | Owner | Needs Chase? | Blocks |
 |---|---|---|---|---|
-| 1 | **Fri Oct 16** | Private GitHub repo created; all code pushed (IN-1) | Chase → infra | everything below; also ends the "lose it all" risk |
-| 2 | **Fri Oct 16** | Apple enrollment confirmed or submitted (CH-1) | Chase | TestFlight, any iPhone build |
-| 3 | Fri Oct 16–Sat 17 | Accounts: Supabase ×2, Backblaze (US East), Expo, Resend, Play; name check + domain bought (CH-2, CH-3) | Chase | IN-3, IN-5, IN-6 |
-| 4 | Sat Oct 17 | CI green on GitHub Actions → S16 closed (IN-2) | infra | Ring 0 gate (BETA-SEE-1) |
-| 5 | Sat Oct 17–Tue 20 | Notification sender + 0003 migration (AE-2), red tests first (QA-1) | app-engineer, qa-tdd | NOTIFY-1/2/3, REPLY-3 (all P0) |
-| 6 | Mon Oct 19 | Staging stack deployed (IN-3), email codes sending from our domain (IN-6) | infra | real sign-in, device builds |
-| 7 | Wed Oct 21 | Website on the domain: invite links, privacy policy (IN-5) | infra | invite links opening the app; Beta App Review |
-| 8 | Wed Oct 21–Fri 23 | First builds on Chase's iPhone + an Android phone; fix whatever breaks (AE-3) | app-engineer | Ring 0 |
-| 9 | Mon Oct 26 | Production project on Pro; key backup + restore drill (IN-4, IN-7); TestFlight external build submitted (AE-6) | infra, Chase | Ring 0 gate |
-| 10 | Tue Oct 27–Wed 28 | Ring 0: Chase posts ≥10 times over 2 days, 0 lost (CH-6) | Chase, qa-tdd | Ring 0 gate Thu Oct 29 |
+| 1 | CI green on GitHub Actions → S16 closed (IN-2) | infra (Claude) | No | SEE-1 |
+| 2 | App calls `register_push_token` + `set_notification_prefs` (contract test first) | qa-tdd → app-engineer | No | NOTIFY-2/3 on device |
+| 3 | 0004 migration test-first: `report_client_error` (OPS-1, AE-7) + S12 (REPLY-4, AE-8) | qa-tdd → app-engineer | No | OPS-1, REPLY-4 |
+| 4 | **Access for deploys:** allow `mcp.supabase.com`, `api.supabase.com`, the project host; add `SUPABASE_ACCESS_TOKEN` | **Chase** | Yes (10 min) | 5 |
+| 5 | **Backblaze B2 account, US East** (region can't change) + bucket keys into Supabase secrets; `MEDIA_KEK` on paper ×2 (CH-5) | **Chase** | Yes (30 min, ~$0 at this size) | 6 |
+| 6 | `supabase db push`; deploy `sign-media` + `notify`; 1-minute cron; smoke test green on hosted | infra (Claude) | No, after 4–5 | 7, QA-2 |
+| 7 | **App on Chase's iPhone.** First try Expo Go (all current deps are Expo Go SDK 54 modules; push and links need checking). If Expo Go can't do push or tap-to-open, an EAS dev build needs the **Apple Developer account ($99, CH-1)** | app-engineer + **Chase** | Yes (install; maybe $99) | 8 |
+| 8 | Device pass on the iPhone: resize, EXIF scan (M-09), encrypted PUT, Save to phone, OTP code, push tap-to-open cold/warm (AE-3, iPhone half) | app-engineer, qa-tdd | Chase holds the phone | gate |
+| 9 | QA-2: all M1 auto criteria 3× on hosted; QA-3 sent-vs-received script | qa-tdd | No | gate |
+| 10 | **Chase posts ≥10 times over ≥2 days**; receives on the second account (CH-6) | **Chase** | Yes | M1 gate |
 
-Sat–Sun Oct 24–25 is buffer for usage-limit days. Don't plan work into it.
+Email codes at M1: Supabase's built-in mailer only sends to project team members, which Chase is. So Resend and the domain are **not** on the M1 path.
+
+### Work for M1 that needs no accounts or money (Claude, overnight)
+
+1. CI green, S16 closed (IN-2).
+2. App wiring for `register_push_token` / `set_notification_prefs`, contract test red first.
+3. Migration 0004 test-first: OPS-1 (`report_client_error`, scrubbed) and REPLY-4 (S12).
+4. Expo Go feasibility check: does the app (crypto, image pipeline, push token, `hearth://` links) run in Expo Go SDK 54? Decides whether $99 is needed at M1.
+5. Investigate web e2e 1 passed vs 3/3.
+6. QA-3 sent-vs-received script; QA-5 tracker hygiene (close S9, S10; add AE-2..AE-8; mark video and REPLY-1 deferred).
+7. Red tests for the two new proposed criteria, BETA-NOTIFY-7 (named sender) and BETA-AUD-7 (no last-active data).
+8. GU-2 copy table (push, code email, invite text, the refused-invite sentence), every message naming a real person ("From Chase on Hearth").
+9. A one-page "M1 setup, in order" checklist for Chase (exact clicks for steps 4, 5, 7), so his part fits in one nap time.
+
+### M1 work that needs Chase
+
+| ID | Item | Cost | Notes |
+|---|---|---|---|
+| CH-A | Network allow-list + `SUPABASE_ACCESS_TOKEN` (HANDOFF item 3) and the secrets in item 4 | $0 | Unblocks every deploy |
+| CH-2 (part) | Backblaze B2, US East | ~$0 | Supabase project already exists; Expo account (free) for builds |
+| CH-5 | `MEDIA_KEK` on paper ×2 + password manager | $0 | Restore drill (IN-4) moves to M3 |
+| CH-1 | Apple Developer enrollment | $99 | Only if Expo Go fails item 7; certainly needed by M3 (TestFlight) |
+| CH-6 | ≥10 posts over 2 days | time | The M1 gate |
+| CH-11 | Help phone number | $0 | Can wait to M3 |
 
 ---
 
-## Top 3 risks to the dates
+## Milestone 2: Mom posts too; both family sides work
 
-1. **Apple.** Enrollment status is unknown. Individual enrollments take 2 days to 3+ weeks, and Beta App Review has never been tried for this app. An invite-only app needs a working demo login. An app that creates accounts is expected to offer in-app account deletion (guideline 5.1.1(v)), so I'm pulling a minimal "Delete my account" button into the beta (AE-5) instead of risking a rejection. **If Apple isn't approved by Thu Oct 22:** Ring 0 runs on Android (internal build) plus Expo Go on Chase's iPhone, the Ring 0 gate drops "external build submitted", and Ring 1 can't start until Apple approves. The Thanksgiving in-person fallback stays.
-2. **Capacity and an ephemeral codebase.** The $20 plan ran out today, mid-lane. There are about 7 real agent-days left before Oct 29, and the list needs about 7. Until IN-1 is done, one container reset loses work that only exists here. **Mitigations:** push to GitHub tomorrow; run one lane at a time; commit at the end of every session. Consider a higher plan for the two build weeks only (CH-9).
-3. **The first real phone, plus notifications that don't exist yet.** Every native path (resize, save to phone, OTP email, universal links, push and tap-to-open) has only run on the web build. Push and email sending isn't written. Both land in the same 5 days (Oct 19–23). If the device pass (AE-3) turns up more than about 2 days of fixes, Ring 0 slips to Mon Nov 2 and Ring 3 moves to in-person setup at Thanksgiving.
+**Gate:** Mom signs in from an invite and posts unaided (JOIN-2, SHARE-1, stopwatch); both of them post to both family sides' groups (Chase's WV side, Mom's Charleston side) with 0 cross-side leaks; AUD-1 answered correctly by both; AUD-6 audience change works; NOTIFY-1 p90 ≤ 60 s over ≥10 posts; REPLY-3 notices reach the poster; 0 open P0.
+
+| # | Item | Owner | Needs Chase? |
+|---|---|---|---|
+| 1 | Name check + domain (CH-3) | **Chase** (~$15/yr) | Yes |
+| 2 | Resend + SPF/DKIM/DMARC so codes reach Mom's inbox (IN-6) | infra after CH-3; **Resend account (free tier)** | Yes (account) |
+| 3 | Website: `/join/*`, AASA, `/p/<id>` (IN-5, minus privacy policy) | infra | No, after 1 |
+| 4 | A build Mom can install: Expo Go (if M1 proved it) or TestFlight **internal** testing (she's added as an App Store Connect user; no Beta App Review) | app-engineer + **Chase** | Yes |
+| 5 | AE-10 push latency log (NOTIFY-1); AE-4 expo-updates channels | app-engineer | No |
+| 6 | Groups set up for both sides in the app (no setup UI in scope: seeded by Claude via SQL from Chase's list) | infra + **Chase gives the list** | Yes (list) |
+| 7 | Triage fixes from Mom's use (AE-11) | app-engineer | No |
 
 ---
 
-## Cut or deferred (decided today)
+## Later milestones (not planned in detail; re-cut when M2 passes)
+
+| Milestone | New work it pulls in |
+|---|---|
+| 3. Most tech-savvy relative | Apple enrollment + TestFlight **external** (AE-6) → Beta App Review → Delete my account (AE-5, JOIN-7) and a plain privacy policy page (PS-3, no legal review); Supabase Pro + key restore drill (IN-7, IN-4, IN-8); JOIN-5, SEE-5, NOTIFY-4 |
+| 4. Everyone else by savviness | Printed guide (GU-3), grandparent test (GU-4), JOIN-6, SEE-2, SEE-4, NOTIFY-5 digest, REPLY-5; **A2 "Seen by" decision due before this**; Thanksgiving setup if Chase keeps the soft date |
+| 5. Android grandpas | Android test phone (CH-7), Play Console $25, Android device pass (AE-3 Android half, GU-1), Android install < 10 min |
+| 6. Smart frame | Check whether the Aluratek model takes photos by email or shared link; skip if app-only |
+| 7. Decide | Costs, problems hit, whether to go further. Funding, pricing, pentest, legal, self-hosted auth (A3 gap) live here |
+
+---
+
+## Risks to milestones 1–2
+
+1. **Chase's time is the bottleneck, not code.** Every remaining M1 blocker is an account, a secret or holding the phone. Mitigation: one checklist, ordered, under 1 hour total (overnight item 9).
+2. **First real phone.** Native paths have only run on web. Budget 1–2 agent-days of device fixes.
+3. **Apple.** Moved off the M1 path if Expo Go works; firmly on the M3 path (external TestFlight needs Beta App Review, account deletion and a privacy policy URL). Enroll by the time M2 starts; it can take 2 days to 3+ weeks.
+4. **Free-tier Supabase with real photos.** No daily backups and it pauses after a week idle. Acceptable for M1–2 (originals are on the parents' phones); Pro ($25/mo) before the first relative at M3.
+
+---
+
+## Cut or deferred
 
 | Item | Decision | Why |
 |---|---|---|
-| Video posting (BETA-SHARE-6, video half of SEE-4) | **Out of beta**, unless app-engineer shows on a device by Nov 5 that a transcode removes location (metadata scan, as in SHARE-2) | We can't truthfully send `exif_stripped: true` for iOS video. Photos-only for 12 grandparents is fine. Video goes in v1.0 |
-| "Audience sees who hearted it" (BETA-REPLY-1) | Show the count plus "You loved this"; names wait | There's no RPC for names. Not a grandparent blocker |
-| Purge worker, export zips | Manual by Chase until v1.0 | Unchanged from BETA-SPEC |
-| S11, S13, S14, S15 | v1.0 | No split household in Rings 0–3; S15 fails closed |
-| Web viewer (M-06) | Still out | The guide must stop promising "nothing to download" (GU-3) |
-| Staging app builds for testers | One production channel plus a "preview" channel for Chase only | Two backends are enough. A third build flavor isn't |
+| Ring dates Oct 29 / Nov 5 / Nov 12 | **Dropped** | Rings superseded by milestones |
+| Staging project (IN-3) | **Deferred to M3**; one hosted project for M1–2 | Two posters don't need two backends; tests run locally and in CI |
+| Supabase Pro, backups, restore drill (IN-7, IN-8, IN-4) | **M3** | No relative data before then; KEK on paper from M1 |
+| Beta App Review, Delete my account, privacy policy page | **M3** | Only external TestFlight needs them |
+| Android phone, Play Console | **M5** | Milestone order; iPhone side first |
+| Video (SHARE-6, video half of SEE-4) | Still out until a transcode proves location-free | Unchanged. Note: video is a named story problem (stepmom, in-laws), not a nice-to-have. Revisit at M4 |
+| REPLY-1 names | Count + "You loved this" | Unchanged |
+| Purge worker, exports, S11/S13/S14/S15, web viewer | Unchanged (v1.0 / out) | |
 
-Spec changes are recorded in BETA-SPEC.md under "Amendments, Oct 15 pm".
+Spec changes are in BETA-SPEC.md under "Milestone map and trace (Oct 16)". The Oct 15 work tables below keep their IDs; their Ring wording is historical, and the milestone each item now belongs to is in the tables above.
 
 ---
 
@@ -150,18 +211,6 @@ Scale is already proven where it matters: the feed is fast at 1M posts. What we 
 
 ---
 
-## After Ring 0: what the later gates need (from BETA-SPEC)
-
-| Ring | Gate | Remaining work it needs |
-|---|---|---|
-| 1 (Oct 30–Nov 5) | Wife passes JOIN-2 and SHARE-1 unaided; push p90 ≤ 60 s; 0 open P0; Beta App Review approved; Pro on | AE-10, AE-11, AE-6 approved, IN-7 |
-| 2 (Nov 6–12) | Grandparent test 4/5; Android install < 10 min; all P0/P1 manual criteria on both platforms; digest reaches the inbox; guide final | AE-8, AE-9, the digest part of AE-2, GU-1, GU-3, GU-4, IN-8, QA-4, CH-8 |
-| 3 (Nov 13–22) | 10 of 12 signed in and opened ≥1 post; 0 wrong-audience incidents | Guide mailed Nov 10; setup calls Nov 14–15; Play tester list (CH-4); daily triage |
-
-Fallback (unchanged): if the Ring 1 gate slips past Mon Nov 9, Ring 3 becomes in-person setup at Thanksgiving (Nov 26).
-
----
-
 ## PM operating cadence
 
 ### What has to be true for a daily PM run to work
@@ -180,9 +229,9 @@ Today the code exists only in this container, so a scheduled run would start in 
 2. **Triage:** give every new item a P0, P1 or P2, a lane, and a "done when". A P0 or a red `main` goes to the top.
 3. **Critical path check:** for each critical-path line, mark it on time or slipping, with a new date. If a slip moves a gate, say so on line 1.
 4. **Write `pm/YYYY-MM-DD.md`:** at most 15 lines, made of today's 3 handoffs (agent → task → done when), Chase's decisions waiting (with my recommendation), and any risk that changed.
-5. **Gate days (Oct 29, Nov 5, Nov 12, Nov 22):** a go/no-go packet instead of the note, with each criterion met or not met with evidence. Never rounded up.
+5. **Milestone gate days (when Chase says a milestone is ready):** a go/no-go packet instead of the note, with each criterion met or not met with evidence. Never rounded up.
 6. Push the note. Chase reads it on his phone in 2 minutes.
 
-**Until the repo exists:** no scheduled run. Chase starts each work session with "PM: daily", and I run the same loop by hand. I also mirror `REMAINING.md` and `CORE-FEATURES.md` into the claude.ai Project so they outlive this container.
+**Repo now exists (Oct 15); until CI and logs are wired:** no scheduled run. Chase starts each work session with "PM: daily", and I run the same loop by hand. I also mirror `REMAINING.md` and `CORE-FEATURES.md` into the claude.ai Project so they outlive this container.
 
 **Weekly (Mondays):** re-cut scope against the agent-days left, and update `REMAINING.md`. Anything new defaults to "not now" unless it unblocks a grandparent or closes a privacy risk.

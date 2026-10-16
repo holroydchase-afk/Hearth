@@ -1,6 +1,6 @@
 # Hearth Beta Spec: single source of truth
 
-Owner: staff-pm. Updated Oct 15, 2026. Target: about 12 WV grandparents using Hearth by **Sun Nov 22, 2026**.
+Owner: staff-pm. Updated Oct 16, 2026. **Milestones in `ANCHORS.md` now set the order** (see "Milestone map and trace" at the end). Nov 22 / Thanksgiving is a soft target for milestones 3–4, pending Chase.
 
 Rules: no criterion, no build. qa-tdd writes each test red before app-engineer builds.
 - **Types:** `auto` means Playwright, SQL (RLS suite), or Deno. `manual` means a real phone or a real person, logged on the Test Log page.
@@ -66,7 +66,7 @@ Rules: no criterion, no build. qa-tdd writes each test red before app-engineer b
 | BETA-REPLY-4 | auto | P1 | **Given** a member removed from a circle, **When** they try to comment on, heart, or edit captions of its posts, **Then** the attempt is refused (S7, S12). |
 | BETA-REPLY-5 | manual | P1 | **Given** a grandparent with no help, **When** asked to find the newest photo and leave a comment, **Then** she does it in under 60 s (M-01). |
 
-**Count:** JOIN 6, SHARE 6, SEE 6, AUD 6, NOTIFY 6, REPLY 5 = 35 (24 P0, 11 P1).
+**Count (Oct 15):** JOIN 6, SHARE 6, SEE 6, AUD 6, NOTIFY 6, REPLY 5 = 35 (24 P0, 11 P1). Plus JOIN-7, OPS-1 (Oct 15 pm) and NOTIFY-7, AUD-7 (Oct 16) = 39.
 
 ## Grandparent test (used by the Ring 2 gate)
 5 testers aged 65+. No help, 60 s cap per task. Pass means 5 of 5 tasks done.
@@ -96,7 +96,7 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 - Self-serve account deletion: Chase deletes on request. It's required before a public App Store launch.
 - Analytics or crash SDKs: they break the no-tracker promise. Use TestFlight crash reports and Play vitals instead.
 
-## Ring gates and evidence
+## Ring gates and evidence (superseded Oct 16 by the milestone gates below; kept for history)
 | Ring | Dates | Gate (all must be met) | Evidence |
 |---|---|---|---|
 | 0: Chase alone | Oct 28–29 | All P0 `auto` criteria green 3× on the hosted stack. S9, S10, S16 closed. ≥10 posts over ≥2 days with 0 lost. 0 crashes. MEDIA_KEK restore tested. External build submitted to Beta App Review. | Test Log runs (IDs); sent vs received counts; TestFlight/Play crash pages; restore note; App Store Connect status |
@@ -114,3 +114,63 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 - **New BETA-OPS-1 (auto, P0, Ring 0):** **Given** a thrown error in the app, **When** it is reported, **Then** exactly 1 `client_errors` row is written with app version, OS and screen, and no caption, email, URL or key. The app has 0 third-party analytics or crash SDKs.
 - **Notification sending is P0 for Ring 0** (NOTIFY-2, NOTIFY-4, REPLY-3 are auto P0s). It wasn't built in the backend lane. Owner: app-engineer (AE-2).
 - **GRANDPARENT-GUIDE.md** must stop saying "nothing to download". The beta requires installing the app (GU-3).
+
+## Milestone map and trace (Oct 16, staff-pm)
+`ANCHORS.md` milestones supersede the ring gates above (kept for history). **M** = first milestone that needs the criterion (1 Chase end to end · 2 Mom, both sides posting · 3 savvy relative · 4 everyone else · 5 Android · 6 frame · 7 decide). **Trace** = the story problem or anchor it serves (A1 Anxiety-less, A2 Guilt-free, A3 US soil). No criterion or built feature is deleted.
+
+| ID | M | Trace | Flag |
+|---|---|---|---|
+| JOIN-1 | 1 | A1: invite-only, no passwords ("preschool app") | |
+| JOIN-2 | 2 | Setup is a family event; least-techy person | |
+| JOIN-3 | 1 | A1: only invited people get in | |
+| JOIN-4 | 1 | A1 | |
+| JOIN-5 | 3 | Grandparent never stuck at a code screen | |
+| JOIN-6 | 4 | Setup is a family event (printed guide, helper, number to call) | |
+| JOIN-7 | 3 | Apple Beta App Review rule; weak A1 (you can leave) | **Flag:** traces to an Apple rule, not the story. Needed only for external TestFlight (M3) |
+| SHARE-1 | 1 | Posting built for Charlotte; time is short | |
+| SHARE-2 | 1 | A1: predators, stalkers (no location) | |
+| SHARE-3 | 1 | A1, A3 | |
+| SHARE-4 | 1 | "Someone doesn't get the photo"; time is short | |
+| SHARE-5 | 1 | Blurry MMS between iPhone and Android | |
+| SHARE-6 | 4 | Video is worse; stepmom sent separately, in-laws offended | Deferred (Oct 15). **Note:** strong story trace, not a nice-to-have |
+| SEE-1 | 1 | A1 | |
+| SEE-2 | 4 | Viewing built for WV; slow old phones | |
+| SEE-3 | 1 | Viewing built for WV; no gesture-only actions | |
+| SEE-4 | 4 | Big photos for WV grandparents (photo half) | Video half deferred |
+| SEE-5 | 3 | Grandparents print photos; A1 (no location in the saved file) | |
+| SEE-6 | 1 | A1: divorced sides; removal is real | |
+| AUD-1 | 2 | Grandma A without Grandpa B, "and without worrying that he might"; A1 | |
+| AUD-2 | 1 | A1: never post to the wrong side by default | |
+| AUD-3 | 1 | Grandma A / Grandpa B on every path; A1 | |
+| AUD-4 | 1 | Split families; A1 | **Flag:** the co-parent case is the Rob persona, not Chase's story (his split is among grandparents). Built and green; keep |
+| AUD-5 | 1 | A1 | |
+| AUD-6 | 2 | A1: a wrong audience can be fixed | |
+| NOTIFY-1 | 2 | Guilt: photos actually reach grandparents | |
+| NOTIFY-2 | 1 | A1; A3 (alerts transit Apple/Google with no photo, caption or child's name) | |
+| NOTIFY-3 | 1 | Viewing built for WV | |
+| NOTIFY-4 | 3 | A1 (Kim: no buzzing) | |
+| NOTIFY-5 | 4 | Someone will never install an app (Earl's morning email); bridge to CF-18 | |
+| NOTIFY-6 | 2 | Megan "know Grandma saw it"; parental guilt | **Flag: conflicts with A2.** Awaiting Chase's decision before M4 (ANCHORS conflicts table). Built code stays |
+| REPLY-1 | 1 | A2: hearts are a signal people choose to show | |
+| REPLY-2 | 1 | "Grandma A should be able to comment without Grandpa B seeing it" | |
+| REPLY-3 | 1 | Guilt: the poster knows it landed, via chosen signals (A2-safe) | |
+| REPLY-4 | 1 | A1 | |
+| REPLY-5 | 4 | Viewing built for WV | |
+| OPS-1 | 1 | A1 + A3: no third-party crash/analytics SDKs | |
+| NOTIFY-7 *(new)* | 1 | Every message names a real person, so it can't pass for a scam (June) | Added Oct 16 |
+| AUD-7 *(new)* | 1 | A2: no last-seen or login details | Added Oct 16 |
+
+**By milestone:** M1 24, M2 5, M3 4, M4 6 (of 39 incl. JOIN-7, OPS-1 and the 2 new). M5 adds no new criterion: every manual criterion re-runs on an Android phone, plus "Android install < 10 min unaided". M6 has none (frame check is a yes/no investigation).
+
+### New criteria (Oct 16)
+| ID | Type | Pri | M | Given / When / Then |
+|---|---|---|---|---|
+| BETA-NOTIFY-7 | auto | P1 | 1 | **Given** any push, sign-in email, digest or invite text, **When** it is generated, **Then** it names the real sender ("From Chase on Hearth" / "Chase invited you to Hearth"), never a generic "You have a new notification", and still carries no photo, caption or child's name. |
+| BETA-AUD-7 | auto | P0 | 1 | **Given** any member, **When** they call any RPC or table they can read, **Then** no other member's last-active, last-login, online status or device details come back. (Does not decide NOTIFY-6.) |
+
+### Milestone gates (replace the ring gates)
+| Milestone | Gate (all must be met) | Evidence |
+|---|---|---|
+| 1: Chase | All M1 `auto` criteria green 3× against the hosted project; S16 closed; M1 `manual` criteria (SHARE-1, SHARE-4, SEE-3, NOTIFY-3, M-09) pass on Chase's iPhone; ≥10 posts over ≥2 days to a second test account, 0 lost; 0 crashes; `MEDIA_KEK` on paper ×2 | CI runs; Test Log entries; QA-3 sent vs received; `client_errors` count |
+| 2: Mom | Mom passes JOIN-2 and SHARE-1 unaided (stopwatch); both post to both family sides' groups with 0 cross-side leaks; AUD-1 2 of 2; AUD-6 passes; NOTIFY-1 p90 ≤ 60 s over ≥10 posts; 0 open P0 | Test Log times; latency log; ticket list |
+| 3+ | Defined when M2 passes. Grandparent test (above) is the M4 entry check; A2 "Seen by" decided before M4 | |

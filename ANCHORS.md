@@ -9,7 +9,7 @@ Source of truth for *why* Hearth exists and what every feature is checked agains
 
 ## Milestones (Chase, Oct 16, 2026)
 
-Hearth is a **proof of concept first**: a birthday present Chase is building himself, because these problems are his own, plus experience for future jobs. These milestones supersede the startup-style Ring 0–3 plan in `BETA-SPEC.md` and `REMAINING.md` (reconcile those next session).
+Hearth is a **proof of concept first**: a birthday present Chase is building himself, because these problems are his own, plus experience for future jobs. These milestones supersede the startup-style Ring 0–3 plan. Reconciled Oct 16: `BETA-SPEC.md` ("Milestone map and trace") and `REMAINING.md` (milestone critical path).
 
 1. **Birthday present.** Chase uses it himself, end to end.
 2. **Wife.** Both households' posting works.
@@ -42,6 +42,9 @@ Not required for the POC: funding, pricing, self-hosted auth, pentest, legal rev
 | "Seen by N of M" on your own posts | BETA-NOTIFY-6, CF-20, prototype | The poster can see who hasn't opened it |
 | "Hasn't opened anything in 14 days" | CF-22 (v1.0) | Shames quiet relatives |
 | Grandparent engagement as a gate/funding metric | ring gates, funding plan | Fine if internal and aggregate only; never shown to family |
+| Ring 3 exit "opened at least 1 post" and success signal "80% open within 24 h" | BETA-SPEC ring gates (now superseded) | Measures each person's opens. Fine as an aggregate Chase-only number; must never be shown per person in the app |
+
+**Status Oct 16:** still awaiting Chase's decision. staff-pm has not resolved it. NOTIFY-6 is flagged in the BETA-SPEC trace table.
 
 Decide before milestone 4 (when grandparents on different sides join). Options: keep for poster only (today), remove, or opt-in by each viewer.
 
@@ -49,6 +52,8 @@ Decide before milestone 4 (when grandparents on different sides join). Options: 
 
 | Date | Idea | Anchor | Status | Notes |
 |---|---|---|---|---|
+| Oct 16 | Video is a story problem (stepmom sent separately, in-laws offended), not a nice-to-have | Story | Revisit at M4 | SHARE-6 stays deferred until a transcode proves location-free |
+| Oct 16 | Trace flags: JOIN-7 traces to an Apple rule; AUD-4's co-parent case traces to the Rob persona, not Chase's story | Trace check | Logged | Both kept; JOIN-7 needed at M3 |
 | Oct 16 | AI positioning session | A1, A2, A3 | To schedule | Agenda below |
 | Oct 16 | Upload 30 photos, Hearth suggests the best few | Parental guilt | Waits on AI session | Could run on-device with no training. Conflicts with CF-10's "no ML of any kind" as written |
 | Oct 16 | Duplicate / near-duplicate detection | A1 | Waits on AI session | Same on-device question |
