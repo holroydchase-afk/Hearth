@@ -1,4 +1,5 @@
 import type {
+  ReplyAudience,
   MyProfile,
   ClientErrorReport,
   NotificationPrefs,
@@ -77,6 +78,10 @@ export interface HearthApi {
   // --- notifications (AE-2) ---
   registerPushToken(token: string, platform: PushPlatform): Promise<void>;
   setNotificationPrefs(space: string, prefs: NotificationPrefs): Promise<void>;
+
+  // --- who reads replies (BETA-AUD-9/10) ---
+  setGroupRepliesShared(circle: string, on: boolean): Promise<void>;
+  setReplyAudience(space: string, choice: ReplyAudience): Promise<void>;
 
   // --- account deletion (BETA-JOIN-7) ---
   requestAccountDeletion(): Promise<void>;

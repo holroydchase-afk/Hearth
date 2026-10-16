@@ -5,6 +5,8 @@
 // contract before the real stack is reachable. The contract tests keep the two honest.
 import { ApiError, type HearthApi } from '../HearthApi';
 import type {
+  ReplyAudience,
+  ReplyScope,
   ClientErrorReport,
   MyProfile,
   NotificationPrefs,
@@ -23,7 +25,7 @@ const INVITE_ALPHABET = 'ABCDEFGHJKMNPQRSTVWXYZ23456789';
 
 interface UserRow { id: string; email: string; name: string; nameSet?: boolean } // nameSet undefined = set
 interface MemberRow { space: string; user: string; role: Role; invited_by: string | null }
-interface CircleRow { id: string; space: string; name: string; created_by: string; deleted: boolean }
+interface CircleRow { id: string; space: string; name: string; created_by: string; deleted: boolean; replies_shared?: boolean }
 interface PostRow {
   id: string; space: string; author: string; caption: string | null; status: 'draft' | 'published';
   deleted: boolean; circles: string[]; client_id: string; created_at: string; published_at: string | null;
@@ -41,7 +43,7 @@ interface InviteRow {
 
 export interface FakeState {
   users: Record<string, UserRow>;
-  spaces: Record<string, { id: string; name: string }>;
+  spaces: Record<string, { id: string; name: string; reply_audience?: ReplyAudience }>;
   members: MemberRow[];
   circles: Record<string, CircleRow>;
   circleMembers: { circle: string; user: string }[];
@@ -170,6 +172,40 @@ export class FakeBackend {
     if (!user) throw new ApiError('42501', 'sign in required');
     return user;
   }
+  /** Same rule as public.can_see_reply (migration 0009, AUD-8/9/10). */
+  canSeeReply(viewer: string, p: PostRow, author: string): boolean {
+    if (!this.canView(viewer, p)) return false;
+    return author === viewer || p.author === viewer || p.author === author
+      || this.isPoster(p.space, viewer) || this.isPoster(p.space, author)
+      || (this.state.spaces[p.space]?.reply_audience ?? 'parents') === 'everyone'
+      || p.circles.some((c) => this.state.circles[c]?.replies_shared && !this.state.circles[c]!.deleted
+                               && this.inCircle(c, author) && this.inCircle(c, viewer));
+  }
+
+  replyScope(viewer: string, p: PostRow): ReplyScope {
+    if (p.author === viewer || this.isPoster(p.space, viewer) || (this.state.spaces[p.space]?.reply_audience ?? 'parents') === 'everyone') return 'everyone';
+    if (p.circles.some((c) => this.state.circles[c]?.replies_shared && !this.state.circles[c]!.deleted && this.inCircle(c, viewer))) return 'group';
+    return 'parents';
+  }
+
+  setGroupRepliesShared(user: string | null, circle: string, on: boolean): void {
+    const me = this.requireUser(user);
+    const c = this.state.circles[circle];
+    if (!c || c.deleted || !this.isPoster(c.space, me)) throw new ApiError('P0002', 'not found');
+    c.replies_shared = !!on;
+    this.changed();
+  }
+
+  setReplyAudience(user: string | null, space: string, choice: ReplyAudience): void {
+    const me = this.requireUser(user);
+    const m = this.member(space, me);
+    if (!m) throw new ApiError('P0002', 'not found');
+    if (m.role !== 'owner') throw new ApiError('42501', 'only the owner can change this');
+    if (choice !== 'parents' && choice !== 'everyone') throw new ApiError('23514', 'choose parents or everyone');
+    this.state.spaces[space]!.reply_audience = choice;
+    this.changed();
+  }
+
   isPoster(space: string, user: string): boolean {
     const r = this.member(space, user)?.role;
     return r === 'owner' || r === 'adult';
@@ -210,6 +246,7 @@ export class FakeBackend {
       role: m.role,
       inviter_name: m.invited_by ? this.state.users[m.invited_by]?.name ?? null : null,
       can_post: m.role === 'owner' || m.role === 'adult',
+      reply_audience: this.state.spaces[m.space]!.reply_audience ?? 'parents',
     }));
   }
 
@@ -220,7 +257,7 @@ export class FakeBackend {
       .filter((c) => c.space === space && !c.deleted && (c.created_by === me || this.inCircle(c.id, me)))
       .map((c) => {
         const ids = this.circleMemberIds(c.id);
-        return { circle_id: c.id, name: c.name, member_count: ids.length, member_names: ids.map((i) => this.state.users[i]?.name ?? '?') };
+        return { circle_id: c.id, name: c.name, member_count: ids.length, member_names: ids.map((i) => this.state.users[i]?.name ?? '?'), replies_shared: !!c.replies_shared };
       });
   }
 
@@ -235,7 +272,7 @@ export class FakeBackend {
     return rows.map((p) => {
       const mine = p.author === me;
       const reach = new Set(p.circles.flatMap((c) => this.circleMemberIds(c)).filter((u) => u !== p.author));
-      const hearts = this.state.hearts.filter((h) => h.post === p.id);
+      const hearts = this.state.hearts.filter((h) => h.post === p.id && this.canSeeReply(me, p, h.user));
       return {
         post_id: p.id,
         author_id: p.author,
@@ -246,10 +283,11 @@ export class FakeBackend {
           .map((m) => ({ media_id: m.id, kind: m.kind, width: m.width, height: m.height, duration_ms: m.duration_ms, status: m.status })),
         heart_count: hearts.length,
         i_hearted: hearts.some((h) => h.user === me),
-        comment_count: Object.values(this.state.comments).filter((c) => c.post === p.id).length,
+        comment_count: Object.values(this.state.comments).filter((c) => c.post === p.id && this.canSeeReply(me, p, c.author)).length,
         audience: mine ? p.circles.map((c) => ({ circle_id: c, name: this.state.circles[c]!.name, member_count: this.circleMemberIds(c).length })) : null,
         seen_count: mine ? this.state.seen.filter((s) => s.post === p.id && reach.has(s.user)).length : null,
         reach_count: mine ? reach.size : null,
+        reply_scope: this.replyScope(me, p),
       };
     });
   }
@@ -307,7 +345,7 @@ export class FakeBackend {
     if (i >= 0) this.state.hearts.splice(i, 1);
     else this.state.hearts.push({ post, user: me });
     this.changed();
-    return { i_hearted: i < 0, heart_count: this.state.hearts.filter((h) => h.post === post).length };
+    return { i_hearted: i < 0, heart_count: this.state.hearts.filter((h) => h.post === post && this.canSeeReply(me, p, h.user)).length };
   }
 
   addComment(user: string | null, a: AddCommentArgs): { comment_id: string; created_at: string } {
@@ -328,7 +366,7 @@ export class FakeBackend {
     const me = this.requireUser(user);
     const p = this.state.posts[post];
     if (!this.canView(me, p)) return [];
-    return Object.values(this.state.comments).filter((c) => c.post === post)
+    return Object.values(this.state.comments).filter((c) => c.post === post && this.canSeeReply(me, p!, c.author))
       .sort((a, b) => (a.created_at < b.created_at ? -1 : 1)).slice(0, Math.min(limit, 200))
       .map((c) => ({ comment_id: c.id, author_id: c.author, author_name: this.state.users[c.author]?.name ?? '', body: c.body, created_at: c.created_at }));
   }
@@ -612,6 +650,8 @@ export class FakeApi implements HearthApi {
   markSeen = (p: string) => this.run(() => this.be.markSeen(this.userId, p));
   registerPushToken = (t: string, platform: PushPlatform) => this.run(() => this.be.registerPushToken(this.userId, t, platform));
   reportClientError = (r: ClientErrorReport) => this.run(() => this.be.reportClientError(r));
+  setGroupRepliesShared = (c: string, on: boolean) => this.run(() => this.be.setGroupRepliesShared(this.userId, c, on));
+  setReplyAudience = (s: string, choice: ReplyAudience) => this.run(() => this.be.setReplyAudience(this.userId, s, choice));
   requestAccountDeletion = () => this.run(() => this.be.requestAccountDeletion(this.userId));
   myProfile = () => this.run(() => this.be.myProfile(this.userId));
   setMyName = (n: string) => this.run(() => this.be.setMyName(this.userId, n));
