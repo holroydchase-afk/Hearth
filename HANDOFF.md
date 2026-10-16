@@ -1,5 +1,12 @@
 # Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
+## Overnight Oct 16, part 4 (staff-pm build queue, unattended)
+1. **Built, test-first, reviewed:** real names (0007; posters set theirs once, invites carry "Grandma June", notices use the full chosen name; privacy-security fixes: no bypass, header-safe, no impersonation). `rename_circle` RPC (0008; duplicates were 23505). No dead `hearth.family` link in emails until the site exists. SHARE-4 kill-at-every-step coverage. On-phone notice timing log + Me-screen report (AE-10, cleared on sign-out). "Take me off Hearth" (JOIN-7) for non-owners. grandparent-ux: the comment box names who can read it; no nameless emails.
+2. **Tests (3 green runs):** SQL 116 + 169 + 48 + 5; Deno 23; Jest 223 + 1 skipped; typecheck clean; web e2e 1. **App contract vs real PostgREST: 79 passed** (local harness; 9 skipped need a joiner email or B2). One earlier run had 1 app test fail and ~35 reruns couldn't reproduce it; failure names are captured from now on.
+3. **Your calls (logged in ANCHORS.md):** who sees comments; Seen by; what happens when the space owner deletes their account.
+4. **Skipped:** demo rehearsal in a browser against the local stack (needs GoTrue for sign-in); do it on staging.
+5. **Next:** deploy (MILESTONE-1 steps 1–4), then the family setup script and the Expo Go demo.
+
 ## Overnight Oct 16, part 3 (staff-pm product review)
 1. **Found:** comments are readable by everyone a post was shared with, but the app said "Sent. Chase will see it." Fixed the words (BETA-REPLY-6). *Who should see comments* (story: Grandma A without Grandpa B) is logged in ANCHORS.md for Chase; staff-pm leans "the poster plus people who share a group with the commenter".
 2. **Built:** `backend/scripts/family-setup.sql` (space, starter groups, test-viewer invite, Mom's poster invite; run as Chase through RPCs; 5 tests). `backend/scripts/deploy.sh` (one-command deploy; dry-run only). `MILESTONE-1.md` (Chase's steps, the $99 answer, Expo Go yes/no, 2-day demo).
