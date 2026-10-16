@@ -174,6 +174,8 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 - **Danielle as a poster (M2):** the backend allows owner-only `adult` invites and adults manage every group; the app's Invite button only makes `viewer` invites and there is no "new group" button. For M2, Claude seeds Danielle's adult invite and both sides' groups by SQL from Chase's list. No setup UI (still "Not now").
 - **AUD-6** (change audience after posting) has a backend RPC but no app UI; moved to M3. Delete + repost covers M2.
 - **Comments cross sides** (REPLY-2 flag, new REPLY-6): honest wording now; the comment model is Chase's call.
+- **Real names (NOTIFY-7, JOIN-1):** a new account's name defaults to the email prefix (`tg_handle_new_user`), so notices would read "From holroydchase on Hearth" and there is no way to set a name. Fix in the M1 build queue: the invite carries the name the poster types (viewers type nothing); posters set theirs once.
+- **Email links** point at `hearth.family/p/<id>`, which doesn't exist yet. Until the website does, emails say "Open Hearth to see it" with no link.
 - Already tracked, not new: no zoom (SEE-4, M4), no Delete my account (JOIN-7, M3), "Seen by" visible (A2 pending).
 
 ### Amendment, Oct 16 (staff-pm): NOTIFY-4 vs NOTIFY-1
