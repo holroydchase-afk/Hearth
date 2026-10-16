@@ -170,3 +170,12 @@ export interface NotificationPrefs {
   push: boolean;
   emailDigest: 'off' | 'daily' | 'weekly';
 }
+
+/** report_client_error (BETA-OPS-1): fixed fields only; never a caption, email, URL or key. */
+export interface ClientErrorReport {
+  appVersion: string;
+  os: string;
+  screen: string;
+  kind: string;
+  code?: string;
+}

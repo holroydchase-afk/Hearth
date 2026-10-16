@@ -5,6 +5,7 @@
 // contract before the real stack is reachable. The contract tests keep the two honest.
 import { ApiError, type HearthApi } from '../HearthApi';
 import type {
+  ClientErrorReport,
   NotificationPrefs,
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
@@ -50,7 +51,8 @@ export interface FakeState {
   comments: Record<string, CommentRec>;
   seen: { post: string; user: string }[];
   pushTokens?: Record<string, { user: string; platform: PushPlatform }>;
-  notifyPrefs?: Record<string, NotificationPrefs>; // key `${user}:${space}`
+  notifyPrefs?: Record<string, NotificationPrefs>;
+  clientErrors?: ClientErrorReport[]; // key `${user}:${space}`
   invites: Record<string, InviteRow>;
   failures: Record<string, number[]>;
   appSession: string | null;
@@ -338,6 +340,16 @@ export class FakeBackend {
     this.changed();
   }
 
+  /** Same rules as the SQL: fixed-shape fields only, so no user content can get in. */
+  reportClientError(r: ClientErrorReport): void {
+    const ok = /^[0-9A-Za-z.+-]{1,20}$/.test(r.appVersion) && /^(ios|android|web)( [0-9.]{1,12})?$/.test(r.os)
+      && /^[A-Za-z0-9_/[\]-]{1,40}$/.test(r.screen) && /^[A-Za-z][A-Za-z0-9_]{0,59}$/.test(r.kind)
+      && (r.code === undefined || /^[A-Za-z0-9_]{1,20}$/.test(r.code));
+    if (!ok) throw new ApiError('23514', 'error reports take fixed fields only');
+    (this.state.clientErrors ??= []).push({ ...r });
+    this.changed();
+  }
+
   setNotificationPrefs(user: string | null, space: string, p: NotificationPrefs): void {
     const me = this.requireUser(user);
     if (!this.member(space, me)) throw new ApiError('P0002', 'not found');
@@ -561,6 +573,7 @@ export class FakeApi implements HearthApi {
   getComments = (p: string, limit?: number) => this.run(() => this.be.getComments(this.userId, p, limit));
   markSeen = (p: string) => this.run(() => this.be.markSeen(this.userId, p));
   registerPushToken = (t: string, platform: PushPlatform) => this.run(() => this.be.registerPushToken(this.userId, t, platform));
+  reportClientError = (r: ClientErrorReport) => this.run(() => this.be.reportClientError(r));
   setNotificationPrefs = (space: string, p: NotificationPrefs) => this.run(() => this.be.setNotificationPrefs(this.userId, space, p));
   redeemInvite = (c: string) => this.run(() => this.be.redeemInvite(this.userId, c));
   invitePreview = (c: string) => this.run(() => this.be.invitePreview(this.userId, c));
