@@ -77,7 +77,10 @@ export function buildEmail(input: Batch): Email | null {
   const b = { ...input, actor_names: input.actor_names.map(headerSafe).filter(Boolean) };
   if (b.actor_names.length === 0) return null;
   const { line, isReply } = summary(b);
-  const link = `${(Deno.env.get("APP_LINK_BASE") ?? "https://hearth.family").replace(/\/$/, "")}/p/${b.latest_post_id}`;
+  // No website yet -> no link (a dead link looks like a scam); plain words instead.
+  const base = Deno.env.get("APP_LINK_BASE")?.replace(/\/$/, "");
+  const link = base ? `${base}/p/${b.latest_post_id}` : null;
+  const what = isReply ? "it" : "them";
   // BETA-NOTIFY-7: "Chase on Hearth <hello@…>". Only the address comes from RESEND_FROM;
   // the name is stripped of anything that could change the header.
   const addr = (Deno.env.get("RESEND_FROM") ?? "hello@hearth.family").match(/<([^>]+)>/)?.[1] ??
@@ -88,9 +91,10 @@ export function buildEmail(input: Batch): Email | null {
     from,
     to: [b.email!],
     subject: `${line} on Hearth`,
-    text: `${line}.\n\nOpen Hearth to see ${isReply ? "it" : "them"}:\n${link}\n`,
+    text: link ? `${line}.\n\nOpen Hearth to see ${what}:\n${link}\n` : `${line}.\n\nOpen Hearth on your phone to see ${what}.\n`,
     html: `<p style="font-size:20px">${esc(line)}.</p>` +
-      `<p><a href="${esc(link)}" style="font-size:20px">Open Hearth to see ${isReply ? "it" : "them"}</a></p>`,
+      (link ? `<p><a href="${esc(link)}" style="font-size:20px">Open Hearth to see ${what}</a></p>`
+            : `<p style="font-size:20px">Open Hearth on your phone to see ${what}.</p>`),
   };
 }
 

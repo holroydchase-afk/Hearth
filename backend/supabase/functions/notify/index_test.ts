@@ -87,6 +87,16 @@ Deno.test("BETA-NOTIFY-7: an email never goes out without a real person's name",
   eq(buildEmail(emailBatch({ actor_names: ["<>"] })), null, "no usable name -> no email");
 });
 
+Deno.test("email: with no website yet (APP_LINK_BASE unset), there is no dead link, just plain words", () => {
+  const saved = Deno.env.get("APP_LINK_BASE");
+  Deno.env.delete("APP_LINK_BASE");
+  try {
+    const e = buildEmail(emailBatch())!;
+    assert(!e.text.includes("http") && !e.html.includes("http") && !/<a /.test(e.html), "no link at all");
+    assert(e.text.includes("Open Hearth on your phone to see them."), "plain words: " + e.text);
+  } finally { if (saved) Deno.env.set("APP_LINK_BASE", saved); }
+});
+
 Deno.test("email: a reply email says 'see it', new photos say 'see them'", () => {
   assert(buildEmail(emailBatch({ actor_names: ["Grandma June"], post_count: 0, comment_count: 1 }))!.text.includes("Open Hearth to see it:"), "reply");
   assert(buildEmail(emailBatch())!.text.includes("Open Hearth to see them:"), "photos");
