@@ -70,8 +70,20 @@ describe('Photos screen', () => {
     fireEvent.changeText(box, 'So cute!');
     fireEvent.press(screen.getByRole('button', { name: 'Send' }));
     expect(await screen.findByText(/So cute!/)).toBeTruthy();
-    expect(await screen.findByText('Sent. Chase will see it.')).toBeTruthy();
+    expect(await screen.findByText('Sent. Everyone this photo was shared with can read it.')).toBeTruthy();
     await waitFor(() => expect(Object.values(be.state.comments)).toHaveLength(1));
+  });
+
+  it('BETA-REPLY-6: before and after Send, the words say everyone it was shared with can read it, never only Chase', async () => {
+    const be = await twoPosts();
+    await renderApp(<PhotosScreen />, { be, user: 'jo' });
+    await screen.findAllByLabelText('Write something back to Chase');
+    expect(screen.getAllByText('Everyone this photo was shared with can read this.').length).toBeGreaterThan(0);
+    const box = screen.getAllByLabelText('Write something back to Chase')[0]!;
+    fireEvent.changeText(box, 'Love you all');
+    fireEvent.press(screen.getAllByRole('button', { name: 'Send' })[0]!);
+    expect(await screen.findByText('Sent. Everyone this photo was shared with can read it.')).toBeTruthy();
+    expect(screen.queryByText(/Chase will see it/)).toBeNull();
   });
 
   it('B6: a half-typed comment survives incoming hearts', async () => {
