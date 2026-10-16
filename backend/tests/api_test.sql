@@ -116,6 +116,10 @@ grant execute on all functions in schema tests to authenticated, anon;
 \set as_anon     'reset role; set role anon; select set_config(''request.jwt.claim.sub'', '''', false);'
 \set as_admin    'reset role; select set_config(''request.jwt.claim.sub'', '''', false);'
 
+-- Reply mechanics (toggle, counts, comment flow) are tested with replies open to everyone
+-- the post went to; the safe default (parents only) and the group switch are in reply_test.sql.
+update public.spaces set reply_audience = 'everyone';
+
 insert into auth.users (id, email, raw_user_meta_data)
 values ('d0000000-0000-0000-0000-0000000000d1', 'uncle.ray@example.com', '{"display_name":"Uncle Ray"}'),
        ('e0000000-0000-0000-0000-0000000000e1', 'rate.tester@example.com', '{"display_name":"Rate Tester"}');

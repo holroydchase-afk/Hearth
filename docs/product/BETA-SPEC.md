@@ -60,8 +60,8 @@ Rules: no criterion, no build. qa-tdd writes each test red before app-engineer b
 ## 6. Say something back (REPLY)
 | ID | Type | Pri | Given / When / Then |
 |---|---|---|---|
-| BETA-REPLY-1 | auto | P0 | **Given** a visible post, **When** a member taps the labeled Heart button, **Then** the heart toggles in one tap, and the audience sees who hearted it. |
-| BETA-REPLY-2 | auto | P0 | **Given** a visible post, **When** a member comments, **Then** only that post's audience sees the comment, and a half-typed comment survives incoming hearts (B6). |
+| BETA-REPLY-1 | auto | P0 | **Given** a visible post, **When** a member taps the labeled Heart button, **Then** the heart toggles in one tap. Who sees the heart follows the reply rule (AUD-8 to AUD-10): the parents always; others only if the family or the group allows it. |
+| BETA-REPLY-2 | auto | P0 | **Given** a visible post, **When** a member comments, **Then** only people the reply rule allows read it (AUD-8 to AUD-10; never anyone outside the post's audience), and a half-typed comment survives incoming hearts (B6). |
 | BETA-REPLY-3 | auto | P0 | **Given** a heart or comment on Chase's post, **When** it's saved, **Then** Chase gets a notice within 60 s (batched as in NOTIFY-4), and the person who reacted gets nothing about their own reaction. |
 | BETA-REPLY-4 | auto | P1 | **Given** a member removed from a circle, **When** they try to comment on, heart, or edit captions of its posts, **Then** the attempt is refused (S7, S12). |
 | BETA-REPLY-5 | manual | P1 | **Given** a grandparent with no help, **When** asked to find the newest photo and leave a comment, **Then** she does it in under 60 s (M-01). |
@@ -175,6 +175,9 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 | ID | Type | Pri | M | Given / When / Then |
 |---|---|---|---|---|
 | BETA-NOTIFY-7 | auto | P1 | 1 | **Given** any push, sign-in email, digest or invite text, **When** it is generated, **Then** it names the real sender ("From Chase on Hearth" / "Chase invited you to Hearth"), never a generic "You have a new notification", and still carries no photo, caption or child's name. |
+| BETA-AUD-8 | auto | P0 | 1 | **Given** a relative's comment or heart on a post, **When** the family hasn't changed the default, **Then** only the parents (owners and adults) and the post's author can read it; counts shown to others leave it out; a parent's own replies reach everyone the post went to. (Chase, Oct 16: "go with a safe bet considering privacy.") |
+| BETA-AUD-9 | auto | P0 | 1 | **Given** a group with "members see each other's replies" on, **When** a post is shared to that group, **Then** its members read each other's replies on that post, and nowhere else. Only posters can flip the switch. |
+| BETA-AUD-10 | auto | P1 | 1 | **Given** the family's owner, **When** they open replies to "everyone the post went to" (or back to parents only), **Then** it takes effect at once; nobody else can change it. |
 | BETA-REPLY-6 | auto | P0 | 1 | **Given** a member about to comment on a post, **When** the comment box is shown and after Send, **Then** the screen says in words who will read it, matching what the server actually allows (today: "Everyone this photo was shared with can read this"), and never implies only the poster will (the current "Sent. Chase will see it." fails). |
 | BETA-AUD-7 | auto | P0 | 1 | **Given** any member, **When** they call any RPC or table they can read, **Then** no other member's last-active, last-login, online status or device details come back. (Does not decide NOTIFY-6.) |
 
