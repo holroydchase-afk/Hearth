@@ -4,7 +4,8 @@ import { AppState, Platform } from 'react-native';
 import type { HearthApi, Session, Space } from '../api/HearthApi';
 import { FeedStore, type FeedState } from '../feed/store';
 import { MediaCache } from '../media/cache';
-import { registerForPush } from '../notify/push';
+import { recordArrival } from '../notify/latency';
+import { listenForArrivals, registerForPush } from '../notify/push';
 import type { KV } from '../platform/kv';
 import { BigTextContext } from '../ui/theme';
 import { UploadQueue, type Job, type Prepared, type QueueItem } from '../upload/queue';
@@ -92,6 +93,7 @@ const SIGNED_OUT: Loaded = { status: 'signedOut', session: null, space: null, fe
 export function AppProvider({ deps, children }: { deps: AppDeps; children: ReactNode }) {
   const [s, setS] = useState<Loaded>({ ...SIGNED_OUT, status: 'loading' });
   const live = useRef<Loaded>(s);
+  const unlisten = useRef<(() => void) | null>(null);
   live.current = s;
 
   const load = useCallback(async () => {
@@ -125,6 +127,9 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
     setS({ status: 'ready', session, space, feed, queue, media, prefs });
     await feed.hydrate();
     void feed.refresh();
+    // AE-10: note when each notice reaches this phone (kept on the phone only).
+    unlisten.current?.();
+    unlisten.current = listenForArrivals((postId, at) => { void recordArrival(deps.kv, session.userId, postId, at); });
     // AE-2: tell the server where to send notices. Failures are silent; the next launch retries.
     void registerForPush().then((token) => {
       if (token) return deps.api.registerPushToken(token, Platform.OS === 'ios' ? 'ios' : Platform.OS === 'android' ? 'android' : 'web');
@@ -136,7 +141,7 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
   }, [load]);
 
   // Unmount (sign-out, tests): no timers or retries may outlive the provider.
-  useEffect(() => () => live.current.queue?.stop(), []);
+  useEffect(() => () => { live.current.queue?.stop(); unlisten.current?.(); }, []);
 
   // Back in front: retry waiting uploads and fetch new photos (BETA-SHARE-4).
   useEffect(() => {

@@ -27,6 +27,20 @@ export async function registerForPush(): Promise<string | null> {
   }
 }
 
+/** AE-10: call back with (post id, time the phone got the notice) for each notice seen. */
+export function listenForArrivals(onArrival: (postId: string, at: number) => void): () => void {
+  if (Platform.OS === 'web' || !projectId()) return () => {};
+  const take = (n: Notifications.Notification | undefined) => {
+    const postId = n?.request.content.data?.post_id;
+    if (typeof postId === 'string' && typeof n?.date === 'number') onArrival(postId, n.date);
+  };
+  const a = Notifications.addNotificationReceivedListener(take);
+  const b = Notifications.addNotificationResponseReceivedListener((r) => take(r.notification));
+  // notices that arrived while the app was closed and are still in the tray
+  Notifications.getPresentedNotificationsAsync().then((ns) => ns.forEach(take)).catch(() => {});
+  return () => { a.remove(); b.remove(); };
+}
+
 /** Tapping a notice opens that post (BETA-NOTIFY-3). */
 export function useNotificationTaps(open: (postId: string) => void): void {
   useEffect(() => {
