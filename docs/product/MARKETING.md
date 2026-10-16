@@ -48,5 +48,6 @@ Say only what's in **True today**. Update when the code or vendors change.
 
 | Date | Idea (Chase's words) | Serves | Status | Notes |
 |---|---|---|---|---|
+| Oct 16 | "Distributed families": families spread across households, places and generations. "We want to build for all family types, optimized for highly complex families." | A1, A2 | Logged; term to use | Candidate audience line: "for distributed families". Check positioning draft wording ("complicated families") against it |
 | Oct 16 | A3 positioning: "your kids' photos never leave the US / never sent to China", not partisan | A3 | Logged (from ANCHORS.md) | Use "stored in the US" until the A3 gaps close |
 | Oct 16 | AI positioning session: what can Hearth say about AI and still allow helpful tools | A1–A3 | To schedule | Agenda in ANCHORS.md |
