@@ -19,6 +19,7 @@ const nav: Nav = {
   close: () => (router.canGoBack() ? router.back() : router.replace('/photos')),
   goPhotos: () => router.replace('/photos'),
   goSignIn: () => router.replace('/sign-in'),
+  goJoin: (code) => router.push({ pathname: '/join/[code]', params: { code } }),
 };
 
 export default function RootLayout() {

@@ -25,7 +25,7 @@ export async function renderApp(ui: ReactElement, opts: { user?: FixtureUser | n
   be.state.appSession = user ? FIXTURE.users[user].id : null;
   const api = be.clientFor(null, { trackAppSession: true });
   const kv = opts.kv ?? memoryKV();
-  const nav: jest.Mocked<Nav> = { openViewer: jest.fn(), close: jest.fn(), goPhotos: jest.fn(), goSignIn: jest.fn() };
+  const nav: jest.Mocked<Nav> = { openViewer: jest.fn(), close: jest.fn(), goPhotos: jest.fn(), goSignIn: jest.fn(), goJoin: jest.fn() };
   const deps: AppDeps = {
     api, kv, helpPhone: '+1 304 555 0100',
     prepare: jest.fn(async () => preparedFixture()),

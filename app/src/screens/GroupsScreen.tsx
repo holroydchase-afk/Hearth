@@ -15,7 +15,7 @@ export function GroupsScreen() {
   const [circles, setCircles] = useState<Circle[] | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [name, setName] = useState('');
-  const [invite, setInvite] = useState<{ circle: string; link: string } | null>(null);
+  const [invite, setInvite] = useState<{ circle: string; link: string; code: string } | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [asking, setAsking] = useState<string | null>(null); // circle id whose invite form is open
   const [inviteName, setInviteName] = useState('');
@@ -51,7 +51,7 @@ export function GroupsScreen() {
     try {
       // JOIN-1: the name the family uses becomes theirs when they join, so they type nothing.
       const r = await app.deps.api.createInvite({ space: app.space!.space_id, role: 'viewer', circleIds: [id], ttlDays: 30, name: inviteName.trim() || null });
-      setInvite({ circle: id, link: r.link });
+      setInvite({ circle: id, link: r.link, code: r.code });
       setAsking(null);
       setInviteName('');
     } catch (e) {
@@ -59,8 +59,8 @@ export function GroupsScreen() {
     }
   };
 
-  const text = (link: string) => {
-    const body = `Hi, it's me. I set up a private place for the kids' photos. Tap this to see them, no password: ${link}`;
+  const text = (link: string, code: string) => {
+    const body = `Hi, it's me. I set up a private place for the kids' photos. Tap this to see them, no password: ${link}\n\nIf that doesn't open, get Hearth and type this code: ${code.slice(0, 5)} ${code.slice(5)}`;
     const sep = Platform.OS === 'ios' ? '&' : '?';
     void app.deps.openUrl(`sms:${sep}body=${encodeURIComponent(body)}`);
   };
@@ -95,8 +95,10 @@ export function GroupsScreen() {
             <Card>
               <Txt variant="strong">Invite ready</Txt>
               <Txt selectable>{invite.link}</Txt>
+              {/* BETA-JOIN-8: for reading out loud, or when the link opens in a browser */}
+              <Txt selectable>{`Or they can type this code in Hearth: ${invite.code.slice(0, 5)} ${invite.code.slice(5)}`}</Txt>
               <Txt>Works for 30 days.</Txt>
-              <Button label="Text the invite" onPress={() => text(invite.link)} />
+              <Button label="Text the invite" onPress={() => text(invite.link, invite.code)} />
             </Card>
           ) : asking === g.circle_id ? (
             <>
