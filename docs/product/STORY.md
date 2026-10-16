@@ -6,6 +6,12 @@ Why Hearth exists, in Chase's words, plus the problems it solves and the family 
 
 Hearth exists so parents can share their kids with every part of a complicated family without anxiety, guilt, or risk to the kids.
 
+**Distributed families** (Chase's term, Oct 16): families spread across households, places and generations: divorces, remarriages, stepparents, new partners, living far from the hometown. Use this term in docs and copy.
+
+**Who we build for** (Chase, Oct 16): "we want to build for all family types, optimized for highly complex families." A simple family must still find Hearth simple; a highly complex family must find it safe.
+
+**How most posts go** (Chase, Oct 16): "for us 90% of the content we post will be to everyone." Sharing to everyone must be the fastest path; picking a narrower audience is the exception.
+
 **The family it was built for.** I'm from West Virginia, where about 25 of my family members still live. I live in Charlotte now. My mom's parents are divorced and remarried. My parents are divorced and remarried. My wife's family, from Charleston, WV, has about the same amount of divorce and separation. People who won't sit in the same room certainly won't comment on each other's photos of the grandkids.
 
 **What that looks like today.** We keep at least 5 group texts. Grandma A should be able to comment on a photo without divorced Grandpa B seeing it, and without worrying that he might.
@@ -44,6 +50,7 @@ These are the stories Chase has shared in this project and related chats. The pe
 | Divorce across generations | Mom's parents divorced and remarried. Chase's parents divorced and remarried | Up to 3 generations of separate households want the same photos |
 | Mom's side | About the same level of divorce and separation. Mom was born in Charleston, WV | Two families' worth of households, not one |
 | 5+ group texts | Relatives won't sit in a room together, let alone comment on each other's photos | The core use case: comment without being seen by the other side |
+| Birthday at Gigi's | "We had a birthday party at Gigi's house. My dad's side was there, Mom's dad's side was there. I'd want to only post to those groups." | Some posts belong to an occasion: share with the people who were there (the events idea) |
 | The stepmom workaround | Sends videos to his stepmom separately and worries about offending his dad. With the in-laws, people really do get offended | Video quality turns into a family relationships problem |
 | Android grandpas | Every grandpa has an Android; everyone else has an iPhone | Cross-platform quality is a must-have |
 | No kids on social media | Chase and Mom don't post the kids, and neither do many of their peers | Privacy is the reason to switch, not a feature |
