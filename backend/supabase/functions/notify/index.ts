@@ -8,14 +8,14 @@
 // batches) -> release_notifications() for anything that failed, forget_push_tokens()
 // for phones Expo says are gone. Batching windows live in SQL.
 //
-// PRIVACY: messages carry the actor's first name and a post id only. No photo, caption,
+// PRIVACY: messages carry the actor's chosen name ("Grandma June") and a post id only. No photo, caption,
 // comment text or child's name, and nothing about them in the logs: never log tokens,
 // email addresses, URLs or message text.
 
 export type Batch = {
   recipient_id: string;
   channel: "push" | "email";
-  actor_first_names: string[];
+  actor_names: string[];
   post_ids: string[];
   latest_post_id: string;
   post_count: number;
@@ -48,7 +48,7 @@ export function joinNames(names: string[]): string {
 }
 
 function summary(b: Batch): { line: string; isReply: boolean } {
-  const who = joinNames(b.actor_first_names);
+  const who = joinNames(b.actor_names);
   if (b.post_count > 0 && b.comment_count + b.heart_count === 0) return { line: `${who} shared new photos`, isReply: false };
   if (b.post_count === 0) return { line: `${who} replied to your photos`, isReply: true };
   return { line: `New photos and replies from ${who}`, isReply: false };
@@ -59,7 +59,7 @@ export function buildPush(b: Batch): PushMessage[] {
   const { line, isReply } = summary(b);
   return [{
     to: b.push_tokens,
-    title: `From ${joinNames(b.actor_first_names)} on Hearth`, // BETA-NOTIFY-7: a real person, not a generic notice
+    title: `From ${joinNames(b.actor_names)} on Hearth`, // BETA-NOTIFY-7: a real person, not a generic notice
     body: isReply ? `${line}. Tap to see.` : `${line}. Tap to see them.`,
     sound: "default",
     data: { post_id: b.latest_post_id },
@@ -76,7 +76,7 @@ export function buildEmail(b: Batch): Email {
   // the name is stripped of anything that could change the header.
   const addr = (Deno.env.get("RESEND_FROM") ?? "hello@hearth.family").match(/<([^>]+)>/)?.[1] ??
     Deno.env.get("RESEND_FROM") ?? "hello@hearth.family";
-  const safe = joinNames(b.actor_first_names).replace(/[^\p{L}\p{N} .'-]/gu, "").trim().slice(0, 60) || "Your family";
+  const safe = joinNames(b.actor_names).replace(/[^\p{L}\p{N} .'-]/gu, "").trim().slice(0, 60) || "Your family";
   const from = `${safe} on Hearth <${addr}>`;
   return {
     from,

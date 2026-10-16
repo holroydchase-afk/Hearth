@@ -35,13 +35,15 @@ Any change requires a contract-test update first; the contract tests live in `ap
 | `mark_seen` | `p_post` | void | Idempotent; feeds "Seen by" |
 | `redeem_invite` | `p_code` | `space_id` | `22023` for any bad code. Rate limited (S10): 10 failures per user per 10 minutes, then `54000`. |
 | `invite_preview` | `p_code` | `{inviter_name, space_name}` or `22023` | Callable by **anon** (shows "Chase invited you" before sign-in). Rate limited like redeem. Leaks nothing else. |
-| `create_invite` | existing signature + returns `{code, link}` | | Only for posters (owner or adult) |
+| `create_invite` | existing signature + `p_name text = null`; returns `{code, link}` | | Only for posters (owner or adult). `p_name` is what the family calls the invitee ("Grandma June"); it becomes their name on joining unless they already chose one. Bad name: `23514`. |
+| `set_my_name` | `p_name` | void | 1–40 characters after trim; no `@`, `<`, `>` or line breaks (`23514`). |
+| `my_profile` | — | `{user_id, display_name, name_set}` | `name_set` is false for an email-prefix placeholder; the app asks posters for a name once. |
 | `register_push_token` | `p_token, p_platform: 'ios'\|'android'\|'web'` | void | Saves this phone's Expo token. Idempotent. A token re-registered by another user moves to them (shared phone). Bad token or platform: `23514`. |
 | `set_notification_prefs` | `p_space, p_push boolean, p_email_digest: 'off'\|'daily'\|'weekly'` | void | Per space. Not a member: `P0002`. Bad choice: `23514`. Push on but no phone registered falls back to a daily email. |
 | `report_client_error` | `p_app_version, p_os, p_screen, p_kind, p_code = null` | void | Callable by **anon**. Fixed-shape fields only (version, `ios 18.1`, route name, error type, error code); free text is `23514`, so no caption, email, URL or key can get in. 30/hour per person, then `54000`. Kept 30 days. |
 
 ## Notifications (server only)
-Triggers queue a notice on publish (audience members, not the author) and on a comment or heart (the post's author, never the reactor). The `notify` edge function runs on a 1-minute cron, calls `claim_notification_batches()` (service_role only) and sends one notice per recipient: at most 1 push per 10 minutes; email goes out when the Help screen promises (Eastern): each evening from 6 pm, or Sunday from 8 am. **Payload:** the actor's first name, counts and post id only; never a photo, caption, comment text or child's name. Push `data.post_id` opens the post.
+Triggers queue a notice on publish (audience members, not the author) and on a comment or heart (the post's author, never the reactor). The `notify` edge function runs on a 1-minute cron, calls `claim_notification_batches()` (service_role only) and sends one notice per recipient: at most 1 push per 10 minutes; email goes out when the Help screen promises (Eastern): each evening from 6 pm, or Sunday from 8 am. **Payload:** the actor's chosen display name, counts and post id only; never a photo, caption, comment text or child's name. Push `data.post_id` opens the post.
 
 ## Edge function `sign-media`
 The request and response shapes documented at the top of `backend/supabase/functions/sign-media/index.ts` (GET view, POST upload, POST finalize) are the contract.
