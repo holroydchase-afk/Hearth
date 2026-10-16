@@ -86,6 +86,20 @@ begin
   return r;
 end $$;
 
+drop function public.my_spaces();
+create or replace function public.my_spaces()
+returns table (space_id uuid, name text, role public.member_role, inviter_name text, can_post boolean, reply_audience text)
+language sql stable security definer set search_path = '' as $$
+  select s.id, s.name, sm.role, inv.display_name,
+         case sm.role when 'viewer' then s.viewers_can_post else true end,
+         s.reply_audience
+  from public.space_members sm
+  join public.spaces s on s.id = sm.space_id and s.deleted_at is null
+  left join public.profiles inv on inv.id = sm.invited_by
+  where sm.user_id = auth.uid()
+  order by sm.joined_at, s.id
+$$;
+
 drop function public.my_circles(uuid);
 create or replace function public.my_circles(p_space uuid)
 returns table (circle_id uuid, name text, member_count integer, member_names text[], replies_shared boolean)
@@ -211,9 +225,9 @@ end $fn$;
 
 revoke execute on function public.can_see_reply(uuid, uuid), public.reply_scope(uuid),
   public.set_group_replies_shared(uuid, boolean), public.set_reply_audience(uuid, text),
-  public.my_circles(uuid), public.get_feed(uuid, timestamptz, uuid, integer)
+  public.my_spaces(), public.my_circles(uuid), public.get_feed(uuid, timestamptz, uuid, integer)
   from public, anon;
 grant execute on function public.can_see_reply(uuid, uuid), public.reply_scope(uuid),
   public.set_group_replies_shared(uuid, boolean), public.set_reply_audience(uuid, text),
-  public.my_circles(uuid), public.get_feed(uuid, timestamptz, uuid, integer)
+  public.my_spaces(), public.my_circles(uuid), public.get_feed(uuid, timestamptz, uuid, integer)
   to authenticated, service_role;

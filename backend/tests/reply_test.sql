@@ -183,6 +183,8 @@ select tests.throws_code(format($$select public.set_reply_audience(%L, 'sometime
                          'AUD-10: unknown choice is 23514', '23514');
 select tests.lives(format($$select public.set_reply_audience(%L, 'everyone')$$, :space_a),
                    'AUD-10: the owner opens replies to everyone the post went to');
+select tests.ok_sql(format($$select reply_audience = 'everyone' from public.my_spaces() where space_id = %L$$, :space_a),
+                    'AUD-10: my_spaces shows the family''s choice');
 :as_gma_riv
 select tests.ok_sql(format('select tests.comments_seen(%L) = 1', :p_a_all),
                     'AUD-10: then Grandma reads Grandpa''s reply on the Everyone post');
