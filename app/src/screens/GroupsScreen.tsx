@@ -4,7 +4,7 @@ import { Platform, View } from 'react-native';
 import type { Circle } from '../api/HearthApi';
 import { messageFor } from '../errors/messages';
 import { useApp } from '../state/AppContext';
-import { Button, Card, Field, Loading, Notice, Screen, Txt } from '../ui/kit';
+import { Button, Card, Choice, Field, Loading, Notice, Screen, Txt } from '../ui/kit';
 import { people } from '../ui/format';
 import { useTheme } from '../ui/theme';
 import { AppGate } from './AppGate';
@@ -86,6 +86,19 @@ export function GroupsScreen() {
               </View>
             ))}
           </View>
+          {/* BETA-AUD-9: off by default; only the parents read what members write */}
+          <Choice
+            kind="switch"
+            label={`${g.name}: members see each other's replies`}
+            title="Members see each other's replies"
+            detail={g.replies_shared ? 'People in this group can read what each other write.' : 'Off: only you and the other parents read what they write.'}
+            checked={!!g.replies_shared}
+            onPress={() => {
+              app.deps.api.setGroupRepliesShared(g.circle_id, !g.replies_shared)
+                .then(() => load())
+                .catch((e) => setNotice(messageFor(e, { action: 'group' })));
+            }}
+          />
           {renaming === g.circle_id ? (
             <>
               <Field label="New name for this group" value={name} onChangeText={setName} autoFocus maxLength={60} />

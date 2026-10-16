@@ -97,9 +97,18 @@ function Comments({ post, mine }: { post: FeedPost; mine: boolean }) {
   const [sent, setSent] = useState(false);
   const prompt = mine ? 'Write something back' : `Write something back to ${post.author_name}`;
   // BETA-REPLY-6 + grandparent-ux: name who can read it; never a vague "everyone", never group names.
+  // AUD-8/9/10: the server says who will read my reply on this post.
+  const scope = post.reply_scope ?? 'everyone';
   const readers = mine
     ? 'The family you shared this photo with can read this.'
+    : scope === 'parents' ? "Only the kids' parents can read this."
+    : scope === 'group' ? "The kids' parents and your part of the family can read this."
     : `${post.author_name} and the family ${post.author_name} shared this photo with can read this.`;
+  const sentWords = mine
+    ? 'Sent. The family you shared this photo with can read it.'
+    : scope === 'parents' ? "Sent. Only the kids' parents can read it."
+    : scope === 'group' ? "Sent. The kids' parents and your part of the family can read it."
+    : `Sent. ${post.author_name} and the family who got this photo can read it.`;
 
   useEffect(() => {
     if (post.comment_count > 0) void feed?.loadComments(post.post_id);
@@ -138,7 +147,7 @@ function Comments({ post, mine }: { post: FeedPost; mine: boolean }) {
       {/* BETA-REPLY-6: say who can read it, matching the server (everyone the post was shared with). */}
       {sent ? null : <Txt variant="muted">{readers}</Txt>}
       <Button label="Send" onPress={() => void send()} disabled={!draft.trim()} />
-      {sent ? <Txt variant="muted">{mine ? 'Sent. The family you shared this photo with can read it.' : `Sent. ${post.author_name} and the family who got this photo can read it.`}</Txt> : null}
+      {sent ? <Txt variant="muted">{sentWords}</Txt> : null}
     </View>
   );
 }
