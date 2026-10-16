@@ -1,5 +1,11 @@
 # Hearth personas (composites; not real family members)
 
+> **Checked against `STORY.md` (staff-pm, Oct 16).** These composites contradict the real family in places; the story wins:
+> - Story: "every grandpa has an Android; everyone else has an iPhone." June (a grandma) is on a Galaxy, and Earl (a grandpa) has a flip phone and an iPad. The Android test target should be a grandpa.
+> - Megan's "see that Grandma opened it" conflicts with anchor A2 (Seen by is waiting on Chase).
+> - Rob's co-parent split isn't in Chase's story: the divorces are among the grandparents, plus stepparents (Chase's stepmom) and a dating parent. There is no stepparent or new-partner persona, and no great-grandparent.
+> - The "Where they show up" column uses the old Rings; milestones replace them.
+
 | Persona | Role | Phone | Needs most | Where they show up |
 |---|---|---|---|---|
 | Megan, 35 | Organizer parent, posts most | iPhone 15 | Share once, know Grandma saw it | Rings 0–1 |

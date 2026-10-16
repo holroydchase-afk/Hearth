@@ -132,23 +132,23 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 | SHARE-3 | 1 | A1, A3 | |
 | SHARE-4 | 1 | "Someone doesn't get the photo"; time is short | |
 | SHARE-5 | 1 | Blurry MMS between iPhone and Android | |
-| SHARE-6 | 4 | Video is worse; stepmom sent separately, in-laws offended | Deferred (Oct 15). **Note:** strong story trace, not a nice-to-have |
+| SHARE-6 | 4 | STORY: in a chat with 1 Android the video arrives degraded, so Chase sends it to his stepmom separately and worries about offending his dad; with the in-laws, people do get offended | Deferred (Oct 15). **Note:** strong story trace, not a nice-to-have |
 | SEE-1 | 1 | A1 | |
 | SEE-2 | 4 | Viewing built for WV; slow old phones | |
 | SEE-3 | 1 | Viewing built for WV; no gesture-only actions | |
 | SEE-4 | 4 | Big photos for WV grandparents (photo half) | Video half deferred |
 | SEE-5 | 3 | Grandparents print photos; A1 (no location in the saved file) | |
-| SEE-6 | 1 | A1: divorced sides; removal is real | |
+| SEE-6 | 1 | A1; STORY: households keep changing (new partners come and go), so removal must be real | |
 | AUD-1 | 2 | Grandma A without Grandpa B, "and without worrying that he might"; A1 | |
 | AUD-2 | 1 | A1: never post to the wrong side by default | |
-| AUD-3 | 1 | Grandma A / Grandpa B on every path; A1 | |
+| AUD-3 | 1 | STORY: up to 3 generations of separate households; Grandma A / Grandpa B on every path; A1 | |
 | AUD-4 | 1 | Split families; A1 | **Flag:** the co-parent case is the Rob persona, not Chase's story (his split is among grandparents). Built and green; keep |
 | AUD-5 | 1 | A1 | |
 | AUD-6 | 3 | A1: a wrong audience can be fixed | Moved 2→3 (Oct 16 review): no app UI yet; delete + repost covers M2 |
 | NOTIFY-1 | 2 | Guilt: photos actually reach grandparents | |
 | NOTIFY-2 | 1 | A1; A3 (alerts transit Apple/Google with no photo, caption or child's name) | |
 | NOTIFY-3 | 1 | Viewing built for WV | |
-| NOTIFY-4 | 3 | A1 (Kim: no buzzing) | |
+| NOTIFY-4 | 3 | STORY parental guilt: "one notice per post, so you can share often without spamming"; Kim | |
 | NOTIFY-5 | 4 | Someone will never install an app (Earl's morning email); bridge to CF-18 | |
 | NOTIFY-6 | 2 | Megan "know Grandma saw it"; parental guilt | **Flag: conflicts with A2.** Awaiting Chase's decision before M4 (ANCHORS conflicts table). Built code stays |
 | REPLY-1 | 1 | A2: hearts are a signal people choose to show | |
@@ -162,6 +162,14 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 | REPLY-6 *(new)* | 1 | A1 + story core quote: "without worrying that he might" | Added Oct 16 review |
 
 **By milestone:** M1 25, M2 4, M3 5, M4 6 (of 40 incl. JOIN-7, OPS-1 and the 2 new). M5 adds no new criterion: every manual criterion re-runs on an Android phone, plus "Android install < 10 min unaided". M6 has none (frame check is a yes/no investigation).
+
+### Story problems with no passing criterion (checked against STORY.md, Oct 16)
+1. **Grandma A comments without Grandpa B seeing, on a post shared to both sides.** No criterion: comments go to the whole post audience. REPLY-6 only makes this honest. Waits on Chase (ANCHORS conflicts table). STORY.md's Problems table calls this "Beta (backend tested)", which overstates it.
+2. **"Viewers never see ... that other groups exist"** (STORY.md). No criterion, and comments and heart counts from the other side show that other groups exist. Same decision as 1.
+3. **Video** (stepmom, dad, in-laws). SHARE-6 is deferred, so no active criterion.
+4. **"No AI training, face scanning, or ads, in writing."** No criterion until the privacy policy (PS-3, M3).
+5. **Earl never installs an app.** NOTIFY-5 covers notices only; viewing without the app is CF-18, v1.0.
+6. **Relatives judging each other's engagement** (A2). NOTIFY-6 conflicts with it; waits on Chase.
 
 ### New criteria (Oct 16)
 | ID | Type | Pri | M | Given / When / Then |
