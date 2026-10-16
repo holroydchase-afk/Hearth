@@ -78,6 +78,6 @@ npx jest src/api/contract
 2. `publish_post` "all media must be ready": the backend also requires ≥1 media item (code 23514). FakeApi now matches.
 3. `aes-256-gcm-chunked-v1` chunk layout is not specified anywhere; defined in `src/crypto/media.ts`. Any web viewer must use the same layout.
 4. `create_invite` link carries a separate token, not the code; `redeem_invite`/`invite_preview` accept either.
-5. No RPC for: the current user's display name, who hearted a post (REPLY-1 "audience sees who hearted it" can't be shown; the app shows a count).
+5. No RPC for: who hearted a post (REPLY-1 "audience sees who hearted it" can't be shown; the app shows a count).
 6. `get_comments` on an invisible post: backend raises P0002, FakeApi returns `[]`; both allowed by API.md.
 7. 22023 wording: API.md says "This invite is too old or already used. Ask {inviter} for a new one."; BETA-JOIN-3 says "has expired"; UX-REVIEW bans "expired". The app uses API.md's sentence.
