@@ -136,11 +136,7 @@ export class SupabaseApi implements HearthApi {
     const r = one<{ code: string; link?: string }>(d);
     return { code: r.code, link: r.link ?? JOIN_LINK_BASE + r.code };
   };
-  renameCircle = async (circle: string, name: string) => {
-    // NOT in API.md: direct table update under RLS. Flagged in README.
-    const { error } = await this.o.client.from('circles').update({ name: name.trim() }).eq('id', circle);
-    if (error) throw toApiError(error);
-  };
+  renameCircle = (circle: string, name: string) => this.rpc<void>('rename_circle', { p_circle: circle, p_name: name });
 
   // ---- sign-media ----
   signUpload = (post: string, items: UploadItemSpec[]) => this.fnCall<UploadGrant>('POST', '', { action: 'upload', post_id: post, items });

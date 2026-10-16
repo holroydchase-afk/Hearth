@@ -36,6 +36,7 @@ Any change requires a contract-test update first; the contract tests live in `ap
 | `redeem_invite` | `p_code` | `space_id` | `22023` for any bad code. Rate limited (S10): 10 failures per user per 10 minutes, then `54000`. |
 | `invite_preview` | `p_code` | `{inviter_name, space_name}` or `22023` | Callable by **anon** (shows "Chase invited you" before sign-in). Rate limited like redeem. Leaks nothing else. |
 | `create_invite` | existing signature + `p_name text = null`; returns `{code, link}` | | Only for posters (owner or adult). `p_name` is what the family calls the invitee ("Grandma June"); it becomes their name on joining unless they already chose one. Bad name: `23514`. |
+| `rename_circle` | `p_circle, p_name` | void | Posters only. Not a manager of that group's space, or no such group: `P0002`. Empty, over 60 characters, or another group's name: `23514`. |
 | `set_my_name` | `p_name` | void | 1–40 characters after trim; no `@`, `<`, `>` or line breaks (`23514`). |
 | `my_profile` | — | `{user_id, display_name, name_set}` | `name_set` is false for an email-prefix placeholder; the app asks posters for a name once. |
 | `register_push_token` | `p_token, p_platform: 'ios'\|'android'\|'web'` | void | Saves this phone's Expo token. Idempotent. A token re-registered by another user moves to them (shared phone). Bad token or platform: `23514`. |

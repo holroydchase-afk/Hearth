@@ -85,6 +85,6 @@ export interface HearthApi {
   // --- our own error reports (BETA-OPS-1); callable signed out ---
   reportClientError(r: ClientErrorReport): Promise<void>;
 
-  // --- NOT in API.md (flagged in README): basic group rename for the Groups screen ---
+  // --- rename_circle (API.md) ---
   renameCircle(circle: string, name: string): Promise<void>;
 }

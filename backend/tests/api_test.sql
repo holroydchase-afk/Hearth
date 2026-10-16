@@ -573,6 +573,23 @@ select tests.throws_code(format($q$select * from public.create_invite(%L, 'viewe
                          'names: an invite can''t reuse a family member''s name (no "Chase" impersonation, 23514)', '23514');
 
 -- ======================================================================
+-- rename_circle (MILESTONE-1 tells Chase to rename the starter groups)
+-- ======================================================================
+:as_alex
+select tests.lives(format($q$select public.rename_circle(%L, '  Dad''s parents  ')$q$, :c_a_gp), 'rename_circle: the owner renames a group');
+select tests.ok_sql(format($q$select name = 'Dad''s parents' from public.circles where id = %L$q$, :c_a_gp), 'rename_circle: ...trimmed and saved');
+select tests.throws_code(format($q$select public.rename_circle(%L, 'Everyone')$q$, :c_a_gp), 'rename_circle: a name another group already has is 23514 (not 23505)', '23514');
+select tests.throws_code(format($q$select public.rename_circle(%L, '')$q$, :c_a_gp), 'rename_circle: an empty name is 23514', '23514');
+select tests.throws_code(format($q$select public.rename_circle(%L, %L)$q$, :c_a_gp, repeat('x', 61)), 'rename_circle: over 60 characters is 23514', '23514');
+:as_gma_riv
+select tests.throws_code(format($q$select public.rename_circle(%L, 'Mine now')$q$, :c_a_gp), 'rename_circle: a viewer gets not found (P0002), even for her own group', 'P0002');
+:as_blair
+select tests.throws_code(format($q$select public.rename_circle(%L, 'Hacked')$q$, :c_a_all), 'rename_circle: a poster in another space gets not found (P0002)', 'P0002');
+:as_alex
+select tests.throws_code(format($q$select public.rename_circle(%L, 'x')$q$, :nopost), 'rename_circle: unknown group is P0002', 'P0002');
+select tests.lives(format($q$select public.rename_circle(%L, 'Grandparents – Dad''s side')$q$, :c_a_gp), 'setup: rename back');
+
+-- ======================================================================
 -- BETA-OPS-1: crash/error reports with no personal data and no third-party SDK
 -- ======================================================================
 :as_gma_riv
