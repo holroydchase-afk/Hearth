@@ -100,6 +100,22 @@ Email codes at M1: Supabase's built-in mailer only sends to project team members
 
 ---
 
+## Reflection point (staff-pm, Oct 16)
+
+**Trigger: pause and review the milestones at whichever comes first:**
+1. The milestone 1 gate is met (Chase's 2-day demo done), or
+2. **2 work sessions in a row with no deploy and no device run**, or
+3. Any work item that isn't a BETA-* criterion or a step on the M1/M2 critical path.
+
+**Checklist (10 minutes, staff-pm writes it, Chase reads it):**
+- Which milestone gate lines are met, with evidence? Which are not?
+- What blocked the last 2 sessions: code, Chase, money, or access?
+- Is the next code task on the critical path, or is it polish? If polish, stop.
+- Do any open Chase decisions now block the next milestone?
+- Does the next milestone still make sense (order, scope, the Nov 22 soft date)?
+
+**Status Oct 16 (late):** the code-only M1 list is done (push-token wiring, NOTIFY-7, AUD-7, REPLY-4, OPS-1, pushed with 3 green runs). Trigger 2 is now armed: no backend or test work until a deploy or a device run, except the M1 setup-and-demo doc and the deploy script.
+
 ## Risks to milestones 1–2
 
 1. **Chase's time is the bottleneck, not code.** Every remaining M1 blocker is an account, a secret or holding the phone. Mitigation: one checklist, ordered, under 1 hour total (overnight item 9).
