@@ -54,6 +54,7 @@ Decide before milestone 4 (when grandparents on different sides join). Options: 
 
 | Date | Idea | Anchor | Status | Notes |
 |---|---|---|---|---|
+| Oct 16 | What happens when the family-space **owner** deletes their account | A1 | Decide before milestone 3 (Beta App Review) | The app hides "Take me off Hearth" from owners. The server today would hide all their posts but keep them as owner, so the family would lose the photos. Options: hand the space to another adult first, keep the photos, or delete the space |
 | Oct 16 | Video is a story problem (stepmom sent separately, in-laws offended), not a nice-to-have | Story | Revisit at M4 | SHARE-6 stays deferred until a transcode proves location-free |
 | Oct 16 | Trace flags: JOIN-7 traces to an Apple rule; AUD-4's co-parent case traces to the Rob persona, not Chase's story | Trace check | Logged | Both kept; JOIN-7 needed at M3 |
 | Oct 16 | AI positioning session | A1, A2, A3 | To schedule | Agenda below |
