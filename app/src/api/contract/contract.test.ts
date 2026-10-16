@@ -366,4 +366,21 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(h.anon().setMyName('X'))).toBe('42501');
     });
   });
+
+  describe('rename_circle (MILESTONE-1 group renames)', () => {
+    it('a poster renames a group; the name comes back trimmed', async () => {
+      expect(await code(poster.renameCircle(h.circleIn, '  Dad\'s parents  '))).toBe('ok');
+      expect((await poster.myCircles(h.spaceId)).find((c) => c.circle_id === h.circleIn)?.name).toBe("Dad's parents");
+    });
+
+    it("a name another group has is 23514; empty is 23514", async () => {
+      const other = (await poster.myCircles(h.spaceId)).find((c) => c.circle_id !== h.circleIn)!;
+      expect(await code(poster.renameCircle(h.circleIn, other.name))).toBe('23514');
+      expect(await code(poster.renameCircle(h.circleIn, '  '))).toBe('23514');
+    });
+
+    it('a viewer gets not found (P0002), even for a group she is in', async () => {
+      expect(await code(viewerIn.renameCircle(h.circleIn, 'Mine now'))).toBe('P0002');
+    });
+  });
 });
