@@ -44,6 +44,8 @@ Not required for the POC: funding, pricing, self-hosted auth, pentest, legal rev
 | Grandparent engagement as a gate/funding metric | ring gates, funding plan | Fine if internal and aggregate only; never shown to family |
 | Ring 3 exit "opened at least 1 post" and success signal "80% open within 24 h" | BETA-SPEC ring gates (now superseded) | Measures each person's opens. Fine as an aggregate Chase-only number; must never be shown per person in the app |
 
+| Comments are seen by the post's whole audience | BETA-REPLY-2, `comments_select` RLS | Not A2 but the story's core line: a post to both sides lets Grandpa B read Grandma A's comment. Options: (a) keep, with honest wording (REPLY-6, doing now); (b) a comment is seen by the poster plus people who share a group with the commenter; (c) comments go to the poster only. staff-pm leans (b), with privacy-security review. Decide before milestone 4 |
+
 **Status Oct 16:** still awaiting Chase's decision. staff-pm has not resolved it. NOTIFY-6 is flagged in the BETA-SPEC trace table.
 
 Decide before milestone 4 (when grandparents on different sides join). Options: keep for poster only (today), remove, or opt-in by each viewer.

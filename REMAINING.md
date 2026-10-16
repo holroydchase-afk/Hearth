@@ -83,7 +83,7 @@ Email codes at M1: Supabase's built-in mailer only sends to project team members
 | 3 | Website: `/join/*`, AASA, `/p/<id>` (IN-5, minus privacy policy) | infra | No, after 1 |
 | 4 | A build Mom can install: Expo Go (if M1 proved it) or TestFlight **internal** testing (she's added as an App Store Connect user; no Beta App Review) | app-engineer + **Chase** | Yes |
 | 5 | AE-10 push latency log (NOTIFY-1); AE-4 expo-updates channels | app-engineer | No |
-| 6 | Groups set up for both sides in the app (no setup UI in scope: seeded by Claude via SQL from Chase's list) | infra + **Chase gives the list** | Yes (list) |
+| 6 | Mom's **adult** (poster) invite plus both sides' groups, seeded by Claude via SQL from Chase's list. The app can only invite viewers and can't create groups; no setup UI in scope | infra + **Chase gives the list** | Yes (list) |
 | 7 | Triage fixes from Mom's use (AE-11) | app-engineer | No |
 
 ---
@@ -113,6 +113,8 @@ Email codes at M1: Supabase's built-in mailer only sends to project team members
 - Is the next code task on the critical path, or is it polish? If polish, stop.
 - Do any open Chase decisions now block the next milestone?
 - Does the next milestone still make sense (order, scope, the Nov 22 soft date)?
+
+**Tonight (Oct 16 late), in order:** (1) BETA-REPLY-6 comment wording, red test first; (2) device readiness without a device: `expo export` for iOS and Android, `expo-doctor`, Expo Go yes/no per native path; (3) the M1 setup-and-demo page for Chase, with the M2 SQL seed for Mom attached. Not tonight: the printed guide (GU-3, M3/M4; screens will change after the device run).
 
 **Status Oct 16 (late):** the code-only M1 list is done (push-token wiring, NOTIFY-7, AUD-7, REPLY-4, OPS-1, pushed with 3 green runs). Trigger 2 is now armed: no backend or test work until a deploy or a device run, except the M1 setup-and-demo doc and the deploy script.
 
