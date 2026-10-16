@@ -402,6 +402,27 @@ reset role;
 select tests.ok(not exists (select 1 from comments where body = 'edited after losing access'),
                 'Commenter who lost access to a post cannot edit their comment on it');
 
+-- 10. BETA-AUD-7 (A2 guilt-free): nobody can read another member's last-active,
+--     login, online or device details. "Seen by" (who has seen) stays: NOTIFY-6 is Chase's call.
+select tests.ok(not exists (
+  select 1 from information_schema.column_privileges
+  where grantee in ('authenticated', 'anon') and privilege_type = 'SELECT'
+    and table_schema in ('public', 'auth')
+    and (column_name ~* '(last_|seen_at|login|sign_in|online|user_agent|ip_addr|device)')),
+  'BETA-AUD-7: no app-readable column holds last-seen, login, online or device details');
+set role authenticated;
+select set_config('request.jwt.claim.sub', :blair, false);
+select tests.ok(exists (select 1 from post_views where post_id = :p_b_gp and user_id = :gma_chen),
+                'BETA-AUD-7: the family-plan author still sees who has seen the post (Seen by unchanged)');
+select tests.throws(format('select last_seen_at from public.post_views where post_id = %L', :p_b_gp),
+                    'BETA-AUD-7: ...but not when each person last looked', 'permission denied');
+select tests.ok(not exists (select 1 from push_tokens where user_id <> auth.uid()),
+                'BETA-AUD-7: nobody sees another member''s phones');
+reset role;
+select tests.throws('set role authenticated; select count(*) from auth.users',
+                    'BETA-AUD-7: app users cannot read sign-in records (auth.users)', 'permission denied');
+reset role;
+
 -- ======================================================================
 -- Summary
 -- ======================================================================
