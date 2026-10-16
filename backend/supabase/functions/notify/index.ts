@@ -59,7 +59,7 @@ export function buildPush(b: Batch): PushMessage[] {
   const { line, isReply } = summary(b);
   return [{
     to: b.push_tokens,
-    title: "Hearth",
+    title: `From ${joinNames(b.actor_first_names)} on Hearth`, // BETA-NOTIFY-7: a real person, not a generic notice
     body: isReply ? `${line}. Tap to see.` : `${line}. Tap to see them.`,
     sound: "default",
     data: { post_id: b.latest_post_id },
@@ -72,7 +72,12 @@ const esc = (s: string) =>
 export function buildEmail(b: Batch): Email {
   const { line } = summary(b);
   const link = `${(Deno.env.get("APP_LINK_BASE") ?? "https://hearth.family").replace(/\/$/, "")}/p/${b.latest_post_id}`;
-  const from = Deno.env.get("RESEND_FROM") ?? "Hearth <hello@hearth.family>";
+  // BETA-NOTIFY-7: "Chase on Hearth <hello@…>". Only the address comes from RESEND_FROM;
+  // the name is stripped of anything that could change the header.
+  const addr = (Deno.env.get("RESEND_FROM") ?? "hello@hearth.family").match(/<([^>]+)>/)?.[1] ??
+    Deno.env.get("RESEND_FROM") ?? "hello@hearth.family";
+  const safe = joinNames(b.actor_first_names).replace(/[^\p{L}\p{N} .'-]/gu, "").trim().slice(0, 60) || "Your family";
+  const from = `${safe} on Hearth <${addr}>`;
   return {
     from,
     to: [b.email!],
