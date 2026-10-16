@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { messageFor } from '../errors/messages';
 import { useApp } from '../state/AppContext';
+import { suggestEmail } from '../ui/emailSuggest';
 import { Button, Field, Notice, Txt } from '../ui/kit';
 
 export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: (email: string) => Promise<void>; inviter?: string | null }) {
@@ -50,10 +51,18 @@ export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: (email: str
     }
   };
 
+  const suggestion = suggestEmail(email);
+
   if (step === 'email') {
     return (
       <>
         <Field label="Your email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" textContentType="emailAddress" placeholder="name@example.com" />
+        {suggestion ? (
+          <>
+            <Txt>{`Did you mean ${suggestion}?`}</Txt>
+            <Button label={`Use ${suggestion}`} variant="secondary" onPress={() => setEmail(suggestion)} />
+          </>
+        ) : null}
         {msg ? <Notice text={msg} /> : null}
         <Button label="Send me a code" busy={busy} disabled={!email.includes('@')} onPress={() => void send()} />
       </>
