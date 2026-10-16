@@ -94,9 +94,9 @@ describe('Photos screen', () => {
     fireEvent.changeText(box, 'She looks just like');
     const postId = Object.values(be.state.posts).find((p) => p.caption === 'Shared with Dad side')!.id;
     await be.clientFor(FIXTURE.users.chase.id).toggleHeart(postId);
-    await be.clientFor(FIXTURE.users.earl.id).toggleHeart(postId);
+    await be.clientFor(FIXTURE.users.earl.id).toggleHeart(postId); // AUD-8: Jo can't see a relative's heart
     await act(async () => { await probe.app!.feed!.refresh(); });
-    expect(await screen.findByText('2 people love this')).toBeTruthy();
+    expect(await screen.findByText('1 person loves this')).toBeTruthy();
     expect(getByLabelText('Write something back to Chase').props.value).toBe('She looks just like');
   });
 

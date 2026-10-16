@@ -398,4 +398,31 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(h.anon().requestAccountDeletion())).toBe('42501');
     });
   });
+
+  describe('who reads replies (BETA-AUD-8/9/10)', () => {
+    it("BETA-AUD-8: a viewer's comment is read by the parent; the app is told it reaches only the parents", async () => {
+      const id = await publishedPost('reply rule');
+      await viewerIn.addComment({ clientId: uuid(), post: id, body: 'Look at him go!' });
+      expect((await poster.getComments(id)).map((c) => c.body)).toContain('Look at him go!');
+      const mine = (await viewerIn.getFeed({ space: h.spaceId, limit: 50 })).find((p) => p.post_id === id)!;
+      expect(mine.reply_scope).toBe('parents');
+      const theirs = (await poster.getFeed({ space: h.spaceId, limit: 50 })).find((p) => p.post_id === id)!;
+      expect(theirs.reply_scope).toBe('everyone');
+    });
+
+    it('BETA-AUD-9: posters flip "members see each other\'s replies" on a group; viewers get not found', async () => {
+      expect(await code(poster.setGroupRepliesShared(h.circleIn, true))).toBe('ok');
+      expect((await poster.myCircles(h.spaceId)).find((c) => c.circle_id === h.circleIn)?.replies_shared).toBe(true);
+      expect(await code(viewerIn.setGroupRepliesShared(h.circleIn, false))).toBe('P0002');
+      expect(await code(poster.setGroupRepliesShared(h.circleIn, false))).toBe('ok');
+    });
+
+    it('BETA-AUD-10: only the owner changes the family default; an unknown choice is 23514', async () => {
+      expect(await code(viewerIn.setReplyAudience(h.spaceId, 'everyone'))).toBe('42501');
+      expect(await code(poster.setReplyAudience(h.spaceId, 'sometimes' as never))).toBe('23514');
+      expect(await code(poster.setReplyAudience(h.spaceId, 'everyone'))).toBe('ok');
+      expect((await poster.mySpaces()).find((s) => s.space_id === h.spaceId)?.reply_audience).toBe('everyone');
+      expect(await code(poster.setReplyAudience(h.spaceId, 'parents'))).toBe('ok');
+    });
+  });
 });

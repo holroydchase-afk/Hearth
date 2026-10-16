@@ -8,13 +8,21 @@ export interface Space {
   role: Role;
   inviter_name: string | null;
   can_post: boolean;
+  /** AUD-10: who reads relatives' replies: only the parents (default), or everyone the post went to. */
+  reply_audience?: ReplyAudience;
 }
+
+export type ReplyAudience = 'parents' | 'everyone';
+/** AUD-8/9: who will read MY replies on this post. */
+export type ReplyScope = 'parents' | 'group' | 'everyone';
 
 export interface Circle {
   circle_id: string;
   name: string;
   member_count: number;
   member_names: string[];
+  /** AUD-9: members see each other's replies on posts shared to this group. */
+  replies_shared?: boolean;
 }
 
 export type MediaKind = 'photo' | 'video';
@@ -49,6 +57,8 @@ export interface FeedPost {
   audience: AudienceCircle[] | null;
   seen_count: number | null;
   reach_count: number | null;
+  /** AUD-8/9: who will read the caller's replies on this post. */
+  reply_scope?: ReplyScope;
 }
 
 export interface FeedArgs {

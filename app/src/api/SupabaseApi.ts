@@ -3,6 +3,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ApiError, type ApiErrorCode, type HearthApi } from './HearthApi';
 import type {
+  ReplyAudience,
   ClientErrorReport,
   MyProfile,
   NotificationPrefs,
@@ -116,6 +117,8 @@ export class SupabaseApi implements HearthApi {
   markSeen = (p: string) => this.rpc<void>('mark_seen', { p_post: p });
   registerPushToken = (token: string, platform: PushPlatform) =>
     this.rpc<void>('register_push_token', { p_token: token, p_platform: platform });
+  setGroupRepliesShared = (circle: string, on: boolean) => this.rpc<void>('set_group_replies_shared', { p_circle: circle, p_on: on });
+  setReplyAudience = (space: string, choice: ReplyAudience) => this.rpc<void>('set_reply_audience', { p_space: space, p_choice: choice });
   requestAccountDeletion = () => this.rpc<void>('request_account_deletion', {});
   myProfile = () => this.rpc<unknown>('my_profile', {}).then((d) => one<MyProfile>(d));
   setMyName = (name: string) => this.rpc<void>('set_my_name', { p_name: name });
