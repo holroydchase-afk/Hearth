@@ -1,5 +1,12 @@
 # Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
+## Oct 16: who reads replies (Chase's call), and the real family
+1. **Family:** `docs/product/PERSONAS.md` is now your real family (Gammy Barbara … Grandma Phyllis, Gigi Sarah, Bebar Fred with the smart frame). Docs live in `docs/product` and `docs/eng`; `docs/product/STORY.md` is the story agents read.
+2. **Built (migration 0009, AUD-8/9/10):** by default only the parents (and the post's author) read a relative's comment or heart; counts leave hidden ones out; parents' replies reach everyone. A group can turn on "members see each other's replies". The owner can open replies to everyone (Me screen). The comment box says who will read it. privacy-security fixes: raw counters hidden, no profile leak through replies, no setting leak.
+3. **Tests (3 green runs):** SQL 116 + 169 + 48 + 5 + 37 reply; Deno 26; Jest 245 + 1 skipped; typecheck clean; web e2e 1; app contract vs real PostgREST 85 passed (9 skipped).
+4. **Next (your direction):** nested groups (a group inside a group, e.g. person → household → side → whole family), set up by a guided flow or by select/drag. This changes who sees posts, so it gets its own spec and review.
+5. **Your calls:** should adults (Danielle) also flip the group switch, or only you? A viewer who posts (off by default) has their replies treated like a parent's on their own post.
+
 ## Oct 16 morning: sign-in and sign-up for every persona (Chase's ask)
 1. **Day-1 blocker fixed:** Supabase's default sign-in email sends a link, not a code. New templates show the 6-number code big and in the subject, have no links, and warn "Never read this code to anyone who calls or texts you". `deploy.sh` step 6 pushes them to the hosted project.
 2. **Built, test-first, grandparent-ux reviewed:** pasted codes with spaces or dashes work; "I have an invite code" on the first screen and on "Almost there" (BETA-JOIN-8), with the code on your invite card and in the text ("Hi, it's Chase… call me and I'll help. Your code is …"); a Junk/Spam hint and a 60 s wait before a new code; "Did you mean june@yahoo.com?"; a clear wrong-email message, while the server still gives no oracle (JOIN-3).

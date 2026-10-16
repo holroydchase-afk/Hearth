@@ -31,7 +31,7 @@ fi
 echo "== 1/6 link project $REF"
 run $CLI link --project-ref "$REF"
 
-echo "== 2/6 migrations (0001-0008, no seed data)"
+echo "== 2/6 migrations (0001-0009, no seed data)"
 run $CLI db push
 
 echo "== 3/6 function secrets"

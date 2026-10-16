@@ -29,7 +29,7 @@ Never paste a key, token or password into chat. Secrets go in the environment se
 ## What Claude does after steps 1–3
 
 1. Confirms it can see the project through the Supabase connection (read-only).
-2. Runs `bash backend/scripts/deploy.sh` (try `--dry-run` first): links the project, pushes migrations 0001–0008 (no demo data), sets the function secrets from `backend/supabase/functions/.env`, deploys `sign-media` and `notify`, and schedules `notify` every minute with its own cron secret (never the service_role key).
+2. Runs `bash backend/scripts/deploy.sh` (try `--dry-run` first): links the project, pushes migrations 0001–0009 (no demo data), sets the function secrets from `backend/supabase/functions/.env`, deploys `sign-media` and `notify`, and schedules `notify` every minute with its own cron secret (never the service_role key).
 3. Runs the SQL suites against the hosted project 3× (gate line 1). They wipe the database, so this happens only before any real photos; after that the project keeps its data.
 4. Sets `app/.env.local` to the hosted project and gives you the Expo Go QR code.
 5. After you sign in once: runs `backend/scripts/family-setup.sql` (as you, through the app's own rules). It creates your space and starter groups ("Test viewer", "Chase's mom's side", "Chase's dad's side", "Danielle's mom's side", "Danielle's dad's side"; rename them in Groups) and prints a viewer invite for account B, plus Danielle's poster invite for milestone 2. The app has no screens for creating a space or groups yet.
