@@ -44,7 +44,7 @@ jobs:
         run: bash tests/run_supabase.sh
 
       - name: Deno - sign-media + notify unit tests
-        run: deno test --allow-env supabase/functions/sign-media/ supabase/functions/notify/
+        run: deno test --allow-env --allow-read supabase/functions/sign-media/ supabase/functions/notify/ tests/templates/
 
       - name: Deno - real-API smoke test through Kong + PostgREST
         run: |
