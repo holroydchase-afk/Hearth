@@ -1,7 +1,7 @@
 # get_feed scale test: results
 
 **Run:** Oct 15, 2026 · `tests/perf/run.sh` (fixture `generate.sql`, benchmark `bench.sql`). Raw output from the last run: `tests/perf/last-run.txt`.
-**Target (API.md):** p95 under 30 ms in the database, for a viewer in a space with 20,000 posts, on about 1M posts across about 50k spaces.
+**Target (docs/eng/API.md):** p95 under 30 ms in the database, for a viewer in a space with 20,000 posts, on about 1M posts across about 50k spaces.
 **Result: pass.** The worst p95 was 1.94 ms (author, first page). The viewer p95 was 0.61 ms on the first page and 0.69 ms on the deep page.
 
 ## Machine

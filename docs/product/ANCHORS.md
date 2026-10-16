@@ -1,15 +1,15 @@
 # Hearth anchors, milestones and ideas log
 
-Source of truth for *why* Hearth exists and what every feature is checked against. The fuller story (Chase's family, problems and solutions, WV vs Charlotte) lives in `STORY.md`.
+Source of truth for *why* Hearth exists and what every feature is checked against. The fuller story (Chase's family, problems and solutions, WV vs Charlotte) lives in `docs/product/STORY.md`.
 
 **Rules for every session**
-- When Chase names a new anchor, add it here and to the doc.
+- When Chase names a new anchor, add it here. `docs/product/STORY.md` and this file are the source of truth; the claude.ai doc is no longer kept in sync.
 - When Chase floats an idea, add it to the Ideas log below.
 - Never delete an already-built feature to satisfy an idea or anchor. Log the conflict and let Chase decide.
 
 ## Milestones (Chase, Oct 16, 2026)
 
-Hearth is a **proof of concept first**: a birthday present Chase is building himself, because these problems are his own, plus experience for future jobs. These milestones supersede the startup-style Ring 0–3 plan. Reconciled Oct 16: `BETA-SPEC.md` ("Milestone map and trace") and `REMAINING.md` (milestone critical path).
+Hearth is a **proof of concept first**: a birthday present Chase is building himself, because these problems are his own, plus experience for future jobs. These milestones supersede the startup-style Ring 0–3 plan. Reconciled Oct 16: `docs/product/BETA-SPEC.md` ("Milestone map and trace") and `docs/product/REMAINING.md` (milestone critical path).
 
 1. **Birthday present.** Chase uses it himself, end to end.
 2. **Wife.** Both households' posting works.
@@ -29,7 +29,7 @@ Not required for the POC: funding, pricing, self-hosted auth, pentest, legal rev
 | A2 | **Guilt-free** | Nobody, sender or viewer, feels judged. No visible view tracking, last-seen or login details. Neither side of a family can tell whether the other is or isn't engaging, beyond what people choose to show (hearts, comments). | Oct 16, 2026 |
 | A3 | **Stays on US soil** | Kids' photos, videos and family data are stored in the US, by US companies, never sent to China or anywhere else. A hard constraint on every vendor and feature. | Oct 16, 2026 |
 
-**A3 gaps today.** Media and database are in US regions (Supabase East US, Backblaze US East). Not yet literally "never leaves US soil": Supabase processes some auth logs and support access outside the US and contracts through a Singapore entity; push alerts transit Apple/Google global networks (no photos or names in them). Public wording stays **"stored in the US"** until closed. Closing = self-hosted auth on US infrastructure (`research.md` §4), a post-POC item.
+**A3 gaps today.** Media and database are in US regions (Supabase East US, Backblaze US East). Not yet literally "never leaves US soil": Supabase processes some auth logs and support access outside the US and contracts through a Singapore entity; push alerts transit Apple/Google global networks (no photos or names in them). Public wording stays **"stored in the US"** until closed. Closing = self-hosted auth on US infrastructure (`docs/eng/research.md` §4), a post-POC item.
 
 **A3 positioning.** Lead with "your kids' photos never leave the US / never sent to China", not partisan politics. Split families span both sides.
 
@@ -64,7 +64,7 @@ Decide before milestone 4 (when grandparents on different sides join). Options: 
 | Oct 16 | Hide or remove engagement signals | A2 | Decide before milestone 4 | See conflicts table; built code stays until decided |
 | Oct 16 | Never show login or last-active details to anyone | A2 | Proposed for Never build | Current design already shows none |
 | Oct 16 | No photo filters | No social-media mechanics | Proposed for Never build | Chase said it directly |
-| Oct 16 | Great-grandparents as a named audience in personas | Rural / low-tech | Proposed | Add to `PERSONAS.md` |
+| Oct 16 | Great-grandparents as a named audience in personas | Rural / low-tech | Proposed | Add to `docs/product/PERSONAS.md` |
 | Oct 16 | Gold-standard security; privacy intuitive and advanced | A1 | In progress | `privacy-security` agent raised; scaled to the POC |
 | Oct 16 | Shared-iCloud-album comparison test | Validation | Suggested | One week with a few iPhone relatives; shows what Hearth must beat |
 

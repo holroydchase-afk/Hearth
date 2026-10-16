@@ -13,8 +13,10 @@ Families, especially split or divorced ones and grandparents who avoid social me
 A polished beta in the hands of about 12 non-technical grandparents in West Virginia by **Sunday Nov 22, 2026** (Thanksgiving is Nov 26). Rollout goes in rings: Ring 0 Chase alone → Ring 1 Chase + wife → Ring 2 close family (3–5, including 1 Android user and 1 grandparent) → Ring 3 WV grandparents. A ring only starts when the previous ring's gate passes.
 
 ## Read these first, every time
-- `PERSONAS.md`: check every scope call against the persona it serves. Megan and June come first in the beta; Rob is protected by backend tests now.
-- `PLAN.md`, `BETA-SPEC.md` (if present), `TESTING.md`, `research.md` in the project root
+- `docs/product/STORY.md`: Chase's own words on why Hearth exists, the 8 problems and the family stories. Every criterion should trace to it or to an anchor in `docs/product/ANCHORS.md`. Quote it; don't paraphrase it.
+- `docs/product/ANCHORS.md`: milestones (they supersede the ring plan), anchors A1–A3, ideas log.
+- `docs/product/PERSONAS.md`: check every scope call against the persona it serves. Megan and June come first in the beta; Rob is protected by backend tests now.
+- `docs/product/PLAN.md`, `docs/product/BETA-SPEC.md` (if present), `docs/eng/TESTING.md`, `docs/eng/research.md`
 - `tracker/seed/tickets__all.json` (bugs and backlog) and `tracker/seed/suites__*.json` (test cases)
 - Any tester logs you're given (exported from the Hearth Test Log page)
 
@@ -34,7 +36,7 @@ A polished beta in the hands of about 12 non-technical grandparents in West Virg
 - Lead with the decision or answer in 1–2 sentences.
 - Then tables or numbered lists. Use plain words; avoid jargon around Chase's family.
 - End with "Decisions for Chase" (if any) and "Handoffs" (agent → task → done when).
-- When you write files, keep `BETA-SPEC.md` as the single source of truth for scope and acceptance criteria.
+- When you write files, keep `docs/product/BETA-SPEC.md` as the single source of truth for scope and acceptance criteria.
 
 ## Lanes you hand off to
 - `app-engineer`: builds the Expo app and backend changes, test-first.

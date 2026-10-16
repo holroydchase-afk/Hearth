@@ -4,13 +4,13 @@ A private family photo and video feed. Postgres holds the who-can-see-what. Back
 
 ```
 supabase/migrations/0001_init.sql      schema, RLS on every table, helper functions, triggers, RPCs
-supabase/migrations/0002_beta_api.sql  the API.md RPCs, invite hardening (S9/S10), faster RLS, feed indexes
+supabase/migrations/0002_beta_api.sql  the docs/eng/API.md RPCs, invite hardening (S9/S10), faster RLS, feed indexes
 supabase/functions/sign-media/         presigned B2 URLs (SigV4 via Web Crypto) + per-item data keys
 supabase/seed.sql                      demo: two households sharing one child
 supabase/config.toml                   local stack for `supabase start` (CI)
 tests/supabase_stub.sql                local stand-in for Supabase's auth schema/roles (not deployed)
 tests/rls_test.sql                     110 permission assertions run as simulated users
-tests/api_test.sql                     130 API.md contract assertions: every RPC, error codes, idempotency, rate limits
+tests/api_test.sql                     130 docs/eng/API.md contract assertions: every RPC, error codes, idempotency, rate limits
 tests/run.sh / tests/run_supabase.sh   both SQL suites on local Postgres / on a real `supabase start` stack
 tests/perf/                            1M-post scale test for get_feed (RESULTS.md)
 tests/integration/                     PostgREST harness (start.sh/stop.sh) + Deno smoke test over real HTTP
@@ -97,12 +97,12 @@ npx supabase@2.121.0 start && tests/run_supabase.sh
 
 ## Known caveats
 
-- **Supabase isn't 100% US.** Auth logs (emails and IPs) and telemetry can be processed outside the US (see research.md §4). The promise we can keep: "photos, videos and the database live in the US, and the photos are encrypted with keys we control."
+- **Supabase isn't 100% US.** Auth logs (emails and IPs) and telemetry can be processed outside the US (see docs/eng/research.md §4). The promise we can keep: "photos, videos and the database live in the US, and the photos are encrypted with keys we control."
 - **This is server-held-key encryption, not end-to-end.** A compromised Edge Function secret, or a malicious operator, could decrypt media. E2EE (per-circle keys on devices) is a later project and would complicate the web viewer and account recovery.
 - **The 10-minute lag on revocation.** A URL or key already handed out can be reused until it expires. Keys are per item, so a viewer who saved a key keeps the ability to decrypt that item if they also saved the ciphertext. Rotating keys on audience change would require re-encrypting.
 - **Video thumbnails and transcoding happen on the device.** The server never sees plaintext, so it can't make variants.
 - **Both co-parents are equal owners of their own spaces.** There's no court-order or "supervised" mode, and no mechanism to stop a co-parent from reposting something they downloaded.
-- **Seen-by receipts are always recorded.** Per API.md, `get_feed` gives every author the *count* (`seen_count` of `reach_count`, audience members only). The `post_views` rows (who saw it) are still readable only on the `family` plan.
+- **Seen-by receipts are always recorded.** Per docs/eng/API.md, `get_feed` gives every author the *count* (`seen_count` of `reach_count`, audience members only). The `post_views` rows (who saw it) are still readable only on the `family` plan.
 - `tests/supabase_stub.sql` only imitates `auth.uid()` and the roles. CI runs both suites against a real `supabase start` stack (`tests/run_supabase.sh`). That job hasn't run yet: it needs GitHub Actions, because Docker images can't be pulled in the dev sandbox.
 - **PostgREST 12 maps `P0002` to HTTP 500.** The `code` field is right, so the app must branch on `error.code`, not the HTTP status.
 - **The per-IP rate limit depends on a trustworthy client IP header.** On hosted Supabase that's Cloudflare's `cf-connecting-ip`. Behind a gateway that doesn't set it, the last `X-Forwarded-For` hop may be the gateway itself, so every client would share one IP bucket. Check this once on the hosted project before Ring 1.

@@ -11,12 +11,12 @@ on by default for viewers, 48 pt targets, 17 pt+ text, "Love it", "Save to my ph
 | `npm test` | Jest (jest-expo) unit + screen + contract tests against FakeApi. ~15 s. |
 | `npm run typecheck` | `tsc --noEmit`, strict + `noUncheckedIndexedAccess`. |
 | `npm run e2e:web` | Exports the web bundle in FakeApi mode (`EXPO_PUBLIC_HEARTH_FAKE=1`) and runs the Playwright core-loop smoke test at 360×740. |
-| `npm run test:contract:real` | Starts `../backend/tests/integration/start.sh` (fresh DB + PostgREST :3001), runs the API.md contract tests through `SupabaseApi`, stops it. |
+| `npm run test:contract:real` | Starts `../backend/tests/integration/start.sh` (fresh DB + PostgREST :3001), runs the docs/eng/API.md contract tests through `SupabaseApi`, stops it. |
 | `npx expo start` | Dev server (needs the env below, or `EXPO_PUBLIC_HEARTH_FAKE=1`). |
 
 ## Architecture
 
-- `src/api/HearthApi.ts` – interface mirroring API.md (+ email-OTP auth + presigned byte transfer).
+- `src/api/HearthApi.ts` – interface mirroring docs/eng/API.md (+ email-OTP auth + presigned byte transfer).
   - `SupabaseApi.ts` – supabase-js RPCs + `sign-media` edge function.
   - `fake/FakeBackend.ts` – in-memory backend enforcing the same visibility, idempotency, error codes, invite rules and S10 rate limit.
   - `contract/` – one contract suite run against every implementation (FakeApi always; SupabaseApi when env is set).
@@ -24,7 +24,7 @@ on by default for viewers, 48 pt targets, 17 pt+ text, "Love it", "Save to my ph
 - `src/media/pipeline.ts` – 2048 px long edge, ~40 KB thumbnail (≤48 KB cap), re-encode strips metadata and the output bytes are **scanned** for EXIF/XMP before upload, orientation applied by the decoder, video ≤ 60 s check.
 - `src/crypto/media.ts` – AES-256-GCM, `aes-256-gcm-chunked-v1` (64 KiB chunks, STREAM-style nonces: prefix‖index‖last-flag) with `@noble/ciphers`.
 - `src/feed/store.ts` – keyset pagination, per-user cached first page, optimistic hearts/comments/delete, comment drafts that survive refreshes (B6).
-- `src/errors/messages.ts` – API.md codes → plain words. `src/ui/ErrorBoundary.tsx` – last line of defense.
+- `src/errors/messages.ts` – docs/eng/API.md codes → plain words. `src/ui/ErrorBoundary.tsx` – last line of defense.
 - Screens (`src/screens`, routes in `src/app`): Join (invite link), Sign in, Photos, Full-screen viewer, Share, Groups (posters), Help (viewers), Me (posters). Viewers see two tabs: Photos and Help.
 
 ## Real backend
@@ -72,12 +72,12 @@ npx jest src/api/contract
 - Video posting is **off** (`VIDEO_POSTING_ENABLED=false`): iOS videos carry location metadata that can't be stripped on device without a transcoder, so claiming `exif_stripped: true` would be false. Duration check exists and is tested.
 - Bigger text is saved on the phone only. The notification choice and the push token also go to the server (`set_notification_prefs`, `register_push_token`, AE-2).
 
-## API.md gaps / ambiguities (simplest reading taken)
+## docs/eng/API.md gaps / ambiguities (simplest reading taken)
 
 1. No re-sign call for existing media rows: if the app dies after `sign-media upload`, the queue deletes its own unpublished draft and restarts under a new `p_client_id` (never a visible duplicate; may leave purged drafts).
 2. `publish_post` "all media must be ready": the backend also requires ≥1 media item (code 23514). FakeApi now matches.
 3. `aes-256-gcm-chunked-v1` chunk layout is not specified anywhere; defined in `src/crypto/media.ts`. Any web viewer must use the same layout.
 4. `create_invite` link carries a separate token, not the code; `redeem_invite`/`invite_preview` accept either.
 5. No RPC for: who hearted a post (REPLY-1 "audience sees who hearted it" can't be shown; the app shows a count).
-6. `get_comments` on an invisible post: backend raises P0002, FakeApi returns `[]`; both allowed by API.md.
-7. 22023 wording: API.md says "This invite is too old or already used. Ask {inviter} for a new one."; BETA-JOIN-3 says "has expired"; UX-REVIEW bans "expired". The app uses API.md's sentence.
+6. `get_comments` on an invisible post: backend raises P0002, FakeApi returns `[]`; both allowed by docs/eng/API.md.
+7. 22023 wording: docs/eng/API.md says "This invite is too old or already used. Ask {inviter} for a new one."; BETA-JOIN-3 says "has expired"; UX-REVIEW bans "expired". The app uses docs/eng/API.md's sentence.

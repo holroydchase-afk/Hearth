@@ -4,7 +4,7 @@ PRINT NOTES FOR CHASE (do not print this block)
 - Plain sans-serif font (Arial or Verdana). Black on white. No light grey text.
 - Screenshots: take them on a phone with Larger text ON, crop to just the part she needs,
   and print each at least 2.5 inches wide. Circle the thing to tap in thick red.
-- This guide uses the words from UX-REVIEW.md ("Help", "Save to my phone", "Bigger text").
+- This guide uses the words from docs/product/UX-REVIEW.md ("Help", "Save to my phone", "Bigger text").
   Do not print it until the app actually uses those words, or the guide and the screen won't match.
 - Fill in [CHASE'S PHONE NUMBER] in both places. Write it by hand too if you like; she trusts handwriting.
 -->

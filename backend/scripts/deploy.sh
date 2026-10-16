@@ -88,4 +88,4 @@ else curl -fsS -X PATCH "https://api.supabase.com/v1/projects/$REF/config/auth" 
        -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" \
        --data-binary "$AUTH_JSON" >/dev/null; fi
 
-echo "deploy: done. Next: set app/.env.local (see app/.env.example) and run the Expo Go check in MILESTONE-1.md."
+echo "deploy: done. Next: set app/.env.local (see app/.env.example) and run the Expo Go check in docs/product/MILESTONE-1.md."

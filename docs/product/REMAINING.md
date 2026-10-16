@@ -1,6 +1,6 @@
 # Hearth: work remaining, by milestone
 
-Owner: staff-pm. Rewritten Fri Oct 16, 2026 (overnight) around the milestones in `ANCHORS.md`, which supersede the Ring 0–3 plan. Scope and acceptance criteria live in `BETA-SPEC.md` (see its "Milestone map and trace" table for which BETA-* each milestone needs). Product scope beyond that is in `CORE-FEATURES.md`.
+Owner: staff-pm. Rewritten Fri Oct 16, 2026 (overnight) around the milestones in `docs/product/ANCHORS.md`, which supersede the Ring 0–3 plan. Scope and acceptance criteria live in `docs/product/BETA-SPEC.md` (see its "Milestone map and trace" table for which BETA-* each milestone needs). Product scope beyond that is in `docs/product/CORE-FEATURES.md`.
 
 **Bottom line:** Milestone 1 (Chase uses Hearth end to end) is mostly blocked on Chase, not code. Backend, notification sender and app are built and green locally; nothing is deployed and nothing has run on a real phone. The shortest path: deploy to the one existing Supabase project, run the app on Chase's iPhone, post for 2 days. Milestone 2 (Mom posting too) adds the email sender domain, invite links and a build she can install.
 
@@ -140,7 +140,7 @@ Email codes at M1: Supabase's built-in mailer only sends to project team members
 | REPLY-1 names | Count + "You loved this" | Unchanged |
 | Purge worker, exports, S11/S13/S14/S15, web viewer | Unchanged (v1.0 / out) | |
 
-Spec changes are in BETA-SPEC.md under "Milestone map and trace (Oct 16)". The Oct 15 work tables below keep their IDs; their Ring wording is historical, and the milestone each item now belongs to is in the tables above.
+Spec changes are in docs/product/BETA-SPEC.md under "Milestone map and trace (Oct 16)". The Oct 15 work tables below keep their IDs; their Ring wording is historical, and the milestone each item now belongs to is in the tables above.
 
 ---
 
@@ -167,7 +167,7 @@ Spec changes are in BETA-SPEC.md under "Milestone map and trace (Oct 16)". The O
 | ID | Item | Size | Depends on | Done when |
 |---|---|---|---|---|
 | AE-1 | **Finish the app lane:** fix the Jest hang; run the contract tests against the real API harness | S | in progress | `npm test` green 3× and exits on its own; `test:contract:real` 19/19 green 3× |
-| AE-2 | **Notification sender** (critical path). Amend API.md first: `register_push_token`, `set_notification_prefs`, `my_profile`. Migration 0003: an outbox table filled by a trigger on publish/comment/heart, plus a `notify` edge function on a 1-minute cron that batches (one notice per recipient per post, and per 10 min), sends through Expo Push, and sends email codes and digests through Resend. Payload: sender's first name only, with no photo, caption or child's name | L | AE-1, QA-1, IN-3 | BETA-NOTIFY-2, NOTIFY-4, REPLY-3 auto green 3× on staging; app saves its token and preference to the server (contract test) |
+| AE-2 | **Notification sender** (critical path). Amend docs/eng/API.md first: `register_push_token`, `set_notification_prefs`, `my_profile`. Migration 0003: an outbox table filled by a trigger on publish/comment/heart, plus a `notify` edge function on a 1-minute cron that batches (one notice per recipient per post, and per 10 min), sends through Expo Push, and sends email codes and digests through Resend. Payload: sender's first name only, with no photo, caption or child's name | L | AE-1, QA-1, IN-3 | BETA-NOTIFY-2, NOTIFY-4, REPLY-3 auto green 3× on staging; app saves its token and preference to the server (contract test) |
 | AE-3 | **First real-device pass:** EAS builds for Chase's iPhone and the Android test phone. Check resize, the EXIF scan, file bytes, encrypted PUT, Save to my phone, OTP sign-in, `hearth.family/join` links, and push tap-to-open from cold and warm starts | L | IN-3, IN-5, IN-6, CH-1 (iOS) | M-07, M-09, M-10 pass on both phones; BETA-JOIN-1, SEE-3, SEE-5, NOTIFY-3 logged as passing on the Test Log |
 | AE-4 | **expo-updates + channels:** `runtimeVersion` policy `fingerprint`; channels `preview` (Chase only) and `production` | S | AE-1 | `eas update --channel preview` reaches Chase's phone; a native change forces a new build instead of an update (see IN-9) |
 | AE-5 | **Delete my account** (pulled in for Beta App Review): a Me screen button with a confirm step; calls `request_account_deletion()`; Chase does the final purge by hand | S | — | New test `BETA-JOIN-7` (auto): after confirming, the user is signed out and `my_spaces` returns `[]` |
@@ -194,7 +194,7 @@ Spec changes are in BETA-SPEC.md under "Milestone map and trace (Oct 16)". The O
 | ID | Item | Size | Depends on | Done when |
 |---|---|---|---|---|
 | GU-1 | Device pass on the Android test phone at maximum font and on an iPhone at the largest Dynamic Type | M | AE-3 | UXG-02/03/04 hold on the device (screenshots); new findings filed as tickets |
-| GU-2 | Wording for the push text, the email code mail, the digest, the invite text, and the 22023 sentence (resolve API.md vs JOIN-3 vs the banned word "expired") | S | — | One copy table in UX-REVIEW.md; app-engineer uses it verbatim |
+| GU-2 | Wording for the push text, the email code mail, the digest, the invite text, and the 22023 sentence (resolve docs/eng/API.md vs JOIN-3 vs the banned word "expired") | S | — | One copy table in docs/product/UX-REVIEW.md; app-engineer uses it verbatim |
 | GU-3 | **Rewrite the printed guide.** It currently promises "nothing to download". The beta needs TestFlight (iPhone) or the Play link (Android). Use real screenshots | M | AE-3 | Guide matches the app screen for screen; printed and **mailed by Nov 10** |
 | GU-4 | Run the grandparent test (5 testers aged 65+) | M | CH-8, Ring 1 gate | 4 of 5 pass; logged with phone and times (Ring 2 gate) |
 
@@ -235,7 +235,7 @@ Scale is already proven where it matters: the feed is fast at 1M posts. What we 
 
 Today the code exists only in this container, so a scheduled run would start in a fresh session with nothing to read. A daily PM agent needs:
 
-1. **A GitHub repo (IN-1).** The scheduled session clones it. The repo holds the code, `BETA-SPEC.md`, `REMAINING.md`, the tracker JSON and the gate packets. Without it, a daily run is blind.
+1. **A GitHub repo (IN-1).** The scheduled session clones it. The repo holds the code, `docs/product/BETA-SPEC.md`, `docs/product/REMAINING.md`, the tracker JSON and the gate packets. Without it, a daily run is blind.
 2. **The repo attached to the cloud environment**, with read access, plus push access to one folder, `pm/` (for the daily note).
 3. **CI running on GitHub (IN-2).** The PM reads the last 24 h of runs with `gh run list` instead of re-running suites, which is cheap on usage.
 4. **Tester logs in the repo.** Export the Hearth Test Log page to `tracker/logs/YYYY-MM-DD.json` (Chase or qa-tdd, 1 minute a day during rings). Help calls go in the same file.
@@ -243,13 +243,13 @@ Today the code exists only in this container, so a scheduled run would start in 
 
 ### The daily loop (weekdays 7:50 am ET; daily during Ring 3, Nov 13–22)
 
-1. Read `BETA-SPEC.md`, `REMAINING.md`, the tracker, yesterday's `pm/` note, the last 24 h of CI, and new tester logs.
+1. Read `docs/product/BETA-SPEC.md`, `docs/product/REMAINING.md`, the tracker, yesterday's `pm/` note, the last 24 h of CI, and new tester logs.
 2. **Triage:** give every new item a P0, P1 or P2, a lane, and a "done when". A P0 or a red `main` goes to the top.
 3. **Critical path check:** for each critical-path line, mark it on time or slipping, with a new date. If a slip moves a gate, say so on line 1.
 4. **Write `pm/YYYY-MM-DD.md`:** at most 15 lines, made of today's 3 handoffs (agent → task → done when), Chase's decisions waiting (with my recommendation), and any risk that changed.
 5. **Milestone gate days (when Chase says a milestone is ready):** a go/no-go packet instead of the note, with each criterion met or not met with evidence. Never rounded up.
 6. Push the note. Chase reads it on his phone in 2 minutes.
 
-**Repo now exists (Oct 15); until CI and logs are wired:** no scheduled run. Chase starts each work session with "PM: daily", and I run the same loop by hand. I also mirror `REMAINING.md` and `CORE-FEATURES.md` into the claude.ai Project so they outlive this container.
+**Repo now exists (Oct 15); until CI and logs are wired:** no scheduled run. Chase starts each work session with "PM: daily", and I run the same loop by hand. I also mirror `docs/product/REMAINING.md` and `docs/product/CORE-FEATURES.md` into the claude.ai Project so they outlive this container.
 
-**Weekly (Mondays):** re-cut scope against the agent-days left, and update `REMAINING.md`. Anything new defaults to "not now" unless it unblocks a grandparent or closes a privacy risk.
+**Weekly (Mondays):** re-cut scope against the agent-days left, and update `docs/product/REMAINING.md`. Anything new defaults to "not now" unless it unblocks a grandparent or closes a privacy risk.

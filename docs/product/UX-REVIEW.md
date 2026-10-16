@@ -83,7 +83,7 @@ Chase's screens are "Needs changes": mostly contrast, tap size, and two layout b
 
 ## Acceptance criteria for qa-tdd
 
-Suggested IDs: `UXG-xx` (grandparent UX). Each needs a ticket (E#) and must fail first, per TESTING.md. Use viewport 360x740 for these, not the suite's 390x844. "Viewer screens" means the feed, Help (Me) tab and full-screen viewer as Grandma Jo.
+Suggested IDs: `UXG-xx` (grandparent UX). Each needs a ticket (E#) and must fail first, per docs/eng/TESTING.md. Use viewport 360x740 for these, not the suite's 390x844. "Viewer screens" means the feed, Help (Me) tab and full-screen viewer as Grandma Jo.
 
 | ID | Test | Covers fix |
 |---|---|---|

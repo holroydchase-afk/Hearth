@@ -34,7 +34,7 @@ Working name: **Hearth**. Private photo and video sharing for families, built fo
 At scale (from research): ~$0.06/family/month at 1,000 families, ~$0.03 at 50,000. Suggested pricing later: free tier + Family plan $4.99/mo or $39.99/yr (unlimited video, linked co-parent households, export).
 
 ## What exists today
-- `research.md` — stack, pricing, competitor gaps, cost model, sources.
+- `docs/eng/research.md` — stack, pricing, competitor gaps, cost model, sources.
 - `backend/` — Postgres schema with row-level security, media-signing edge function, seed data, 90/90 permission tests + 5/5 function tests passing.
 - **Hearth prototype** artifact — clickable v1 on your phone. Switch "Viewing as" to see exactly what each relative sees.
 
@@ -47,7 +47,7 @@ At scale (from research): ~$0.06/family/month at 1,000 families, ~$0.03 at 50,00
 - 32 prototype test cases (33 tests) written before any fix. Red run: 12 passing. Green run: 32/32, stable across 3 runs.
 - Fixed 10 prototype bugs (worst: co-parent could see the other household's relatives) and shipped 8 features: delete post, full-screen photo viewer, invite flow with circles, "Seen by", larger text, remove picked photo, rename/delete circles, revocation count.
 - Security review fixed 7 backend holes (worst: removed members kept access to their old posts). Backend now 110/110.
-- 16 items open in the backlog. Everything is tracked on the Hearth Test Log page. Workflow is in TESTING.md.
+- 16 items open in the backlog. Everything is tracked on the Hearth Test Log page. Workflow is in docs/eng/TESTING.md.
 
 ## Next steps (me, next session)
 1. Build the Expo app screens against the backend (feed, share, circles, invites, settings).

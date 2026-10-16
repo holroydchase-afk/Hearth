@@ -1,6 +1,6 @@
 # Hearth story, problems and family stories
 
-Why Hearth exists, in Chase's words, plus the problems it solves and the family stories behind them. Milestones, anchors (A1–A3) and the ideas log live in `ANCHORS.md`. Mirrored from the claude.ai doc **Hearth Story & Anchors** on Oct 16, 2026; this file is now the source of truth.
+Why Hearth exists, in Chase's words, plus the problems it solves and the family stories behind them. Milestones, anchors (A1–A3) and the ideas log live in `docs/product/ANCHORS.md`. Mirrored from the claude.ai doc **Hearth Story & Anchors** on Oct 16, 2026; this file is now the source of truth.
 
 ## Why Hearth exists
 
@@ -73,4 +73,4 @@ Hearth's design target is the WV side; the Charlotte side is who posts. Everythi
 4. Setup is a family event: a printed guide, a local helper, and a number to call.
 5. Someone will never install an app (Earl). Plan a non-app path for v1.0 (CF-18).
 
-Ideas waiting on a decision: see the Ideas log in `ANCHORS.md`.
+Ideas waiting on a decision: see the Ideas log in `docs/product/ANCHORS.md`.

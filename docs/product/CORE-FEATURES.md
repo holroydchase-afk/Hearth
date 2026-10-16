@@ -1,9 +1,9 @@
 # Hearth: core features (beyond the beta)
 
-Owner: staff-pm. Written Oct 15, 2026. Beta scope and its tests stay in `BETA-SPEC.md`. This file covers what Hearth has to be to solve the problems it exists for, and when each part ships.
+Owner: staff-pm. Written Oct 15, 2026. Beta scope and its tests stay in `docs/product/BETA-SPEC.md`. This file covers what Hearth has to be to solve the problems it exists for, and when each part ships.
 
 **Phases:** **Beta** = 12 WV grandparents by Sun Nov 22, 2026 · **v1.0** = public launch, about Q1 2027 · **Later** = after v1.0 proves people keep using it.
-**Rule:** v1.0 gets small and deep. A feature reaches v1.0 only if one of the 7 problems below stays unsolved without it. Personas are in `PERSONAS.md`.
+**Rule:** v1.0 gets small and deep. A feature reaches v1.0 only if one of the 7 problems below stays unsolved without it. Personas are in `docs/product/PERSONAS.md`.
 
 **Count:** 30 numbered features: **Beta 18 · v1.0 8 · Later 4** (plus an unscheduled parking lot at the end). CF-12 and CF-25 have parts in two phases; each is counted in the phase where it first ships. Some features serve two problems; each is listed once, under the problem it mainly solves.
 
@@ -78,7 +78,7 @@ Owner: staff-pm. Written Oct 15, 2026. Beta scope and its tests stay in `BETA-SP
 
 ## Paid plan (introduced in v1.0)
 
-**Recommendation:** charge for volume and keepsakes, never for the core promise or the split-family wedge. Co-parent linking stays **free**. This reverses `research.md` §7, because the wedge only spreads if both households can join without paying.
+**Recommendation:** charge for volume and keepsakes, never for the core promise or the split-family wedge. Co-parent linking stays **free**. This reverses `docs/eng/research.md` §7, because the wedge only spreads if both households can join without paying.
 
 | ID | Feature | Free | Family ($4.99/mo or $39.99/yr) | Phase |
 |---|---|---|---|---|
@@ -123,5 +123,5 @@ CF-03 co-parent link · CF-04 change audience · CF-06 one feed across families 
 1. **Earl's email.** Do grandparents who won't install get (a) a personal web link to photos, which means building and securing a second client, or (b) a text with a link, which needs Twilio, a registered business and about $10–20/month? Photos *inside* the email are off the table, because Gmail and Yahoo would then hold the kids' photos. My pick is (a), because it also covers the iPad and the flip-phone household.
 2. **Who holds the keys.** Server-held keys (today) let us recover a lost phone and run a web viewer. End-to-end encryption is a stronger promise, but a lost phone with no backup means lost photos, and a web viewer becomes much harder. Which promise do you want to market? My pick: server-held for v1.0, with honest wording, and E2EE as a later paid "vault" option.
 3. **Co-parent conflicts.** When one parent wants a photo of the child removed from the *other* household's space, does Hearth do anything (notify, mediate, a court-order mode), or is each household fully sovereign? This decides CF-03's design and your support burden.
-4. **Who pays.** Is the payer the organizer parent, or do grandparents gift it? Is co-parent linking free (my recommendation) or the main paid hook (research.md's original plan)? Do we charge at v1.0 or after 1,000 families?
+4. **Who pays.** Is the payer the organizer parent, or do grandparents gift it? Is co-parent linking free (my recommendation) or the main paid hook (docs/eng/research.md's original plan)? Do we charge at v1.0 or after 1,000 families?
 5. **Launch shape.** Is v1.0 a public listing in both stores, or an invite-only waitlist that grows through families who already use it? Do you form an LLC first? That decides Apple organization enrollment, Play organization registration (no 14-day closed test), SMS registration, and liability for kids' data.
