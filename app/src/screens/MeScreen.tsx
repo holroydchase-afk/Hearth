@@ -2,6 +2,7 @@ import React from 'react';
 import { useApp } from '../state/AppContext';
 import { Card, Screen, Txt } from '../ui/kit';
 import { AppGate } from './AppGate';
+import { NoticeTiming } from './NoticeTiming';
 import { BiggerText, HowToTell, Privacy, SignOut } from './Preferences';
 
 export function MeScreen() {
@@ -17,6 +18,7 @@ export function MeScreen() {
       <BiggerText />
       <HowToTell />
       <Privacy who={app.helper} />
+      <NoticeTiming />
       <SignOut />
     </Screen>
   );
