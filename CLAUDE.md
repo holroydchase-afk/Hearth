@@ -20,7 +20,7 @@ Hearth is a private family photo app for split families and for grandparents who
 
 ## Layout
 - `backend/`: Supabase.
-  - `migrations/0001`–`0008`: RLS, RPCs, triggers, notification outbox (0003), AUD-7 (0004), S12 (0005), error reports (0006), real names (0007), rename_circle (0008).
+  - `migrations/0001`–`0009`: RLS, RPCs, triggers, notification outbox (0003), AUD-7 (0004), S12 (0005), error reports (0006), real names (0007), rename_circle (0008), who reads replies (0009).
   - `scripts/`: `deploy.sh` (one-command deploy, `--dry-run`), `family-setup.sql` (M1/M2 space + groups + invites).
   - `functions/notify/`: Deno TS; Expo Push + Resend sender, run by a 1-minute cron.
   - `functions/sign-media/`: Deno TS; presigned Backblaze B2 URLs and per-item keys.
