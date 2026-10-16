@@ -1,0 +1,74 @@
+# Hearth anchors, milestones and ideas log
+
+Source of truth for *why* Hearth exists and what every feature is checked against. The fuller story (Chase's family, problems and solutions, WV vs Charlotte) lives in the claude.ai doc **Hearth Story & Anchors** (claude.ai/code/artifact/7f2a40e2-64e2-4463-8640-ede7d44c748c).
+
+**Rules for every session**
+- When Chase names a new anchor, add it here and to the doc.
+- When Chase floats an idea, add it to the Ideas log below.
+- Never delete an already-built feature to satisfy an idea or anchor. Log the conflict and let Chase decide.
+
+## Milestones (Chase, Oct 16, 2026)
+
+Hearth is a **proof of concept first**: a birthday present Chase is building himself, because these problems are his own, plus experience for future jobs. These milestones supersede the startup-style Ring 0–3 plan in `BETA-SPEC.md` and `REMAINING.md` (reconcile those next session).
+
+1. **Birthday present.** Chase uses it himself, end to end.
+2. **Wife.** Both households' posting works.
+3. **The most tech-savvy relative** (about 1 person).
+4. **Everyone else, in order of tech-savviness** (most savvy first, least savvy last). Each step fixes what confused the last group.
+5. **Android relatives** (the grandpas), once the iPhone side is solid.
+6. **Nice to have:** POC on an Aluratek smart frame for great-grandpa. First check whether the model accepts photos by email or a shared link; if it only takes its own app, skip it.
+7. **Then decide.** Look at costs and the problems people hit; decide whether to take it further.
+
+Not required for the POC: funding, pricing, self-hosted auth, pentest, legal review. Those come at milestone 7 if the answer is yes.
+
+## Anchors
+
+| # | Anchor | What it means | Named |
+|---|---|---|---|
+| A1 | **Anxiety-less** | Parents already carry enough. Sharing feels like the preschool app: secure, exclusive to people you trust, nothing to second-guess about who sees what. | Oct 16, 2026 |
+| A2 | **Guilt-free** | Nobody, sender or viewer, feels judged. No visible view tracking, last-seen or login details. Neither side of a family can tell whether the other is or isn't engaging, beyond what people choose to show (hearts, comments). | Oct 16, 2026 |
+| A3 | **Stays on US soil** | Kids' photos, videos and family data are stored in the US, by US companies, never sent to China or anywhere else. A hard constraint on every vendor and feature. | Oct 16, 2026 |
+
+**A3 gaps today.** Media and database are in US regions (Supabase East US, Backblaze US East). Not yet literally "never leaves US soil": Supabase processes some auth logs and support access outside the US and contracts through a Singapore entity; push alerts transit Apple/Google global networks (no photos or names in them). Public wording stays **"stored in the US"** until closed. Closing = self-hosted auth on US infrastructure (`research.md` §4), a post-POC item.
+
+**A3 positioning.** Lead with "your kids' photos never leave the US / never sent to China", not partisan politics. Split families span both sides.
+
+**Candidate anchors (Claude's wording, not adopted):** kids' privacy is non-negotiable; built for the least techy person in the family; no social-media mechanics.
+
+### Built features that conflict with A2 (logged, not deleted)
+
+| Feature | Where | Conflict |
+|---|---|---|
+| "Seen by N of M" on your own posts | BETA-NOTIFY-6, CF-20, prototype | The poster can see who hasn't opened it |
+| "Hasn't opened anything in 14 days" | CF-22 (v1.0) | Shames quiet relatives |
+| Grandparent engagement as a gate/funding metric | ring gates, funding plan | Fine if internal and aggregate only; never shown to family |
+
+Decide before milestone 4 (when grandparents on different sides join). Options: keep for poster only (today), remove, or opt-in by each viewer.
+
+## Ideas log (newest first)
+
+| Date | Idea | Anchor | Status | Notes |
+|---|---|---|---|---|
+| Oct 16 | AI positioning session | A1, A2, A3 | To schedule | Agenda below |
+| Oct 16 | Upload 30 photos, Hearth suggests the best few | Parental guilt | Waits on AI session | Could run on-device with no training. Conflicts with CF-10's "no ML of any kind" as written |
+| Oct 16 | Duplicate / near-duplicate detection | A1 | Waits on AI session | Same on-device question |
+| Oct 16 | AI-assisted onboarding | A1 | Waits on AI session | e.g., set up groups from a plain description of the family |
+| Oct 16 | Hide or remove engagement signals | A2 | Decide before milestone 4 | See conflicts table; built code stays until decided |
+| Oct 16 | Never show login or last-active details to anyone | A2 | Proposed for Never build | Current design already shows none |
+| Oct 16 | No photo filters | No social-media mechanics | Proposed for Never build | Chase said it directly |
+| Oct 16 | Great-grandparents as a named audience in personas | Rural / low-tech | Proposed | Add to `PERSONAS.md` |
+| Oct 16 | Gold-standard security; privacy intuitive and advanced | A1 | In progress | `privacy-security` agent raised; scaled to the POC |
+| Oct 16 | Shared-iCloud-album comparison test | Validation | Suggested | One week with a few iPhone relatives; shows what Hearth must beat |
+
+### AI positioning session (agenda)
+
+Question: what can Hearth say about AI that stays true and still allows helpful tools?
+
+1. Words: "training" (a model learns from your photos) vs "processing" (a program looks at a photo once). "No computer program learns from your photos" can stay true under on-device processing.
+2. Options:
+   - **A. No ML anywhere.** Simplest promise; loses best-shot, duplicates, smart onboarding.
+   - **B. On-device only, opt-in.** Photo never leaves the phone for AI. Claude's pick. Satisfies A3.
+   - **C. Server-side under a no-training contract.** Most capable; breaks Never build #3, hardest to explain, must also satisfy A3.
+3. Which features are worth it: best-shot, duplicates, onboarding, caption help.
+4. If B: update CF-10's "done when", privacy policy, Never build list, grandparent wording.
+5. Reviewers: privacy-security (data flow), grandparent-ux (wording).
