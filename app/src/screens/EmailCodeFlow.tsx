@@ -51,7 +51,8 @@ export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: () => Promi
   return (
     <>
       <Txt>{`We sent a 6-number code to ${email.trim()}. Type it here.`}</Txt>
-      <Field label="6-number code" value={code} onChangeText={setCode} keyboardType="number-pad" maxLength={6} autoComplete="one-time-code" textContentType="oneTimeCode" style={{ letterSpacing: 6 }} />
+      {/* Keep digits only: a pasted "123 456" or "123-456" must not get cut to "123 45". */}
+      <Field label="6-number code" value={code} onChangeText={(t) => setCode(t.replace(/\D/g, '').slice(0, 6))} keyboardType="number-pad" maxLength={12} autoComplete="one-time-code" textContentType="oneTimeCode" style={{ letterSpacing: 6 }} />
       {msg ? <Notice text={msg} /> : null}
       <Button label="Continue" busy={busy} disabled={code.replace(/\D/g, '').length !== 6} onPress={() => void verify()} />
       <Button label="Send a new code" variant="secondary" onPress={() => void send()} />
