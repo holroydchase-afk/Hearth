@@ -524,6 +524,40 @@ select tests.ok_sql($q$select tests.rest(format('select public.invite_preview(%L
                     'BETA-JOIN-4 (S10) invite_preview: another IP still works');
 
 -- ======================================================================
+-- BETA-OPS-1: crash/error reports with no personal data and no third-party SDK
+-- ======================================================================
+:as_gma_riv
+select tests.lives($$select public.report_client_error('0.1.0', 'android 14', 'photos', 'TypeError', null)$$,
+                   'BETA-OPS-1: a signed-in member reports an error');
+:as_admin
+select tests.ok_sql($$select count(*) = 1 from public.client_errors
+                      where app_version = '0.1.0' and os = 'android 14' and screen = 'photos' and kind = 'TypeError'$$,
+                    'BETA-OPS-1: exactly 1 row with app version, OS, screen and error type');
+:as_anon
+select tests.lives($$select public.report_client_error('0.1.0', 'ios 18.1', 'sign-in', 'ApiError', 'P0002')$$,
+                   'BETA-OPS-1: errors before sign-in can be reported too');
+:as_gma_riv
+select tests.throws_code($$select public.report_client_error('0.1.0', 'ios', 'photos', 'Sam''s caption here', null)$$,
+                         'BETA-OPS-1: free text (a caption) is refused, not stored', '23514');
+select tests.throws_code($$select public.report_client_error('0.1.0', 'ios', 'https://x.b2.com/k?sig=1', 'TypeError', null)$$,
+                         'BETA-OPS-1: a URL is refused, not stored', '23514');
+select tests.throws_code($$select public.report_client_error('0.1.0', 'gma@example.com', 'photos', 'TypeError', null)$$,
+                         'BETA-OPS-1: an email address is refused, not stored', '23514');
+select tests.throws_code('select count(*) from public.client_errors', 'BETA-OPS-1: app users cannot read error reports', '42501');
+select tests.lives($$select public.report_client_error('0.1.0', 'ios', 'photos', 'TypeError', null) from generate_series(1, 29)$$,
+                   'setup: 30 reports in an hour');
+select tests.throws_code($$select public.report_client_error('0.1.0', 'ios', 'photos', 'TypeError', null)$$,
+                         'BETA-OPS-1: more than 30 reports an hour from one person is 54000', '54000');
+:as_admin
+update public.client_errors set at = now() - interval '31 days' where kind = 'ApiError';
+select public.purge_client_errors();
+select tests.ok_sql($$select not exists (select 1 from public.client_errors where kind = 'ApiError')
+                         and exists (select 1 from public.client_errors where kind = 'TypeError')$$,
+                    'BETA-OPS-1: reports older than 30 days are purged; newer ones stay');
+:as_gma_riv
+select tests.throws_code('select public.purge_client_errors()', 'BETA-OPS-1: only the server can purge', '42501');
+
+-- ======================================================================
 -- RLS performance hygiene
 -- ======================================================================
 :as_admin
