@@ -1,5 +1,5 @@
 // Email → 6-digit code. No passwords, no magic links, nothing to copy.
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { messageFor } from '../errors/messages';
 import { useApp } from '../state/AppContext';
 import { Button, Field, Notice, Txt } from '../ui/kit';
@@ -11,6 +11,15 @@ export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: () => Promi
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  // BETA-JOIN-2: a minute between codes (the mailer allows only a few an hour), said in words.
+  const [waitUntil, setWaitUntil] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (waitUntil <= Date.now()) return;
+    const t = setInterval(() => { const n = Date.now(); setNow(n); if (n >= waitUntil) clearInterval(t); }, 1000);
+    return () => clearInterval(t);
+  }, [waitUntil]);
+  const waitLeft = Math.max(0, Math.ceil((waitUntil - now) / 1000));
 
   const send = async () => {
     setBusy(true);
@@ -19,6 +28,8 @@ export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: () => Promi
       await deps.api.sendCode(email.trim());
       setStep('code');
       setCode('');
+      setNow(Date.now());
+      setWaitUntil(Date.now() + 60_000);
     } catch (e) {
       setMsg(messageFor(e, { inviter }).replace("That didn't work. Please check what you typed and try again.", 'Please check your email address and try again.'));
     } finally {
@@ -55,7 +66,9 @@ export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: () => Promi
       <Field label="6-number code" value={code} onChangeText={(t) => setCode(t.replace(/\D/g, '').slice(0, 6))} keyboardType="number-pad" maxLength={12} autoComplete="one-time-code" textContentType="oneTimeCode" style={{ letterSpacing: 6 }} />
       {msg ? <Notice text={msg} /> : null}
       <Button label="Continue" busy={busy} disabled={code.replace(/\D/g, '').length !== 6} onPress={() => void verify()} />
-      <Button label="Send a new code" variant="secondary" onPress={() => void send()} />
+      <Txt variant="muted">It can take a minute. Not there? Look in your Junk or Spam folder.</Txt>
+      {waitLeft > 0 ? <Txt variant="muted">{`You can ask for a new code in ${waitLeft} seconds.`}</Txt> : null}
+      <Button label="Send a new code" variant="secondary" disabled={waitLeft > 0} onPress={() => void send()} />
       <Button label="Use a different email" variant="quiet" onPress={() => { setStep('email'); setMsg(null); }} />
     </>
   );

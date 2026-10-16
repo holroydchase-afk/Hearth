@@ -1,5 +1,5 @@
 // Sign-in and sign-up flows for every persona (Chase's ask, Oct 16).
-import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';
 import { FakeBackend } from '../../api/fake/FakeBackend';
 import { expectGrandparentSafe, renderApp } from '../../test/renderApp';
@@ -60,6 +60,30 @@ describe('BETA-JOIN-8: typing an invite code (links can open in a browser, or Ta
     fireEvent.press(await screen.findByRole('button', { name: "Invite someone to Grandparents – Dad's side" }));
     fireEvent.press(await screen.findByRole('button', { name: 'Make the invite' }));
     expect(await screen.findByText(/^Or they can type this code in Hearth: [A-Z0-9]{5} [A-Z0-9]{5}$/)).toBeTruthy();
+  });
+});
+
+describe('sign in: waiting for the code (BETA-JOIN-2)', () => {
+  it('BETA-JOIN-2: says where to look, and asks her to wait a minute before a new code', async () => {
+    await renderApp(<SignInScreen />, { user: null });
+    await toCodeStep();
+    expect(screen.getByText('It can take a minute. Not there? Look in your Junk or Spam folder.')).toBeTruthy();
+    expect(screen.getByText(/You can ask for a new code in (60|59) seconds\./)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Send a new code' }).props.accessibilityState).toMatchObject({ disabled: true });
+    expectGrandparentSafe();
+  });
+
+  it('BETA-JOIN-2: after the minute, "Send a new code" works again', async () => {
+    jest.useFakeTimers({ doNotFake: ['setImmediate', 'nextTick'] });
+    try {
+      await renderApp(<SignInScreen />, { user: null });
+      await toCodeStep();
+      await act(async () => { jest.advanceTimersByTime(61_000); });
+      expect(screen.queryByText(/You can ask for a new code in/)).toBeNull();
+      expect(screen.getByRole('button', { name: 'Send a new code' }).props.accessibilityState?.disabled ?? false).toBe(false);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
 
