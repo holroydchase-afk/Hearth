@@ -71,6 +71,23 @@ Deno.test("email: names are HTML-escaped", () => {
   assert(!e.html.includes("<b>Al"), "escaped");
 });
 
+Deno.test("BETA-NOTIFY-7: push and email name the real sender, never a generic notice", () => {
+  const [m] = buildPush(pushBatch({ actor_first_names: ["Chase"] }));
+  eq(m.title, "From Chase on Hearth", "push title names the sender");
+  const [m2] = buildPush(pushBatch({ actor_first_names: ["Chase", "Danielle"] }));
+  eq(m2.title, "From Chase and Danielle on Hearth", "two senders");
+  const e = buildEmail(emailBatch({ actor_first_names: ["Chase"] }));
+  eq(e.from, "Chase on Hearth <hello@hearth.family>", "email From shows the sender's name");
+  for (const t of [m.title, m.body, e.subject, e.text]) {
+    assert(!/new notification/i.test(t), "no generic wording: " + t);
+  }
+});
+
+Deno.test("BETA-NOTIFY-7: a sender name can't break the email From header", () => {
+  const e = buildEmail(emailBatch({ actor_first_names: ['Al"<x@evil.com>'] }));
+  assert(e.from.endsWith("<hello@hearth.family>") && (e.from.match(/</g) ?? []).length === 1, "one address only: " + e.from);
+});
+
 // ---------- handler: one run of the cron ----------
 type Call = { url: string; body: unknown; auth: string | null };
 function mockFetch(opts: { batches: Batch[]; expo?: (body: unknown) => Response; resend?: () => Response }) {
