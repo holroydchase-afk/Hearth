@@ -168,6 +168,9 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 | BETA-NOTIFY-7 | auto | P1 | 1 | **Given** any push, sign-in email, digest or invite text, **When** it is generated, **Then** it names the real sender ("From Chase on Hearth" / "Chase invited you to Hearth"), never a generic "You have a new notification", and still carries no photo, caption or child's name. |
 | BETA-AUD-7 | auto | P0 | 1 | **Given** any member, **When** they call any RPC or table they can read, **Then** no other member's last-active, last-login, online status or device details come back. (Does not decide NOTIFY-6.) |
 
+### Amendment, Oct 16 (staff-pm): NOTIFY-4 vs NOTIFY-1
+NOTIFY-4 now reads: **Given** 5 photos in one post, or 3 posts within 10 minutes, **When** notices go out, **Then** each recipient gets 1 notice for the 5-photo post, and at most 2 for the 3 posts (the first right away so NOTIFY-1 holds; the rest as 1). Reason: the 60 s alert for the first post matters more than one extra buzz.
+
 ### Milestone gates (replace the ring gates)
 | Milestone | Gate (all must be met) | Evidence |
 |---|---|---|
