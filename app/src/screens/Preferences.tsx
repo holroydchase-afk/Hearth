@@ -110,3 +110,23 @@ export function DeleteAccount() {
     </>
   );
 }
+
+/** BETA-AUD-10: the family owner picks who reads what relatives write. Safest is the default. */
+export function ReplyAudience() {
+  const app = useApp();
+  const [choice, setChoice] = useState(app.space?.reply_audience ?? 'parents');
+  if (!app.space || app.space.role !== 'owner') return null;
+  const pick = (c: 'parents' | 'everyone') => {
+    const before = choice;
+    setChoice(c);
+    app.deps.api.setReplyAudience(app.space!.space_id, c).catch(() => setChoice(before));
+  };
+  return (
+    <Card>
+      <Txt variant="title" role="header">Who reads what family members write</Txt>
+      <Txt variant="muted">For comments and hearts. Your own replies always reach everyone the photo went to. Groups can also be set so their members see each other's replies.</Txt>
+      <Choice kind="radio" label="Only the kids' parents (safest)" title="Only the kids' parents (safest)" checked={choice === 'parents'} onPress={() => pick('parents')} />
+      <Choice kind="radio" label="Everyone the photo was shared with" title="Everyone the photo was shared with" checked={choice === 'everyone'} onPress={() => pick('everyone')} />
+    </Card>
+  );
+}

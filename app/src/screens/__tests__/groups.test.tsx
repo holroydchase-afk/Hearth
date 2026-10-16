@@ -48,6 +48,16 @@ describe('Groups (posters only)', () => {
     expectGrandparentSafe();
   });
 
+  it('BETA-AUD-9: a group can let its members see each other\'s replies (off by default)', async () => {
+    const be = FakeBackend.withFixture();
+    await renderApp(<GroupsScreen />, { be, user: 'chase' });
+    const sw = await screen.findByRole('switch', { name: "Grandparents – Dad's side: members see each other's replies" });
+    expect(sw.props.accessibilityState).toMatchObject({ checked: false });
+    fireEvent.press(sw);
+    await waitFor(() => expect(be.state.circles[FIXTURE.circles.dadSide.id]!.replies_shared).toBe(true));
+    expectGrandparentSafe();
+  });
+
   it('viewers are told plainly', async () => {
     await renderApp(<GroupsScreen />, { user: 'jo' });
     expect(await screen.findByText("You can't do that here.")).toBeTruthy();
