@@ -7,7 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 DB=${DB:-hearth_test}
 STATUS=0
-for suite in tests/rls_test.sql tests/api_test.sql tests/notify_test.sql; do
+for suite in tests/rls_test.sql tests/api_test.sql tests/notify_test.sql tests/setup_test.sql; do
   dropdb --if-exists "$DB"
   createdb "$DB"
   files=(-f tests/supabase_stub.sql)
