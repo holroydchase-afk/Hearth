@@ -40,7 +40,7 @@ Any change requires a contract-test update first; the contract tests live in `ap
 | `set_notification_prefs` | `p_space, p_push boolean, p_email_digest: 'off'\|'daily'\|'weekly'` | void | Per space. Not a member: `P0002`. Bad choice: `23514`. Push on but no phone registered falls back to a daily email. |
 
 ## Notifications (server only)
-Triggers queue a notice on publish (audience members, not the author) and on a comment or heart (the post's author, never the reactor). The `notify` edge function runs on a 1-minute cron, calls `claim_notification_batches()` (service_role only) and sends one notice per recipient: at most 1 push per 10 minutes, and 1 email per day (or week). **Payload:** the actor's first name, counts and post id only; never a photo, caption, comment text or child's name. Push `data.post_id` opens the post.
+Triggers queue a notice on publish (audience members, not the author) and on a comment or heart (the post's author, never the reactor). The `notify` edge function runs on a 1-minute cron, calls `claim_notification_batches()` (service_role only) and sends one notice per recipient: at most 1 push per 10 minutes; email goes out when the Help screen promises (Eastern): each evening from 6 pm, or Sunday from 8 am. **Payload:** the actor's first name, counts and post id only; never a photo, caption, comment text or child's name. Push `data.post_id` opens the post.
 
 ## Edge function `sign-media`
 The request and response shapes documented at the top of `backend/supabase/functions/sign-media/index.ts` (GET view, POST upload, POST finalize) are the contract.
