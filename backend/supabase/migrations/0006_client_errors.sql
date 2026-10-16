@@ -26,7 +26,7 @@ declare v_who text := coalesce(auth.uid()::text, 'anon');
 begin
   if coalesce(p_app_version, '') !~ '^[0-9A-Za-z.+-]{1,20}$'
      or coalesce(p_os, '') !~ '^(ios|android|web)( [0-9.]{1,12})?$'
-     or coalesce(p_screen, '') !~ '^[a-z0-9_/\[\]-]{1,40}$'
+     or coalesce(p_screen, '') !~ '^[A-Za-z0-9_/\[\]-]{1,40}$'
      or coalesce(p_kind, '') !~ '^[A-Za-z][A-Za-z0-9_]{0,59}$'
      or (p_code is not null and p_code !~ '^[A-Za-z0-9_]{1,20}$') then
     raise exception 'error reports take fixed fields only' using errcode = '23514';
