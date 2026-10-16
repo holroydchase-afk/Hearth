@@ -383,4 +383,19 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(viewerIn.renameCircle(h.circleIn, 'Mine now'))).toBe('P0002');
     });
   });
+
+  describe('request_account_deletion (BETA-JOIN-7)', () => {
+    itJoiner('BETA-JOIN-7: a member who deletes their account is out of every space', async () => {
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], channel: 'email', targetEmail: h.joinerEmail });
+      const joiner = h.as('joiner');
+      await joiner.redeemInvite(c);
+      expect((await joiner.mySpaces()).length).toBeGreaterThan(0);
+      expect(await code(joiner.requestAccountDeletion())).toBe('ok');
+      expect(await joiner.mySpaces()).toEqual([]);
+    });
+
+    it('BETA-JOIN-7: signed out cannot request a deletion (42501)', async () => {
+      expect(await code(h.anon().requestAccountDeletion())).toBe('42501');
+    });
+  });
 });

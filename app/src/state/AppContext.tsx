@@ -4,7 +4,7 @@ import { AppState, Platform } from 'react-native';
 import type { HearthApi, Session, Space } from '../api/HearthApi';
 import { FeedStore, type FeedState } from '../feed/store';
 import { MediaCache } from '../media/cache';
-import { recordArrival } from '../notify/latency';
+import { clearArrivals, recordArrival } from '../notify/latency';
 import { listenForArrivals, registerForPush } from '../notify/push';
 import type { KV } from '../platform/kv';
 import { BigTextContext } from '../ui/theme';
@@ -166,9 +166,13 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
 
   const signOut = useCallback(async () => {
     live.current.queue?.stop();
+    unlisten.current?.();
+    unlisten.current = null;
+    const who = live.current.session?.userId;
+    if (who) await clearArrivals(deps.kv, who);
     await deps.api.signOut().catch(() => {});
     setS(SIGNED_OUT);
-  }, [deps.api]);
+  }, [deps.api, deps.kv]);
 
   const value = useMemo<AppValue>(() => ({
     ...s,

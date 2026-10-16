@@ -16,6 +16,11 @@ export async function loadArrivals(kv: KV, userId: string): Promise<Arrival[]> {
   }
 }
 
+/** Sign-out: nothing about notices stays on a shared phone (privacy-security review). */
+export async function clearArrivals(kv: KV, userId: string): Promise<void> {
+  try { await kv.removeItem(key(userId)); } catch { /* best effort */ }
+}
+
 /** Keeps the first arrival per post (a later tap on the same notice doesn't count). */
 export async function recordArrival(kv: KV, userId: string, postId: string, arrivedAt: number): Promise<void> {
   const a = await loadArrivals(kv, userId);

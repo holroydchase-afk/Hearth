@@ -78,3 +78,35 @@ export function SignOut() {
     </>
   );
 }
+
+/** BETA-JOIN-7. Not offered to the space's owner: what happens to the family's photos is Chase's call. */
+export function DeleteAccount() {
+  const app = useApp();
+  const [ask, setAsk] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  if (!app.space || app.space.role === 'owner') return null;
+  const yes = async () => {
+    setAsk(false);
+    try {
+      await app.deps.api.requestAccountDeletion();
+      await app.signOut();
+    } catch {
+      setMsg("Didn't work. Try again in a minute.");
+    }
+  };
+  return (
+    <>
+      <Button label="Take me off Hearth" variant="secondary" onPress={() => setAsk(true)} />
+      {msg ? <Txt>{msg}</Txt> : null}
+      <Confirm
+        visible={ask}
+        title="Take you off Hearth?"
+        body="This takes you off Hearth for good. Your comments and hearts are removed. This can't be undone."
+        yes="Yes, take me off Hearth"
+        no="No, stay on Hearth"
+        onNo={() => setAsk(false)}
+        onYes={() => void yes()}
+      />
+    </>
+  );
+}
