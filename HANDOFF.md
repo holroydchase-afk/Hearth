@@ -35,6 +35,7 @@
 - Decisions (picks in `CORE-FEATURES.md`): an Android test phone (~$100), upgrading the Claude plan, and the 5 product questions.
 
 ## Next session, in order
+0. **Read `ANCHORS.md` (added Oct 16, midnight).** Chase reframed Hearth as a proof of concept with new milestones. staff-pm: reconcile `BETA-SPEC.md`, `REMAINING.md` and the ring gates to those milestones (Ring 0 ≈ Chase only, then wife, then 1 savvy relative). Raise the A2 "Seen by" conflict as a decision for Chase before milestone 4. Don't delete built features.
 1. Confirm the repo is pushed and CI is running. Fix CI until it's green; that closes S16.
 2. **staff-pm:** daily triage. Update the Test Log.
 3. **app-engineer + qa-tdd, test-first:** the notification sender (Expo push + Resend email, batched, with no image or caption in the payload) plus the missing RPCs.
