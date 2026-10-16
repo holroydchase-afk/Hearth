@@ -26,9 +26,21 @@ describe('Groups (posters only)', () => {
   it('invite someone: makes a link that works for 30 days and a text to send', async () => {
     const { deps } = await renderApp(<GroupsScreen />, { user: 'chase' });
     fireEvent.press(await screen.findByRole('button', { name: "Invite someone to Grandparents – Dad's side" }));
+    fireEvent.press(await screen.findByRole('button', { name: 'Make the invite' }));
     expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
     fireEvent.press(screen.getByRole('button', { name: 'Text the invite' }));
     await waitFor(() => expect(deps.openUrl).toHaveBeenCalledWith(expect.stringMatching(/^sms:.*body=Hi.*hearth\.family%2Fjoin%2F/)));
+  });
+
+  it('JOIN-1: the invite carries the name the family uses, so she types nothing', async () => {
+    const be = FakeBackend.withFixture();
+    await renderApp(<GroupsScreen />, { be, user: 'chase' });
+    fireEvent.press(await screen.findByRole('button', { name: "Invite someone to Grandparents – Dad's side" }));
+    fireEvent.changeText(screen.getByLabelText('Their name, the way your family says it'), 'Grandma June');
+    fireEvent.press(screen.getByRole('button', { name: 'Make the invite' }));
+    expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
+    expect(Object.values(be.state.invites).some((i) => i.name === 'Grandma June')).toBe(true);
+    expectGrandparentSafe();
   });
 
   it('viewers are told plainly', async () => {

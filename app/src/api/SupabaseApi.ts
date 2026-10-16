@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { ApiError, type ApiErrorCode, type HearthApi } from './HearthApi';
 import type {
   ClientErrorReport,
+  MyProfile,
   NotificationPrefs,
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
@@ -115,6 +116,8 @@ export class SupabaseApi implements HearthApi {
   markSeen = (p: string) => this.rpc<void>('mark_seen', { p_post: p });
   registerPushToken = (token: string, platform: PushPlatform) =>
     this.rpc<void>('register_push_token', { p_token: token, p_platform: platform });
+  myProfile = () => this.rpc<unknown>('my_profile', {}).then((d) => one<MyProfile>(d));
+  setMyName = (name: string) => this.rpc<void>('set_my_name', { p_name: name });
   reportClientError = (r: ClientErrorReport) =>
     this.rpc<void>('report_client_error', { p_app_version: r.appVersion, p_os: r.os, p_screen: r.screen, p_kind: r.kind, p_code: r.code ?? null });
   setNotificationPrefs = (space: string, p: NotificationPrefs) =>
@@ -128,7 +131,7 @@ export class SupabaseApi implements HearthApi {
     const d = await this.rpc<unknown>('create_invite', {
       p_space: a.space, p_role: a.role, p_circle_ids: a.circleIds, p_channel: a.channel ?? 'link',
       p_target_email: a.targetEmail ?? null, p_target_phone: a.targetPhone ?? null,
-      p_ttl: `${Math.min(30, a.ttlDays ?? 30)} days`, p_max_uses: a.maxUses ?? 1,
+      p_ttl: `${Math.min(30, a.ttlDays ?? 30)} days`, p_max_uses: a.maxUses ?? 1, p_name: a.name ?? null,
     });
     const r = one<{ code: string; link?: string }>(d);
     return { code: r.code, link: r.link ?? JOIN_LINK_BASE + r.code };

@@ -99,6 +99,8 @@ export interface CreateInviteArgs {
   targetPhone?: string | null;
   ttlDays?: number;
   maxUses?: number;
+  /** What the family calls the invitee ("Grandma June"); becomes their name on joining (JOIN-1). */
+  name?: string | null;
 }
 
 export interface Session {
@@ -178,4 +180,11 @@ export interface ClientErrorReport {
   screen: string;
   kind: string;
   code?: string;
+}
+
+/** my_profile (BETA-NOTIFY-7): name_set is false while the name is only an email-prefix placeholder. */
+export interface MyProfile {
+  user_id: string;
+  display_name: string;
+  name_set: boolean;
 }
