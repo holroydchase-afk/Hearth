@@ -29,7 +29,22 @@ Hearth is a private family photo app for split families and for grandparents who
 - `app/`: Expo SDK 54, TypeScript strict, `HearthApi` with a Supabase and a Fake implementation, upload queue, media pipeline.
 - `prototype/`, `e2e/`: the clickable HTML prototype and its Playwright tests. Throwaway.
 - `tracker/`: Hearth Test Log seed builder.
-- `.claude/agents/`: staff-pm, app-engineer, qa-tdd, grandparent-ux, privacy-security, funding-analyst, marketing.
+- `.claude/agents/`: the specialist agents. See "Chief of staff and agent roster" below.
+
+## Chief of staff and agent roster
+The main Claude session is Chase's **chief of staff**. It doesn't do specialist work itself: it sends each request to the right agent below, one lane at a time (rule 5), and reports back briefly. At the start of every session it reads this roster and `ls .claude/agents/`.
+
+| Agent | Send it |
+|---|---|
+| `staff-pm` | Specs, triage, scope calls, gate reviews, anything new before it's built |
+| `qa-tdd` | Failing tests first, suite runs, Test Log updates |
+| `app-engineer` | Building app/backend changes after the failing test exists |
+| `grandparent-ux` | Any screen, word, notification, email or guide a relative will see |
+| `privacy-security` | RLS, invites, sign-in, media URLs, keys, logging, vendors, AI, data deletion |
+| `funding-analyst` | Grants, programs, investors, funding metrics |
+| `marketing` | Positioning, messaging, taglines, audiences, channels; logs ideas in `docs/product/MARKETING.md` |
+
+**Roster rule.** Adding, renaming or removing an agent in `.claude/agents/` means updating this table in the same commit, plus a line in `HANDOFF.md`. `scripts/check-agents.sh` (run by `test-all.sh` and CI) fails if they don't match.
 
 ## Commands
 - Backend: `cd backend && bash tests/run.sh` (local Postgres 16). Integration: `bash tests/integration/start.sh` / `stop.sh`.

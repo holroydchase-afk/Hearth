@@ -10,6 +10,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Roster rule (CLAUDE.md): every agent in .claude/agents/ is in the chief-of-staff roster.
+  agents:
+    name: Agent roster
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v5
+      - run: bash scripts/check-agents.sh
+
   # ---------------------------------------------------------------------------
   # Backend on a REAL local Supabase stack (S16): Postgres + GoTrue + PostgREST + Kong.
   # ---------------------------------------------------------------------------
