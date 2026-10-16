@@ -418,6 +418,9 @@ export class FakeBackend {
     if (!a.circleIds.length) throw new ApiError('23514', 'at least one circle');
     if (a.circleIds.some((c) => this.state.circles[c]?.space !== a.space)) throw new ApiError('23514', 'circle not in space');
     if (a.name != null && !validName(a.name)) throw new ApiError('23514', 'a name is 1-40 characters, not an email address');
+    if (a.name != null && this.state.members.some((m) => m.space === a.space && this.state.users[m.user]?.name.toLowerCase() === a.name!.trim().toLowerCase())) {
+      throw new ApiError('23514', 'someone in this family already has that name'); // no impersonation, like the SQL
+    }
     const bytes = randomBytes(10);
     const code = Array.from(bytes, (b) => INVITE_ALPHABET[b % INVITE_ALPHABET.length]).join('');
     const days = Math.min(30, a.ttlDays ?? 30);

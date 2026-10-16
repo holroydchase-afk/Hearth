@@ -83,6 +83,11 @@ Deno.test("BETA-NOTIFY-7: push and email name the real sender, never a generic n
   }
 });
 
+Deno.test("BETA-NOTIFY-7: a sender name can't break the email subject either", () => {
+  const e = buildEmail(emailBatch({ actor_names: ["Al\r\nBcc: x@evil.com"] }));
+  assert(!/[\r\n]/.test(e.subject) && !e.subject.includes("@"), "subject is one clean line: " + JSON.stringify(e.subject));
+});
+
 Deno.test("BETA-NOTIFY-7: a sender name can't break the email From header", () => {
   const e = buildEmail(emailBatch({ actor_names: ['Al"<x@evil.com>'] }));
   assert(e.from.endsWith("<hello@hearth.family>") && (e.from.match(/</g) ?? []).length === 1, "one address only: " + e.from);

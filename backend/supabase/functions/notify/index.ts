@@ -69,14 +69,18 @@ export function buildPush(b: Batch): PushMessage[] {
 const esc = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
 
-export function buildEmail(b: Batch): Email {
+// Names go into email headers (From, Subject): keep only letters, digits and simple punctuation.
+const headerSafe = (n: string) => n.replace(/[^\p{L}\p{N} .'-]/gu, "").trim().slice(0, 40);
+
+export function buildEmail(input: Batch): Email {
+  const b = { ...input, actor_names: input.actor_names.map(headerSafe).filter(Boolean) };
   const { line } = summary(b);
   const link = `${(Deno.env.get("APP_LINK_BASE") ?? "https://hearth.family").replace(/\/$/, "")}/p/${b.latest_post_id}`;
   // BETA-NOTIFY-7: "Chase on Hearth <hello@…>". Only the address comes from RESEND_FROM;
   // the name is stripped of anything that could change the header.
   const addr = (Deno.env.get("RESEND_FROM") ?? "hello@hearth.family").match(/<([^>]+)>/)?.[1] ??
     Deno.env.get("RESEND_FROM") ?? "hello@hearth.family";
-  const safe = joinNames(b.actor_names).replace(/[^\p{L}\p{N} .'-]/gu, "").trim().slice(0, 60) || "Your family";
+  const safe = headerSafe(joinNames(b.actor_names)) || "Your family";
   const from = `${safe} on Hearth <${addr}>`;
   return {
     from,
