@@ -1,4 +1,5 @@
 import type {
+  MyProfile,
   ClientErrorReport,
   NotificationPrefs,
   PushPlatform,
@@ -76,6 +77,10 @@ export interface HearthApi {
   // --- notifications (AE-2) ---
   registerPushToken(token: string, platform: PushPlatform): Promise<void>;
   setNotificationPrefs(space: string, prefs: NotificationPrefs): Promise<void>;
+
+  // --- names (BETA-NOTIFY-7, JOIN-1) ---
+  myProfile(): Promise<MyProfile>;
+  setMyName(name: string): Promise<void>;
 
   // --- our own error reports (BETA-OPS-1); callable signed out ---
   reportClientError(r: ClientErrorReport): Promise<void>;

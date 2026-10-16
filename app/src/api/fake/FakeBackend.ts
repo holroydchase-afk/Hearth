@@ -6,6 +6,7 @@
 import { ApiError, type HearthApi } from '../HearthApi';
 import type {
   ClientErrorReport,
+  MyProfile,
   NotificationPrefs,
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
@@ -20,7 +21,7 @@ const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_MAX_FAILURES = 10;
 const INVITE_ALPHABET = 'ABCDEFGHJKMNPQRSTVWXYZ23456789';
 
-interface UserRow { id: string; email: string; name: string }
+interface UserRow { id: string; email: string; name: string; nameSet?: boolean } // nameSet undefined = set
 interface MemberRow { space: string; user: string; role: Role; invited_by: string | null }
 interface CircleRow { id: string; space: string; name: string; created_by: string; deleted: boolean }
 interface PostRow {
@@ -35,7 +36,7 @@ interface MediaRow {
 interface CommentRec { id: string; post: string; author: string; body: string; created_at: string; client_id: string }
 interface InviteRow {
   code: string; space: string; role: Role; circles: string[]; created_by: string; target_email: string | null;
-  expires_at: string; max_uses: number; uses: number; revoked: boolean;
+  expires_at: string; max_uses: number; uses: number; revoked: boolean; name?: string | null;
 }
 
 export interface FakeState {
@@ -340,6 +341,21 @@ export class FakeBackend {
     this.changed();
   }
 
+  myProfile(user: string | null): MyProfile {
+    const me = this.requireUser(user);
+    const u = this.state.users[me]!;
+    return { user_id: me, display_name: u.name, name_set: u.nameSet !== false };
+  }
+
+  setMyName(user: string | null, name: string): void {
+    const me = this.requireUser(user);
+    if (!validName(name)) throw new ApiError('23514', 'a name is 1-40 characters, not an email address');
+    const u = this.state.users[me]!;
+    u.name = name.trim();
+    u.nameSet = true;
+    this.changed();
+  }
+
   /** Same rules as the SQL: fixed-shape fields only, so no user content can get in. */
   reportClientError(r: ClientErrorReport): void {
     const ok = /^[0-9A-Za-z.+-]{1,20}$/.test(r.appVersion) && /^(ios|android|web)( [0-9.]{1,12})?$/.test(r.os)
@@ -388,6 +404,8 @@ export class FakeBackend {
     if (this.member(inv.space, me)) this.fail(key);
     inv.uses += 1;
     this.state.members.push({ space: inv.space, user: me, role: inv.role, invited_by: inv.created_by });
+    const u = this.state.users[me];
+    if (u && inv.name && u.nameSet === false) { u.name = inv.name; u.nameSet = true; } // JOIN-1
     for (const c of inv.circles) if (!this.inCircle(c, me)) this.state.circleMembers.push({ circle: c, user: me });
     this.changed();
     return inv.space;
@@ -399,12 +417,14 @@ export class FakeBackend {
     if (a.role !== 'viewer' && this.member(a.space, me)?.role !== 'owner') throw new ApiError('42501', 'only owners invite adults');
     if (!a.circleIds.length) throw new ApiError('23514', 'at least one circle');
     if (a.circleIds.some((c) => this.state.circles[c]?.space !== a.space)) throw new ApiError('23514', 'circle not in space');
+    if (a.name != null && !validName(a.name)) throw new ApiError('23514', 'a name is 1-40 characters, not an email address');
     const bytes = randomBytes(10);
     const code = Array.from(bytes, (b) => INVITE_ALPHABET[b % INVITE_ALPHABET.length]).join('');
     const days = Math.min(30, a.ttlDays ?? 30);
     this.state.invites[code] = {
       code, space: a.space, role: a.role, circles: [...a.circleIds], created_by: me, target_email: a.targetEmail?.toLowerCase() ?? null,
       expires_at: new Date(Date.now() + days * 864e5).toISOString(), max_uses: a.maxUses ?? 1, uses: 0, revoked: false,
+      name: a.name?.trim() || null,
     };
     this.changed();
     return { code, link: `https://hearth.family/join/${code}` };
@@ -497,13 +517,16 @@ export class FakeBackend {
     if (!u) {
       const id = uuid();
       const local = e.split('@')[0] ?? e;
-      u = { id, email: e, name: local.charAt(0).toUpperCase() + local.slice(1) };
+      u = { id, email: e, name: local, nameSet: false }; // like the SQL trigger: email prefix, not set
       this.state.users[id] = u;
       this.changed();
     }
     return u;
   }
 }
+
+/** Same rule as private.valid_name (migration 0007). */
+const validName = (n: string) => { const t = n.trim(); return t.length >= 1 && t.length <= 40 && !/[@<>\r\n\t]/.test(t); };
 
 const clone = <T>(x: T): T => (x === undefined ? x : JSON.parse(JSON.stringify(x)));
 
@@ -574,6 +597,8 @@ export class FakeApi implements HearthApi {
   markSeen = (p: string) => this.run(() => this.be.markSeen(this.userId, p));
   registerPushToken = (t: string, platform: PushPlatform) => this.run(() => this.be.registerPushToken(this.userId, t, platform));
   reportClientError = (r: ClientErrorReport) => this.run(() => this.be.reportClientError(r));
+  myProfile = () => this.run(() => this.be.myProfile(this.userId));
+  setMyName = (n: string) => this.run(() => this.be.setMyName(this.userId, n));
   setNotificationPrefs = (space: string, p: NotificationPrefs) => this.run(() => this.be.setNotificationPrefs(this.userId, space, p));
   redeemInvite = (c: string) => this.run(() => this.be.redeemInvite(this.userId, c));
   invitePreview = (c: string) => this.run(() => this.be.invitePreview(this.userId, c));

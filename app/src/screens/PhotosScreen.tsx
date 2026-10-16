@@ -8,6 +8,7 @@ import { useTheme } from '../ui/theme';
 import { AppGate } from './AppGate';
 import { PostCard } from './PostCard';
 import { QueueStatus } from './QueueStatus';
+import { YourName } from './YourName';
 
 export function PhotosScreen() {
   const app = useApp();
@@ -21,6 +22,7 @@ export function PhotosScreen() {
     <View style={{ gap: 12 }}>
       <Txt variant="display" role="header">{`Photos of ${app.space.name}`}</Txt>
       {senders ? <Txt variant="muted">{`Sent by ${senders}`}</Txt> : null}
+      {app.space.can_post ? <YourName /> : null}
       <QueueStatus />
       {state.notice ? <Notice text={state.notice} onClose={() => feed.clearNotice()} /> : null}
       {state.loaded ? (

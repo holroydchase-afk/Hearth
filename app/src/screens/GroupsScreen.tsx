@@ -17,6 +17,8 @@ export function GroupsScreen() {
   const [name, setName] = useState('');
   const [invite, setInvite] = useState<{ circle: string; link: string } | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [asking, setAsking] = useState<string | null>(null); // circle id whose invite form is open
+  const [inviteName, setInviteName] = useState('');
   const spaceId = app.space?.space_id;
   const canPost = !!app.space?.can_post;
 
@@ -47,8 +49,11 @@ export function GroupsScreen() {
 
   const makeInvite = async (id: string) => {
     try {
-      const r = await app.deps.api.createInvite({ space: app.space!.space_id, role: 'viewer', circleIds: [id], ttlDays: 30 });
+      // JOIN-1: the name the family uses becomes theirs when they join, so they type nothing.
+      const r = await app.deps.api.createInvite({ space: app.space!.space_id, role: 'viewer', circleIds: [id], ttlDays: 30, name: inviteName.trim() || null });
       setInvite({ circle: id, link: r.link });
+      setAsking(null);
+      setInviteName('');
     } catch (e) {
       setNotice(messageFor(e, { action: 'invite' }));
     }
@@ -93,8 +98,15 @@ export function GroupsScreen() {
               <Txt>Works for 30 days.</Txt>
               <Button label="Text the invite" onPress={() => text(invite.link)} />
             </Card>
+          ) : asking === g.circle_id ? (
+            <>
+              <Field label="Their name, the way your family says it" value={inviteName} onChangeText={setInviteName} placeholder='Like "Grandma June"' maxLength={40} />
+              <Txt variant="muted">They'll see this name on Hearth and won't have to type it.</Txt>
+              <Button label="Make the invite" onPress={() => void makeInvite(g.circle_id)} />
+              <Button label="Cancel" variant="secondary" onPress={() => { setAsking(null); setInviteName(''); }} />
+            </>
           ) : (
-            <Button label={`Invite someone to ${g.name}`} text="Invite someone" variant="secondary" onPress={() => void makeInvite(g.circle_id)} />
+            <Button label={`Invite someone to ${g.name}`} text="Invite someone" variant="secondary" onPress={() => setAsking(g.circle_id)} />
           )}
         </Card>
       ))}

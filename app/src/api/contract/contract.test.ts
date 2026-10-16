@@ -334,4 +334,36 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(viewerIn.reportClientError({ appVersion: '0.1.0', os: 'ios', screen: 'https://x.y/z', kind: 'TypeError' }))).toBe('23514');
     });
   });
+
+  describe('set_my_name / my_profile / create_invite p_name (BETA-NOTIFY-7, JOIN-1)', () => {
+    it('BETA-NOTIFY-7: a poster sets the name the family knows them by', async () => {
+      expect(await code(poster.setMyName('  Chase  '))).toBe('ok');
+      expect(await poster.myProfile()).toMatchObject({ display_name: 'Chase', name_set: true });
+    });
+
+    it('BETA-NOTIFY-7: empty, email-like, too long or bracketed names are 23514', async () => {
+      for (const bad of ['', 'chase@example.com', 'x'.repeat(41), 'Chase <x@y.z>']) {
+        expect(await code(poster.setMyName(bad))).toBe('23514');
+      }
+    });
+
+    it('JOIN-1: an invite can carry the name the family uses; an email-like one is 23514', async () => {
+      expect(await code(poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], name: 'Grandma June' }))).toBe('ok');
+      expect(await code(poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], name: 'june@example.com' }))).toBe('23514');
+    });
+
+    itJoiner('JOIN-1: joining gives a person with no chosen name the name on the invite', async () => {
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], channel: 'email', targetEmail: h.joinerEmail, name: 'Grandma June' });
+      const joiner = h.as('joiner');
+      const before = await joiner.myProfile();
+      await joiner.redeemInvite(c);
+      const after = await joiner.myProfile();
+      expect(after.name_set).toBe(true);
+      expect(after.display_name).toBe(before.name_set ? before.display_name : 'Grandma June');
+    });
+
+    it('names: signed out cannot set a name (42501)', async () => {
+      expect(await code(h.anon().setMyName('X'))).toBe('42501');
+    });
+  });
 });
