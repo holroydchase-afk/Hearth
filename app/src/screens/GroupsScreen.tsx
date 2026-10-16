@@ -19,6 +19,8 @@ export function GroupsScreen() {
   const [notice, setNotice] = useState<string | null>(null);
   const [asking, setAsking] = useState<string | null>(null); // circle id whose invite form is open
   const [inviteName, setInviteName] = useState('');
+  const [myName, setMyName] = useState<string | null>(null);
+  useEffect(() => { app.deps.api.myProfile().then((p) => setMyName(p.display_name)).catch(() => {}); }, [app.deps.api]);
   const spaceId = app.space?.space_id;
   const canPost = !!app.space?.can_post;
 
@@ -60,7 +62,9 @@ export function GroupsScreen() {
   };
 
   const text = (link: string, code: string) => {
-    const body = `Hi, it's me. I set up a private place for the kids' photos. Tap this to see them, no password: ${link}\n\nIf that doesn't open, get Hearth and type this code: ${code.slice(0, 5)} ${code.slice(5)}`;
+    // grandparent-ux: name the sender (an unsaved number or an email reads like a scam), and offer a call, not an app store trip.
+    const hi = myName ? `Hi, it's ${myName}.` : 'Hi, this is your family.';
+    const body = `${hi} I set up a private place for the kids' photos. Tap this to see them, no password: ${link}\n\nIf that doesn't open, call me and I'll help. Your code is ${code.slice(0, 5)} ${code.slice(5)}.`;
     const sep = Platform.OS === 'ios' ? '&' : '?';
     void app.deps.openUrl(`sms:${sep}body=${encodeURIComponent(body)}`);
   };

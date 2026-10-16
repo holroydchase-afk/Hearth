@@ -13,7 +13,7 @@ export function InviteCodeEntry() {
   const open = () => {
     const c = normalizeInviteCode(code);
     if (c.length !== 10) {
-      setMsg('An invite code has 10 letters and numbers. Check the text from your family.');
+      setMsg('An invite code has 10 letters and numbers. Check the text or email from your family.');
       return;
     }
     setMsg(null);

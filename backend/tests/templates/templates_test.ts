@@ -15,6 +15,7 @@ for (const name of ["magic_link", "confirmation"]) {
     assert(/font-size:\s*(3[2-9]|[4-9]\d)px/.test(html), "the code is big (32px+)");
     assert(/Hearth will never ask for a password/.test(html), "says what we never do");
     assert(/didn.t ask/i.test(html), "tells you what to do if you didn't ask");
+    assert(html.includes("Never read this code to anyone who calls or texts you. Only type it into Hearth."), "scam warning");
   });
 }
 
