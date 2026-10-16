@@ -58,7 +58,13 @@ describe('Join (BETA-JOIN-1, -3)', () => {
     fireEvent.press(screen.getByRole('button', { name: 'Send me a code' }));
     fireEvent.changeText(await screen.findByLabelText('6-number code'), '123456');
     fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-    expect(await screen.findByText('This invite is too old or already used. Ask Chase for a new one.')).toBeTruthy();
+    // June signed in with her Gmail; Chase sent it to her Yahoo. The server can't say which (BETA-JOIN-3),
+    // so the screen names the email she used and every reason, with a way to try another email.
+    expect(await screen.findByText("This invite didn't open for stranger@example.com.")).toBeTruthy();
+    expect(screen.getByText('It may be old or already used, or Chase sent it to a different email. Try that email, or ask Chase for a new invite.')).toBeTruthy();
+    expectGrandparentSafe();
+    fireEvent.press(screen.getByRole('button', { name: 'Try a different email' }));
+    expect(await screen.findByLabelText('Your email')).toBeTruthy();
   });
 
   it('already signed in and already in the family: straight to the photos', async () => {
