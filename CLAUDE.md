@@ -2,7 +2,10 @@
 
 Hearth is a private family photo app for split families and for grandparents who avoid social media. Each post has an explicit audience ("groups"; "circles" in code). Data stays in the US. Nothing is used for AI training, and there are no ads or trackers. Founder: Chase (former PM, solo, near Charlotte). Beta target: about 12 West Virginia grandparents by **Nov 22, 2026**.
 
+**Hearth is a proof of concept first** (Chase, Oct 16): a birthday present to himself plus job experience. The milestones in `ANCHORS.md` (Chase → wife → most tech-savvy relative → everyone else by savviness → Android → maybe a smart frame → then decide on costs) supersede the startup-style Ring 0–3 plan. Every feature is checked against anchors A1 Anxiety-less, A2 Guilt-free, A3 Stays on US soil.
+
 ## Read first
+- `ANCHORS.md`: why Hearth exists, milestones, anchors (A1–A3), ideas log. Add new anchors and ideas there as Chase names them; never delete built features to satisfy one.
 - `HANDOFF.md`: current state and what's next. Start here every session.
 - `REMAINING.md`: the critical path to the Ring 0 gate (Oct 29) and the beta.
 - `BETA-SPEC.md`: 35 acceptance criteria (BETA-*), the scope source of truth.
@@ -36,6 +39,6 @@ Hearth is a private family photo app for split families and for grandparents who
    - Text 17pt+ and 48pt tap targets.
    - Verb labels and words under icons; no gesture-only actions.
    - Words: group (not circle), Photos (not feed), Help (not Me) for viewers.
-4. **Deep, not wide.** Nothing outside BETA-SPEC without the staff-pm's call.
+4. **Deep, not wide.** Nothing outside BETA-SPEC without the staff-pm's call. New ideas go in the `ANCHORS.md` ideas log, not straight into code.
 5. **Cost.** Chase is on a $20/mo plan. Run one agent lane at a time and keep reports short.
 6. **PostgREST quirks.** Branch on `error.code`, never on HTTP status (P0002 comes back as 500).
