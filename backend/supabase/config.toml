@@ -416,3 +416,8 @@ enabled = true
 # formatted with uppercase keywords, indent 2, max width 180, trailing commas,
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
+
+# notify is called by pg_cron with NOTIFY_CRON_SECRET (not a user JWT); the
+# function checks the bearer itself and refuses anything else (401).
+[functions.notify]
+verify_jwt = false
