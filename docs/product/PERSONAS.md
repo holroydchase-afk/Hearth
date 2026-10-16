@@ -2,7 +2,7 @@
 
 Hearth is built for this family first (milestones in `docs/product/ANCHORS.md`, story in `docs/product/STORY.md`). Use these names in specs and reviews. Each person is named the way the kids say it.
 
-**Still to confirm with Chase** (marked "?" below): phones, how comfortable each person is with tech, the most tech-savvy relative (milestone 3), anyone who will never install an app, and which side Gigi and Bebar are on.
+**Still to confirm with Chase** (marked "?" below): phones, how comfortable each person is with tech, and the most and least tech-savvy relatives (milestones 3–4).
 
 ## Who's who
 
@@ -16,8 +16,9 @@ Hearth is built for this family first (milestones in `docs/product/ANCHORS.md`, 
 | Memaw | Sue | Grandparent (Mom's mom) | Mom's side, her own household | iPhone? | Divorced from Pawpaw |
 | Pawpaw | Pawpaw | Grandparent (Mom's dad) | Mom's side, with Granny | Android | Divorced from Sue |
 | Granny | Granny | Grandparent (Mom's stepmom) | Mom's side, with Pawpaw | iPhone? | |
-| Gigi | Gigi | Great-grandparent | ? side | ? | |
-| Bebar | Bebar | Great-grandparent | ? side | Android? | "Every grandpa has an Android." Possible smart-frame person (milestone 6)? |
+| Gigi | Gigi | Great-grandparent (Chase's great-grandmother) | Chase's side, with Bebar | ? | |
+| Bebar | Bebar | Great-grandparent (Chase's great-grandfather) | Chase's side, with Gigi | Android? | Has the Aluratek smart frame (milestone 6) |
+| Great-Grandma | Great-Grandma | Great-grandparent (Granny's mother) | Mom's side, her own household | ? | The only other great-grandparent |
 
 The phones come from the story: "every grandpa has an Android and everyone else has an iPhone."
 
@@ -27,7 +28,7 @@ The phones come from the story: "every grandpa has an Android and everyone else 
 - **Every grandpa is on Android.** Grandaddy, Pawpaw and probably Bebar must get the same full-quality photo (and later video) as everyone else.
 - **Stepparents are full grandparents.** Grandmomma and Granny should never feel second-tier (A2): no rankings, no "seen by" that singles anyone out.
 - **New partners.** A grandparent may find a new partner. They may join later, or may be kept out; groups have to handle both without drama.
-- **Great-grandparents.** Gigi and Bebar may never install an app. A smart frame or an email is the likely way in.
+- **Great-grandparents.** Gigi, Bebar and Great-Grandma may never install an app. Bebar's way in is his Aluratek smart frame; for the others, email.
 - **The parents' guilt.** Chase and Mom want to share often without spamming, and without worrying who sees what (A1).
 
 ## Old composite names → real people
@@ -38,7 +39,7 @@ Older docs and test names still use the composites. Read them as:
 |---|---|
 | Megan (organizer parent) | Chase (and Mom) |
 | June (least-techy WV grandma) | the least-techy grandparent: ? (Chase to say) |
-| Earl (never installs an app) | likely Gigi or Bebar: ? |
+| Earl (never installs an app) | Bebar Bebar (smart frame); maybe Gigi |
 | Linda (other-side grandma, feels left out) | any stepparent or other-household grandparent: Grandmomma, Granny, Memaw |
 | Rob (co-parent ex) | retired: the splits are among the grandparents, not the parents |
 | Kim (busy aunt) | retired unless Chase names someone |

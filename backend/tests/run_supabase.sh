@@ -9,7 +9,7 @@ cd "$(dirname "$0")/.."
 SB=${SUPABASE_CLI:-npx --yes supabase@2.121.0}
 DB_URL=${SUPABASE_TEST_DB_URL:-postgresql://supabase_admin:postgres@127.0.0.1:54322/postgres}
 STATUS=0
-for suite in tests/rls_test.sql tests/api_test.sql tests/notify_test.sql tests/setup_test.sql; do
+for suite in tests/rls_test.sql tests/api_test.sql tests/notify_test.sql tests/setup_test.sql tests/reply_test.sql; do
   echo "== $suite (fresh db reset)" >&2
   $SB db reset --local >&2
   psql "$DB_URL" -X -q -f "$suite" || STATUS=1
