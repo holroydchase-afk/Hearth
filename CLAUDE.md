@@ -17,6 +17,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - `docs/product/BETA-SPEC.md`: 35 acceptance criteria (BETA-*), the scope source of truth.
 - `docs/eng/API.md`: the app↔backend contract. Change the contract tests before changing it.
 - `docs/product/PERSONAS.md`, `docs/product/CORE-FEATURES.md`, `docs/eng/TESTING.md`.
+- `docs/product/MARKETING.md`: positioning, claims register (what we can truthfully say), marketing ideas log. Owned by the `marketing` agent.
 
 ## Layout
 - `backend/`: Supabase.
@@ -28,7 +29,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - `app/`: Expo SDK 54, TypeScript strict, `HearthApi` with a Supabase and a Fake implementation, upload queue, media pipeline.
 - `prototype/`, `e2e/`: the clickable HTML prototype and its Playwright tests. Throwaway.
 - `tracker/`: Hearth Test Log seed builder.
-- `.claude/agents/`: staff-pm, app-engineer, qa-tdd, grandparent-ux, privacy-security, funding-analyst.
+- `.claude/agents/`: staff-pm, app-engineer, qa-tdd, grandparent-ux, privacy-security, funding-analyst, marketing.
 
 ## Commands
 - Backend: `cd backend && bash tests/run.sh` (local Postgres 16). Integration: `bash tests/integration/start.sh` / `stop.sh`.
