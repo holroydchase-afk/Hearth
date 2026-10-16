@@ -2,8 +2,8 @@
 -- Triggers queue one outbox row per recipient on publish / comment / heart.
 -- The `notify` edge function (cron, service_role) calls claim_notification_batches(),
 -- sends through Expo Push or Resend, and calls release_notifications() on failure.
--- PRIVACY: the outbox and the claim output hold ids, counts and the actor's FIRST
--- NAME only. Never a caption, comment body, child's name, media key or URL.
+-- PRIVACY: the outbox and the claim output hold ids, counts and the actor's display
+-- name only (the name the family chose, BETA-NOTIFY-7). Never a caption, comment body, child's name, media key or URL.
 
 create type public.notice_kind as enum ('post', 'comment', 'heart');
 
@@ -85,7 +85,7 @@ create or replace function public.claim_notification_batches(p_now timestamptz d
 returns table (
   recipient_id      uuid,
   channel           text,
-  actor_first_names text[],
+  actor_names       text[],
   post_ids          uuid[],
   latest_post_id    uuid,
   post_count        int,
@@ -160,7 +160,7 @@ language sql security definer set search_path = '' as $$
   )
   select w.recipient_id,
          w.ch,
-         array_agg(distinct split_part(pr.display_name, ' ', 1) order by split_part(pr.display_name, ' ', 1)),
+         array_agg(distinct pr.display_name order by pr.display_name),
          array_agg(distinct w.post_id order by w.post_id),
          (array_agg(w.post_id order by w.created_at desc))[1],
          (count(distinct w.post_id) filter (where w.kind = 'post'))::int,

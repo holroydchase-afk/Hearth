@@ -165,9 +165,9 @@ select tests.setv('n', format($$select tests.claim(%L::timestamptz)$$, tests.v('
 select tests.ok_sql($$select tests.v('n') = '2'$$,
                     'BETA-NOTIFY-2: the sender claims one notice per audience member');
 select tests.ok_sql(format($$select push_tokens = array['ExponentPushToken[gma_riv]'] and channel = 'push'
-                                    and actor_first_names = array['Alex'] and post_ids = array[%L::uuid]
+                                    and actor_names = array['Alex'] and post_ids = array[%L::uuid]
                              from tests.batches where recipient_id = %L$$, tests.v('p1'), :gma_riv),
-                    'BETA-NOTIFY-2: the notice carries the poster''s first name, the post id and only that member''s token');
+                    'BETA-NOTIFY-2: the notice carries the poster''s name, the post id and only that member''s token');
 select tests.ok_sql($$select bool_and(b::text not like '%tooth%' and b::text not like '%Sam%'
                                       and b::text not like '%secret-%' and b::text not like '%http%')
                       from tests.batches b$$,
@@ -229,7 +229,7 @@ select tests.lives(format('select public.toggle_heart(%L)', tests.v('p3')), 'set
 select tests.setv('n', format($$select tests.claim(%L::timestamptz + interval '4 days')$$, tests.v('t0')));
 select tests.ok_sql(format($$select tests.v('n') = '1'
                              and (select comment_count = 1 and heart_count = 1 and post_count = 0
-                                         and actor_first_names = array['Grandma','Grandpa'] and channel = 'push'
+                                         and actor_names = array['Grandma Rivera','Grandpa Rivera'] and channel = 'push'
                                     from tests.batches where recipient_id = %L)$$, :alex),
                     'BETA-REPLY-3: a comment and a heart on Alex''s post reach Alex as 1 notice');
 select tests.ok_sql(format('select tests.batch_count(%L) = 0 and tests.batch_count(%L) = 0', :gma_riv, :gpa_riv),

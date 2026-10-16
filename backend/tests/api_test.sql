@@ -524,6 +524,45 @@ select tests.ok_sql($q$select tests.rest(format('select public.invite_preview(%L
                     'BETA-JOIN-4 (S10) invite_preview: another IP still works');
 
 -- ======================================================================
+-- BETA-NOTIFY-7 / JOIN-1: real names. Posters set theirs once; invitees get the
+-- name the poster typed, so a grandparent types nothing.
+-- ======================================================================
+:as_admin
+insert into auth.users (id, email) values
+  ('f0000000-0000-0000-0000-0000000000f1', 'june.w1947@example.com'),
+  ('f0000000-0000-0000-0000-0000000000f2', 'earl.p@example.com');
+select tests.ok_sql($$select display_name = 'june.w1947' and not name_set from public.profiles
+                      where id = 'f0000000-0000-0000-0000-0000000000f1'$$,
+                    'names: a new account starts with a placeholder name, marked not set');
+:as_alex
+select tests.ok_sql($$select (public.my_profile()->>'name_set')::boolean and public.my_profile()->>'display_name' = 'Alex'$$,
+                    'names: my_profile returns the caller''s name and whether it is set');
+select tests.lives($$select public.set_my_name('  Chase  ')$$, 'BETA-NOTIFY-7: a poster sets the name the family knows him by');
+select tests.ok_sql($$select public.my_profile()->>'display_name' = 'Chase'$$, 'BETA-NOTIFY-7: ...trimmed and saved');
+select tests.throws_code($$select public.set_my_name('')$$, 'names: an empty name is 23514', '23514');
+select tests.throws_code($$select public.set_my_name('chase@example.com')$$, 'names: an email address is not a name (23514)', '23514');
+select tests.throws_code(format('select public.set_my_name(%L)', repeat('x', 41)), 'names: over 40 characters is 23514', '23514');
+select tests.throws_code($$select public.set_my_name('Chase <x@evil.com>')$$, 'names: angle brackets are refused (23514)', '23514');
+select tests.setv('inv_june', format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'Grandma June') i$q$, :space_a, :c_a_gp));
+select tests.throws_code(format($q$select * from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'june@example.com')$q$, :space_a, :c_a_gp),
+                         'JOIN-1: an invite name that is an email is 23514', '23514');
+reset role; set role authenticated; select set_config('request.jwt.claim.sub', 'f0000000-0000-0000-0000-0000000000f1', false);
+select tests.ok_sql(format($q$select public.invite_preview(%L)->>'inviter_name' = 'Chase'$q$, tests.v('inv_june')),
+                    'BETA-NOTIFY-7: the invite preview names the real sender ("Chase invited you")');
+select tests.lives(format('select public.redeem_invite(%L)', tests.v('inv_june')), 'setup: June joins');
+select tests.ok_sql($$select public.my_profile()->>'display_name' = 'Grandma June' and (public.my_profile()->>'name_set')::boolean$$,
+                    'JOIN-1: joining gives her the name Chase typed; she types nothing');
+:as_alex
+select tests.setv('inv_earl', format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'Grandpa Earl') i$q$, :space_a, :c_a_gp));
+reset role; set role authenticated; select set_config('request.jwt.claim.sub', 'f0000000-0000-0000-0000-0000000000f2', false);
+select tests.lives($$select public.set_my_name('Earl')$$, 'setup: Earl sets his own name first');
+select tests.lives(format('select public.redeem_invite(%L)', tests.v('inv_earl')), 'setup: Earl joins');
+select tests.ok_sql($$select public.my_profile()->>'display_name' = 'Earl'$$,
+                    'names: an invite never overwrites a name the person chose');
+:as_anon
+select tests.throws_code($$select public.set_my_name('X')$$, 'names: anon cannot set a name (42501)', '42501');
+
+-- ======================================================================
 -- BETA-OPS-1: crash/error reports with no personal data and no third-party SDK
 -- ======================================================================
 :as_gma_riv

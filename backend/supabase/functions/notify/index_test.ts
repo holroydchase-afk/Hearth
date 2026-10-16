@@ -14,7 +14,7 @@ for (const [k, v] of Object.entries(env)) Deno.env.set(k, v);
 const P1 = "55555555-0000-0000-0000-0000000000a1";
 const P2 = "55555555-0000-0000-0000-0000000000a2";
 const pushBatch = (over: Partial<Batch> = {}): Batch => ({
-  recipient_id: "a0000000-0000-0000-0000-0000000000a1", channel: "push", actor_first_names: ["Alex"],
+  recipient_id: "a0000000-0000-0000-0000-0000000000a1", channel: "push", actor_names: ["Alex"],
   post_ids: [P1], latest_post_id: P1, post_count: 1, comment_count: 0, heart_count: 0,
   outbox_ids: ["o1"], push_tokens: ["ExponentPushToken[gma]"], email: null, ...over,
 });
@@ -53,7 +53,7 @@ Deno.test("BETA-NOTIFY-4: 3 posts in one batch are 1 push that opens the newest"
 });
 
 Deno.test("BETA-REPLY-3: replies read as replies", () => {
-  const [m] = buildPush(pushBatch({ actor_first_names: ["Grandma", "Grandpa"], post_count: 0, comment_count: 1, heart_count: 1 }));
+  const [m] = buildPush(pushBatch({ actor_names: ["Grandma", "Grandpa"], post_count: 0, comment_count: 1, heart_count: 1 }));
   eq(m.body, "Grandma and Grandpa replied to your photos. Tap to see.", "reply body");
 });
 
@@ -67,16 +67,16 @@ Deno.test("BETA-NOTIFY-5: email links to the post and carries no photo or captio
 });
 
 Deno.test("email: names are HTML-escaped", () => {
-  const e = buildEmail(emailBatch({ actor_first_names: ["<b>Al"] }));
+  const e = buildEmail(emailBatch({ actor_names: ["<b>Al"] }));
   assert(!e.html.includes("<b>Al"), "escaped");
 });
 
 Deno.test("BETA-NOTIFY-7: push and email name the real sender, never a generic notice", () => {
-  const [m] = buildPush(pushBatch({ actor_first_names: ["Chase"] }));
+  const [m] = buildPush(pushBatch({ actor_names: ["Chase"] }));
   eq(m.title, "From Chase on Hearth", "push title names the sender");
-  const [m2] = buildPush(pushBatch({ actor_first_names: ["Chase", "Mom"] }));
+  const [m2] = buildPush(pushBatch({ actor_names: ["Chase", "Mom"] }));
   eq(m2.title, "From Chase and Mom on Hearth", "two senders");
-  const e = buildEmail(emailBatch({ actor_first_names: ["Chase"] }));
+  const e = buildEmail(emailBatch({ actor_names: ["Chase"] }));
   eq(e.from, "Chase on Hearth <hello@hearth.family>", "email From shows the sender's name");
   for (const t of [m.title, m.body, e.subject, e.text]) {
     assert(!/new notification/i.test(t), "no generic wording: " + t);
@@ -84,7 +84,7 @@ Deno.test("BETA-NOTIFY-7: push and email name the real sender, never a generic n
 });
 
 Deno.test("BETA-NOTIFY-7: a sender name can't break the email From header", () => {
-  const e = buildEmail(emailBatch({ actor_first_names: ['Al"<x@evil.com>'] }));
+  const e = buildEmail(emailBatch({ actor_names: ['Al"<x@evil.com>'] }));
   assert(e.from.endsWith("<hello@hearth.family>") && (e.from.match(/</g) ?? []).length === 1, "one address only: " + e.from);
 });
 
