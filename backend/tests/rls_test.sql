@@ -402,6 +402,19 @@ reset role;
 select tests.ok(not exists (select 1 from comments where body = 'edited after losing access'),
                 'Commenter who lost access to a post cannot edit their comment on it');
 
+-- 9f. S12 / BETA-REPLY-4: an author removed from the space can't edit their old captions.
+insert into space_members (space_id, user_id, role, invited_by) values (:space_a, :aunt_jo, 'adult', :alex)
+  on conflict (space_id, user_id) do update set role = 'adult';
+insert into posts (id, space_id, author_id, caption) values ('55555555-0000-0000-0000-0000000000c9', :space_a, :aunt_jo, 'Jo''s old post');
+delete from space_members where space_id = :space_a and user_id = :aunt_jo;
+set role authenticated;
+select set_config('request.jwt.claim.sub', :aunt_jo, false);
+do $$ begin update public.posts set caption = 'edited after removal';  -- unfiltered: skips SELECT policies
+          exception when others then null; end $$;
+reset role;
+select tests.ok((select caption from posts where id = '55555555-0000-0000-0000-0000000000c9') = 'Jo''s old post',
+                'S12 / BETA-REPLY-4: an author removed from the space cannot edit captions on their old posts');
+
 -- 10. BETA-AUD-7 (A2 guilt-free): nobody can read another member's last-active,
 --     login, online or device details. "Seen by" (who has seen) stays: NOTIFY-6 is Chase's call.
 select tests.ok(not exists (
