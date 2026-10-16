@@ -82,11 +82,11 @@ Ranking = expected value for Chase: amount × odds ÷ hours to apply [EST]. "Fit
 
 **Recommended offer (my judgment, not a researched benchmark):**
 - **"Founding Family": $39.99/yr, price-locked for life.** Optionally offer 2 years prepaid for $69. Charge when the Family plan's features ship, or charge now with a full refund on request.
-- **Avoid an uncapped "lifetime" deal.** Storage compounds by about 1 GB per family per year (research.md §6). If you do one:
+- **Avoid an uncapped "lifetime" deal.** Storage compounds by about 1 GB per family per year (docs/eng/research.md §6). If you do one:
   - cap it at 100 families,
   - price it at ≥$149,
   - set a written fair-use video limit.
-- **Gift angle:** "A grandparent pays for the family." This matches the $29.99/yr Gift plan in research.md. Launch it right after Thanksgiving.
+- **Gift angle:** "A grandparent pays for the family." This matches the $29.99/yr Gift plan in docs/eng/research.md. Launch it right after Thanksgiving.
 - **Honest expectation:** a few hundred to a few thousand dollars. The real value is the **paid-conversion number**, which every investor and SCRA reviewer will ask for.
 
 ---
@@ -139,7 +139,7 @@ Investors' scorecard, from the role brief: weekly active grandparents, posts per
 **Read:**
 - Fewer, larger checks are going to AI and B2B. A no-AI, no-ads family app is a *values* pitch, which resonates with angels who are grandparents and with community rounds more than with funds.
 - Hearth's defensible VC angle is the **split-household and grandparent-loneliness wedge** plus a >97% gross margin. That only matters once retention and paid conversion are proven.
-- Plan to be **revenue- and grant-funded through 2027.** Costs are about $33/month (research.md), so that's realistic.
+- Plan to be **revenue- and grant-funded through 2027.** Costs are about $33/month (docs/eng/research.md), so that's realistic.
 
 ---
 

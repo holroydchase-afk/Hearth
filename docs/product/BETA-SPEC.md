@@ -1,6 +1,6 @@
 # Hearth Beta Spec: single source of truth
 
-Owner: staff-pm. Updated Oct 16, 2026. **Milestones in `ANCHORS.md` now set the order** (see "Milestone map and trace" at the end). Nov 22 / Thanksgiving is a soft target for milestones 3–4, pending Chase.
+Owner: staff-pm. Updated Oct 16, 2026. **Milestones in `docs/product/ANCHORS.md` now set the order** (see "Milestone map and trace" at the end). Nov 22 / Thanksgiving is a soft target for milestones 3–4, pending Chase.
 
 Rules: no criterion, no build. qa-tdd writes each test red before app-engineer builds.
 - **Types:** `auto` means Playwright, SQL (RLS suite), or Deno. `manual` means a real phone or a real person, logged on the Test Log page.
@@ -106,17 +106,17 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 
 **Beta success signals, measured Nov 23 to Dec 20:** 80% of grandparents open new posts within 24 h. 0 help calls after each person's first week. 0 wrong-audience incidents. Chase and his wife share 3+ times a week with no family group texts.
 
-## Amendments, Oct 15 pm (staff-pm; see REMAINING.md)
+## Amendments, Oct 15 pm (staff-pm; see docs/product/REMAINING.md)
 - **BETA-SHARE-6 and the video half of BETA-SEE-4: out of beta.** iOS video location can't be stripped without a transcoder, so the app ships photos only (`VIDEO_POSTING_ENABLED=false`). It comes back in only if app-engineer shows on a device by Nov 5 that a transcode leaves no location in the file. Otherwise it goes to v1.0 (CORE-FEATURES CF-17).
 - **BETA-REPLY-1:** "the audience sees who hearted it" becomes "the audience sees the heart count, and the person who hearted sees 'You loved this'". Names wait for v1.0, because there is no RPC for them.
-- **BETA-JOIN-3 wording:** the app uses API.md's sentence ("This invite is too old or already used. Ask {inviter} for a new one."). The word "expired" is banned (UX-REVIEW). grandparent-ux confirms the final copy (GU-2).
+- **BETA-JOIN-3 wording:** the app uses docs/eng/API.md's sentence ("This invite is too old or already used. Ask {inviter} for a new one."). The word "expired" is banned (UX-REVIEW). grandparent-ux confirms the final copy (GU-2).
 - **New BETA-JOIN-7 (auto, P0):** **Given** a signed-in user, **When** they tap "Delete my account" and confirm, **Then** they are signed out, `my_spaces` returns `[]`, and a deletion request is recorded. This is pulled forward from "Not now" because Beta App Review expects in-app account deletion.
 - **New BETA-OPS-1 (auto, P0, Ring 0):** **Given** a thrown error in the app, **When** it is reported, **Then** exactly 1 `client_errors` row is written with app version, OS and screen, and no caption, email, URL or key. The app has 0 third-party analytics or crash SDKs.
 - **Notification sending is P0 for Ring 0** (NOTIFY-2, NOTIFY-4, REPLY-3 are auto P0s). It wasn't built in the backend lane. Owner: app-engineer (AE-2).
-- **GRANDPARENT-GUIDE.md** must stop saying "nothing to download". The beta requires installing the app (GU-3).
+- **docs/product/GRANDPARENT-GUIDE.md** must stop saying "nothing to download". The beta requires installing the app (GU-3).
 
 ## Milestone map and trace (Oct 16, staff-pm)
-`ANCHORS.md` milestones supersede the ring gates above (kept for history). **M** = first milestone that needs the criterion (1 Chase end to end · 2 Danielle, both sides posting · 3 savvy relative · 4 everyone else · 5 Android · 6 frame · 7 decide). **Trace** = the story problem or anchor it serves (A1 Anxiety-less, A2 Guilt-free, A3 US soil). No criterion or built feature is deleted.
+`docs/product/ANCHORS.md` milestones supersede the ring gates above (kept for history). **M** = first milestone that needs the criterion (1 Chase end to end · 2 Danielle, both sides posting · 3 savvy relative · 4 everyone else · 5 Android · 6 frame · 7 decide). **Trace** = the story problem or anchor it serves (A1 Anxiety-less, A2 Guilt-free, A3 US soil). No criterion or built feature is deleted.
 
 | ID | M | Trace | Flag |
 |---|---|---|---|

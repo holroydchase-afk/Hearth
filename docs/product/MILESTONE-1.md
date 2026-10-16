@@ -1,6 +1,6 @@
 # Milestone 1: Chase uses Hearth end to end
 
-Your morning doc. Do the steps in order and Claude handles the rest. The gate is in `BETA-SPEC.md` ("Milestone gates").
+Your morning doc. Do the steps in order and Claude handles the rest. The gate is in `docs/product/BETA-SPEC.md` ("Milestone gates").
 
 ## The $99 question, answered first
 
