@@ -5,7 +5,8 @@ Hearth is a private family photo app for split families and for grandparents who
 **Hearth is a proof of concept first** (Chase, Oct 16): a birthday present to himself plus job experience. The milestones in `ANCHORS.md` (Chase → wife → most tech-savvy relative → everyone else by savviness → Android → maybe a smart frame → then decide on costs) supersede the startup-style Ring 0–3 plan. Every feature is checked against anchors A1 Anxiety-less, A2 Guilt-free, A3 Stays on US soil.
 
 ## Read first
-- `ANCHORS.md`: why Hearth exists, milestones, anchors (A1–A3), ideas log. Add new anchors and ideas there as Chase names them; never delete built features to satisfy one.
+- `STORY.md`: why Hearth exists, the 8 problems and Hearth's answers, family stories, WV vs Charlotte. Read before any UX or positioning call.
+- `ANCHORS.md`: milestones, anchors (A1–A3), ideas log. Add new anchors and ideas there as Chase names them; never delete built features to satisfy one.
 - `HANDOFF.md`: current state and what's next. Start here every session.
 - `MILESTONE-1.md`: Chase's setup steps and the 2-day demo for milestone 1 (incl. the $99 Apple answer).
 - `REMAINING.md`: the critical path to the Ring 0 gate (Oct 29) and the beta.

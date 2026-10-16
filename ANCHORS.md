@@ -1,6 +1,6 @@
 # Hearth anchors, milestones and ideas log
 
-Source of truth for *why* Hearth exists and what every feature is checked against. The fuller story (Chase's family, problems and solutions, WV vs Charlotte) lives in the claude.ai doc **Hearth Story & Anchors** (claude.ai/code/artifact/7f2a40e2-64e2-4463-8640-ede7d44c748c).
+Source of truth for *why* Hearth exists and what every feature is checked against. The fuller story (Chase's family, problems and solutions, WV vs Charlotte) lives in `STORY.md`.
 
 **Rules for every session**
 - When Chase names a new anchor, add it here and to the doc.
