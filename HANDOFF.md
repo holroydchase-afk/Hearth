@@ -1,5 +1,12 @@
 # Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
+## Overnight Oct 16, part 3 (staff-pm product review)
+1. **Found:** comments are readable by everyone a post was shared with, but the app said "Sent. Chase will see it." Fixed the words (BETA-REPLY-6). *Who should see comments* (story: Grandma A without Grandpa B) is logged in ANCHORS.md for Chase; staff-pm leans "the poster plus people who share a group with the commenter".
+2. **Built:** `backend/scripts/family-setup.sql` (space, starter groups, test-viewer invite, Mom's poster invite; run as Chase through RPCs; 5 tests). `backend/scripts/deploy.sh` (one-command deploy; dry-run only). `MILESTONE-1.md` (Chase's steps, the $99 answer, Expo Go yes/no, 2-day demo).
+3. **Tests, 3 green runs:** SQL 116 + 141 + 48 + 5 setup; Deno 19; Jest 196 + 1 skipped; typecheck clean; web e2e 1 ×3.
+4. **Reflection point armed** (REMAINING.md): no more backend/test polish until a deploy or a device run.
+5. **Resume at 4 am ET:** a scheduled check-in restarts this session; next is whatever doesn't need access (staff-pm's list), then deploy once Chase finishes MILESTONE-1 steps 1–4.
+
 ## Overnight Oct 16–17, part 2 (after reading ANCHORS + the story doc)
 1. **staff-pm:** BETA-SPEC and REMAINING now follow your milestones. Every criterion maps to a milestone and traces to a story problem or anchor; new NOTIFY-7 and AUD-7; ring dates dropped. Flagged: NOTIFY-6 vs A2, JOIN-7 (Apple rule only), AUD-4 (persona-only), SHARE-6 video (still deferred).
 2. **Built, test first:** app saves push token + notification choice to the server; emails arrive when Help promises (6 pm / Sunday 8 am Eastern); notices say "From Chase on Hearth" (NOTIFY-7); posters can no longer read *when* each person last looked (AUD-7; "Seen by" unchanged); removed authors can't edit old captions (S12, migration 0005); our own error reports with fixed fields only, no SDKs (OPS-1, migration 0006).
