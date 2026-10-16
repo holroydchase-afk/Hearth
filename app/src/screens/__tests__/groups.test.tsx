@@ -30,7 +30,11 @@ describe('Groups (posters only)', () => {
     expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
     fireEvent.press(screen.getByRole('button', { name: 'Text the invite' }));
     await waitFor(() => expect(deps.openUrl).toHaveBeenCalledWith(expect.stringMatching(/^sms:.*body=Hi.*hearth\.family%2Fjoin%2F/)));
-    expect(decodeURIComponent((deps.openUrl as jest.Mock).mock.calls[0][0])).toMatch(/type this code: [A-Z0-9]{5} [A-Z0-9]{5}$/); // BETA-JOIN-8
+    const sms = decodeURIComponent((deps.openUrl as jest.Mock).mock.calls[0][0]);
+    expect(sms).toMatch(/Your code is [A-Z0-9]{5} [A-Z0-9]{5}\.$/); // BETA-JOIN-8
+    expect(sms).toContain("Hi, it's Chase."); // NOTIFY-7: names the real sender, never "it's me"
+    expect(sms).not.toContain("it's me");
+    expect(sms).toContain("If that doesn't open, call me and I'll help.");
   });
 
   it('JOIN-1: the invite carries the name the family uses, so she types nothing', async () => {

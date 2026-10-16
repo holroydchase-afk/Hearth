@@ -43,7 +43,7 @@ describe('BETA-JOIN-8: typing an invite code (links can open in a browser, or Ta
     fireEvent.press(await screen.findByRole('button', { name: 'I have an invite code' }));
     fireEvent.changeText(screen.getByLabelText('Invite code'), 'abc');
     fireEvent.press(screen.getByRole('button', { name: 'Open the invite' }));
-    expect(await screen.findByText('An invite code has 10 letters and numbers. Check the text from your family.')).toBeTruthy();
+    expect(await screen.findByText('An invite code has 10 letters and numbers. Check the text or email from your family.')).toBeTruthy();
     expect(nav.goJoin).not.toHaveBeenCalled();
   });
 
