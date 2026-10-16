@@ -21,7 +21,6 @@ export async function registerForPush(): Promise<string | null> {
     if (!granted) granted = (await Notifications.requestPermissionsAsync()).granted;
     if (!granted) return null;
     const token = await Notifications.getExpoPushTokenAsync({ projectId: id });
-    // NOTE: API.md has no RPC to store the token yet. Flagged in README.
     return token.data;
   } catch {
     return null;

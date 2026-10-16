@@ -70,7 +70,7 @@ npx jest src/api/contract
 - Real email OTP (Supabase Auth), session persistence over 7 days (JOIN-5), deep links / universal links, push delivery and tap-to-open (NOTIFY-1/3), the `sign-media` edge function with B2.
 - Swipe between photos (implemented with PanResponder; buttons are tested). Pinch zoom (SEE-4) and video playback are not built.
 - Video posting is **off** (`VIDEO_POSTING_ENABLED=false`): iOS videos carry location metadata that can't be stripped on device without a transcoder, so claiming `exif_stripped: true` would be false. Duration check exists and is tested.
-- Notification choice and Bigger text are saved on the phone only (API.md has no endpoint for `notification_prefs` or push tokens).
+- Bigger text is saved on the phone only. The notification choice and the push token also go to the server (`set_notification_prefs`, `register_push_token`, AE-2).
 
 ## API.md gaps / ambiguities (simplest reading taken)
 
@@ -78,6 +78,6 @@ npx jest src/api/contract
 2. `publish_post` "all media must be ready": the backend also requires ≥1 media item (code 23514). FakeApi now matches.
 3. `aes-256-gcm-chunked-v1` chunk layout is not specified anywhere; defined in `src/crypto/media.ts`. Any web viewer must use the same layout.
 4. `create_invite` link carries a separate token, not the code; `redeem_invite`/`invite_preview` accept either.
-5. No RPC for: renaming groups (app uses a direct `circles` update under RLS – untested against the real backend), push tokens, notification prefs, the current user's display name, who hearted a post (REPLY-1 "audience sees who hearted it" can't be shown; the app shows a count).
+5. No RPC for: renaming groups (app uses a direct `circles` update under RLS – untested against the real backend), the current user's display name, who hearted a post (REPLY-1 "audience sees who hearted it" can't be shown; the app shows a count).
 6. `get_comments` on an invisible post: backend raises P0002, FakeApi returns `[]`; both allowed by API.md.
 7. 22023 wording: API.md says "This invite is too old or already used. Ask {inviter} for a new one."; BETA-JOIN-3 says "has expired"; UX-REVIEW bans "expired". The app uses API.md's sentence.

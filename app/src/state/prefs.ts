@@ -1,9 +1,17 @@
 // Per-user, on-this-phone choices. Viewers start with Bigger text ON (UX-REVIEW #3, #15).
 import type { Role } from '../api/HearthApi';
+import type { NotificationPrefs } from '../api/types';
 import type { KV } from '../platform/kv';
 
 export type NotifyChoice = 'push' | 'evening' | 'sunday';
 export interface Prefs { bigText: boolean; notify: NotifyChoice }
+
+/** What the server needs for each Help choice (AE-2, set_notification_prefs). */
+export function serverPrefs(choice: NotifyChoice): NotificationPrefs {
+  if (choice === 'evening') return { push: false, emailDigest: 'daily' };
+  if (choice === 'sunday') return { push: false, emailDigest: 'weekly' };
+  return { push: true, emailDigest: 'off' };
+}
 
 const key = (u: string) => `hearth.prefs.v1.${u}`;
 

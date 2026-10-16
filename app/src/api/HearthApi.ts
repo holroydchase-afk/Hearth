@@ -1,4 +1,6 @@
 import type {
+  NotificationPrefs,
+  PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost,
   FinalizeResult, HeartState, InvitePreview, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
 } from './types';
@@ -69,6 +71,10 @@ export interface HearthApi {
   finalizeMedia(mediaIds: string[]): Promise<FinalizeResult[]>;
   signView(post: string): Promise<ViewGrant>;
   getObject(url: string): Promise<Uint8Array>;
+
+  // --- notifications (AE-2) ---
+  registerPushToken(token: string, platform: PushPlatform): Promise<void>;
+  setNotificationPrefs(space: string, prefs: NotificationPrefs): Promise<void>;
 
   // --- NOT in API.md (flagged in README): basic group rename for the Groups screen ---
   renameCircle(circle: string, name: string): Promise<void>;

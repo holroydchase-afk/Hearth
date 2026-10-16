@@ -3,6 +3,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ApiError, type ApiErrorCode, type HearthApi } from './HearthApi';
 import type {
+  NotificationPrefs,
+  PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
   HeartState, InvitePreview, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
 } from './types';
@@ -110,6 +112,10 @@ export class SupabaseApi implements HearthApi {
     this.rpc<unknown>('add_comment', { p_client_id: a.clientId, p_post: a.post, p_body: a.body }).then((d) => one<{ comment_id: string; created_at: string }>(d));
   getComments = (p: string, limit = 50) => this.rpc<CommentRow[]>('get_comments', { p_post: p, p_limit: limit }).then((d) => d ?? []);
   markSeen = (p: string) => this.rpc<void>('mark_seen', { p_post: p });
+  registerPushToken = (token: string, platform: PushPlatform) =>
+    this.rpc<void>('register_push_token', { p_token: token, p_platform: platform });
+  setNotificationPrefs = (space: string, p: NotificationPrefs) =>
+    this.rpc<void>('set_notification_prefs', { p_space: space, p_push: p.push, p_email_digest: p.emailDigest });
   redeemInvite = (code: string) => this.rpc<string>('redeem_invite', { p_code: code });
   invitePreview = (code: string) => this.rpc<unknown>('invite_preview', { p_code: code }).then((d) => {
     const r = one<InvitePreview>(d);

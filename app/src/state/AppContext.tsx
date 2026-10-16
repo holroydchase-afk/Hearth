@@ -1,6 +1,6 @@
 // Session, family space, prefs and the long-lived stores (feed, upload queue, media cache).
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import type { HearthApi, Session, Space } from '../api/HearthApi';
 import { FeedStore, type FeedState } from '../feed/store';
 import { MediaCache } from '../media/cache';
@@ -8,7 +8,7 @@ import { registerForPush } from '../notify/push';
 import type { KV } from '../platform/kv';
 import { BigTextContext } from '../ui/theme';
 import { UploadQueue, type Job, type Prepared, type QueueItem } from '../upload/queue';
-import { defaultPrefs, loadPrefs, savePrefs, type Prefs } from './prefs';
+import { defaultPrefs, loadPrefs, savePrefs, serverPrefs, type Prefs } from './prefs';
 
 export interface AppDeps {
   api: HearthApi;
@@ -125,7 +125,10 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
     setS({ status: 'ready', session, space, feed, queue, media, prefs });
     await feed.hydrate();
     void feed.refresh();
-    void registerForPush();
+    // AE-2: tell the server where to send notices. Failures are silent; the next launch retries.
+    void registerForPush().then((token) => {
+      if (token) return deps.api.registerPushToken(token, Platform.OS === 'ios' ? 'ios' : Platform.OS === 'android' ? 'android' : 'web');
+    }).catch(() => {});
   }, [deps]);
 
   useEffect(() => {
@@ -149,9 +152,12 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
     setS((cur) => {
       const prefs = { ...cur.prefs, ...p };
       if (cur.session) void savePrefs(deps.kv, cur.session.userId, prefs);
+      if (cur.space && p.notify && p.notify !== cur.prefs.notify) {
+        deps.api.setNotificationPrefs(cur.space.space_id, serverPrefs(p.notify)).catch(() => {});
+      }
       return { ...cur, prefs };
     });
-  }, [deps.kv]);
+  }, [deps.kv, deps.api]);
 
   const signOut = useCallback(async () => {
     live.current.queue?.stop();
