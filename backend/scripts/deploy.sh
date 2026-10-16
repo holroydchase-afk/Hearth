@@ -50,7 +50,7 @@ create extension if not exists pg_cron;
 create extension if not exists pg_net;
 select vault.create_secret('${CRON_SECRET}', 'notify_cron_secret')
   where not exists (select 1 from vault.secrets where name = 'notify_cron_secret');
-update vault.secrets set secret = '${CRON_SECRET}' where name = 'notify_cron_secret';
+select vault.update_secret(id, '${CRON_SECRET}') from vault.secrets where name = 'notify_cron_secret';
 select cron.unschedule('hearth-notify') where exists (select 1 from cron.job where jobname = 'hearth-notify');
 select cron.schedule('hearth-notify', '* * * * *', \$cron\$
   select net.http_post(
