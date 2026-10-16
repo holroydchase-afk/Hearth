@@ -87,3 +87,33 @@ describe('sign in: waiting for the code (BETA-JOIN-2)', () => {
   });
 });
 
+describe('sign in: email typos (June types "yaho.com")', () => {
+  it('JOIN-2: suggests the likely email and never changes it on its own', async () => {
+    await renderApp(<SignInScreen />, { user: null });
+    fireEvent.changeText(await screen.findByLabelText('Your email'), 'june@yaho.com');
+    expect(await screen.findByText('Did you mean june@yahoo.com?')).toBeTruthy();
+    expect(screen.getByLabelText('Your email').props.value).toBe('june@yaho.com');
+    fireEvent.press(screen.getByRole('button', { name: 'Use june@yahoo.com' }));
+    expect(screen.getByLabelText('Your email').props.value).toBe('june@yahoo.com');
+    expect(screen.queryByText(/Did you mean/)).toBeNull();
+    expectGrandparentSafe();
+  });
+
+  it.each([
+    ['earl@gmial.com', 'earl@gmail.com'], ['ruth@aol.co', 'ruth@aol.com'], ['kim@hotmal.com', 'kim@hotmail.com'],
+    ['tammy@frontier.con', 'tammy@frontier.com'], ['jo@icloud.cm', 'jo@icloud.com'],
+  ])('JOIN-2: %s -> %s', async (typed, fixed) => {
+    await renderApp(<SignInScreen />, { user: null });
+    fireEvent.changeText(await screen.findByLabelText('Your email'), typed);
+    expect(await screen.findByText(`Did you mean ${fixed}?`)).toBeTruthy();
+  });
+
+  it('JOIN-2: a real address, or an uncommon one, gets no suggestion', async () => {
+    await renderApp(<SignInScreen />, { user: null });
+    for (const ok of ['june@yahoo.com', 'chase@holroyd.family', 'a@suddenlink.net']) {
+      fireEvent.changeText(await screen.findByLabelText('Your email'), ok);
+      expect(screen.queryByText(/Did you mean/)).toBeNull();
+    }
+  });
+});
+
