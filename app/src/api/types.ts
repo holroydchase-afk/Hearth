@@ -161,3 +161,12 @@ export interface ViewGrant {
   expires_in: number;
   items: ViewGrantItem[];
 }
+
+/** register_push_token (AE-2). */
+export type PushPlatform = 'ios' | 'android' | 'web';
+
+/** set_notification_prefs (AE-2): per space. Push on with no phone registered falls back to a daily email. */
+export interface NotificationPrefs {
+  push: boolean;
+  emailDigest: 'off' | 'daily' | 'weekly';
+}

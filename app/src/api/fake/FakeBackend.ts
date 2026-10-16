@@ -5,6 +5,8 @@
 // contract before the real stack is reachable. The contract tests keep the two honest.
 import { ApiError, type HearthApi } from '../HearthApi';
 import type {
+  NotificationPrefs,
+  PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
   HeartState, InvitePreview, MediaKind, MediaStatus, Role, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
 } from '../types';
@@ -47,6 +49,8 @@ export interface FakeState {
   hearts: { post: string; user: string }[];
   comments: Record<string, CommentRec>;
   seen: { post: string; user: string }[];
+  pushTokens?: Record<string, { user: string; platform: PushPlatform }>;
+  notifyPrefs?: Record<string, NotificationPrefs>; // key `${user}:${space}`
   invites: Record<string, InviteRow>;
   failures: Record<string, number[]>;
   appSession: string | null;
@@ -326,6 +330,24 @@ export class FakeBackend {
       .map((c) => ({ comment_id: c.id, author_id: c.author, author_name: this.state.users[c.author]?.name ?? '', body: c.body, created_at: c.created_at }));
   }
 
+  registerPushToken(user: string | null, token: string, platform: PushPlatform): void {
+    const me = this.requireUser(user);
+    if (!/^Expo(nent)?PushToken\[[^\]]+\]$/.test(token)) throw new ApiError('23514', 'not an Expo push token');
+    if (!['ios', 'android', 'web'].includes(platform)) throw new ApiError('23514', 'unknown platform');
+    (this.state.pushTokens ??= {})[token] = { user: me, platform };
+    this.changed();
+  }
+
+  setNotificationPrefs(user: string | null, space: string, p: NotificationPrefs): void {
+    const me = this.requireUser(user);
+    if (!this.member(space, me)) throw new ApiError('P0002', 'not found');
+    if (typeof p.push !== 'boolean' || !['off', 'daily', 'weekly'].includes(p.emailDigest)) {
+      throw new ApiError('23514', 'email choice must be off, daily or weekly');
+    }
+    (this.state.notifyPrefs ??= {})[`${me}:${space}`] = { push: p.push, emailDigest: p.emailDigest };
+    this.changed();
+  }
+
   markSeen(user: string | null, post: string): void {
     const me = this.requireUser(user);
     this.visiblePost(me, post);
@@ -538,6 +560,8 @@ export class FakeApi implements HearthApi {
   addComment = (a: AddCommentArgs) => this.run(() => this.be.addComment(this.userId, a));
   getComments = (p: string, limit?: number) => this.run(() => this.be.getComments(this.userId, p, limit));
   markSeen = (p: string) => this.run(() => this.be.markSeen(this.userId, p));
+  registerPushToken = (t: string, platform: PushPlatform) => this.run(() => this.be.registerPushToken(this.userId, t, platform));
+  setNotificationPrefs = (space: string, p: NotificationPrefs) => this.run(() => this.be.setNotificationPrefs(this.userId, space, p));
   redeemInvite = (c: string) => this.run(() => this.be.redeemInvite(this.userId, c));
   invitePreview = (c: string) => this.run(() => this.be.invitePreview(this.userId, c));
   createInvite = (a: CreateInviteArgs) => this.run(() => this.be.createInvite(this.userId, a));

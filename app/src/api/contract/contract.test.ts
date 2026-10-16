@@ -292,4 +292,33 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(['42501', 'P0002']).toContain(await code(viewerIn.signUpload(id, [item(10, 5)])));
     });
   });
+
+  describe('register_push_token / set_notification_prefs (AE-2)', () => {
+    it('AE-2: a member saves her phone token; saving it again is fine', async () => {
+      expect(await code(viewerIn.registerPushToken('ExponentPushToken[contract-a]', 'android'))).toBe('ok');
+      expect(await code(viewerIn.registerPushToken('ExponentPushToken[contract-a]', 'android'))).toBe('ok');
+    });
+
+    it('AE-2: a malformed token or unknown platform is 23514', async () => {
+      expect(await code(viewerIn.registerPushToken('not-a-token', 'ios'))).toBe('23514');
+      expect(await code(viewerIn.registerPushToken('ExponentPushToken[x]', 'fax' as never))).toBe('23514');
+    });
+
+    it('AE-2: signed out cannot save a token (42501)', async () => {
+      expect(await code(h.anon().registerPushToken('ExponentPushToken[y]', 'ios'))).toBe('42501');
+    });
+
+    it('BETA-NOTIFY-5: a member saves push off + daily email for her space', async () => {
+      expect(await code(viewerIn.setNotificationPrefs(h.spaceId, { push: false, emailDigest: 'daily' }))).toBe('ok');
+      expect(await code(viewerIn.setNotificationPrefs(h.spaceId, { push: true, emailDigest: 'off' }))).toBe('ok');
+    });
+
+    it('BETA-NOTIFY-5: an unknown email choice is 23514', async () => {
+      expect(await code(viewerIn.setNotificationPrefs(h.spaceId, { push: true, emailDigest: 'hourly' as never }))).toBe('23514');
+    });
+
+    it('AE-2: a space you are not in behaves as not found (P0002)', async () => {
+      expect(await code(viewerIn.setNotificationPrefs('99999999-0000-0000-0000-000000000099', { push: true, emailDigest: 'off' }))).toBe('P0002');
+    });
+  });
 });

@@ -21,7 +21,7 @@ jest.mock('expo-secure-store', () => {
 });
 
 jest.mock('./src/notify/push', () => ({
-  registerForPush: async () => null,
+  registerForPush: jest.fn(async () => null),
   useNotificationTaps: () => {},
 }));
 
