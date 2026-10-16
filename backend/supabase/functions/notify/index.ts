@@ -72,23 +72,25 @@ const esc = (s: string) =>
 // Names go into email headers (From, Subject): keep only letters, digits and simple punctuation.
 const headerSafe = (n: string) => n.replace(/[^\p{L}\p{N} .'-]/gu, "").trim().slice(0, 40);
 
-export function buildEmail(input: Batch): Email {
+/** null when no real person's name survives sanitizing: never send a nameless email (BETA-NOTIFY-7). */
+export function buildEmail(input: Batch): Email | null {
   const b = { ...input, actor_names: input.actor_names.map(headerSafe).filter(Boolean) };
-  const { line } = summary(b);
+  if (b.actor_names.length === 0) return null;
+  const { line, isReply } = summary(b);
   const link = `${(Deno.env.get("APP_LINK_BASE") ?? "https://hearth.family").replace(/\/$/, "")}/p/${b.latest_post_id}`;
   // BETA-NOTIFY-7: "Chase on Hearth <hello@…>". Only the address comes from RESEND_FROM;
   // the name is stripped of anything that could change the header.
   const addr = (Deno.env.get("RESEND_FROM") ?? "hello@hearth.family").match(/<([^>]+)>/)?.[1] ??
     Deno.env.get("RESEND_FROM") ?? "hello@hearth.family";
-  const safe = headerSafe(joinNames(b.actor_names)) || "Your family";
+  const safe = headerSafe(joinNames(b.actor_names));
   const from = `${safe} on Hearth <${addr}>`;
   return {
     from,
     to: [b.email!],
     subject: `${line} on Hearth`,
-    text: `${line}.\n\nOpen Hearth to see them:\n${link}\n`,
+    text: `${line}.\n\nOpen Hearth to see ${isReply ? "it" : "them"}:\n${link}\n`,
     html: `<p style="font-size:20px">${esc(line)}.</p>` +
-      `<p><a href="${esc(link)}" style="font-size:20px">Open Hearth to see them</a></p>`,
+      `<p><a href="${esc(link)}" style="font-size:20px">Open Hearth to see ${isReply ? "it" : "them"}</a></p>`,
   };
 }
 
@@ -136,11 +138,13 @@ async function sendEmails(batches: Batch[]): Promise<Batch[]> {
   const failed: Batch[] = [];
   for (let i = 0; i < batches.length; i += CHUNK) {
     const chunk = batches.slice(i, i + CHUNK);
+    const emails = chunk.map(buildEmail).filter((e): e is Email => e !== null);
+    if (emails.length === 0) continue; // nothing nameable to send; the notices stay closed
     try {
       const res = await fetch(RESEND_URL, {
         method: "POST",
         headers: { authorization: `Bearer ${env("RESEND_API_KEY")}`, "content-type": "application/json" },
-        body: JSON.stringify(chunk.map(buildEmail)),
+        body: JSON.stringify(emails),
       });
       if (!res.ok) throw new Error(`resend ${res.status}`);
     } catch (_) {

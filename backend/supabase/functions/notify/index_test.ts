@@ -58,7 +58,7 @@ Deno.test("BETA-REPLY-3: replies read as replies", () => {
 });
 
 Deno.test("BETA-NOTIFY-5: email links to the post and carries no photo or caption", () => {
-  const e = buildEmail(emailBatch());
+  const e = buildEmail(emailBatch())!;
   eq(e.to, ["grandpa@example.com"], "to");
   eq(e.subject, "Alex shared new photos on Hearth", "subject");
   assert(e.text.includes(`https://hearth.family/p/${P1}`), "link to the post");
@@ -67,7 +67,7 @@ Deno.test("BETA-NOTIFY-5: email links to the post and carries no photo or captio
 });
 
 Deno.test("email: names are HTML-escaped", () => {
-  const e = buildEmail(emailBatch({ actor_names: ["<b>Al"] }));
+  const e = buildEmail(emailBatch({ actor_names: ["<b>Al"] }))!;
   assert(!e.html.includes("<b>Al"), "escaped");
 });
 
@@ -76,20 +76,29 @@ Deno.test("BETA-NOTIFY-7: push and email name the real sender, never a generic n
   eq(m.title, "From Chase on Hearth", "push title names the sender");
   const [m2] = buildPush(pushBatch({ actor_names: ["Chase", "Danielle"] }));
   eq(m2.title, "From Chase and Danielle on Hearth", "two senders");
-  const e = buildEmail(emailBatch({ actor_names: ["Chase"] }));
+  const e = buildEmail(emailBatch({ actor_names: ["Chase"] }))!;
   eq(e.from, "Chase on Hearth <hello@hearth.family>", "email From shows the sender's name");
   for (const t of [m.title, m.body, e.subject, e.text]) {
     assert(!/new notification/i.test(t), "no generic wording: " + t);
   }
 });
 
+Deno.test("BETA-NOTIFY-7: an email never goes out without a real person's name", () => {
+  eq(buildEmail(emailBatch({ actor_names: ["<>"] })), null, "no usable name -> no email");
+});
+
+Deno.test("email: a reply email says 'see it', new photos say 'see them'", () => {
+  assert(buildEmail(emailBatch({ actor_names: ["Grandma June"], post_count: 0, comment_count: 1 }))!.text.includes("Open Hearth to see it:"), "reply");
+  assert(buildEmail(emailBatch())!.text.includes("Open Hearth to see them:"), "photos");
+});
+
 Deno.test("BETA-NOTIFY-7: a sender name can't break the email subject either", () => {
-  const e = buildEmail(emailBatch({ actor_names: ["Al\r\nBcc: x@evil.com"] }));
+  const e = buildEmail(emailBatch({ actor_names: ["Al\r\nBcc: x@evil.com"] }))!;
   assert(!/[\r\n]/.test(e.subject) && !e.subject.includes("@"), "subject is one clean line: " + JSON.stringify(e.subject));
 });
 
 Deno.test("BETA-NOTIFY-7: a sender name can't break the email From header", () => {
-  const e = buildEmail(emailBatch({ actor_names: ['Al"<x@evil.com>'] }));
+  const e = buildEmail(emailBatch({ actor_names: ['Al"<x@evil.com>'] }))!;
   assert(e.from.endsWith("<hello@hearth.family>") && (e.from.match(/</g) ?? []).length === 1, "one address only: " + e.from);
 });
 
