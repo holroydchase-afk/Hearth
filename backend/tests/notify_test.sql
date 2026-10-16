@@ -157,7 +157,8 @@ select tests.ok_sql($$select array_agg(recipient_id order by recipient_id)
 select tests.ok_sql(format('select not exists (select 1 from public.notification_outbox where recipient_id in (%L,%L,%L,%L))',
                            :alex, :blair, :aunt_jo, :gma_chen),
                     'BETA-NOTIFY-2: the author, the co-parent, Aunt Jo and Grandma Chen get nothing');
-select tests.ok_sql(format($$select tests.claim(%L::timestamptz) = 2$$, tests.v('t0')),
+select tests.setv('n', format($$select tests.claim(%L::timestamptz)$$, tests.v('t0')));
+select tests.ok_sql($$select tests.v('n') = '2'$$,
                     'BETA-NOTIFY-2: the sender claims one notice per audience member');
 select tests.ok_sql(format($$select push_tokens = array['ExponentPushToken[gma_riv]'] and channel = 'push'
                                     and actor_first_names = array['Alex'] and post_ids = array[%L::uuid]
@@ -175,8 +176,8 @@ select tests.ok_sql($$select tests.claim(now() + interval '1 hour') = 0$$,
 delete from public.notification_outbox;
 select tests.setv('p2', format('select tests.mkpost(%L, %L, 1, %L)', :alex, :c_a_gp, 'x'));
 delete from public.circle_members where circle_id = :c_a_gp and user_id = :gpa_riv;
-select tests.ok_sql(format($$select tests.claim(%L::timestamptz + interval '1 day') = 1
-                             and tests.batch_count(%L) = 0$$, tests.v('t0'), :gpa_riv),
+select tests.setv('n', format($$select tests.claim(%L::timestamptz + interval '1 day')$$, tests.v('t0')));
+select tests.ok_sql(format($$select tests.v('n') = '1' and tests.batch_count(%L) = 0$$, :gpa_riv),
                     'BETA-NOTIFY-2: someone removed from the group before sending gets no notice');
 insert into public.circle_members (circle_id, user_id) values (:c_a_gp, :gpa_riv);
 
@@ -195,9 +196,9 @@ select tests.mkpost(:alex, :c_a_gp, 1, 'b');
 select tests.mkpost(:alex, :c_a_gp, 1, 'c');
 select tests.ok_sql(format($$select tests.claim(%L::timestamptz + interval '4 minutes') = 0$$, tests.v('t1')),
                     'BETA-NOTIFY-4: posts within 10 minutes of the last notice wait (no second buzz)');
-select tests.ok_sql(format($$select tests.claim(%L::timestamptz + interval '11 minutes') = 2
-                             and (select cardinality(post_ids) from tests.batches where recipient_id = %L) = 3$$,
-                           tests.v('t1'), :gma_riv),
+select tests.setv('n', format($$select tests.claim(%L::timestamptz + interval '11 minutes')$$, tests.v('t1')));
+select tests.ok_sql(format($$select tests.v('n') = '2'
+                             and (select cardinality(post_ids) from tests.batches where recipient_id = %L) = 3$$, :gma_riv),
                     'BETA-NOTIFY-4: after the 10-minute window, 3 posts arrive as 1 notice per recipient');
 :as_admin
 delete from public.notification_outbox;
@@ -205,7 +206,8 @@ select tests.setv('t2', format($$select %L::timestamptz + interval '3 days'$$, t
 select tests.mkpost(:alex, :c_a_gp, 1, 'a');
 select tests.mkpost(:alex, :c_a_gp, 1, 'b');
 select tests.mkpost(:alex, :c_a_gp, 1, 'c');
-select tests.ok_sql(format($$select tests.claim(%L) = 2 and bool_and(cardinality(post_ids) = 3) from tests.batches$$, tests.v('t2')),
+select tests.setv('n', format($$select tests.claim(%L)$$, tests.v('t2')));
+select tests.ok_sql($$select tests.v('n') = '2' and bool_and(cardinality(post_ids) = 3) from tests.batches$$,
                     'BETA-NOTIFY-4: 3 posts queued together go out as 1 notice per recipient');
 
 -- ======================================================================
@@ -220,10 +222,11 @@ select tests.lives(format('select public.add_comment(gen_random_uuid(), %L, %L)'
 :as_gpa_riv
 select tests.lives(format('select public.toggle_heart(%L)', tests.v('p3')), 'setup: Grandpa Rivera hearts');
 :as_admin
-select tests.ok_sql(format($$select tests.claim(%L::timestamptz + interval '4 days') = 1
+select tests.setv('n', format($$select tests.claim(%L::timestamptz + interval '4 days')$$, tests.v('t0')));
+select tests.ok_sql(format($$select tests.v('n') = '1'
                              and (select comment_count = 1 and heart_count = 1 and post_count = 0
                                          and actor_first_names = array['Grandma','Grandpa'] and channel = 'push'
-                                    from tests.batches where recipient_id = %L)$$, tests.v('t0'), :alex),
+                                    from tests.batches where recipient_id = %L)$$, :alex),
                     'BETA-REPLY-3: a comment and a heart on Alex''s post reach Alex as 1 notice');
 select tests.ok_sql(format('select tests.batch_count(%L) = 0 and tests.batch_count(%L) = 0', :gma_riv, :gpa_riv),
                     'BETA-REPLY-3: the people who reacted get nothing about their own reaction');
@@ -237,9 +240,11 @@ select tests.ok_sql(format('select not exists (select 1 from public.notification
 :as_gpa_riv
 select tests.lives(format('select public.toggle_heart(%L)', tests.v('p3')), 'setup: Grandpa un-hearts');
 select tests.lives(format('select public.toggle_heart(%L)', tests.v('p3')), 'setup: Grandpa hearts again');
+select tests.lives(format('select public.toggle_heart(%L)', tests.v('p3')), 'setup: Grandpa un-hearts again');
+select tests.lives(format('select public.toggle_heart(%L)', tests.v('p3')), 'setup: Grandpa hearts a third time');
 :as_admin
 select tests.ok_sql(format('select count(*) = 1 from public.notification_outbox where recipient_id = %L and sent_at is null', :alex),
-                    'BETA-NOTIFY-4: heart, un-heart, heart again queues 1 notice, not 2');
+                    'BETA-NOTIFY-4: hearting on and off repeatedly queues 1 notice, not one per tap');
 
 -- ======================================================================
 -- Channels: push vs email digest vs nothing (notification_prefs)
@@ -251,8 +256,9 @@ insert into public.notification_prefs (user_id, space_id, push, email_digest) va
   (:gpa_riv, :space_a, false, 'off');
 select tests.setv('t3', format($$select %L::timestamptz + interval '5 days'$$, tests.v('t0')));
 select tests.mkpost(:alex, :c_a_gp, 1, 'z');
-select tests.ok_sql(format($$select tests.claim(%L) = 1 and (select channel = 'email' and email = 'grandma.rivera@example.com'
-                                                                    and push_tokens = '{}' from tests.batches)$$, tests.v('t3')),
+select tests.setv('n', format($$select tests.claim(%L)$$, tests.v('t3')));
+select tests.ok_sql($$select tests.v('n') = '1' and (select channel = 'email' and email = 'grandma.rivera@example.com'
+                                                    and push_tokens = '{}' from tests.batches)$$,
                     'BETA-NOTIFY-5: push off + daily email -> an email notice, no push tokens');
 select tests.ok_sql(format('select tests.batch_count(%L) = 0 and exists (select 1 from public.notification_outbox where recipient_id = %L and sent_at is not null)', :gpa_riv, :gpa_riv),
                     'prefs: push off and email off -> nothing sent, and the notice is closed out (no pile-up)');
@@ -265,8 +271,9 @@ select tests.ok_sql(format($$select tests.claim(%L::timestamptz + interval '2 ho
 delete from public.notification_prefs;
 delete from public.push_tokens where user_id = :gma_riv;
 select tests.mkpost(:alex, :c_a_gp, 1, 'z3');
-select tests.ok_sql(format($$select tests.claim(%L::timestamptz + interval '3 days') >= 1
-                             and (select channel = 'email' from tests.batches where recipient_id = %L)$$, tests.v('t3'), :gma_riv),
+select tests.setv('n', format($$select tests.claim(%L::timestamptz + interval '3 days')$$, tests.v('t3')));
+select tests.ok_sql(format($$select tests.v('n')::int >= 1
+                             and (select channel = 'email' from tests.batches where recipient_id = %L)$$, :gma_riv),
                     'prefs: push wanted but no phone registered -> falls back to email');
 
 -- ======================================================================
@@ -278,6 +285,15 @@ select tests.throws_code('select public.release_notifications(array[gen_random_u
 select tests.throws_code('select count(*) from public.notification_outbox', 'security: a signed-in user cannot read the outbox', '42501');
 :as_anon
 select tests.throws_code('select * from public.claim_notification_batches(now())', 'security: anon cannot claim notices', '42501');
+
+-- Expo says a phone is gone (DeviceNotRegistered) -> the sender forgets that token
+:as_admin
+select public.forget_push_tokens(array['ExponentPushToken[gpa_riv]']);
+select tests.ok_sql(format('select not exists (select 1 from public.push_tokens where user_id = %L)', :gpa_riv),
+                    'sender: forget_push_tokens drops a token Expo reports as no longer registered');
+insert into public.push_tokens (user_id, expo_token, platform) values (:gpa_riv, 'ExponentPushToken[gpa_riv]', 'ios');
+:as_gma_riv
+select tests.throws_code($$select public.forget_push_tokens(array['ExponentPushToken[alex]'])$$, 'security: a signed-in user cannot delete tokens', '42501');
 
 -- release puts a failed send back in the queue
 :as_admin
