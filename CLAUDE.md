@@ -22,10 +22,10 @@ Hearth is a private family photo app for split families and for grandparents who
 ## Layout
 - `backend/`: Supabase.
   - `migrations/0001`–`0009`: RLS, RPCs, triggers, notification outbox (0003), AUD-7 (0004), S12 (0005), error reports (0006), real names (0007), rename_circle (0008), who reads replies (0009).
-  - `scripts/`: `deploy.sh` (one-command deploy, `--dry-run`), `family-setup.sql` (M1/M2 space + groups + invites).
+  - `scripts/`: `deploy.sh` (one-command deploy via the Management API, needs only `SUPABASE_ACCESS_TOKEN`; `--dry-run`), `family-setup.sql` (M1/M2 space + groups + invites).
   - `functions/notify/`: Deno TS; Expo Push + Resend sender, run by a 1-minute cron.
   - `functions/sign-media/`: Deno TS; presigned Backblaze B2 URLs and per-item keys.
-  - `tests/`: SQL, perf, integration (PostgREST harness).
+  - `tests/`: SQL, perf, integration (PostgREST harness), deploy (DEPLOY-1 shell test).
 - `app/`: Expo SDK 54, TypeScript strict, `HearthApi` with a Supabase and a Fake implementation, upload queue, media pipeline.
 - `prototype/`, `e2e/`: the clickable HTML prototype and its Playwright tests. Throwaway.
 - `tracker/`: Hearth Test Log seed builder.

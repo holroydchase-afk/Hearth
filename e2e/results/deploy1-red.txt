@@ -1,0 +1,20 @@
+FAIL - DEPLOY-1 succeeds with only SUPABASE_ACCESS_TOKEN (no DB password, no DB URL)
+       exit 1: deploy: missing SUPABASE_DB_PASSWORD (add it as an environment secret)
+FAIL - DEPLOY-1 run A completes without psql, CLI db push or CLI link
+       exit 1
+FAIL - DEPLOY-1 run B completes without psql, CLI db push or CLI link
+       exit 0; psql called; CLI db push called; CLI link called
+FAIL - DEPLOY-1 unapplied migrations go to database/query in order, recorded in schema_migrations, 0001 skipped
+       0002_beta_api.sql not sent; 0003_notifications.sql not sent; 0004_aud7_no_activity_details.sql not sent; 0005_s12_removed_author_edits.sql not sent; 0006_client_errors.sql not sent; 0007_real_names.sql not sent; 0008_rename_circle.sql not sent; 0009_reply_visibility.sql not sent; 
+FAIL - DEPLOY-1 cron + vault SQL goes to database/query
+       no database/query body contains cron.schedule('hearth-notify'
+FAIL - DEPLOY-1 database/query calls use POST and the bearer token
+       no curl call with Authorization: Bearer <token> to /v1/projects/testref123/database/query
+ok   - DEPLOY-1 run A prints no token or cron secret
+ok   - DEPLOY-1 run B prints no token or cron secret
+ok   - DEPLOY-1 run C prints no token or cron secret
+ok   - DEPLOY-1 --dry-run with no secrets exits 0
+ok   - DEPLOY-1 --dry-run makes no curl, psql or CLI calls
+FAIL - DEPLOY-1 --dry-run prints migrations via database/query
+       no migrations line mentioning database/query
+DEPLOY-1 deploy tests: 5 passed, 7 failed

@@ -1,5 +1,7 @@
 # Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
+**DEPLOY-1 (Oct 16):** `backend/scripts/deploy.sh` no longer links or uses psql/db push; migrations (recorded in `supabase_migrations.schema_migrations`) and the cron + vault SQL go through the Management API `database/query`, so the deploy needs only `SUPABASE_ACCESS_TOKEN` (test: `backend/tests/deploy/deploy_test.sh`, 12 green ×3). Hosted SQL test runs still need a DB connection string.
+
 ## Oct 16: who reads replies (Chase's call), and the real family
 1. **Family:** `docs/product/PERSONAS.md` is now your real family (Gammy … Great-Grandma, Gigi, Bebar with the smart frame). Docs live in `docs/product` and `docs/eng`; `docs/product/STORY.md` is the story agents read.
 2. **Built (migration 0009, AUD-8/9/10):** by default only the parents (and the post's author) read a relative's comment or heart; counts leave hidden ones out; parents' replies reach everyone. A group can turn on "members see each other's replies". The owner can open replies to everyone (Me screen). The comment box says who will read it. privacy-security fixes: raw counters hidden, no profile leak through replies, no setting leak.
