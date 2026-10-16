@@ -15,15 +15,23 @@ language sql immutable set search_path = '' as $$
   select coalesce(char_length(btrim(p)) between 1 and 40 and btrim(p) !~ '[@<>\r\n\t]', false)
 $$;
 
+-- Names change only through set_my_name / an invite (privacy-security review): the
+-- old direct column grant skipped the rules, and the table refuses anything that
+-- could break an email header or markup.
+revoke update (display_name) on public.profiles from authenticated;
+alter table public.profiles add constraint profiles_display_name_clean
+  check (display_name !~ '[\r\n\t<>]');
+
 -- New accounts: a name given at sign-up counts as set; the email-prefix fallback does not.
 create or replace function public.tg_handle_new_user() returns trigger
 language plpgsql security definer set search_path = '' as $fn$
 begin
   insert into public.profiles (id, display_name, name_set)
   values (new.id,
-          coalesce(nullif(new.raw_user_meta_data->>'display_name',''),
-                   split_part(coalesce(new.email, new.phone, 'Member'), '@', 1)),
-          nullif(new.raw_user_meta_data->>'display_name','') is not null)
+          case when private.valid_name(new.raw_user_meta_data->>'display_name')
+               then btrim(new.raw_user_meta_data->>'display_name')
+               else regexp_replace(split_part(coalesce(new.email, new.phone, 'Member'), '@', 1), '[\r\n\t<>]', '', 'g') end,
+          private.valid_name(new.raw_user_meta_data->>'display_name'))
   on conflict (id) do nothing;
   return new;
 end $fn$;
@@ -76,6 +84,12 @@ begin
   end if;
   if p_name is not null and not private.valid_name(p_name) then
     raise exception 'a name is 1-40 characters, not an email address' using errcode = '23514';
+  end if;
+  -- no impersonation: an invite can't reuse the name of someone already in the family
+  if p_name is not null and exists (
+       select 1 from public.space_members sm join public.profiles pr on pr.id = sm.user_id
+       where sm.space_id = p_space and lower(pr.display_name) = lower(btrim(p_name))) then
+    raise exception 'someone in this family already has that name' using errcode = '23514';
   end if;
   select string_agg(substr(v_alphabet, (get_byte(v_bytes, i) % length(v_alphabet)) + 1, 1), '' order by i)
     into v_code from generate_series(0, 9) i;

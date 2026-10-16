@@ -561,6 +561,16 @@ select tests.ok_sql($$select public.my_profile()->>'display_name' = 'Earl'$$,
                     'names: an invite never overwrites a name the person chose');
 :as_anon
 select tests.throws_code($$select public.set_my_name('X')$$, 'names: anon cannot set a name (42501)', '42501');
+-- privacy-security review: no way around the name rules
+:as_alex
+select tests.throws_code($$update public.profiles set display_name = E'Chase\r\nBcc: x@evil.com' where id = auth.uid()$$,
+                         'names: a direct profile update cannot bypass set_my_name (42501)', '42501');
+:as_admin
+select tests.throws_code($$update public.profiles set display_name = 'A <b>' where id = 'a0000000-0000-0000-0000-00000000000a'$$,
+                         'names: the table itself refuses brackets or line breaks in a name (23514)', '23514');
+:as_alex
+select tests.throws_code(format($q$select * from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'chase')$q$, :space_a, :c_a_gp),
+                         'names: an invite can''t reuse a family member''s name (no "Chase" impersonation, 23514)', '23514');
 
 -- ======================================================================
 -- BETA-OPS-1: crash/error reports with no personal data and no third-party SDK
