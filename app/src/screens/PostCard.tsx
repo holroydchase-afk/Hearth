@@ -131,8 +131,10 @@ function Comments({ post, mine }: { post: FeedPost; mine: boolean }) {
         multiline
         maxLength={500}
       />
+      {/* BETA-REPLY-6: say who can read it, matching the server (everyone the post was shared with). */}
+      {sent ? null : <Txt variant="muted">Everyone this photo was shared with can read this.</Txt>}
       <Button label="Send" onPress={() => void send()} disabled={!draft.trim()} />
-      {sent && !mine ? <Txt variant="muted">{`Sent. ${post.author_name} will see it.`}</Txt> : null}
+      {sent ? <Txt variant="muted">Sent. Everyone this photo was shared with can read it.</Txt> : null}
     </View>
   );
 }
