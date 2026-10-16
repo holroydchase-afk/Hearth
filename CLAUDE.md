@@ -14,7 +14,8 @@ Hearth is a private family photo app for split families and for grandparents who
 
 ## Layout
 - `backend/`: Supabase.
-  - `migrations/0001`, `0002`: RLS, RPCs, triggers.
+  - `migrations/0001`–`0006`: RLS, RPCs, triggers, notification outbox (0003), AUD-7 (0004), S12 (0005), error reports (0006).
+  - `functions/notify/`: Deno TS; Expo Push + Resend sender, run by a 1-minute cron.
   - `functions/sign-media/`: Deno TS; presigned Backblaze B2 URLs and per-item keys.
   - `tests/`: SQL, perf, integration (PostgREST harness).
 - `app/`: Expo SDK 54, TypeScript strict, `HearthApi` with a Supabase and a Fake implementation, upload queue, media pipeline.

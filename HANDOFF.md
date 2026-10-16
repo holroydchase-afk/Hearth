@@ -1,5 +1,12 @@
 # Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
+## Overnight Oct 16–17, part 2 (after reading ANCHORS + the story doc)
+1. **staff-pm:** BETA-SPEC and REMAINING now follow your milestones. Every criterion maps to a milestone and traces to a story problem or anchor; new NOTIFY-7 and AUD-7; ring dates dropped. Flagged: NOTIFY-6 vs A2, JOIN-7 (Apple rule only), AUD-4 (persona-only), SHARE-6 video (still deferred).
+2. **Built, test first:** app saves push token + notification choice to the server; emails arrive when Help promises (6 pm / Sunday 8 am Eastern); notices say "From Chase on Hearth" (NOTIFY-7); posters can no longer read *when* each person last looked (AUD-7; "Seen by" unchanged); removed authors can't edit old captions (S12, migration 0005); our own error reports with fixed fields only, no SDKs (OPS-1, migration 0006).
+3. **Tests, 3 green runs:** SQL 116 RLS + 141 API + 48 NOTIFY; Deno 19; Jest 195 + 1 skipped; typecheck clean; web e2e 1. CI on main was green before this batch.
+4. **Needs you:** same as part 1 (network allow-list + `SUPABASE_ACCESS_TOKEN`, then keys). Decide NOTIFY-6 / "Seen by" before milestone 4.
+5. **Next:** deploy to staging once access exists; check whether Expo Go can run milestone 1 without the $99 Apple account; tracker hygiene (close S12).
+
 ## Overnight Oct 16: notification sender (AE-2)
 1. **Built:** migration 0003 adds an outbox filled on publish/comment/heart and a batching claim (at most 1 push per 10 min and 1 email per day; access is re-checked at send time). New RPCs `register_push_token` and `set_notification_prefs` are in API.md. The `notify` edge function sends through Expo Push and Resend with the first name and post id only, retries failed sends, and drops dead phone tokens.
 2. **Tests (one full run):** SQL 110 RLS + 130 API + 46 NOTIFY green; Deno 17 (5 sign-media + 12 notify); Jest 179 passed + 1 skipped; typecheck clean; web e2e 1 passed (the day-2 note said 3/3, worth a look). Nothing is deployed.
