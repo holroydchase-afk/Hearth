@@ -6,8 +6,8 @@
 - **Prototype + Test Log:** 32/32 prototype cases green. The Test Log page is published; its data covers runs through day 2 morning only.
 
 ## Not done
-1. **GitHub.** The repo exists at github.com/holroydchase-afk/Hearth but is **empty**. Claude can't reach it until Chase links GitHub at claude.ai/code and installs the Claude GitHub App on the repo. Meanwhile the code goes over as a bundle.
-2. **CI (`.github/workflows/ci.yml`)** has never run. Its first run closes S16: the backend tests on a real Supabase stack.
+1. **GitHub: done (Oct 15, 10:45 pm).** Code lives at github.com/holroydchase-afk/Hearth, and Claude can push to it. Start every session at claude.ai/code with Hearth selected. No more zips or bundles.
+2. **CI (`.github/workflows/ci.yml`)** runs on every push. Getting it green closes S16: the backend tests on a real Supabase stack. Check the Actions tab for the latest result.
 3. **Notifications aren't built**, push or email. This is the biggest gap. NOTIFY-1/2/3 and REPLY-3 depend on it.
 4. **Nothing has run on a real phone yet.** Unverified: resize, save to phone, OTP email, deep links, push.
 5. **Missing API endpoints:** push-token save, notification prefs, profile name, who hearted, re-signing an upload after a crash (see `app/README.md`, "API.md gaps").
@@ -18,7 +18,6 @@
 7. **Video is off for the beta.** iOS location metadata can't be stripped without a transcoder.
 
 ## Chase's to-dos (blocking)
-- Link GitHub: claude.ai/code → connect GitHub, then install the Claude GitHub App on Hearth (github.com/apps/claude/installations/new).
 - Confirm Apple Developer enrollment.
 - Create the accounts:
   - Supabase: a staging and a prod project, both East US

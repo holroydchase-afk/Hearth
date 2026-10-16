@@ -24,9 +24,9 @@ jobs:
       SUPABASE_CLI: npx --yes supabase@2.121.0
       SUPABASE_TELEMETRY_DISABLED: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
 
@@ -57,18 +57,18 @@ jobs:
         run: $SUPABASE_CLI stop --no-backup
 
   # ---------------------------------------------------------------------------
-  # APP — STUB. Owned by the app lane (app/). Wire up more steps (lint, e2e) there.
+  # APP: Jest (unit, screens, contract vs FakeApi) + strict typecheck.
   # ---------------------------------------------------------------------------
   app:
-    name: App (STUB - app lane)
+    name: App (Jest + typecheck)
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
       run:
         working-directory: app
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
