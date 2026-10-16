@@ -1,4 +1,5 @@
 import type {
+  ClientErrorReport,
   NotificationPrefs,
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost,
@@ -75,6 +76,9 @@ export interface HearthApi {
   // --- notifications (AE-2) ---
   registerPushToken(token: string, platform: PushPlatform): Promise<void>;
   setNotificationPrefs(space: string, prefs: NotificationPrefs): Promise<void>;
+
+  // --- our own error reports (BETA-OPS-1); callable signed out ---
+  reportClientError(r: ClientErrorReport): Promise<void>;
 
   // --- NOT in API.md (flagged in README): basic group rename for the Groups screen ---
   renameCircle(circle: string, name: string): Promise<void>;

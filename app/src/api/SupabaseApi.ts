@@ -3,6 +3,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ApiError, type ApiErrorCode, type HearthApi } from './HearthApi';
 import type {
+  ClientErrorReport,
   NotificationPrefs,
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
@@ -114,6 +115,8 @@ export class SupabaseApi implements HearthApi {
   markSeen = (p: string) => this.rpc<void>('mark_seen', { p_post: p });
   registerPushToken = (token: string, platform: PushPlatform) =>
     this.rpc<void>('register_push_token', { p_token: token, p_platform: platform });
+  reportClientError = (r: ClientErrorReport) =>
+    this.rpc<void>('report_client_error', { p_app_version: r.appVersion, p_os: r.os, p_screen: r.screen, p_kind: r.kind, p_code: r.code ?? null });
   setNotificationPrefs = (space: string, p: NotificationPrefs) =>
     this.rpc<void>('set_notification_prefs', { p_space: space, p_push: p.push, p_email_digest: p.emailDigest });
   redeemInvite = (code: string) => this.rpc<string>('redeem_invite', { p_code: code });

@@ -29,7 +29,7 @@ export default function RootLayout() {
   }
   return (
     <SafeAreaProvider>
-      <ErrorBoundary>
+      <ErrorBoundary onReport={(r) => runtime.api.reportClientError(r)}>
         <AppProvider deps={runtime}>
           <NavContext.Provider value={nav}>
             <StatusBar style="auto" />

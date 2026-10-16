@@ -321,4 +321,17 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(viewerIn.setNotificationPrefs('99999999-0000-0000-0000-000000000099', { push: true, emailDigest: 'off' }))).toBe('P0002');
     });
   });
+
+  describe('report_client_error (BETA-OPS-1)', () => {
+    it('BETA-OPS-1: signed in or not, a fixed-shape error report is accepted', async () => {
+      const r = { appVersion: '0.1.0', os: 'ios 18.1', screen: 'photos', kind: 'TypeError' };
+      expect(await code(viewerIn.reportClientError(r))).toBe('ok');
+      expect(await code(h.anon().reportClientError({ ...r, kind: 'ApiError', code: 'P0002' }))).toBe('ok');
+    });
+
+    it('BETA-OPS-1: free text (a caption or URL) is refused with 23514', async () => {
+      expect(await code(viewerIn.reportClientError({ appVersion: '0.1.0', os: 'ios', screen: 'photos', kind: 'Mia at the park' }))).toBe('23514');
+      expect(await code(viewerIn.reportClientError({ appVersion: '0.1.0', os: 'ios', screen: 'https://x.y/z', kind: 'TypeError' }))).toBe('23514');
+    });
+  });
 });

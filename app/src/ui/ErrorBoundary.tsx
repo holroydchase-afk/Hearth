@@ -1,9 +1,19 @@
 import React, { Component, type ReactNode } from 'react';
 import { View } from 'react-native';
+import type { ClientErrorReport } from '../api/types';
+import { errorReport } from '../errors/report';
 import { Button, Txt } from './kit';
 
 /** Last line of defense: a plain sentence and a button, never a stack trace. */
-export class ErrorBoundary extends Component<{ children: ReactNode; helper?: string | null }, { failed: boolean }> {
+interface Props {
+  children: ReactNode;
+  helper?: string | null;
+  /** BETA-OPS-1: sends our own error report (no third-party SDK). */
+  onReport?: (r: ClientErrorReport) => Promise<void>;
+  screen?: string;
+}
+
+export class ErrorBoundary extends Component<Props, { failed: boolean }> {
   override state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
@@ -11,6 +21,9 @@ export class ErrorBoundary extends Component<{ children: ReactNode; helper?: str
   override componentDidCatch(e: unknown) {
     // Never log captions, keys or URLs: only the error type.
     console.warn('Hearth screen error', e instanceof Error ? e.name : typeof e);
+    try {
+      this.props.onReport?.(errorReport(e, this.props.screen ?? 'app')).catch(() => {});
+    } catch { /* a report must never cause a second error */ }
   }
   override render() {
     if (!this.state.failed) return this.props.children;
