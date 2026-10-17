@@ -30,7 +30,8 @@ export type ApiErrorCode =
   | 'UNKNOWN';
 
 export class ApiError extends Error {
-  constructor(public readonly code: ApiErrorCode, message?: string) {
+  /** UX-G7: only invite_preview's 22023 sets this (the inviter's name, for "Ask Chase for a new one."). */
+  constructor(public readonly code: ApiErrorCode, message?: string, public readonly inviter?: string) {
     super(message ?? code);
     this.name = 'ApiError';
   }

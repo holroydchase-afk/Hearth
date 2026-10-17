@@ -54,6 +54,14 @@ describe('SupabaseApi RPC wiring (API.md names and args)', () => {
     await expect(make(c).toggleHeart('P')).rejects.toMatchObject({ code: 'P0002' });
   });
 
+  it('UX-G7: a refused invite_preview passes the inviter from details; no other RPC does', async () => {
+    const c = mockClient({ data: null, error: { code: '22023', message: 'invite is invalid or expired', details: 'Chase' } });
+    await expect(make(c).invitePreview('CODE')).rejects.toMatchObject({ code: '22023', inviter: 'Chase' });
+    const e = await make(c).redeemInvite('CODE').catch((x: unknown) => x);
+    expect(e).toMatchObject({ code: '22023' });
+    expect((e as ApiError).inviter).toBeUndefined();
+  });
+
   it('toggle_heart accepts a row or an array of one row', async () => {
     const c = mockClient({ data: { i_hearted: true, heart_count: 3 }, error: null });
     expect(await make(c).toggleHeart('P')).toEqual({ i_hearted: true, heart_count: 3 });

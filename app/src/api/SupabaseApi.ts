@@ -139,10 +139,23 @@ export class SupabaseApi implements HearthApi {
   setNotificationPrefs = (space: string, p: NotificationPrefs) =>
     this.rpc<void>('set_notification_prefs', { p_space: space, p_push: p.push, p_email_digest: p.emailDigest });
   redeemInvite = (code: string) => this.rpc<string>('redeem_invite', { p_code: code });
-  invitePreview = (code: string) => this.rpc<unknown>('invite_preview', { p_code: code }).then((d) => {
-    const r = one<InvitePreview>(d);
+  invitePreview = async (code: string): Promise<InvitePreview> => {
+    let res: { data: unknown; error: unknown };
+    try {
+      res = (await this.o.client.rpc('invite_preview', { p_code: code })) as { data: unknown; error: unknown };
+    } catch (e) {
+      throw toApiError(e);
+    }
+    if (res.error) {
+      const e = toApiError(res.error);
+      // UX-G7: a real invite that no longer places anyone names the inviter in details. Only here: details from
+      // any other RPC may hold server text and is never shown.
+      const d = (res.error as { details?: unknown }).details;
+      throw e.code === '22023' && typeof d === 'string' && d.trim() ? new ApiError('22023', e.message, d.trim()) : e;
+    }
+    const r = one<InvitePreview>(res.data);
     return { inviter_name: r.inviter_name, space_name: r.space_name };
-  });
+  };
   createInvite = async (a: CreateInviteArgs) => {
     const d = await this.rpc<unknown>('create_invite', {
       p_space: a.space, p_role: a.role, p_circle_ids: a.circleIds, p_channel: a.channel ?? 'link',

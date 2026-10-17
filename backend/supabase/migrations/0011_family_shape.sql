@@ -49,6 +49,10 @@ alter table public.space_members add column in_everyone boolean not null default
 alter table public.invites add column history text check (history in ('all', 'new'));
 alter table public.circle_members add column sees_from timestamptz;
 alter table public.circle_members add column derived boolean not null default false;
+-- S-0011-6: when a membership's cutoff is widened in place (e.g. placed again with "Share all past photos"),
+-- the moment and the cutoff before it, so replies written before the widening keep the readers they had.
+alter table public.circle_members add column widened_at timestamptz;
+alter table public.circle_members add column sees_from_before timestamptz;
 
 create table public.circle_links (
   parent_id  uuid not null references public.circles(id) on delete cascade,
@@ -122,6 +126,36 @@ begin
 end $$;
 create trigger people_check before insert or update on public.circle_people
   for each row execute function private.tg_people_check();
+
+-- S-0011-6: a widened cutoff is recorded, never silently back-dated. Until widened_at the earlier cutoff applies
+-- (after several widenings the first one is kept: that can only narrow old replies, never widen them).
+create or replace function private.tg_members_widen() returns trigger
+language plpgsql set search_path = '' as $$
+begin
+  if old.sees_from is not null and (new.sees_from is null or new.sees_from < old.sees_from) then
+    new.widened_at := now();
+    new.sees_from_before := coalesce(old.sees_from_before, old.sees_from);
+  else
+    new.widened_at := old.widened_at;
+    new.sees_from_before := old.sees_from_before;
+  end if;
+  return new;
+end $$;
+create trigger members_widen before update on public.circle_members
+  for each row execute function private.tg_members_widen();
+
+-- S-0011-7: Everyone stays, however it is updated (retire_level says so too; a parent's direct UPDATE of
+-- circles.deleted_at must not get round it).
+create or replace function private.tg_everyone_stays() returns trigger
+language plpgsql set search_path = '' as $$
+begin
+  if old.kind = 'everyone' and old.deleted_at is null and new.deleted_at is not null then
+    raise exception 'Everyone stays' using errcode = '23514';
+  end if;
+  return new;
+end $$;
+create trigger everyone_stays before update of deleted_at on public.circles
+  for each row execute function private.tg_everyone_stays();
 
 -- ---------------------------------------------------------------------------
 -- Derived membership (circle_members.derived), rebuilt per family in the same transaction
@@ -510,7 +544,9 @@ begin
   if v_aud = 'everyone' then return true; end if;
   -- household and event rules, fixed when the reply was written: the reader could already see the post (through a
   -- container that was already on its audience: S-0011-1) ...
-  select min(greatest(cm.added_at, pa.added_at)) into v_since
+  -- (S-0011-6: through a membership widened in place, only from the widening for posts the old cutoff hid)
+  select min(greatest(case when cm.widened_at is not null and v_post.published_at < cm.sees_from_before
+                           then cm.widened_at else cm.added_at end, pa.added_at)) into v_since
   from public.post_audiences pa
   join public.circles c on c.id = pa.circle_id and c.deleted_at is null
   join public.circle_members cm on cm.circle_id = pa.circle_id and cm.user_id = p_reader
@@ -694,7 +730,8 @@ begin
              as reads_all,
            array(select sm.user_id from public.space_members sm
                  where sm.space_id = p.space_id and sm.role in ('owner', 'adult')) as parents,
-           (select min(greatest(cm.added_at, pa.added_at))
+           (select min(greatest(case when cm.widened_at is not null and p.published_at < cm.sees_from_before
+                                     then cm.widened_at else cm.added_at end, pa.added_at))
               from public.post_audiences pa
               join public.circles c on c.id = pa.circle_id and c.deleted_at is null
               join public.circle_members cm on cm.circle_id = pa.circle_id and cm.user_id = v_uid
@@ -1011,6 +1048,65 @@ begin
           v_exp)::public.invite_created;
 end $$;
 
+-- An error body with details (the 0002 api_error has none). Same PostgREST behaviour: returned with
+-- response.status under PostgREST, raised (with DETAIL) from plain SQL.
+create or replace function private.api_error(p_code text, p_message text, p_http integer, p_details text) returns json
+language plpgsql set search_path = '' as $$
+begin
+  if nullif(current_setting('request.method', true), '') is null then
+    raise exception using errcode = p_code, message = p_message, detail = coalesce(p_details, '');
+  end if;
+  perform set_config('response.status', p_http::text, true);
+  return json_build_object('code', p_code, 'details', p_details, 'hint', null, 'message', p_message);
+end $$;
+
+-- Would redeeming this (live, unused, unexpired) invite place the person somewhere? Parents always (they see
+-- everything); a relative needs a live household, or (S-0011-3, until 0012) only live Everyone / groups with
+-- nothing under them. One rule for redeem_invite and invite_preview (UX-G7).
+create or replace function private.invite_places(p_inv public.invites) returns boolean
+language sql stable security definer set search_path = '' as $$
+  select p_inv.role <> 'viewer'
+      or exists (select 1 from public.invite_circles ic
+                 join public.circles c on c.id = ic.circle_id and c.deleted_at is null and c.kind = 'household'
+                 where ic.invite_id = p_inv.id)
+      or (exists (select 1 from public.invite_circles ic join public.circles c on c.id = ic.circle_id and c.deleted_at is null
+                  where ic.invite_id = p_inv.id)
+          and not exists (select 1 from public.invite_circles ic join public.circles c on c.id = ic.circle_id
+                          where ic.invite_id = p_inv.id
+                            and (c.deleted_at is not null or c.kind not in ('everyone', 'group')
+                                 or exists (select 1 from public.circle_links l join public.circles k on k.id = l.child_id and k.deleted_at is null
+                                            where l.parent_id = c.id))))
+$$;
+
+-- UX-G7: the preview refuses (22023) every invite redeem_invite would refuse for the invite's own sake, so a
+-- grandparent hears it before typing anything. A live, unused invite that no longer places anyone carries the
+-- inviter's name in details ("Ask Chase for a new one."): the preview named them already. Unknown, expired, used
+-- and revoked codes stay nameless (BETA-JOIN-3). Who is signed in is never checked here (anon).
+create or replace function public.invite_preview(p_code text) returns json
+language plpgsql security definer set search_path = '' as $$
+declare v_keys text[]; v_inv public.invites; v_inviter text; v_space text;
+begin
+  v_keys := private.rl_keys();
+  if private.rl_blocked(v_keys) then
+    return private.api_error('54000', 'Too many tries. Wait 10 minutes.', 429);
+  end if;
+  select i.* into v_inv
+  from public.invites i
+  join public.spaces s on s.id = i.space_id and s.deleted_at is null
+  where (i.code_hash = private.invite_hash(p_code) or i.link_hash = private.invite_hash(p_code))
+    and i.revoked_at is null and i.expires_at > now() and i.use_count < i.max_uses;
+  if not found then
+    perform private.rl_fail(v_keys, 'preview');
+    return private.api_error('22023', 'invite is invalid or expired', 400);
+  end if;
+  select pr.display_name into v_inviter from public.profiles pr where pr.id = v_inv.created_by;
+  if not private.invite_places(v_inv) then
+    return private.api_error('22023', 'invite is invalid or expired', 400, v_inviter);
+  end if;
+  select s.name into v_space from public.spaces s where s.id = v_inv.space_id;
+  return json_build_object('inviter_name', v_inviter, 'space_name', v_space);
+end $$;
+
 create or replace function public.redeem_invite(p_code text) returns json
 language plpgsql security definer set search_path = '' as $$
 declare
@@ -1047,14 +1143,7 @@ begin
   -- S-0011-3 (until 0012): a relative's invite without a household places them straight into the groups it
   -- names. Only while each is still a live Everyone or a group with nothing under it; else the parent's choice
   -- no longer means the same thing (the group was retired, or now holds households): ask for a new invite.
-  if v_house is null and v_inv.role = 'viewer'
-     and (not exists (select 1 from public.invite_circles ic join public.circles c on c.id = ic.circle_id and c.deleted_at is null
-                      where ic.invite_id = v_inv.id)
-          or exists (select 1 from public.invite_circles ic join public.circles c on c.id = ic.circle_id
-                     where ic.invite_id = v_inv.id
-                       and (c.deleted_at is not null or c.kind not in ('everyone', 'group')
-                            or exists (select 1 from public.circle_links l join public.circles k on k.id = l.child_id and k.deleted_at is null
-                                       where l.parent_id = c.id)))) then
+  if not private.invite_places(v_inv) then
     return private.api_error('22023', 'invite is invalid or expired', 400);
   end if;
   insert into public.space_members (space_id, user_id, role, invited_by, sees_from, in_everyone)
@@ -1144,7 +1233,8 @@ grant all on public.circle_links, public.circle_people to service_role;
 revoke execute on function private.link_allowed(text, text), private.tg_link_check(), private.tg_people_check(),
   private.rebuild_members(uuid), private.tg_rebuild_members(), private.sees_post(uuid, uuid),
   private.reply_ok(uuid, uuid, uuid, timestamptz), private.reply_visible(uuid, uuid, timestamptz),
-  private.history_from(text), private.managed_circle(uuid)
+  private.history_from(text), private.managed_circle(uuid), private.tg_members_widen(), private.tg_everyone_stays(),
+  private.invite_places(public.invites), private.api_error(text, text, integer, text)
   from public, anon, authenticated;
 -- RLS policies on comments and reactions call reply_visible as the app user
 grant execute on function private.reply_visible(uuid, uuid, timestamptz) to authenticated;
