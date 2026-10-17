@@ -46,7 +46,8 @@ end $$;
 \echo 'Test viewer invite (milestone 1, account B):'
 select link from public.create_invite(
   current_setting('hearth.space_id')::uuid, 'viewer',
-  array(select id from public.circles where space_id = current_setting('hearth.space_id')::uuid and name = 'Test viewer'));
+  array(select id from public.circles where space_id = current_setting('hearth.space_id')::uuid and name = 'Test viewer'),
+  p_history => 'all');   -- 0011: every relative's invite says whether they see past photos
 
 \if :{?danielle_email}
 \echo 'Danielle''s poster invite (milestone 2; she can post to every group):'

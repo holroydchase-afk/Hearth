@@ -177,7 +177,7 @@ select set_config('request.jwt.claim.sub', :gpa_riv, false);
 select tests.ok(exists (select 1 from posts where id = :p_a_co),               '...and grants Dad-side grandpa access');
 -- removing someone from a circle revokes too
 select set_config('request.jwt.claim.sub', :alex, false);
-delete from circle_members where circle_id = :c_a_gp and user_id = :gpa_riv;
+select public.unplace_person(:c_a_gp, :gpa_riv);   -- 0011: memberships change only through the setup RPCs (privacy item 3)
 select set_config('request.jwt.claim.sub', :gpa_riv, false);
 select tests.ok(not exists (select 1 from posts where id = :p_a_gp),           'Removing grandpa from the circle revokes his access');
 -- empty audience is refused
@@ -251,7 +251,7 @@ reset role;
 insert into auth.users (id, email) values ('d0000000-0000-0000-0000-0000000000d1', 'uncle.ray@example.com');
 set role authenticated;
 select set_config('request.jwt.claim.sub', :alex, false);
-select code as invite_code from public.create_invite(:space_a, 'viewer', array[:c_a_gp]::uuid[], 'email', 'Uncle.Ray@example.com') \gset
+select code as invite_code from public.create_invite(:space_a, 'viewer', array[:c_a_gp]::uuid[], 'email', 'Uncle.Ray@example.com', p_history => 'all') \gset
 reset role;   -- (S9) clients can no longer read code_hash at all; check the stored value as superuser
 select tests.ok(not exists (select 1 from invites where code_hash = :'invite_code'), 'Invite code stored hashed, not plaintext');
 set role authenticated;
@@ -373,6 +373,17 @@ select public.mark_media_upload_result(:'b_m1', true), public.mark_media_upload_
 set role authenticated;
 select set_config('request.jwt.claim.sub', :blair, false);
 select public.publish_post(:'b_pub');
+-- privacy-security review (Oct 17): an author may only add groups they could pick in create_post
+-- (theirs, or any if they manage the family). Otherwise the author-only audience row would hand a
+-- co-parent the name, size and "seen" count of a group she isn't in (threat 1, A2).
+select tests.throws(format('insert into post_audiences (post_id, circle_id) values (%L, %L)', :'b_pub', :c_a_gp),
+                    'BETA-AUD-4 review: a viewer-author cannot add a group she is not in to her post (direct insert)', 'row-level security');
+select tests.throws(format('select public.set_post_audience(%L, array[%L, %L]::uuid[])', :'b_pub', :c_a_co, :c_a_gp),
+                    'BETA-AUD-4 review: ...nor through set_post_audience', 'row-level security');
+select tests.ok(not exists (select 1 from post_audiences where post_id = :'b_pub' and circle_id = :c_a_gp),
+                'BETA-AUD-4 review: the grandparents group never joined her post''s audience');
+select tests.lives(format('select public.set_post_audience(%L, array[%L]::uuid[])', :'b_pub', :c_a_co),
+                   'BETA-AUD-4 review allowed: she can still set her post to a group she is in');
 reset role;
 update spaces set viewers_can_post = false where id = :space_a;
 set role authenticated;

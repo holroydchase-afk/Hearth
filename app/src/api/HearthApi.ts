@@ -6,6 +6,7 @@ import type {
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost,
   FinalizeResult, HeartState, InvitePreview, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
+  TimelineArgs, TimelinePost, TimelineYear,
 } from './types';
 
 export * from './types';
@@ -29,7 +30,8 @@ export type ApiErrorCode =
   | 'UNKNOWN';
 
 export class ApiError extends Error {
-  constructor(public readonly code: ApiErrorCode, message?: string) {
+  /** UX-G7: only invite_preview's 22023 sets this (the inviter's name, for "Ask Chase for a new one."). */
+  constructor(public readonly code: ApiErrorCode, message?: string, public readonly inviter?: string) {
     super(message ?? code);
     this.name = 'ApiError';
   }
@@ -56,6 +58,10 @@ export interface HearthApi {
   mySpaces(): Promise<Space[]>;
   myCircles(space: string): Promise<Circle[]>;
   getFeed(args: FeedArgs): Promise<FeedPost[]>;
+  /** BETA-TIME-2/3 (migration 0010): by date taken; same visibility as getFeed. */
+  getTimeline(args: TimelineArgs): Promise<TimelinePost[]>;
+  /** BETA-TIME-4 "Jump to year". timeZone = the phone's IANA zone. */
+  getTimelineYears(space: string, timeZone?: string): Promise<TimelineYear[]>;
   createPost(args: CreatePostArgs): Promise<string>;
   publishPost(post: string): Promise<void>;
   deletePost(post: string): Promise<void>;
@@ -79,9 +85,10 @@ export interface HearthApi {
   registerPushToken(token: string, platform: PushPlatform): Promise<void>;
   setNotificationPrefs(space: string, prefs: NotificationPrefs): Promise<void>;
 
-  // --- who reads replies (BETA-AUD-9/10) ---
-  setGroupRepliesShared(circle: string, on: boolean): Promise<void>;
+  // --- who reads replies (BETA-AUD-10, REPLY-11; the AUD-9 group switch is gone in 0011) ---
   setReplyAudience(space: string, choice: ReplyAudience): Promise<void>;
+  /** REPLY-11: the names of everyone who will read the caller's reply on this post; null = not found. */
+  replyReaders(post: string): Promise<string[] | null>;
 
   // --- account deletion (BETA-JOIN-7) ---
   requestAccountDeletion(): Promise<void>;

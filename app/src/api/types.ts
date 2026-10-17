@@ -13,16 +13,24 @@ export interface Space {
 }
 
 export type ReplyAudience = 'parents' | 'everyone';
-/** AUD-8/9: who will read MY replies on this post. */
+/** AUD-8 / REPLY-7: who will read MY replies on this post ('group' = my household or event too). */
 export type ReplyScope = 'parents' | 'group' | 'everyone';
+
+/** 0011 (SPEC-GROUPS): every container is a "group" in the app's words; kind says which part of the family shape. */
+export type CircleKind = 'everyone' | 'group' | 'household' | 'event';
+
+/** BETA-AUD-19: when someone is added, do they see photos already shared? No default. */
+export type ShareHistory = 'all' | 'new';
 
 export interface Circle {
   circle_id: string;
   name: string;
   member_count: number;
   member_names: string[];
-  /** AUD-9: members see each other's replies on posts shared to this group. */
-  replies_shared?: boolean;
+  /** 0011. Older servers omit it (treat as 'group'). */
+  kind?: CircleKind;
+  /** 0011: the groups and events this one sits under. */
+  parent_ids?: string[];
 }
 
 export type MediaKind = 'photo' | 'video';
@@ -59,6 +67,8 @@ export interface FeedPost {
   reach_count: number | null;
   /** AUD-8/9: who will read the caller's replies on this post. */
   reply_scope?: ReplyScope;
+  /** 0010 (BETA-TIME-1): when it was taken, read on the phone; null if unknown. Older servers omit it. */
+  taken_at?: string | null;
 }
 
 export interface FeedArgs {
@@ -73,7 +83,32 @@ export interface CreatePostArgs {
   space: string;
   caption: string | null;
   circleIds: string[];
+  /** Capture time read on the phone (BETA-BULK-1). Only this date leaves the phone, never EXIF/GPS. */
   takenAt?: string | null;
+  /** BETA-BULK-6: posts from one bulk pick share a batch id; size = number of posts in the batch (1-100). Both or neither. */
+  batchId?: string | null;
+  batchSize?: number | null;
+}
+
+/** get_timeline (migration 0010, BETA-TIME-2): keyset on (sort_at, post_id). */
+export interface TimelineArgs {
+  space: string;
+  beforeAt?: string | null;
+  beforeId?: string | null;
+  limit?: number;
+}
+
+/** A feed row plus when it was taken. sort_at = coalesce(taken_at, published_at). */
+export interface TimelinePost extends FeedPost {
+  taken_at: string | null;
+  sort_at: string;
+}
+
+/** get_timeline_years (BETA-TIME-4 "Jump to year"): only posts the caller can see are counted. */
+export interface TimelineYear {
+  year: number;
+  post_count: number;
+  photo_count: number;
 }
 
 export interface HeartState {
@@ -111,6 +146,8 @@ export interface CreateInviteArgs {
   maxUses?: number;
   /** What the family calls the invitee ("Grandma June"); becomes their name on joining (JOIN-1). */
   name?: string | null;
+  /** BETA-AUD-19 (0011): required for a relative ('viewer'); the server refuses the invite without it (23514). */
+  history?: ShareHistory | null;
 }
 
 export interface Session {

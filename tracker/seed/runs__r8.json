@@ -1,0 +1,9 @@
+{
+ "suite": "app",
+ "at": "2026-10-17T05:30:00-04:00",
+ "label": "Bulk photos + timeline app tests written first (red)",
+ "passed": 247,
+ "failed": 35,
+ "results": {},
+ "note": "Red on purpose: not-built stubs for takenAtFromAsset, planBatch, pickBulk, enqueueBatch/batchProgress/batchLabel and getTimeline/getTimelineYears; FakeApi accepts batchId without batchSize. Existing 245 still green; typecheck clean. 2 test bugs found and fixed before this run: T3 (dynamic import in pick.test) and T4 (process.env.TZ ignored by Jest's sandbox; the phone zone is now an explicit option)."
+}

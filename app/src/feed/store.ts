@@ -19,6 +19,8 @@ export interface FeedState {
   notice: string | null;
   comments: Record<string, CommentView[]>;
   drafts: Record<string, string>;
+  /** BETA-TIME-2: posts opened from the timeline that aren't on a loaded feed page (hearts and replies still work). */
+  opened: Record<string, FeedPost>;
 }
 
 export interface FeedStoreOptions {
@@ -34,7 +36,7 @@ export interface FeedStoreOptions {
 const cacheKey = (user: string, space: string) => `hearth.feedCache.v1.${user}.${space}`;
 
 export class FeedStore {
-  private state: FeedState = { posts: [], status: 'idle', loaded: false, hasMore: false, notice: null, comments: {}, drafts: {} };
+  private state: FeedState = { posts: [], status: 'idle', loaded: false, hasMore: false, notice: null, comments: {}, drafts: {}, opened: {} };
   private listeners = new Set<() => void>();
   private pendingHearts = new Map<string, { i_hearted: boolean; heart_count: number }>();
   private deleting = new Set<string>();
@@ -116,11 +118,26 @@ export class FeedStore {
   }
 
   private patchPost(id: string, patch: Partial<FeedPost>): void {
-    this.set({ posts: this.state.posts.map((p) => (p.post_id === id ? { ...p, ...patch } : p)) });
+    const o = this.state.opened[id];
+    this.set({
+      posts: this.state.posts.map((p) => (p.post_id === id ? { ...p, ...patch } : p)),
+      ...(o ? { opened: { ...this.state.opened, [id]: { ...o, ...patch } } } : {}),
+    });
+  }
+
+  /** A post from the feed, or one opened from the timeline. */
+  find(id: string): FeedPost | undefined {
+    return this.state.posts.find((x) => x.post_id === id) ?? this.state.opened[id];
+  }
+
+  /** BETA-TIME-2: open a timeline post as a full post; it joins the store only if the feed hasn't loaded it. */
+  adopt(post: FeedPost): void {
+    if (this.find(post.post_id)) return;
+    this.set({ opened: { ...this.state.opened, [post.post_id]: post } });
   }
 
   async toggleHeart(id: string): Promise<void> {
-    const p = this.state.posts.find((x) => x.post_id === id);
+    const p = this.find(id);
     if (!p) return;
     const before = { i_hearted: p.i_hearted, heart_count: p.heart_count };
     const guess = { i_hearted: !p.i_hearted, heart_count: Math.max(0, p.heart_count + (p.i_hearted ? -1 : 1)) };
@@ -187,7 +204,7 @@ export class FeedStore {
     try {
       const r = await this.o.api.addComment({ clientId, post: id, body: text });
       this.putComment(id, clientId, { comment_id: r.comment_id, created_at: r.created_at, status: 'sent' });
-      const p = this.state.posts.find((x) => x.post_id === id);
+      const p = this.find(id);
       if (p) this.patchPost(id, { comment_count: p.comment_count + 1 });
     } catch (e) {
       this.putComment(id, clientId, { status: 'failed' });

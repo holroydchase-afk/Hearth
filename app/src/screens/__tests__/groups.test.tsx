@@ -26,6 +26,7 @@ describe('Groups (posters only)', () => {
   it('invite someone: makes a link that works for 30 days and a text to send', async () => {
     const { deps } = await renderApp(<GroupsScreen />, { user: 'chase' });
     fireEvent.press(await screen.findByRole('button', { name: "Invite someone to Grandparents – Dad's side" }));
+    fireEvent.press(await screen.findByRole('radio', { name: 'Share all past photos' })); // BETA-AUD-19: the parent picks share history first
     fireEvent.press(await screen.findByRole('button', { name: 'Make the invite' }));
     expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
     fireEvent.press(screen.getByRole('button', { name: 'Text the invite' }));
@@ -42,19 +43,18 @@ describe('Groups (posters only)', () => {
     await renderApp(<GroupsScreen />, { be, user: 'chase' });
     fireEvent.press(await screen.findByRole('button', { name: "Invite someone to Grandparents – Dad's side" }));
     fireEvent.changeText(screen.getByLabelText('Their name, the way your family says it'), 'Grandma June');
+    fireEvent.press(await screen.findByRole('radio', { name: 'Share all past photos' })); // BETA-AUD-19: the parent picks share history first
     fireEvent.press(screen.getByRole('button', { name: 'Make the invite' }));
     expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
     expect(Object.values(be.state.invites).some((i) => i.name === 'Grandma June')).toBe(true);
     expectGrandparentSafe();
   });
 
-  it('BETA-AUD-9: a group can let its members see each other\'s replies (off by default)', async () => {
-    const be = FakeBackend.withFixture();
-    await renderApp(<GroupsScreen />, { be, user: 'chase' });
-    const sw = await screen.findByRole('switch', { name: "Grandparents – Dad's side: members see each other's replies" });
-    expect(sw.props.accessibilityState).toMatchObject({ checked: false });
-    fireEvent.press(sw);
-    await waitFor(() => expect(be.state.circles[FIXTURE.circles.dadSide.id]!.replies_shared).toBe(true));
+  it('BETA-REPLY-12: there is no per-group "see each other\'s replies" switch any more', async () => {
+    await renderApp(<GroupsScreen />, { user: 'chase' });
+    await screen.findByText("Grandparents – Dad's side");
+    expect(screen.queryByRole('switch')).toBeNull();
+    expect(screen.queryByText(/see each other's replies/)).toBeNull();
     expectGrandparentSafe();
   });
 

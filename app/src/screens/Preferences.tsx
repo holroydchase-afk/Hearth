@@ -115,18 +115,21 @@ export function DeleteAccount() {
 export function ReplyAudience() {
   const app = useApp();
   const [choice, setChoice] = useState(app.space?.reply_audience ?? 'parents');
+  const [failed, setFailed] = useState(false);
   if (!app.space || app.space.role !== 'owner') return null;
   const pick = (c: 'parents' | 'everyone') => {
     const before = choice;
     setChoice(c);
-    app.deps.api.setReplyAudience(app.space!.space_id, c).catch(() => setChoice(before));
+    setFailed(false);
+    app.deps.api.setReplyAudience(app.space!.space_id, c).catch(() => { setChoice(before); setFailed(true); });
   };
   return (
     <Card>
       <Txt variant="title" role="header">Who reads what family members write</Txt>
-      <Txt variant="muted">For comments and hearts. Your own replies always reach everyone the photo went to. Groups can also be set so their members see each other's replies.</Txt>
-      <Choice kind="radio" label="Only the kids' parents (safest)" title="Only the kids' parents (safest)" checked={choice === 'parents'} onPress={() => pick('parents')} />
-      <Choice kind="radio" label="Everyone the photo was shared with" title="Everyone the photo was shared with" checked={choice === 'everyone'} onPress={() => pick('everyone')} />
+      <Txt variant="muted">For comments and hearts. The kids' parents read them all, and your own replies reach everyone the photo went to. People in the same household, or in the same event, read each other's.</Txt>
+      <Choice kind="radio" label="The parents, plus their own household and events (safest)" title="The parents, plus their own household and events (safest)" detail="A grandparent's comment reaches you, the other parent, and their own household. Never the other side." checked={choice === 'parents'} onPress={() => pick('parents')} />
+      <Choice kind="radio" label="Everyone the photo was shared with" title="Everyone the photo was shared with" detail="Divorced grandparents on the same photo will read each other's comments." checked={choice === 'everyone'} onPress={() => pick('everyone')} />
+      {failed ? <Notice text="Didn't save. Check your internet and try again." /> : null}
     </Card>
   );
 }

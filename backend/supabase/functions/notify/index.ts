@@ -8,7 +8,9 @@
 // batches) -> release_notifications() for anything that failed, forget_push_tokens()
 // for phones Expo says are gone. Batching windows live in SQL.
 //
-// PRIVACY: messages carry the actor's chosen name ("Grandma June") and a post id only. No photo, caption,
+// PRIVACY: messages carry the actor's chosen name ("Grandma June"), counts and a post id only; a bulk
+// import also names the month and year taken ("from July 2024"), from posts that person can see
+// (privacy-security, Oct 17: coarse, no day, place or child). No photo, caption,
 // comment text or child's name, and nothing about them in the logs: never log tokens,
 // email addresses, URLs or message text.
 
@@ -24,6 +26,11 @@ export type Batch = {
   outbox_ids: string[];
   push_tokens: string[];
   email: string | null;
+  // 0010 (BETA-BULK-6): a bulk import's batch notice. Optional so an older claim still parses.
+  is_batch?: boolean;
+  photo_count?: number;
+  taken_from?: string | null;
+  taken_to?: string | null;
 };
 
 export type PushMessage = { to: string[]; title: string; body: string; sound: "default"; data: { post_id: string } };
@@ -47,8 +54,29 @@ export function joinNames(names: string[]): string {
   return `${names[0]}, ${names[1]} and ${names.length - 2} others`;
 }
 
-function summary(b: Batch): { line: string; isReply: boolean } {
+// "July 2024" in Eastern time (full month names: grandparent-ux; "Jul" reads as a typo or an abbreviation June must decode) (the POC family is all in WV/NC, like the email windows).
+const month = (iso: string) => {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", month: "long", year: "numeric" })
+    .formatToParts(new Date(iso));
+  return { m: parts.find((p) => p.type === "month")!.value, y: parts.find((p) => p.type === "year")!.value };
+};
+
+/** BETA-BULK-6: "from July 2024", "from June to July 2024", "from December 2023 to January 2024", or "" with no dates. */
+export function takenSpan(from?: string | null, to?: string | null): string {
+  if (!from || !to) return "";
+  const a = month(from), b = month(to);
+  if (a.y === b.y && a.m === b.m) return ` from ${a.m} ${a.y}`;
+  if (a.y === b.y) return ` from ${a.m} to ${b.m} ${b.y}`;
+  return ` from ${a.m} ${a.y} to ${b.m} ${b.y}`;
+}
+
+function summary(b: Batch): { line: string; isReply: boolean; one?: boolean } {
   const who = joinNames(b.actor_names);
+  if (b.is_batch && b.post_count > 0 && b.comment_count + b.heart_count === 0) {
+    const n = b.photo_count ?? 0;
+    const photos = n === 1 ? "1 photo" : `${n} photos`;
+    return { line: `${who} added ${photos}${takenSpan(b.taken_from, b.taken_to)}`, isReply: false, one: n === 1 };
+  }
   if (b.post_count > 0 && b.comment_count + b.heart_count === 0) return { line: `${who} shared new photos`, isReply: false };
   if (b.post_count === 0) return { line: `${who} replied to your photos`, isReply: true };
   return { line: `New photos and replies from ${who}`, isReply: false };
@@ -56,11 +84,11 @@ function summary(b: Batch): { line: string; isReply: boolean } {
 
 export function buildPush(b: Batch): PushMessage[] {
   if (b.push_tokens.length === 0) return [];
-  const { line, isReply } = summary(b);
+  const { line, isReply, one } = summary(b);
   return [{
     to: b.push_tokens,
     title: `From ${joinNames(b.actor_names)} on Hearth`, // BETA-NOTIFY-7: a real person, not a generic notice
-    body: isReply ? `${line}. Tap to see.` : `${line}. Tap to see them.`,
+    body: isReply ? `${line}. Tap to see.` : one ? `${line}. Tap to see it.` : `${line}. Tap to see them.`,
     sound: "default",
     data: { post_id: b.latest_post_id },
   }];
@@ -76,11 +104,11 @@ const headerSafe = (n: string) => n.replace(/[^\p{L}\p{N} .'-]/gu, "").trim().sl
 export function buildEmail(input: Batch): Email | null {
   const b = { ...input, actor_names: input.actor_names.map(headerSafe).filter(Boolean) };
   if (b.actor_names.length === 0) return null;
-  const { line, isReply } = summary(b);
+  const { line, isReply, one } = summary(b);
   // No website yet -> no link (a dead link looks like a scam); plain words instead.
   const base = Deno.env.get("APP_LINK_BASE")?.replace(/\/$/, "");
   const link = base ? `${base}/p/${b.latest_post_id}` : null;
-  const what = isReply ? "it" : "them";
+  const what = isReply || one ? "it" : "them";
   // BETA-NOTIFY-7: "Chase on Hearth <hello@…>". Only the address comes from RESEND_FROM;
   // the name is stripped of anything that could change the header.
   const addr = (Deno.env.get("RESEND_FROM") ?? "hello@hearth.family").match(/<([^>]+)>/)?.[1] ??

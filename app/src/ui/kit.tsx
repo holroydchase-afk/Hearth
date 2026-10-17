@@ -31,7 +31,7 @@ export function Txt({ variant = 'body', style, children, role, testID, numberOfL
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'quiet';
 
-export function Button({ label, text, onPress, variant = 'primary', disabled, style, selected, testID, busy, role = 'button' }: {
+export function Button({ label, text, onPress, variant = 'primary', disabled, softDisabled, style, selected, testID, busy, role = 'button' }: {
   /** What a screen reader says. Required: no unlabeled targets. */
   label: string;
   /** Visible words; defaults to the label. */
@@ -39,6 +39,8 @@ export function Button({ label, text, onPress, variant = 'primary', disabled, st
   onPress: () => void;
   variant?: ButtonVariant;
   disabled?: boolean;
+  /** Looks and reads as off, but a tap still reaches onPress so the screen can say why ("Pick one above first."). */
+  softDisabled?: boolean;
   selected?: boolean;
   busy?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -52,13 +54,13 @@ export function Button({ label, text, onPress, variant = 'primary', disabled, st
     <Pressable
       accessibilityRole={role}
       accessibilityLabel={label}
-      accessibilityState={{ disabled: !!disabled, selected: !!selected, busy: !!busy }}
+      accessibilityState={{ disabled: !!disabled || !!softDisabled, selected: !!selected, busy: !!busy }}
       disabled={disabled || busy}
       onPress={onPress}
       testID={testID}
       style={({ pressed }) => [
         styles.btn,
-        { backgroundColor: bg, borderColor: variant === 'secondary' || variant === 'quiet' ? c.line : bg, opacity: disabled ? 0.5 : pressed ? 0.85 : 1 },
+        { backgroundColor: bg, borderColor: variant === 'secondary' || variant === 'quiet' ? c.line : bg, opacity: disabled || softDisabled ? 0.5 : pressed ? 0.85 : 1 },
         selected ? { borderColor: c.accent, borderWidth: 2, backgroundColor: c.accentSoft } : null,
         style,
       ]}

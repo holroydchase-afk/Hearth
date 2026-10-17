@@ -207,11 +207,11 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
 
   describe('invites (BETA-JOIN-1, -3, -4)', () => {
     it('viewers cannot create invites (42501)', async () => {
-      expect(await code(viewerIn.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn] }))).toBe('42501');
+      expect(await code(viewerIn.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all' }))).toBe('42501');
     });
 
     it('preview works signed out and leaks only inviter and space name', async () => {
-      const { code: c, link } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn] });
+      const { code: c, link } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all' });
       expect(link).toMatch(/^https:\/\//); // may carry a separate link token rather than the code
       const prev = await h.anon().invitePreview(c);
       expect(Object.keys(prev).sort()).toEqual(['inviter_name', 'space_name']);
@@ -224,7 +224,7 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
 
     itJoiner('redeeming places the person in the invite circles, once', async () => {
       const id = await publishedPost('for the joiner');
-      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], channel: 'email', targetEmail: h.joinerEmail });
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', channel: 'email', targetEmail: h.joinerEmail });
       const joiner = h.as('joiner');
       expect(await joiner.redeemInvite(c)).toBe(h.spaceId);
       expect(await feedIds(joiner)).toContain(id);
@@ -232,14 +232,14 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
     });
 
     itJoiner('an invite addressed to someone else is refused (22023)', async () => {
-      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], channel: 'email', targetEmail: 'someone.else@example.com' });
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', channel: 'email', targetEmail: 'someone.else@example.com' });
       expect(await code(h.as('joiner').redeemInvite(c))).toBe('22023');
     });
 
     itRate('S10: 10 failures in 10 minutes, then 54000 even for a good code', async () => {
       const rl = h.as('ratelimit');
       for (let i = 0; i < 10; i++) expect(await code(rl.redeemInvite(`BAD${i}BAD${i}XX`))).toBe('22023');
-      const { code: good } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn] });
+      const { code: good } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all' });
       expect(await code(rl.redeemInvite(good))).toBe('54000');
     });
   });
@@ -348,12 +348,12 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
     });
 
     it('JOIN-1: an invite can carry the name the family uses; an email-like one is 23514', async () => {
-      expect(await code(poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], name: 'Grandma June' }))).toBe('ok');
-      expect(await code(poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], name: 'june@example.com' }))).toBe('23514');
+      expect(await code(poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', name: 'Grandma June' }))).toBe('ok');
+      expect(await code(poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', name: 'june@example.com' }))).toBe('23514');
     });
 
     itJoiner('JOIN-1: joining gives a person with no chosen name the name on the invite', async () => {
-      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], channel: 'email', targetEmail: h.joinerEmail, name: 'Grandma June' });
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', channel: 'email', targetEmail: h.joinerEmail, name: 'Grandma June' });
       const joiner = h.as('joiner');
       const before = await joiner.myProfile();
       await joiner.redeemInvite(c);
@@ -386,7 +386,7 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
 
   describe('request_account_deletion (BETA-JOIN-7)', () => {
     itJoiner('BETA-JOIN-7: a member who deletes their account is out of every space', async () => {
-      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], channel: 'email', targetEmail: h.joinerEmail });
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', channel: 'email', targetEmail: h.joinerEmail });
       const joiner = h.as('joiner');
       await joiner.redeemInvite(c);
       expect((await joiner.mySpaces()).length).toBeGreaterThan(0);
@@ -410,11 +410,19 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(theirs.reply_scope).toBe('everyone');
     });
 
-    it('BETA-AUD-9: posters flip "members see each other\'s replies" on a group; viewers get not found', async () => {
-      expect(await code(poster.setGroupRepliesShared(h.circleIn, true))).toBe('ok');
-      expect((await poster.myCircles(h.spaceId)).find((c) => c.circle_id === h.circleIn)?.replies_shared).toBe(true);
-      expect(await code(viewerIn.setGroupRepliesShared(h.circleIn, false))).toBe('P0002');
-      expect(await code(poster.setGroupRepliesShared(h.circleIn, false))).toBe('ok');
+    it('BETA-REPLY-12: the per-group switch is gone; containers report their kind', async () => {
+      expect((poster as unknown as Record<string, unknown>).setGroupRepliesShared).toBeUndefined();
+      const mine = (await poster.myCircles(h.spaceId)).find((c) => c.circle_id === h.circleIn)!;
+      expect(mine).not.toHaveProperty('replies_shared');
+      expect(['everyone', 'group', 'household', 'event']).toContain(mine.kind);
+    });
+
+    it('BETA-REPLY-11: reply_readers names who will read my reply; null for a post I cannot see', async () => {
+      const id = await publishedPost('who reads');
+      const names = await viewerIn.replyReaders(id);
+      expect(Array.isArray(names)).toBe(true);
+      expect(names!.length).toBeGreaterThan(0);
+      expect(await viewerOut.replyReaders(id)).toBeNull();
     });
 
     it('BETA-AUD-10: only the owner changes the family default; an unknown choice is 23514', async () => {
@@ -423,6 +431,113 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(poster.setReplyAudience(h.spaceId, 'everyone'))).toBe('ok');
       expect((await poster.mySpaces()).find((s) => s.space_id === h.spaceId)?.reply_audience).toBe('everyone');
       expect(await code(poster.setReplyAudience(h.spaceId, 'parents'))).toBe('ok');
+    });
+  });
+  describe('get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010)', () => {
+    async function datedPost(takenAt: string | null, circles = [h.circleIn], caption = 'dated'): Promise<string> {
+      const id = await poster.createPost({ clientId: uuid(), space: h.spaceId, caption, circleIds: circles, takenAt });
+      await h.attachReadyMedia(poster, id);
+      await poster.publishPost(id);
+      return id;
+    }
+    const tlIds = async (api: HearthApi) => (await api.getTimeline({ space: h.spaceId, limit: 50 })).map((p) => p.post_id);
+
+    it('BETA-TIME-2 orders by date taken (shared date when none), newest first; rows carry taken_at and sort_at', async () => {
+      const old = await datedPost('2024-07-04T14:00:00.000Z');
+      const mid = await datedPost('2025-12-25T18:00:00.000Z');
+      const undated = await datedPost(null);
+      const ids = (await tlIds(viewerIn)).filter((i) => [old, mid, undated].includes(i));
+      expect(ids).toEqual([undated, mid, old]);
+      const rows = await viewerIn.getTimeline({ space: h.spaceId, limit: 50 });
+      const o = rows.find((r) => r.post_id === old)!;
+      expect(o.taken_at && new Date(o.taken_at).toISOString()).toBe('2024-07-04T14:00:00.000Z');
+      expect(new Date(o.sort_at).toISOString()).toBe('2024-07-04T14:00:00.000Z');
+      const u = rows.find((r) => r.post_id === undated)!;
+      expect(u.taken_at).toBeNull();
+      expect(u.sort_at).toBe(u.published_at);
+    });
+
+    it('BETA-TIME-1 feed rows carry taken_at (for the "Added from earlier" card); null when none', async () => {
+      const old = await datedPost('2024-07-04T14:00:00.000Z');
+      const undated = await datedPost(null);
+      const rows = await viewerIn.getFeed({ space: h.spaceId, limit: 50 });
+      const o = rows.find((r) => r.post_id === old)!;
+      expect(o.taken_at && new Date(o.taken_at).toISOString()).toBe('2024-07-04T14:00:00.000Z');
+      expect(rows.find((r) => r.post_id === undated)!.taken_at).toBeNull();
+    });
+
+    it('BETA-TIME-1 the feed is unchanged: still newest shared first', async () => {
+      const a = await datedPost('2020-01-01T12:00:00.000Z');
+      const b = await datedPost('2025-01-01T12:00:00.000Z');
+      const ids = (await feedIds(viewerIn)).filter((i) => [a, b].includes(i));
+      expect(ids).toEqual([b, a]);
+      const tl = (await tlIds(viewerIn)).filter((i) => [a, b].includes(i));
+      expect(tl).toEqual([b, a]);
+      const c = await datedPost('2019-06-01T12:00:00.000Z');
+      expect((await feedIds(viewerIn))[0]).toBe(c);
+      expect((await tlIds(viewerIn)).indexOf(c)).toBeGreaterThan((await tlIds(viewerIn)).indexOf(a));
+    });
+
+    it('BETA-TIME-2 keyset pages: no gaps or duplicates, limit capped at 50', async () => {
+      for (let i = 0; i < 5; i++) await datedPost(`2023-0${i + 1}-15T12:00:00.000Z`);
+      const all = await tlIds(viewerIn);
+      const seen: string[] = [];
+      let beforeAt: string | null = null, beforeId: string | null = null;
+      for (let guard = 0; guard < 30; guard++) {
+        const page = await viewerIn.getTimeline({ space: h.spaceId, limit: 2, beforeAt, beforeId });
+        seen.push(...page.map((p) => p.post_id));
+        if (page.length < 2) break;
+        beforeAt = page[page.length - 1]!.sort_at; beforeId = page[page.length - 1]!.post_id;
+      }
+      expect(seen).toEqual(all);
+      expect(new Set(seen).size).toBe(seen.length);
+      expect((await viewerIn.getTimeline({ space: h.spaceId, limit: 500 })).length).toBeLessThanOrEqual(50);
+    });
+
+    it('BETA-TIME-3 a hidden post is simply absent: the allowed person sees it, the excluded one never does', async () => {
+      const id = await datedPost('2024-07-04T14:00:00.000Z', [h.circleIn], 'only for circleIn');
+      expect(await tlIds(viewerIn)).toContain(id);
+      expect(await tlIds(poster)).toContain(id);
+      expect(await tlIds(viewerOut)).not.toContain(id);
+      const yearsIn = await viewerIn.getTimelineYears(h.spaceId, 'America/New_York');
+      const yearsOut = await viewerOut.getTimelineYears(h.spaceId, 'America/New_York');
+      expect(yearsIn.find((y) => y.year === 2024)?.post_count ?? 0).toBeGreaterThanOrEqual(1);
+      expect(yearsOut.find((y) => y.year === 2024)).toBeUndefined();
+    });
+
+    it('BETA-TIME-3 drafts and deleted posts never appear', async () => {
+      const draft = await poster.createPost({ clientId: uuid(), space: h.spaceId, caption: 'draft', circleIds: [h.circleIn], takenAt: '2022-02-02T12:00:00.000Z' });
+      const gone = await datedPost('2022-03-03T12:00:00.000Z');
+      await poster.deletePost(gone);
+      for (const api of [poster, viewerIn]) {
+        const ids = await tlIds(api);
+        expect(ids).not.toContain(draft);
+        expect(ids).not.toContain(gone);
+      }
+    });
+
+    it('BETA-TIME-4 years, newest first, with post and photo counts; the year follows the phone time zone', async () => {
+      await datedPost('2021-05-01T12:00:00.000Z');
+      await datedPost('2021-06-01T12:00:00.000Z');
+      await datedPost('2019-01-01T03:30:00.000Z'); // 10:30 pm Dec 31 2018 in New York
+      const ny = await viewerIn.getTimelineYears(h.spaceId, 'America/New_York');
+      expect(ny.map((y) => y.year)).toEqual([...ny.map((y) => y.year)].sort((a, b) => b - a));
+      expect(ny.find((y) => y.year === 2021)).toMatchObject({ post_count: 2, photo_count: 2 });
+      expect(ny.find((y) => y.year === 2018)).toMatchObject({ post_count: 1 });
+      expect(ny.find((y) => y.year === 2019)).toBeUndefined();
+      const utc = await viewerIn.getTimelineYears(h.spaceId, 'UTC');
+      expect(utc.find((y) => y.year === 2019)).toMatchObject({ post_count: 1 });
+    });
+
+    it('BETA-TIME-4 an unknown time zone is 22023', async () => {
+      expect(await code(viewerIn.getTimelineYears(h.spaceId, 'Mars/Olympus'))).toBe('22023');
+    });
+
+    it('BETA-BULK-6 create_post: batch id and size go together; a batch is 1-100 posts (23514)', async () => {
+      expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid() }))).toBe('23514');
+      expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchSize: 3 }))).toBe('23514');
+      expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid(), batchSize: 101 }))).toBe('23514');
+      expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid(), batchSize: 5, takenAt: '2024-07-04T14:00:00.000Z' }))).toBe('ok');
     });
   });
 });

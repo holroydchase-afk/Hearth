@@ -809,6 +809,2150 @@
     "S7"
    ],
    "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-111",
+   "title": "S12 / BETA-REPLY-4: an author removed from the space cannot edit captions on their old posts",
+   "area": "Security review fixes",
+   "tickets": [
+    "S1"
+   ],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-112",
+   "title": "BETA-AUD-7: no app-readable column holds last-seen, login, online or device details",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-113",
+   "title": "BETA-AUD-7: the family-plan author still sees who has seen the post (Seen by unchanged)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-114",
+   "title": "BETA-AUD-7: ...but not when each person last looked",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-115",
+   "title": "BETA-AUD-7: nobody sees another member's phones",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-116",
+   "title": "BETA-AUD-7: app users cannot read sign-in records (auth.users)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-001",
+   "title": "my_spaces: Alex is in 2 spaces",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-002",
+   "title": "my_spaces: owner row has role owner, can_post, no inviter",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-003",
+   "title": "my_spaces: co-parent row shows viewer, cannot post, inviter Blair",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-004",
+   "title": "my_spaces: grandparent sees one space, invited by Alex",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-005",
+   "title": "my_spaces: a user with no spaces gets",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-006",
+   "title": "my_spaces: anon is refused",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-007",
+   "title": "my_circles: owner sees all 3 circles",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-008",
+   "title": "my_circles: member_count and member_names for Everyone",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-009",
+   "title": "my_circles: Co-parent circle has exactly Blair",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-010",
+   "title": "my_circles: Alex is a viewer in Blair's space, gets",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-011",
+   "title": "my_circles: viewer gets",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-012",
+   "title": "BETA-AUD-4 my_circles: co-parent gets [] in the other household (no circle names leak)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-013",
+   "title": "my_circles: non-member gets",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-014",
+   "title": "BETA-AUD-3 get_feed: user only in circle Everyone sees only the Everyone post, not the circle-A post",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-015",
+   "title": "get_feed: Dad-side grandma sees the grandparents post and the Everyone post",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-016",
+   "title": "get_feed: audience, seen_count, reach_count are null for non-authors",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-017",
+   "title": "get_feed: author_name, caption, heart_count, i_hearted, comment_count",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-018",
+   "title": "get_feed: media array in position order with the contract fields",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-019",
+   "title": "get_feed: i_hearted is per caller",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-020",
+   "title": "BETA-AUD-4 get_feed: co-parent sees only the co-parent post in the other space",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-021",
+   "title": "get_feed: author sees all own published posts",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-022",
+   "title": "get_feed: author gets audience [{circle_id,name,member_count}], reach_count, seen_count",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-023",
+   "title": "get_feed: reach_count excludes the author",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-024",
+   "title": "get_feed: non-member gets",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-025",
+   "title": "get_feed: anon is refused",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-026",
+   "title": "get_feed matches can_view_post() for every user x space (seed)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-027",
+   "title": "get_feed: keyset pages (limit 7, with timestamp ties) return every visible post once, newest first",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-028",
+   "title": "get_feed: p_limit is capped at 50",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-029",
+   "title": "get_feed: default page is 20",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-030",
+   "title": "get_feed: a cursor before everything returns",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-031",
+   "title": "get_feed: author keyset pages cover every own post once",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-032",
+   "title": "create_post: retry with the same p_client_id returns the original post_id",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-033",
+   "title": "create_post: ...creates no duplicate, keeps the original, and makes a draft",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-034",
+   "title": "create_post: drafts are not in the author's feed",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-035",
+   "title": "create_post: no audience is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-036",
+   "title": "create_post: a circle from another space is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-037",
+   "title": "create_post: p_client_id is required (23514)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-038",
+   "title": "create_post: viewer who cannot post gets 42501",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-039",
+   "title": "create_post: non-member gets 42501",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-040",
+   "title": "create_post: a viewer-poster cannot target a circle they cannot see (23514)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-041",
+   "title": "create_post: a viewer-poster can target their own circle",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-042",
+   "title": "create_post: anon is refused",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-043",
+   "title": "publish_post: media not ready is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-044",
+   "title": "publish_post: someone who cannot see the draft gets P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-045",
+   "title": "publish_post: unknown post gets P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-046",
+   "title": "publish_post: author publishes once media is ready",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-047",
+   "title": "publish_post: publishing again is a no-op (idempotent)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-048",
+   "title": "publish_post: ...and does not move published_at",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-049",
+   "title": "publish_post: the audience now sees it in get_feed",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-050",
+   "title": "publish_post: a visible post by someone else is 42501",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-051",
+   "title": "BETA-REPLY-1 toggle_heart: one call hearts it",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-052",
+   "title": "BETA-REPLY-1 the audience sees who hearted it",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-053",
+   "title": "BETA-REPLY-1 toggle_heart: a second call un-hearts it",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-054",
+   "title": "BETA-AUD-3 toggle_heart: invisible post is P0002 (not 42501)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-055",
+   "title": "toggle_heart: unknown post is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-056",
+   "title": "BETA-REPLY-1 people outside the audience do not see who hearted",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-057",
+   "title": "toggle_heart: viewer when viewers_can_comment = false is 42501",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-058",
+   "title": "BETA-REPLY-2 add_comment: retry with the same p_client_id returns the original comment",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-059",
+   "title": "add_comment: no duplicate, body stored trimmed",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-060",
+   "title": "add_comment: 500 characters is allowed and returns created_at",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-061",
+   "title": "add_comment: 501 characters is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-062",
+   "title": "add_comment: blank after trim is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-063",
+   "title": "get_comments: oldest first",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-064",
+   "title": "get_comments: author_name",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-065",
+   "title": "get_comments: p_limit",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-066",
+   "title": "BETA-REPLY-2 the post's audience sees the comment",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-067",
+   "title": "BETA-REPLY-2 outside the audience: get_comments is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-068",
+   "title": "get_comments: unknown post is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-069",
+   "title": "BETA-REPLY-2 add_comment on an invisible post is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-070",
+   "title": "BETA-REPLY-2 ...and the comments table shows nothing",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-071",
+   "title": "add_comment: viewers_can_comment = false is 42501",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-072",
+   "title": "mark_seen: audience member marks seen",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-073",
+   "title": "mark_seen: again is fine (idempotent)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-074",
+   "title": "mark_seen: one receipt row",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-075",
+   "title": "mark_seen: feeds the author's seen_count",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-076",
+   "title": "mark_seen: author viewing own post is a no-op",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-077",
+   "title": "mark_seen: ...and the author never counts as a viewer",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-078",
+   "title": "mark_seen: invisible post is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-079",
+   "title": "BETA-SEE-6 removed from the circle: post gone from get_feed immediately",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-080",
+   "title": "BETA-SEE-6 ...and can_view_post (the media signer) says no",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-081",
+   "title": "BETA-SEE-6 / REPLY-4 ...hearting it is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-082",
+   "title": "BETA-SEE-6 / REPLY-4 ...commenting is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-083",
+   "title": "BETA-AUD-5 delete_post: a visible post by someone else is 42501",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-084",
+   "title": "BETA-AUD-5 delete_post: an invisible post is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-085",
+   "title": "BETA-AUD-5 delete_post: author deletes",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-086",
+   "title": "BETA-AUD-5 delete_post: deleting again is a no-op (idempotent)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-087",
+   "title": "BETA-AUD-5 gone from the author's feed",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-088",
+   "title": "BETA-AUD-5 gone from a viewer's feed",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-089",
+   "title": "BETA-AUD-5 can_view_post is false, so sign-media refuses new URLs",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-090",
+   "title": "BETA-AUD-5 hearting a deleted post is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-091",
+   "title": "BETA-AUD-5 the deleted post's wrapped keys are destroyed (crypto-shred)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-092",
+   "title": "BETA-AUD-5 its media blobs are queued for purge",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-093",
+   "title": "delete_post: unknown post is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-094",
+   "title": "create_invite: returns code and link",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-095",
+   "title": "create_invite: the typed code stays short (10 chars)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-096",
+   "title": "BETA-JOIN-4 create_invite: the link carries >= 128 random bits",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-097",
+   "title": "BETA-JOIN-4 (S9) a manager cannot read invite code hashes",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-098",
+   "title": "BETA-JOIN-4 (S9) a manager cannot read invite link hashes",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-099",
+   "title": "BETA-JOIN-4 (S9) select * on invites is refused (name the columns)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-100",
+   "title": "create_invite: managers still list invites without the hashes",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-101",
+   "title": "BETA-JOIN-4 (S9) stored hash is keyed (HMAC with a server pepper), not sha256(code)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-102",
+   "title": "BETA-JOIN-4 (S9) clients cannot read the pepper",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-103",
+   "title": "create_invite: viewer is 42501",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-104",
+   "title": "invite_preview: anon sees exactly {inviter_name, space_name}",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-105",
+   "title": "invite_preview: the link token works too",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-106",
+   "title": "invite_preview: unknown code is 22023",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-107",
+   "title": "invite_preview over PostgREST: 400 with code 22023",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-108",
+   "title": "BETA-JOIN-3 expired invite is 22023",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-109",
+   "title": "BETA-JOIN-3 revoked invite is 22023",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-110",
+   "title": "BETA-JOIN-3 used-up invite is 22023",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-111",
+   "title": "BETA-JOIN-3 unknown code is 22023",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-112",
+   "title": "BETA-JOIN-3 invite addressed to a different email is 22023",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-113",
+   "title": "BETA-JOIN-3 wrong-email and unknown-code responses are byte-identical (no space data, no hint the code is real)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-114",
+   "title": "redeem_invite: the addressed person redeems (case-insensitive) and gets space_id",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-115",
+   "title": "redeem_invite: ...and lands in the invited circle",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-116",
+   "title": "redeem_invite: the long link token redeems",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-117",
+   "title": "BETA-JOIN-4 (S10) 10th failure is still 22023 (failures persist across requests)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-118",
+   "title": "BETA-JOIN-4 (S10) 11th attempt by the same account is 54000, even with a valid code",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-119",
+   "title": "BETA-JOIN-4 (S10) ...and did not join",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-120",
+   "title": "BETA-JOIN-4 (S10) also 54000 outside PostgREST",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-121",
+   "title": "BETA-JOIN-4 (S10) the same IP is limited across accounts (last X-Forwarded-For hop)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-122",
+   "title": "BETA-JOIN-4 (S10) a different account on a different IP is not limited",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-123",
+   "title": "BETA-JOIN-4 (S10) Prefer: tx=rollback (which would erase the failure log) is refused",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-124",
+   "title": "BETA-JOIN-4 (S10) the window is 10 minutes",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-125",
+   "title": "BETA-JOIN-4 (S10) invite_preview: 11th anon attempt from one IP is 54000",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-126",
+   "title": "BETA-JOIN-4 (S10) invite_preview: another IP still works",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-127",
+   "title": "names: a new account starts with a placeholder name, marked not set",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-128",
+   "title": "names: my_profile returns the caller's name and whether it is set",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-129",
+   "title": "BETA-NOTIFY-7: a poster sets the name the family knows him by",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-130",
+   "title": "BETA-NOTIFY-7: ...trimmed and saved",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-131",
+   "title": "names: an empty name is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-132",
+   "title": "names: an email address is not a name (23514)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-133",
+   "title": "names: over 40 characters is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-134",
+   "title": "names: angle brackets are refused (23514)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-135",
+   "title": "JOIN-1: an invite name that is an email is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-136",
+   "title": "BETA-NOTIFY-7: the invite preview names the real sender (\"Chase invited you\")",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-137",
+   "title": "setup: June joins",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-138",
+   "title": "JOIN-1: joining gives her the name Chase typed; she types nothing",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-139",
+   "title": "setup: Earl sets his own name first",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-140",
+   "title": "setup: Earl joins",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-141",
+   "title": "names: an invite never overwrites a name the person chose",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-142",
+   "title": "names: anon cannot set a name (42501)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-143",
+   "title": "names: a direct profile update cannot bypass set_my_name (42501)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-144",
+   "title": "names: the table itself refuses brackets or line breaks in a name (23514)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-145",
+   "title": "names: an invite can't reuse a family member's name (no \"Chase\" impersonation, 23514)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-146",
+   "title": "rename_circle: the owner renames a group",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-147",
+   "title": "rename_circle: ...trimmed and saved",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-148",
+   "title": "rename_circle: a name another group already has is 23514 (not 23505)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-149",
+   "title": "rename_circle: an empty name is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-150",
+   "title": "rename_circle: over 60 characters is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-151",
+   "title": "rename_circle: a viewer gets not found (P0002), even for her own group",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-152",
+   "title": "rename_circle: a poster in another space gets not found (P0002)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-153",
+   "title": "rename_circle: unknown group is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-154",
+   "title": "setup: rename back",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-155",
+   "title": "BETA-OPS-1: a signed-in member reports an error",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-156",
+   "title": "BETA-OPS-1: exactly 1 row with app version, OS, screen and error type",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-157",
+   "title": "BETA-OPS-1: errors before sign-in can be reported too",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-158",
+   "title": "BETA-OPS-1: free text (a caption) is refused, not stored",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-159",
+   "title": "BETA-OPS-1: a URL is refused, not stored",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-160",
+   "title": "BETA-OPS-1: an email address is refused, not stored",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-161",
+   "title": "BETA-OPS-1: app users cannot read error reports",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-162",
+   "title": "setup: 30 reports in an hour",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-163",
+   "title": "BETA-OPS-1: more than 30 reports an hour from one person is 54000",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-164",
+   "title": "BETA-OPS-1: reports older than 30 days are purged; newer ones stay",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-165",
+   "title": "BETA-OPS-1: only the server can purge",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-166",
+   "title": "RLS: every policy uses (select auth.uid()), never a per-row auth.uid()",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-167",
+   "title": "RLS: membership helpers are wrapped as once-per-statement (select ...) arrays, not per-row calls",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-168",
+   "title": "Indexes: every foreign key has an index on its columns",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-169",
+   "title": "RLS: rewritten posts policy returns exactly the rows can_view_post() allows, for every user",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-001",
+   "title": "BETA-NOTIFY-2: publishing to the Dad's-side grandparents group queues exactly those two members",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-002",
+   "title": "BETA-NOTIFY-2: the author, the co-parent, Aunt Jo and Grandma Chen get nothing",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-003",
+   "title": "BETA-NOTIFY-2: the sender claims one notice per audience member",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-004",
+   "title": "BETA-NOTIFY-2: the notice carries the poster's name, the post id and only that member's token",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-005",
+   "title": "BETA-NOTIFY-2: the claimed payload has no caption, no child's name and no media key or URL",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-006",
+   "title": "BETA-NOTIFY-2: a claimed notice is never sent twice",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-007",
+   "title": "BETA-NOTIFY-2: someone removed from the group before sending gets no notice",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-008",
+   "title": "BETA-NOTIFY-4: a post with 5 photos gives each recipient 1 notice, not 5",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-009",
+   "title": "BETA-NOTIFY-4: posts within 10 minutes of the last notice wait (no second buzz)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-010",
+   "title": "BETA-NOTIFY-4: after the 10-minute window, 3 posts arrive as 1 notice per recipient",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-011",
+   "title": "BETA-NOTIFY-4: 3 posts queued together go out as 1 notice per recipient",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-012",
+   "title": "setup: Grandma Rivera comments",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-013",
+   "title": "setup: Grandpa Rivera hearts",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-014",
+   "title": "BETA-REPLY-3: a comment and a heart on Alex's post reach Alex as 1 notice",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-015",
+   "title": "BETA-REPLY-3: the people who reacted get nothing about their own reaction",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-016",
+   "title": "BETA-REPLY-3: the comment text is not in the notice",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-017",
+   "title": "setup: Alex hearts the post they made",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-018",
+   "title": "BETA-REPLY-3: hearting your own post queues nothing",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-019",
+   "title": "setup: Grandpa un-hearts",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-020",
+   "title": "setup: Grandpa hearts again",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-021",
+   "title": "setup: Grandpa un-hearts again",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-022",
+   "title": "setup: Grandpa hearts a third time",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-023",
+   "title": "BETA-NOTIFY-4: hearting on and off repeatedly queues 1 notice, not one per tap",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-024",
+   "title": "BETA-NOTIFY-5: a daily email waits for the evening (nothing at noon)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-025",
+   "title": "prefs: push off and email off -> nothing sent, and the notice is closed out (no pile-up)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-026",
+   "title": "BETA-NOTIFY-5: push off + daily email -> one email at 6 pm, no push tokens",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-027",
+   "title": "BETA-NOTIFY-5: one evening email per day; later photos wait for the next evening",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-028",
+   "title": "BETA-NOTIFY-5: the Sunday email waits for Sunday 8 am",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-029",
+   "title": "prefs: push wanted but no phone registered -> falls back to the evening email",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-030",
+   "title": "security: a signed-in user cannot claim notices",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-031",
+   "title": "security: a signed-in user cannot release notices",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-032",
+   "title": "security: a signed-in user cannot read the outbox",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-033",
+   "title": "security: anon cannot claim notices",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-034",
+   "title": "sender: forget_push_tokens drops a token Expo reports as no longer registered",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-035",
+   "title": "security: a signed-in user cannot delete tokens",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-036",
+   "title": "sender: release_notifications puts a failed send back, and it goes out on the next run",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-037",
+   "title": "register_push_token: a member saves her phone's token",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-038",
+   "title": "register_push_token: saving it again is a no-op (idempotent)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-039",
+   "title": "register_push_token: unknown platform is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-040",
+   "title": "register_push_token: a malformed token is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-041",
+   "title": "register_push_token: the same phone signed in by someone else",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-042",
+   "title": "register_push_token: the token moves to whoever signed in last (shared phone gets one person's notices)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-043",
+   "title": "register_push_token: anon is 42501",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-044",
+   "title": "set_notification_prefs: a member turns push off and picks a daily email",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-045",
+   "title": "set_notification_prefs: the choice is saved on the server",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-046",
+   "title": "set_notification_prefs: changing it again overwrites",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-047",
+   "title": "set_notification_prefs: unknown email choice is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-048",
+   "title": "set_notification_prefs: a space you are not in is P0002",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-049",
+   "title": "BETA-BULK-6: create_post with p_batch_id but no p_batch_size is 23514 (both or neither)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-050",
+   "title": "BETA-BULK-6: a batch of more than 100 posts is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-051",
+   "title": "BETA-BULK-6: mid-batch (2 of 5 posts sent) nobody is notified yet",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-052",
+   "title": "BETA-BULK-6: when the 5th post is sent, each grandparent gets exactly 1 notice for the whole batch",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-053",
+   "title": "BETA-BULK-6: the notice says 5 posts, 48 photos, taken Jul 4 to Jul 6 2024, from Alex (\"Alex added 48 photos from Jul 2024\")",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-054",
+   "title": "BETA-BULK-6: the batch notice carries no media key or URL",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-055",
+   "title": "BETA-BULK-6: no second notice for the same batch",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-056",
+   "title": "BETA-BULK-6: an unfinished batch waits (1 of 3 posts sent, 20 minutes in)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-057",
+   "title": "BETA-BULK-6: ...and goes out as 1 notice (4 photos) 30 minutes after it was queued",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-001",
+   "title": "M1 setup: Chase owns one space",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-002",
+   "title": "M1 setup: the starter groups exist (Chase can rename them in the app)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-003",
+   "title": "M1 setup: one viewer invite for the test account",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-004",
+   "title": "M2 setup: one poster (adult) invite for Danielle",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-005",
+   "title": "setup: running it again reuses the space and groups (no duplicates)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-001",
+   "title": "AUD-8: by default Grandma can't read Grandpa's comment, even in the same group",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-002",
+   "title": "AUD-8: ...not through the table either",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-003",
+   "title": "AUD-8: the comment count she sees doesn't give it away",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-004",
+   "title": "AUD-8: Grandpa sees his own comment",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-005",
+   "title": "AUD-8: Grandpa can't tell Grandma hearted it (heart count shows only what he may see)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-006",
+   "title": "AUD-8: the app is told his replies reach only the parents",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-007",
+   "title": "AUD-8: the parent (owner) reads every reply",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-008",
+   "title": "AUD-8: ...and sees every heart",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-009",
+   "title": "setup: Alex answers",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-010",
+   "title": "AUD-8: a parent's own replies reach everyone the post went to",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-011",
+   "title": "AUD-8: so Grandma sees the parent's answer, but still not Grandpa's comment",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-012",
+   "title": "AUD-8: toggling her heart off reports only what she may see",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-013",
+   "title": "setup: Grandma hearts again",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-014",
+   "title": "AUD-9: a viewer can't flip the switch (not found)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-015",
+   "title": "AUD-9: the parent turns on \"members see each other's replies\" for the grandparents group",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-016",
+   "title": "AUD-9: my_circles shows the switch",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-017",
+   "title": "AUD-9: now Grandma reads Grandpa's comment (and the parent's)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-018",
+   "title": "AUD-9: the app is told her replies reach her group",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-019",
+   "title": "setup: Grandpa comments on the Everyone post",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-020",
+   "title": "AUD-9: the switch follows the post's groups: on the Everyone post, Grandpa's reply stays private",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-021",
+   "title": "setup: switch back off",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-022",
+   "title": "AUD-10: a viewer can't change it (42501)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-023",
+   "title": "AUD-10: an adult who isn't the owner can't either (42501)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-024",
+   "title": "AUD-10: unknown choice is 23514",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-025",
+   "title": "AUD-10: the owner opens replies to everyone the post went to",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-026",
+   "title": "AUD-10: my_spaces shows the family's choice",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-027",
+   "title": "AUD-10: then Grandma reads Grandpa's reply on the Everyone post",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-028",
+   "title": "AUD-10: and the app says so",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-029",
+   "title": "AUD-10: not in the family -> not found (P0002)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-030",
+   "title": "setup: back to the safe default",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-031",
+   "title": "AUD-10: back to parents-only immediately",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-032",
+   "title": "AUD-8 review: the raw heart counter on posts is not readable (42501)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-033",
+   "title": "AUD-8 review: the raw comment counter on posts is not readable (42501)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-034",
+   "title": "AUD-8 review: ...while the post itself still reads fine",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-035",
+   "title": "AUD-8 review: reply_scope on a post you can't see says nothing (\"not found\")",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-036",
+   "title": "AUD-8 review: a relative in another group who replied stays invisible (no profile leak)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-037",
+   "title": "AUD-8 review: ...while the parent still sees who replied",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-001",
+   "title": "BETA-TIME-2: public.get_timeline exists (migration 0010)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-002",
+   "title": "BETA-TIME-4: public.get_timeline_years exists (migration 0010)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-003",
+   "title": "BETA-TIME-3: one visibility function, private.visible_posts, exists",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-004",
+   "title": "BETA-TIME-3: get_feed, get_timeline and get_timeline_years all read private.visible_posts (no copies)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-005",
+   "title": "BETA-TIME-3: get_timeline has no visibility logic of its own (no circle_members / post_audiences joins)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-006",
+   "title": "BETA-TIME-2: posts has an index on (space_id, coalesce(taken_at, published_at) desc, ...)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-007",
+   "title": "BETA-TIME-3: anon cannot call get_timeline or get_timeline_years (same as get_feed)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-008",
+   "title": "BETA-TIME-2: Grandma Rivera's timeline orders by date taken (shared date if none): t_new, t_mid, t_old2, t_old, t_nye",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-009",
+   "title": "BETA-TIME-2: first page of 3 is t_new (Oct 16), Soccer (Oct 12), Bike ride (Oct 10): an undated post sorts by its shared date",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-010",
+   "title": "BETA-TIME-2: every row has sort_at = coalesce(taken_at, published_at), never increasing",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-011",
+   "title": "BETA-TIME-2: a timeline row is a feed row plus taken_at (3 photos, no audience for a viewer)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-012",
+   "title": "BETA-TIME-2: a post with no taken_at comes back with taken_at null and sorts by its shared date",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-013",
+   "title": "BETA-TIME-2: keyset pages of 2 (p_before_at, p_before_id) match the full timeline with no gaps or duplicates",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-014",
+   "title": "BETA-TIME-2: limit is capped at 50",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-015",
+   "title": "BETA-TIME-3 allowed: Grandma Rivera (Dad's-side grandparents) sees the grandparents-only posts",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-016",
+   "title": "BETA-TIME-3 excluded: Grandma Rivera never gets the co-parent-only posts",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-017",
+   "title": "BETA-TIME-3: drafts and deleted posts never appear",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-018",
+   "title": "BETA-TIME-3: a space she is not in returns nothing (not an error that confirms it exists)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-019",
+   "title": "BETA-TIME-3 excluded: Grandma Chen (Everyone only) gets just the Everyone posts, in date-taken order",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-020",
+   "title": "BETA-TIME-3 excluded: Grandma Chen never gets the Dad's-side-grandparents posts, on any page",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-021",
+   "title": "BETA-TIME-3: Blair (co-parent) sees the co-parent posts and nothing from Dad's family groups",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-022",
+   "title": "BETA-TIME-3: the author sees all his published posts, but not his draft or deleted post",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-023",
+   "title": "BETA-TIME-2: like get_feed, the author gets the audience on his own posts",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-024",
+   "title": "BETA-TIME-3: private.visible_posts matches can_view_post (published) for the author, both grandmas and the co-parent",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-025",
+   "title": "BETA-TIME-4: Grandma Rivera's years, newest first: 2026 (3 posts, 3 photos), 2025 (1, 4), 2024 (2, 5), 2023 (1, 1); videos not counted",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-026",
+   "title": "BETA-TIME-4: in UTC the 10:30 pm New Year's Eve photo counts in 2024: the year follows the phone's time zone",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-027",
+   "title": "BETA-TIME-3: years for a space she is not in: nothing",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-028",
+   "title": "BETA-TIME-4: an unknown time zone is 22023",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-029",
+   "title": "BETA-TIME-3 excluded: Grandma Chen's years leave out the grandparents-only posts (no 2024 at all)",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-030",
+   "title": "BETA-TIME-3: Blair's years count only the 2 co-parent posts",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-031",
+   "title": "BETA-TIME-1: get_feed still orders by shared date, so old photos imported today don't reorder by date taken",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
+  },
+  {
+   "id": "SQL-032",
+   "title": "BETA-TIME-1: get_feed rows carry taken_at, so Photos can put old photos in an \"Added from earlier\" card",
+   "area": "Other",
+   "tickets": [],
+   "where": "backend/tests/rls_test.sql"
   }
  ]
 }

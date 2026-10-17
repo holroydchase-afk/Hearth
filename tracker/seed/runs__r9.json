@@ -1,0 +1,9 @@
+{
+ "suite": "backend",
+ "at": "2026-10-17T07:30:00-04:00",
+ "label": "Groups, households, events, roles, share history: tests written first (red, no 0011 yet)",
+ "passed": 465,
+ "failed": 139,
+ "results": {},
+ "note": "Red on purpose. New: groups_test.sql 119 of 137 red (no circles.kind, circle_links, circle_people, can, can_send_to, create_level, link_level, place_person, reply_readers, invites.history, sees_from; the 0009 switch still exists). The 18 passing are refusal or 'sees nothing' guards that pass trivially until the fixture can be built. aud16 (BETA-AUD-16 snapshot before/after 0011): 4 of 11 red only because 0011 isn't there; the 7 diff checks pass on a no-op, which shows the diff itself raises no false alarm. setup_v2_test.sh 12 of 14 red (no family-setup-v2.sql). timeline_future_test.sql 4 of 6 red (taken_at after published_at still sorts and counts by taken_at). Existing suites unchanged and green: rls 120, api 169, notify 60, setup 5, reply 44, timeline 38. Same counts on 3 runs. Deno tests not run: no deno binary here."
+}

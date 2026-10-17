@@ -18,3 +18,7 @@ backend/tests/integration/*.log
 *.pem
 .DS_Store
 backend/tests/integration/.bin/
+
+# test-all.sh logs regenerated each run
+e2e/results/app-eas.txt
+e2e/results/backend-deploy.txt

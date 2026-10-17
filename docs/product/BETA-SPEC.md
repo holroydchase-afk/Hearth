@@ -1,6 +1,6 @@
 # Hearth Beta Spec: single source of truth
 
-Owner: staff-pm. Updated Oct 17, 2026 (groups criteria at the end). **Milestones in `docs/product/ANCHORS.md` now set the order** (see "Milestone map and trace" at the end). Nov 22 / Thanksgiving is a soft target for milestones 3–4, pending Chase.
+Owner: staff-pm. Updated Oct 17, 2026 (bulk photos, timeline and groups criteria at the end). **Milestones in `docs/product/ANCHORS.md` now set the order** (see "Milestone map and trace" at the end). Nov 22 / Thanksgiving is a soft target for milestones 3–4, pending Chase.
 
 Rules: no criterion, no build. qa-tdd writes each test red before app-engineer builds.
 - **Types:** `auto` means Playwright, SQL (RLS suite), or Deno. `manual` means a real phone or a real person, logged on the Test Log page.
@@ -83,7 +83,7 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 - Web posting: the web viewer isn't in the beta.
 - Co-parent setup UI: no split household in Rings 0–3. The backend separation tests stay as BETA-AUD-4.
 - True background upload: retry on reopen (SHARE-4) covers the risk at much lower cost.
-- Albums, search, child tags (E9): Hearth works as a feed for 12 people.
+- Albums, free-text search, child tags (E9): Hearth works as a feed for 12 people. The timeline's "Pick a year" (BETA-TIME-4) covers finding old photos; caption search is in the ANCHORS ideas log.
 - Multiple spaces per user: one family space covers the beta.
 - Billing, paywall, and the video-cap messaging (E12): no money in the beta. The "willing to pay" question waits until after Thanksgiving.
 - SMS or text-link notices: needs Twilio (paid) and A2P registration. Push and email are enough.
@@ -199,6 +199,37 @@ NOTIFY-4 now reads: **Given** 5 photos in one post, or 3 posts within 10 minutes
 | 1: Chase | All M1 `auto` criteria green 3× against the hosted project; S16 closed; M1 `manual` criteria (SHARE-1, SHARE-4, SEE-3, NOTIFY-3, M-09) pass on Chase's iPhone; ≥10 posts over ≥2 days to a second test account, 0 lost; 0 crashes; `MEDIA_KEK` on paper ×2 | CI runs; Test Log entries; QA-3 sent vs received; `client_errors` count |
 | 2: Danielle | Danielle joins as a poster (adult) and passes JOIN-2 and SHARE-1 unaided (stopwatch); both post to both family sides' groups with 0 cross-side leaks; AUD-1 2 of 2; NOTIFY-1 p90 ≤ 60 s over ≥10 posts; 0 open P0 | Test Log times; latency log; ticket list |
 | 3+ | Defined when M2 passes. Grandparent test (above) is the M4 entry check; A2 "Seen by" decided before M4 | |
+
+## Bulk photos and timeline criteria (Oct 17, overnight plan)
+Source: the overnight plan "How each piece should work" (Chase's go, Oct 17, 3:26 am). Backend in migration **0010**. Video stays off (SHARE-6); audio, albums, free-text and AI search are cut.
+
+| ID | Type | Pri | M | Given / When / Then |
+|---|---|---|---|---|
+| BETA-BULK-1 | auto | P0 | 1 | **Given** a picked photo, **When** it is prepared on the phone, **Then** its date is read on the phone (EXIF `DateTimeOriginal` with `OffsetTimeOriginal` if present, else the photo's creation time, else none) and only `taken_at` is sent; the uploaded file still has no EXIF or GPS (SHARE-2). |
+| BETA-BULK-2 | auto | P0 | 1 | **Given** up to 100 photos picked at once, **When** the batch is planned, **Then** they are grouped by the day taken (the photo's own local day when its offset is known, else the phone's time zone) into posts of at most 10 (48 photos from 3 days become 5 posts), undated photos go together last, and a pick over 100 keeps the first 100 and says so. |
+| BETA-BULK-3 | auto | P0 | 1 | **Given** a planned batch, **When** the review screen shows, **Then** it reads "48 photos from 3 days", "Send to:" names the audience in words (default: the last group used, never a silent Everyone) with a labeled Change button, and nothing sends until Send is tapped. |
+| BETA-BULK-4 | auto | P0 | 1 | **Given** a batch sending, **When** the app is killed mid-batch and reopened, **Then** progress reads "Sending 12 of 48 photos…" across the whole batch, the rest finish on their own, and no post is duplicated or lost. |
+| BETA-BULK-5 | auto | P0 | 1 | **Given** a pick with videos, a Live Photo and a HEIC photo, **When** it is planned and prepared, **Then** videos are left out with "Hearth can't send videos yet, so 3 videos were left out.", and the Live Photo and HEIC each become one JPEG with no EXIF that keeps its date. |
+| BETA-BULK-6 | auto | P0 | 1 | **Given** a batch of 5 posts and 48 photos taken in July 2024, **When** notices go out, **Then** each person in the audience gets 1 notice for the whole batch ("Chase added 48 photos from July 2024", full month names), not one per post, and it carries no photo or caption. |
+| BETA-TIME-1 | auto | P0 | 1 | **Given** old photos imported today, **When** anyone opens Photos, **Then** it stays newest-shared-first, and posts taken more than 30 days before they were shared sit in one "Older photos" card ("Chase added 48 older photos from July 2024. See them") that opens the timeline at that month. |
+| BETA-TIME-2 | auto | P0 | 1 | **Given** posts with and without `taken_at`, **When** `get_timeline` is called, **Then** posts come back by `coalesce(taken_at, published_at)` newest first, with keyset pages that have no gaps or duplicates, using the same visibility function as `get_feed`. |
+| BETA-TIME-3 | auto | P0 | 1 | **Given** a post someone isn't allowed to see, **When** they call `get_timeline` or `get_timeline_years`, **Then** it is missing as if it never existed (not in any page, not in any year count), and the allowed person does see and count it. |
+| BETA-TIME-4 | auto | P1 | 1 | **Given** the timeline, **When** it shows, **Then** it opens from a labeled "By date" button on Photos, has month and year headers ("July 2024"), and a labeled "Pick a year" button lists years with photo counts; no scrubber or gesture-only control. |
+| BETA-BULK-7 | manual | P0 | 1 | **Given** Chase's iPhone in Expo Go, **When** he bulk-picks 20 photos from 2 trips (one abroad, one Live Photo, one HEIC) and turns on airplane mode mid-batch, **Then** each lands on the day it was taken, the batch finishes when signal returns, and a downloaded copy has no location (M-13, M-14). |
+
+| ID | M | Trace | Flag |
+|---|---|---|---|
+| BULK-1 | 1 | A1: no location leaves the phone (predators, stalkers); M1 "photos land by the date they were taken" | Photos sent without `taken_at` can't be re-dated, so this ships first |
+| BULK-2 | 1 | Time is short (Charlotte); M1 "years of photos on his phone" | Time zones: the 11 pm vacation photo |
+| BULK-3 | 1 | A1: 100 photos to the wrong side is the worst A1 failure | privacy-security review before it ships |
+| BULK-4 | 1 | "Someone doesn't get the photo" (SHARE-4) | |
+| BULK-5 | 1 | A1 (no location); iPhone defaults (Live Photo, HEIC) | Video stays off until the Nov 5 device proof |
+| BULK-6 | 1 | Parental guilt: share often without spamming (NOTIFY-4) | Chase's answer Oct 17: one batch notice. Month in the push needs privacy-security review |
+| BULK-7 | 1 | Plan's stop rule: if Expo Go can't read EXIF dates (`exif: true`), stop and report | Needs Chase's phone |
+| TIME-1 | 1 | Viewing built for WV: new posts are what relatives open the app for | First cut if the night runs short |
+| TIME-2 | 1 | M1 "see them land in the right place by the date taken" | |
+| TIME-3 | 1 | A1 | 0011 adds the share-history cutoff in the same shared function (AUD-20) |
+| TIME-4 | 1 | Grandparents "find the ones from Christmas"; no gesture-only actions | Second cut if the night runs short |
 
 ## Groups criteria (Oct 17, staff-pm; reworked from the hierarchy after Chase's 2:47 am answer)
 Full spec, roles, data model, reply rule and worked cases: `docs/product/SPEC-GROUPS.md`. Fixed shape: Everyone, set groups (Chase's side, Danielle's side), households slightly under them; a person can be in several households and a household in several groups (siblings). Events combine any groups and households (Charleston trip, Gigi's birthday, any custom group). Only parents send to Everyone. Adding anyone means an explicit "Share all past photos" or "Only new photos", no default. A relative's replies reach their household(s), their event-mates on event posts, the post's author and the parents. Ships in migration 0011 (0010 is the timeline) before milestone 3; does not block M1 or M2 (AUD-16 is the only M2 item, so the migration can't change anyone's feed).

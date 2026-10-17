@@ -1,0 +1,1430 @@
+FAIL src/media/__tests__/captureFuture.test.ts
+  ● BETA-BULK-1 future capture dates are ignored on the phone › BETA-BULK-1 an EXIF date a week ahead is ignored: falls back to the creation time
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "2026-10-01T15:00:00.000Z"
+    Received: "2026-10-24T14:00:00.000Z"
+
+      15 |     const created = Date.UTC(2026, 9, 1, 15, 0, 0);
+      16 |     expect(takenAtFromAsset({ exif: { DateTimeOriginal: '2026:10:24 10:00:00', OffsetTimeOriginal: '-04:00' }, creationTime: created }, NY))
+    > 17 |       .toBe('2026-10-01T15:00:00.000Z');
+         |        ^
+      18 |   });
+      19 |
+      20 |   it('BETA-BULK-1 a future EXIF date and a future creation time: no date at all (it sorts by its shared date)', () => {
+
+      at Object.toBe (src/media/__tests__/captureFuture.test.ts:17:8)
+
+  ● BETA-BULK-1 future capture dates are ignored on the phone › BETA-BULK-1 a future EXIF date and a future creation time: no date at all (it sorts by its shared date)
+
+    expect(received).toBeNull()
+
+    Received: "2027-03-01T15:00:00.000Z"
+
+      19 |
+      20 |   it('BETA-BULK-1 a future EXIF date and a future creation time: no date at all (it sorts by its shared date)', () => {
+    > 21 |     expect(takenAtFromAsset({ exif: { DateTimeOriginal: '2027:03:01 10:00:00' }, creationTime: Date.UTC(2027, 2, 1) }, NY)).toBeNull();
+         |                                                                                                                             ^
+      22 |     expect(captureInfo({ exif: { DateTimeOriginal: '2027:03:01 10:00:00' } }, NY)).toBeNull();
+      23 |   });
+      24 |
+
+      at Object.toBeNull (src/media/__tests__/captureFuture.test.ts:21:125)
+
+  ● BETA-BULK-1 future capture dates are ignored on the phone › BETA-BULK-1 up to 1 day ahead is kept (time zones and slightly-off camera clocks)
+
+    expect(received).toBeNull()
+
+    Received: "2026-10-18T16:01:00.000Z"
+
+      30 |     expect(takenAtFromAsset({ exif: { DateTimeOriginal: '2026:10:18 12:00:00', OffsetTimeOriginal: '-04:00' } }, NY))
+      31 |       .toBe('2026-10-18T16:00:00.000Z');
+    > 32 |     expect(takenAtFromAsset({ exif: { DateTimeOriginal: '2026:10:18 12:01:00', OffsetTimeOriginal: '-04:00' } }, NY)).toBeNull();
+         |                                                                                                                       ^
+      33 |   });
+      34 |
+      35 |   it('BETA-BULK-2 a bulk pick puts a future-dated photo with the undated ones (last), not on a 2027 day', () => {
+
+      at Object.toBeNull (src/media/__tests__/captureFuture.test.ts:32:119)
+
+  ● BETA-BULK-1 future capture dates are ignored on the phone › BETA-BULK-2 a bulk pick puts a future-dated photo with the undated ones (last), not on a 2027 day
+
+    expect(received).not.toContain(expected) // indexOf
+
+    Expected value: not "2027-01-01"
+    Received array:     ["2024-07-04", "2027-01-01"]
+
+      40 |     const plan = planBatch([asset('2024:07:04 10:00:00', 1), asset('2027:01:01 10:00:00', 2)], NY);
+      41 |     const days = plan.posts.map((p) => p.dayKey);
+    > 42 |     expect(days).not.toContain('2027-01-01');
+         |                      ^
+      43 |     expect(days[days.length - 1]).toBeNull();
+      44 |   });
+      45 | });
+
+      at Object.toContain (src/media/__tests__/captureFuture.test.ts:42:22)
+
+FAIL src/screens/__tests__/familyShape.test.tsx (9.901 s)
+  ● BETA-AUD-19 invite form: share history, no default › BETA-AUD-19 asks "Should they see photos already shared?" with two choices, neither picked
+
+    Unable to find an element with text: Should they see photos already shared?
+
+    <RNCSafeAreaView>
+      <RCTScrollView>
+        <View>
+          <Text
+            accessibilityRole="header"
+          >
+            Your groups
+          </Text>
+          <Text>
+            Each photo goes only to the groups you pick. People never see group names.
+          </Text>
+          <View>
+            <Text>
+              Everyone
+            </Text>
+            <Text>
+              5 people
+            </Text>
+            <View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Everyone: members see each other's replies"
+              accessibilityRole="switch"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  Off
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Members see each other's replies
+                </Text>
+                <Text>
+                  Off: only you and the other parents read what they write.
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Rename Everyone"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Rename
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="Invite someone to Everyone"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Invite someone
+              </Text>
+            </View>
+          </View>
+          <View>
+            <Text>
+              Grandparents – Dad's side
+            </Text>
+            <Text>
+              3 people
+            </Text>
+            <View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Grandparents – Dad's side: members see each other's replies"
+              accessibilityRole="switch"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  Off
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Members see each other's replies
+                </Text>
+                <Text>
+                  Off: only you and the other parents read what they write.
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Rename Grandparents – Dad's side"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Rename
+              </Text>
+            </View>
+            <View>
+              <Text>
+                Their name, the way your family says it
+              </Text>
+              <TextInput
+                accessibilityLabel="Their name, the way your family says it"
+                placeholder="Like \"Grandma June\""
+                value=""
+              />
+            </View>
+            <Text>
+              They'll see this name on Hearth and won't have to type it.
+            </Text>
+            <View
+              accessibilityLabel="Make the invite"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Make the invite
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Cancel
+              </Text>
+            </View>
+          </View>
+          <View>
+            <Text>
+              Grandparents – Mom's side
+            </Text>
+            <Text>
+              3 people
+            </Text>
+            <View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Grandparents – Mom's side: members see each other's replies"
+              accessibilityRole="switch"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  Off
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Members see each other's replies
+                </Text>
+                <Text>
+                  Off: only you and the other parents read what they write.
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Rename Grandparents – Mom's side"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Rename
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="Invite someone to Grandparents – Mom's side"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Invite someone
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RCTScrollView>
+    </RNCSafeAreaView>
+
+      32 |   it('BETA-AUD-19 asks "Should they see photos already shared?" with two choices, neither picked', async () => {
+      33 |     await openForm();
+    > 34 |     expect(await screen.findByText('Should they see photos already shared?')).toBeTruthy();
+         |                         ^
+      35 |     const all = screen.getByRole('radio', { name: 'Share all past photos' });
+      36 |     const fresh = screen.getByRole('radio', { name: 'Only new photos' });
+      37 |     expect(all.props.accessibilityState).toMatchObject({ checked: false });
+
+      at Object.findByText (src/screens/__tests__/familyShape.test.tsx:34:25)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-AUD-19 invite form: share history, no default › BETA-AUD-19 "Make the invite" stays off until one is picked, and no invite is made
+
+    expect(received).toMatchObject(expected)
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+    -   "disabled": true,
+    +   "disabled": false,
+      }
+
+      46 |     const { createInvite } = await openForm();
+      47 |     const make = await screen.findByRole('button', { name: 'Make the invite' });
+    > 48 |     expect(make.props.accessibilityState).toMatchObject({ disabled: true });
+         |                                           ^
+      49 |     fireEvent.press(make);
+      50 |     expect(await screen.findByText('Pick one above first.')).toBeTruthy();
+      51 |     expect(createInvite).not.toHaveBeenCalled();
+
+      at Object.toMatchObject (src/screens/__tests__/familyShape.test.tsx:48:43)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-AUD-19 invite form: share history, no default › BETA-AUD-19 picking "Only new photos" sends history "new" with the invite
+
+    Unable to find an element with role: radio, name: Only new photos
+
+    <RNCSafeAreaView>
+      <RCTScrollView>
+        <View>
+          <Text
+            accessibilityRole="header"
+          >
+            Your groups
+          </Text>
+          <Text>
+            Each photo goes only to the groups you pick. People never see group names.
+          </Text>
+          <View>
+            <Text>
+              Everyone
+            </Text>
+            <Text>
+              5 people
+            </Text>
+            <View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Everyone: members see each other's replies"
+              accessibilityRole="switch"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  Off
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Members see each other's replies
+                </Text>
+                <Text>
+                  Off: only you and the other parents read what they write.
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Rename Everyone"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Rename
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="Invite someone to Everyone"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Invite someone
+              </Text>
+            </View>
+          </View>
+          <View>
+            <Text>
+              Grandparents – Dad's side
+            </Text>
+            <Text>
+              3 people
+            </Text>
+            <View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Grandparents – Dad's side: members see each other's replies"
+              accessibilityRole="switch"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  Off
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Members see each other's replies
+                </Text>
+                <Text>
+                  Off: only you and the other parents read what they write.
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Rename Grandparents – Dad's side"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Rename
+              </Text>
+            </View>
+            <View>
+              <Text>
+                Their name, the way your family says it
+              </Text>
+              <TextInput
+                accessibilityLabel="Their name, the way your family says it"
+                placeholder="Like \"Grandma June\""
+                value=""
+              />
+            </View>
+            <Text>
+              They'll see this name on Hearth and won't have to type it.
+            </Text>
+            <View
+              accessibilityLabel="Make the invite"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Make the invite
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Cancel
+              </Text>
+            </View>
+          </View>
+          <View>
+            <Text>
+              Grandparents – Mom's side
+            </Text>
+            <Text>
+              3 people
+            </Text>
+            <View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Grandparents – Mom's side: members see each other's replies"
+              accessibilityRole="switch"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  Off
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Members see each other's replies
+                </Text>
+                <Text>
+                  Off: only you and the other parents read what they write.
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Rename Grandparents – Mom's side"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Rename
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="Invite someone to Grandparents – Mom's side"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Invite someone
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RCTScrollView>
+    </RNCSafeAreaView>
+
+      54 |   it('BETA-AUD-19 picking "Only new photos" sends history "new" with the invite', async () => {
+      55 |     const { createInvite } = await openForm();
+    > 56 |     fireEvent.press(await screen.findByRole('radio', { name: 'Only new photos' }));
+         |                                  ^
+      57 |     expect(screen.getByRole('radio', { name: 'Only new photos' }).props.accessibilityState).toMatchObject({ checked: true });
+      58 |     const make = screen.getByRole('button', { name: 'Make the invite' });
+      59 |     expect(make.props.accessibilityState?.disabled ?? false).toBe(false);
+
+      at Object.findByRole (src/screens/__tests__/familyShape.test.tsx:56:34)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-AUD-19 invite form: share history, no default › BETA-AUD-19 picking "Share all past photos" sends history "all"
+
+    Unable to find an element with role: radio, name: Share all past photos
+
+    <RNCSafeAreaView>
+      <RCTScrollView>
+        <View>
+          <Text
+            accessibilityRole="header"
+          >
+            Your groups
+          </Text>
+          <Text>
+            Each photo goes only to the groups you pick. People never see group names.
+          </Text>
+          <View>
+            <Text>
+              Everyone
+            </Text>
+            <Text>
+              5 people
+            </Text>
+            <View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Everyone: members see each other's replies"
+              accessibilityRole="switch"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  Off
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Members see each other's replies
+                </Text>
+                <Text>
+                  Off: only you and the other parents read what they write.
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Rename Everyone"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Rename
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="Invite someone to Everyone"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Invite someone
+              </Text>
+            </View>
+          </View>
+          <View>
+            <Text>
+              Grandparents – Dad's side
+            </Text>
+            <Text>
+              3 people
+            </Text>
+            <View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Grandparents – Dad's side: members see each other's replies"
+              accessibilityRole="switch"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  Off
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Members see each other's replies
+                </Text>
+                <Text>
+                  Off: only you and the other parents read what they write.
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Rename Grandparents – Dad's side"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Rename
+              </Text>
+            </View>
+            <View>
+              <Text>
+                Their name, the way your family says it
+              </Text>
+              <TextInput
+                accessibilityLabel="Their name, the way your family says it"
+                placeholder="Like \"Grandma June\""
+                value=""
+              />
+            </View>
+            <Text>
+              They'll see this name on Hearth and won't have to type it.
+            </Text>
+            <View
+              accessibilityLabel="Make the invite"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Make the invite
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Cancel
+              </Text>
+            </View>
+          </View>
+          <View>
+            <Text>
+              Grandparents – Mom's side
+            </Text>
+            <Text>
+              3 people
+            </Text>
+            <View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+              <View>
+                <Text>
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Grandparents – Mom's side: members see each other's replies"
+              accessibilityRole="switch"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  Off
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Members see each other's replies
+                </Text>
+                <Text>
+                  Off: only you and the other parents read what they write.
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Rename Grandparents – Mom's side"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Rename
+              </Text>
+            </View>
+            <View
+              accessibilityLabel="Invite someone to Grandparents – Mom's side"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Invite someone
+              </Text>
+            </View>
+          </View>
+        </View>
+      </RCTScrollView>
+    </RNCSafeAreaView>
+
+      65 |   it('BETA-AUD-19 picking "Share all past photos" sends history "all"', async () => {
+      66 |     const { createInvite } = await openForm();
+    > 67 |     fireEvent.press(await screen.findByRole('radio', { name: 'Share all past photos' }));
+         |                                  ^
+      68 |     fireEvent.press(screen.getByRole('button', { name: 'Make the invite' }));
+      69 |     expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
+      70 |     expect(createInvite).toHaveBeenCalledWith(expect.objectContaining({ history: 'all' }));
+
+      at Object.findByRole (src/screens/__tests__/familyShape.test.tsx:67:34)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-REPLY-12 the per-group reply switch is gone › BETA-REPLY-12 the Groups screen has no "members see each other's replies" switch
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 0
+    Received length: 3
+    Received array:  [{"_fiber": [FiberNode]}, {"_fiber": [FiberNode]}, {"_fiber": [FiberNode]}]
+
+      76 |     await renderApp(<GroupsScreen />, { user: 'chase' });
+      77 |     expect(await screen.findByText(DAD)).toBeTruthy();
+    > 78 |     expect(screen.queryAllByRole('switch')).toHaveLength(0);
+         |                                             ^
+      79 |     expect(screen.queryByText("Members see each other's replies")).toBeNull();
+      80 |   });
+      81 |
+
+      at Object.toHaveLength (src/screens/__tests__/familyShape.test.tsx:78:45)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-REPLY-12 the per-group reply switch is gone › BETA-REPLY-12 the API no longer offers setGroupRepliesShared
+
+    expect(received).toBeUndefined()
+
+    Received: [Function anonymous]
+
+      82 |   it('BETA-REPLY-12 the API no longer offers setGroupRepliesShared', () => {
+      83 |     const api = FakeBackend.withFixture().clientFor(FIXTURE.users.chase.id) as unknown as Record<string, unknown>;
+    > 84 |     expect(api.setGroupRepliesShared).toBeUndefined();
+         |                                       ^
+      85 |   });
+      86 | });
+      87 |
+
+      at Object.toBeUndefined (src/screens/__tests__/familyShape.test.tsx:84:39)
+
+  ● BETA-REPLY-11 the comment box names who will read it › BETA-REPLY-11 before sending: "Memaw, Pawpaw, Granny, Chase and Danielle will read this."
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "7cf72f98-ecaa-4c9c-8199-2506af7e77b8"
+
+    Number of calls: 0
+
+      102 |   it('BETA-REPLY-11 before sending: "Memaw, Pawpaw, Granny, Chase and Danielle will read this."', async () => {
+      103 |     const { id, replyReaders } = await photosWithReaders();
+    > 104 |     await waitFor(() => expect(replyReaders).toHaveBeenCalledWith(id));
+          |                  ^
+      105 |     const card = screen.getByTestId(`post-${id}`);
+      106 |     expect(await within(card).findByText('Memaw, Pawpaw, Granny, Chase and Danielle will read this.')).toBeTruthy();
+      107 |     // never a vague "everyone", never a group name
+
+      at Object.<anonymous> (src/screens/__tests__/familyShape.test.tsx:104:18)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-REPLY-11 the comment box names who will read it › BETA-REPLY-11 after Send it still names them
+
+    Unable to find an element with text: /Memaw, Pawpaw, Granny, Chase and Danielle (will )?read it/
+
+    <RNCSafeAreaView>
+      <RCTScrollView>
+        <RCTRefreshControl />
+        <View>
+          <View>
+            <View>
+              <Text
+                accessibilityRole="header"
+              >
+                Photos of Mia and Leo
+              </Text>
+              <Text>
+                Sent by Chase
+              </Text>
+              <View
+                accessibilityLabel="Check for new photos"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Check for new photos
+                </Text>
+              </View>
+              <View
+                accessibilityLabel="Show photos by the date they were taken"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Show by date
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View>
+            <View
+              testID="post-37eea24f-ed99-4eff-a4dc-122ef5e968d6"
+            >
+              <View>
+                <Text>
+                  Chase
+                </Text>
+                <Text>
+                  Sat, Oct 17
+                </Text>
+              </View>
+              <View
+                accessibilityLabel="Open photo 1 of 1 full screen"
+                accessibilityRole="button"
+                accessible={true}
+              >
+                <View>
+                  <Image />
+                </View>
+              </View>
+              <View>
+                <Text>
+                  Beach day
+                </Text>
+                <Text>
+                  Shared with you
+                </Text>
+                <View>
+                  <View
+                    accessibilityLabel="Love it"
+                    accessibilityRole="button"
+                    accessibilityState={
+                      {
+                        "busy": false,
+                        "disabled": false,
+                        "selected": false,
+                      }
+                    }
+                    accessible={true}
+                  >
+                    <Text>
+                      ♡ Love it
+                    </Text>
+                  </View>
+                </View>
+                <View>
+                  <View>
+                    <Text>
+                      <Text>
+                        Grandma Jo: 
+                      </Text>
+                      So cute!
+                    </Text>
+                  </View>
+                  <View>
+                    <Text>
+                      Write something back to Chase
+                    </Text>
+                    <TextInput
+                      accessibilityLabel="Write something back to Chase"
+                      placeholder="Write something back to Chase"
+                      value=""
+                    />
+                  </View>
+                  <View
+                    accessibilityLabel="Send"
+                    accessibilityRole="button"
+                    accessibilityState={
+                      {
+                        "busy": false,
+                        "disabled": true,
+                        "selected": false,
+                      }
+                    }
+                    accessible={true}
+                  >
+                    <Text>
+                      Send
+                    </Text>
+                  </View>
+                  <Text>
+                    Sent. Only the kids' parents can read it.
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </RCTScrollView>
+    </RNCSafeAreaView>
+
+      114 |     fireEvent.changeText(within(card).getByLabelText('Write something back to Chase'), 'So cute!');
+      115 |     fireEvent.press(within(card).getByRole('button', { name: 'Send' }));
+    > 116 |     expect(await within(card).findByText(/Memaw, Pawpaw, Granny, Chase and Danielle (will )?read it/)).toBeTruthy();
+          |                               ^
+      117 |   });
+      118 | });
+      119 |
+
+      at Object.findByText (src/screens/__tests__/familyShape.test.tsx:116:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-BULK-3 "Pick lots of photos" is for parents only (Oct 17 decision) › BETA-BULK-3 a relative allowed to post (milestone 4) never gets a bulk picker
+
+    expect(received).toBeNull()
+
+    Received: {"_fiber": {"_debugHookTypes": null, "_debugInfo": null, "_debugNeedsRemount": false, "_debugOwner": [FiberNode], "_debugStack": [Error: react-stack-top-frame], "_debugTask": null, "actualDuration": 0, "actualStartTime": 1792213903370, "alternate": [FiberNode], "child": [FiberNode], "childLanes": 0, "deletions": null, "dependencies": null, "elementType": "View", "flags": 0, "index": 0, "key": null, "lanes": 0, "memoizedProps": [Object], "memoizedState": null, "mode": 3, "pendingProps": [Object], "ref": null, "refCleanup": null, "return": [FiberNode], "selfBaseDuration": 0, "sibling": null, "stateNode": [Object], "subtreeFlags": 1048577, "tag": 5, "treeBaseDuration": 0, "type": "View", "updateQueue": null}}
+
+      137 |     await renderApp(<ShareScreen />, { be, user: 'ruth', deps: { pickBulk } });
+      138 |     expect(await screen.findByRole('header', { name: 'Share photos' })).toBeTruthy();
+    > 139 |     expect(screen.queryByRole('button', { name: 'Pick up to 100 photos at once' })).toBeNull();
+          |                                                                                     ^
+      140 |     expect(screen.queryByText('Lots of photos?')).toBeNull();
+      141 |   });
+      142 | });
+
+      at Object.toBeNull (src/screens/__tests__/familyShape.test.tsx:139:85)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-TIME-2 a timeline card opens the full post (hearts and replies) › BETA-TIME-2 tapping a timeline card opens that post with Love it and a reply box
+
+    Unable to find an element with role: button, name: /^Open (this|Chase's) post/
+
+    <RNCSafeAreaView>
+      <RCTScrollView>
+        <View>
+          <View>
+            <View>
+              <Text
+                accessibilityRole="header"
+              >
+                Photos by date
+              </Text>
+              <View
+                accessibilityLabel="Back to Photos"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Back to Photos
+                </Text>
+              </View>
+              <View
+                accessibilityLabel="Pick a year"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Pick a year
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View>
+            <Text
+              accessibilityRole="header"
+            >
+              July 2024
+            </Text>
+          </View>
+          <View>
+            <View
+              testID="timeline-9629ea9b-f239-4ff7-a676-610cb03fb62e"
+            >
+              <View>
+                <Text>
+                  Chase
+                </Text>
+                <Text>
+                  Taken Thu, Jul 4, 2024
+                </Text>
+              </View>
+              <View>
+                <View>
+                  <Image />
+                </View>
+              </View>
+              <View>
+                <Text>
+                  Fourth of July
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </RCTScrollView>
+    </RNCSafeAreaView>
+
+      149 |     fireEvent.press(await screen.findByRole('button', { name: 'Show photos by the date they were taken' }));
+      150 |     const card = await screen.findByTestId(`timeline-${id}`);
+    > 151 |     fireEvent.press(within(card).getByRole('button', { name: /^Open (this|Chase's) post/ }));
+          |                                  ^
+      152 |     const post = await screen.findByTestId(`post-${id}`);
+      153 |     expect(within(post).getByRole('button', { name: 'Love it' })).toBeTruthy();
+      154 |     expect(within(post).getByLabelText('Write something back to Chase')).toBeTruthy();
+
+      at Object.getByRole (src/screens/__tests__/familyShape.test.tsx:151:34)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-TIME-2 a timeline card opens the full post (hearts and replies) › BETA-TIME-2 a heart from the opened post sticks
+
+    Unable to find an element with role: button, name: /^Open (this|Chase's) post/
+
+    <RNCSafeAreaView>
+      <RCTScrollView>
+        <View>
+          <View>
+            <View>
+              <Text
+                accessibilityRole="header"
+              >
+                Photos by date
+              </Text>
+              <View
+                accessibilityLabel="Back to Photos"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Back to Photos
+                </Text>
+              </View>
+              <View
+                accessibilityLabel="Pick a year"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Pick a year
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View>
+            <Text
+              accessibilityRole="header"
+            >
+              July 2024
+            </Text>
+          </View>
+          <View>
+            <View
+              testID="timeline-beec4aa4-ae03-4dfd-84e0-b5c27b568135"
+            >
+              <View>
+                <Text>
+                  Chase
+                </Text>
+                <Text>
+                  Taken Thu, Jul 4, 2024
+                </Text>
+              </View>
+              <View>
+                <View>
+                  <Image />
+                </View>
+              </View>
+              <View>
+                <Text>
+                  Fourth of July
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </RCTScrollView>
+    </RNCSafeAreaView>
+
+      164 |     await renderApp(<PhotosScreen />, { be, user: 'jo' });
+      165 |     fireEvent.press(await screen.findByRole('button', { name: 'Show photos by the date they were taken' }));
+    > 166 |     fireEvent.press(within(await screen.findByTestId(`timeline-${id}`)).getByRole('button', { name: /^Open (this|Chase's) post/ }));
+          |                                                                         ^
+      167 |     fireEvent.press(within(await screen.findByTestId(`post-${id}`)).getByRole('button', { name: 'Love it' }));
+      168 |     await waitFor(() => expect(be.state.hearts.some((h) => h.post === id && h.user === FIXTURE.users.jo.id)).toBe(true));
+      169 |   });
+
+      at Object.getByRole (src/screens/__tests__/familyShape.test.tsx:166:73)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 2 failed, 2 total
+Tests:       15 failed, 2 passed, 17 total
+Snapshots:   0 total
+Time:        10.632 s, estimated 12 s
+Ran all test suites matching /src\/media\/__tests__\/captureFuture.test.ts|src\/screens\/__tests__\/familyShape.test.tsx/i.
+# Full app suite, 3 runs after T5 (Oct 17):
+Test Suites: 2 failed, 31 passed, 33 total
+Tests:       15 failed, 1 skipped, 313 passed, 329 total
+Test Suites: 2 failed, 31 passed, 33 total
+Tests:       15 failed, 1 skipped, 313 passed, 329 total
+Test Suites: 2 failed, 31 passed, 33 total
+Tests:       15 failed, 1 skipped, 313 passed, 329 total

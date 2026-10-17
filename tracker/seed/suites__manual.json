@@ -99,6 +99,38 @@
    "steps": "Set a tester to Daily email digest; post 2 photos.",
    "expected": "One email that evening; links open the right photos.",
    "tickets": []
+  },
+  {
+   "id": "M-13",
+   "title": "BETA-BULK-1/7 Bulk pick keeps the date taken (Expo Go)",
+   "area": "iPhone",
+   "steps": "In Expo Go, bulk-pick 20 photos from 2 trips: one abroad, one Live Photo, one HEIC, one screenshot with no date. Send to a test group. Open By date.",
+   "expected": "Each photo sits under the month and day it was taken (the abroad one on its local day); the screenshot sorts by today. If Expo Go returns no EXIF date, stop and report (plan stop rule).",
+   "tickets": []
+  },
+  {
+   "id": "M-14",
+   "title": "BETA-BULK-4/7 Bulk send survives no network, then network",
+   "area": "iPhone",
+   "steps": "Bulk-pick 48 photos. Tap Send, then turn on airplane mode at about 'Sending 12 of 48'. Force-quit. Wait 1 minute, turn airplane mode off, reopen Hearth.",
+   "expected": "It finishes on its own: 48 photos in the right posts, none twice. The other phone gets 1 notice. A downloaded copy has no location.",
+   "tickets": []
+  },
+  {
+   "id": "M-15",
+   "title": "BETA-AUD-17 Share sheet: Everyone first, then Groups, then Events",
+   "area": "iPhone",
+   "steps": "On Chase's iPhone, Chase and then Danielle each share one photo to Everyone and one to the Charleston trip. Then ask each: who sees this one?",
+   "expected": "Everyone is first and takes 1 tap; Groups then Events follow, each as name plus 'N people'; both answer 'who sees this?' correctly from the screen alone (2 of 2).",
+   "tickets": []
+  },
+  {
+   "id": "M-16",
+   "title": "BETA-AUD-22 Make an event unaided (milestone 4)",
+   "area": "iPhone",
+   "steps": "Ask Chase to make 'Thanksgiving 2026' by ticking groups and households. Time it. Don't help.",
+   "expected": "Under 60 seconds; it shows under Events in the share sheet as name plus 'N people'; the screen says everyone in it can read each other's comments on its photos.",
+   "tickets": []
   }
  ]
 }

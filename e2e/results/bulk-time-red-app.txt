@@ -1,0 +1,1241 @@
+FAIL src/media/__tests__/pick.test.ts
+  ● BETA-BULK-1 pickBulk › BETA-BULK-1 asks for up to 100, multiple, with EXIF, photos and videos (so skipped videos can be named)
+
+    not built yet: pickBulk (BETA-BULK-1)
+
+      27 |  */
+      28 | export async function pickBulk(): Promise<{ assets: import('../share/bulk').PickedAsset[] } | { denied: true }> {
+    > 29 |   throw new Error('not built yet: pickBulk (BETA-BULK-1)');
+         |         ^
+      30 | }
+      31 |
+
+      at src/media/pick.ts:29:9
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/media/pick.ts:30:2)
+      at apply (src/media/pick.ts:28:31)
+      at Object.<anonymous> (src/media/__tests__/pick.test.ts:17:29)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+FAIL src/upload/__tests__/queue.test.ts
+  ● BETA-BULK-4 batch progress and resume after kill › BETA-BULK-4 batchLabel reads "Sending 12 of 48…" across the batch, then "Sent 48 photos"
+
+    not built yet: batchLabel (BETA-BULK-4)
+
+      60 | /** "Sending 12 of 48…" across the whole batch; "Sent 48 photos" when done. NOT BUILT YET (plan step 3). */
+      61 | export function batchLabel(_p: { done: number; total: number }): string {
+    > 62 |   throw new Error('not built yet: batchLabel (BETA-BULK-4)');
+         |         ^
+      63 | }
+      64 |
+      65 | export interface QueueDeps {
+
+      at batchLabel (src/upload/queue.ts:62:9)
+      at Object.<anonymous> (src/upload/__tests__/queue.test.ts:306:22)
+
+  ● BETA-BULK-4 batch progress and resume after kill › BETA-BULK-4/6 each post is created with its taken_at and the same batch id and size
+
+    not built yet: enqueueBatch (BETA-BULK-4)
+
+      158 |    */
+      159 |   async enqueueBatch(_input: EnqueueBatchInput): Promise<string> {
+    > 160 |     throw new Error('not built yet: enqueueBatch (BETA-BULK-4)');
+          |           ^
+      161 |   }
+      162 |
+      163 |   /** Photos sent so far / photos in the batch, across all its posts. NOT BUILT YET. */
+
+      at UploadQueue.<anonymous> (src/upload/queue.ts:160:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at UploadQueue.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+      at UploadQueue.apply [as enqueueBatch] (src/upload/queue.ts:159:21)
+      at Object.enqueueBatch (src/upload/__tests__/queue.test.ts:320:29)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-BULK-4 batch progress and resume after kill › BETA-BULK-4 progress counts photos across posts while sending
+
+    not built yet: enqueueBatch (BETA-BULK-4)
+
+      158 |    */
+      159 |   async enqueueBatch(_input: EnqueueBatchInput): Promise<string> {
+    > 160 |     throw new Error('not built yet: enqueueBatch (BETA-BULK-4)');
+          |           ^
+      161 |   }
+      162 |
+      163 |   /** Photos sent so far / photos in the batch, across all its posts. NOT BUILT YET. */
+
+      at UploadQueue.<anonymous> (src/upload/queue.ts:160:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at UploadQueue.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+      at UploadQueue.apply [as enqueueBatch] (src/upload/queue.ts:159:21)
+      at Object.enqueueBatch (src/upload/__tests__/queue.test.ts:334:29)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-BULK-4 batch progress and resume after kill › BETA-BULK-4 killed mid-batch → reopened, the rest finish; 5 posts, 48 photos, no duplicates
+
+    not built yet: enqueueBatch (BETA-BULK-4)
+
+      158 |    */
+      159 |   async enqueueBatch(_input: EnqueueBatchInput): Promise<string> {
+    > 160 |     throw new Error('not built yet: enqueueBatch (BETA-BULK-4)');
+          |           ^
+      161 |   }
+      162 |
+      163 |   /** Photos sent so far / photos in the batch, across all its posts. NOT BUILT YET. */
+
+      at UploadQueue.<anonymous> (src/upload/queue.ts:160:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at UploadQueue.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+      at UploadQueue.apply [as enqueueBatch] (src/upload/queue.ts:159:21)
+      at Object.enqueueBatch (src/upload/__tests__/queue.test.ts:347:30)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+FAIL src/api/contract/contract.test.ts
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-2 orders by date taken (shared date when none), newest first; rows carry taken_at and sort_at
+
+    ApiError: not built yet: get_timeline
+
+      644 |   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+    > 646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+          |                                                                               ^
+      647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+
+      at FakeApi.getTimeline (src/api/fake/FakeBackend.ts:646:79)
+      at getTimeline (src/api/contract/contract.test.ts:435:56)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/api/contract/contract.test.ts:435:16)
+      at Object.tlIds (src/api/contract/contract.test.ts:441:26)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-1 the feed is unchanged: still newest shared first
+
+    ApiError: not built yet: get_timeline
+
+      644 |   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+    > 646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+          |                                                                               ^
+      647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+
+      at FakeApi.getTimeline (src/api/fake/FakeBackend.ts:646:79)
+      at getTimeline (src/api/contract/contract.test.ts:435:56)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/api/contract/contract.test.ts:435:16)
+      at Object.tlIds (src/api/contract/contract.test.ts:457:25)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-2 keyset pages: no gaps or duplicates, limit capped at 50
+
+    ApiError: not built yet: get_timeline
+
+      644 |   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+    > 646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+          |                                                                               ^
+      647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+
+      at FakeApi.getTimeline (src/api/fake/FakeBackend.ts:646:79)
+      at getTimeline (src/api/contract/contract.test.ts:435:56)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/api/contract/contract.test.ts:435:16)
+      at Object.tlIds (src/api/contract/contract.test.ts:466:25)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-3 a hidden post is simply absent: the allowed person sees it, the excluded one never does
+
+    ApiError: not built yet: get_timeline
+
+      644 |   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+    > 646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+          |                                                                               ^
+      647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+
+      at FakeApi.getTimeline (src/api/fake/FakeBackend.ts:646:79)
+      at getTimeline (src/api/contract/contract.test.ts:435:56)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/api/contract/contract.test.ts:435:16)
+      at Object.tlIds (src/api/contract/contract.test.ts:482:20)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-3 drafts and deleted posts never appear
+
+    ApiError: not built yet: get_timeline
+
+      644 |   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+    > 646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+          |                                                                               ^
+      647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+
+      at FakeApi.getTimeline (src/api/fake/FakeBackend.ts:646:79)
+      at getTimeline (src/api/contract/contract.test.ts:435:56)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/api/contract/contract.test.ts:435:16)
+      at Object.tlIds (src/api/contract/contract.test.ts:496:27)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-4 years, newest first, with post and photo counts; the year follows the phone time zone
+
+    ApiError: not built yet: get_timeline_years
+
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+      646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+    > 647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+          |                                                                                                ^
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+      650 |   deletePost = (p: string) => this.run(() => this.be.deletePost(this.userId, p));
+
+      at FakeApi.getTimelineYears (src/api/fake/FakeBackend.ts:647:96)
+      at Object.getTimelineYears (src/api/contract/contract.test.ts:506:33)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-4 an unknown time zone is 22023
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "22023"
+    Received: "UNKNOWN"
+
+      514 |
+      515 |     it('BETA-TIME-4 an unknown time zone is 22023', async () => {
+    > 516 |       expect(await code(viewerIn.getTimelineYears(h.spaceId, 'Mars/Olympus'))).toBe('22023');
+          |                                                                                ^
+      517 |     });
+      518 |
+      519 |     it('BETA-BULK-6 create_post: batch id and size go together; a batch is 1-100 posts (23514)', async () => {
+
+      at Object.toBe (src/api/contract/contract.test.ts:516:80)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-BULK-6 create_post: batch id and size go together; a batch is 1-100 posts (23514)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "23514"
+    Received: "ok"
+
+      518 |
+      519 |     it('BETA-BULK-6 create_post: batch id and size go together; a batch is 1-100 posts (23514)', async () => {
+    > 520 |       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid() }))).toBe('23514');
+          |                                                                                                                                              ^
+      521 |       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchSize: 3 }))).toBe('23514');
+      522 |       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid(), batchSize: 101 }))).toBe('23514');
+      523 |       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid(), batchSize: 5, takenAt: '2024-07-04T14:00:00.000Z' }))).toBe('ok');
+
+      at Object.toBe (src/api/contract/contract.test.ts:520:142)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/screens/__tests__/share.test.tsx
+PASS src/screens/__tests__/photos.test.tsx
+PASS src/screens/__tests__/groups.test.tsx
+PASS src/screens/__tests__/viewer.test.tsx
+PASS src/screens/__tests__/signin.test.tsx
+PASS src/crypto/__tests__/media.test.ts (5.368 s)
+PASS src/screens/__tests__/join.test.tsx
+PASS src/screens/__tests__/name.test.tsx
+PASS src/screens/__tests__/timing.test.tsx
+PASS src/screens/__tests__/help.test.tsx
+PASS src/screens/__tests__/deleteAccount.test.tsx
+FAIL src/media/__tests__/captureDate.test.ts
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 DateTimeOriginal + OffsetTimeOriginal gives the exact instant (11:15 pm EDT = 03:15 UTC next day)
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:12:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 a photo taken abroad keeps its own offset, whatever zone the phone is in now
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:17:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 no offset: the date is read as the phone's local time
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:22:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 iPhone shape: the date sits under {Exif} (expo-image-picker on iOS)
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:27:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 no EXIF date: falls back to the creation time
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:33:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 the edit date (DateTime) is not the capture date: falls back to creation time
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:39:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 a zeroed or malformed EXIF date is ignored
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:44:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 none: no EXIF date and no creation time gives null (it sorts by its shared date)
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:50:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 privacy: the result is just the date, never GPS or maker data
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:56:31)
+
+PASS src/screens/__tests__/replyAudience.test.tsx
+PASS src/state/__tests__/notifySync.test.tsx
+PASS src/feed/__tests__/store.test.ts
+FAIL src/share/__tests__/bulk.test.ts
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 48 photos from 3 days become 5 posts, oldest day first
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:32:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 pick order does not matter: photos sort by time inside each day
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:43:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 exactly 10 is one post; 11 is two (10 + 1)
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:53:21)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 time zones: an 11:30 pm vacation photo stays on the day it was taken
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:62:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 time zones: with only a creation time, the day is the phone's day (11:30 pm Eastern is still Jul 4)
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:69:21)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 undated photos go together, last, with no date
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:75:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 creation time is used when a photo has no EXIF date
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:83:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 a pick over 100 keeps the first 100 (pick order) and says so
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:90:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-1/2 privacy: a planned item carries the date only, no EXIF, GPS or maker data
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:102:27)
+
+  ● BETA-BULK-3 review screen words › BETA-BULK-3 "48 photos from 3 days"; singular forms read right
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:113:27)
+
+  ● BETA-BULK-5 videos, Live Photos, HEIC › BETA-BULK-5 videos are skipped with a plain line and do not count toward 100
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:121:27)
+
+  ● BETA-BULK-5 videos, Live Photos, HEIC › BETA-BULK-5 a Live Photo comes through as one still with its date; the motion part is dropped, not counted as a video
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:138:27)
+
+  ● BETA-BULK-5 videos, Live Photos, HEIC › BETA-BULK-5 Live Photo and HEIC each become one JPEG with no EXIF and keep their date
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:145:27)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+PASS src/media/__tests__/pipeline.test.ts
+PASS src/screens/__tests__/tabs.test.tsx
+PASS src/ui/__tests__/ErrorBoundary.test.tsx
+PASS src/api/__tests__/SupabaseApi.test.ts
+PASS src/errors/__tests__/messages.test.ts
+PASS src/media/__tests__/cache.test.ts
+PASS src/notify/__tests__/latency.test.ts
+PASS src/ui/__tests__/errorReport.test.tsx
+PASS src/share/__tests__/audienceMemory.test.ts
+
+Summary of all failing tests
+FAIL src/media/__tests__/pick.test.ts
+  ● BETA-BULK-1 pickBulk › BETA-BULK-1 asks for up to 100, multiple, with EXIF, photos and videos (so skipped videos can be named)
+
+    not built yet: pickBulk (BETA-BULK-1)
+
+      27 |  */
+      28 | export async function pickBulk(): Promise<{ assets: import('../share/bulk').PickedAsset[] } | { denied: true }> {
+    > 29 |   throw new Error('not built yet: pickBulk (BETA-BULK-1)');
+         |         ^
+      30 | }
+      31 |
+
+      at src/media/pick.ts:29:9
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/media/pick.ts:30:2)
+      at apply (src/media/pick.ts:28:31)
+      at Object.<anonymous> (src/media/__tests__/pick.test.ts:17:29)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+FAIL src/upload/__tests__/queue.test.ts
+  ● BETA-BULK-4 batch progress and resume after kill › BETA-BULK-4 batchLabel reads "Sending 12 of 48…" across the batch, then "Sent 48 photos"
+
+    not built yet: batchLabel (BETA-BULK-4)
+
+      60 | /** "Sending 12 of 48…" across the whole batch; "Sent 48 photos" when done. NOT BUILT YET (plan step 3). */
+      61 | export function batchLabel(_p: { done: number; total: number }): string {
+    > 62 |   throw new Error('not built yet: batchLabel (BETA-BULK-4)');
+         |         ^
+      63 | }
+      64 |
+      65 | export interface QueueDeps {
+
+      at batchLabel (src/upload/queue.ts:62:9)
+      at Object.<anonymous> (src/upload/__tests__/queue.test.ts:306:22)
+
+  ● BETA-BULK-4 batch progress and resume after kill › BETA-BULK-4/6 each post is created with its taken_at and the same batch id and size
+
+    not built yet: enqueueBatch (BETA-BULK-4)
+
+      158 |    */
+      159 |   async enqueueBatch(_input: EnqueueBatchInput): Promise<string> {
+    > 160 |     throw new Error('not built yet: enqueueBatch (BETA-BULK-4)');
+          |           ^
+      161 |   }
+      162 |
+      163 |   /** Photos sent so far / photos in the batch, across all its posts. NOT BUILT YET. */
+
+      at UploadQueue.<anonymous> (src/upload/queue.ts:160:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at UploadQueue.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+      at UploadQueue.apply [as enqueueBatch] (src/upload/queue.ts:159:21)
+      at Object.enqueueBatch (src/upload/__tests__/queue.test.ts:320:29)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-BULK-4 batch progress and resume after kill › BETA-BULK-4 progress counts photos across posts while sending
+
+    not built yet: enqueueBatch (BETA-BULK-4)
+
+      158 |    */
+      159 |   async enqueueBatch(_input: EnqueueBatchInput): Promise<string> {
+    > 160 |     throw new Error('not built yet: enqueueBatch (BETA-BULK-4)');
+          |           ^
+      161 |   }
+      162 |
+      163 |   /** Photos sent so far / photos in the batch, across all its posts. NOT BUILT YET. */
+
+      at UploadQueue.<anonymous> (src/upload/queue.ts:160:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at UploadQueue.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+      at UploadQueue.apply [as enqueueBatch] (src/upload/queue.ts:159:21)
+      at Object.enqueueBatch (src/upload/__tests__/queue.test.ts:334:29)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● BETA-BULK-4 batch progress and resume after kill › BETA-BULK-4 killed mid-batch → reopened, the rest finish; 5 posts, 48 photos, no duplicates
+
+    not built yet: enqueueBatch (BETA-BULK-4)
+
+      158 |    */
+      159 |   async enqueueBatch(_input: EnqueueBatchInput): Promise<string> {
+    > 160 |     throw new Error('not built yet: enqueueBatch (BETA-BULK-4)');
+          |           ^
+      161 |   }
+      162 |
+      163 |   /** Photos sent so far / photos in the batch, across all its posts. NOT BUILT YET. */
+
+      at UploadQueue.<anonymous> (src/upload/queue.ts:160:11)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at UploadQueue.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+      at UploadQueue.apply [as enqueueBatch] (src/upload/queue.ts:159:21)
+      at Object.enqueueBatch (src/upload/__tests__/queue.test.ts:347:30)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+FAIL src/api/contract/contract.test.ts
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-2 orders by date taken (shared date when none), newest first; rows carry taken_at and sort_at
+
+    ApiError: not built yet: get_timeline
+
+      644 |   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+    > 646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+          |                                                                               ^
+      647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+
+      at FakeApi.getTimeline (src/api/fake/FakeBackend.ts:646:79)
+      at getTimeline (src/api/contract/contract.test.ts:435:56)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/api/contract/contract.test.ts:435:16)
+      at Object.tlIds (src/api/contract/contract.test.ts:441:26)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-1 the feed is unchanged: still newest shared first
+
+    ApiError: not built yet: get_timeline
+
+      644 |   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+    > 646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+          |                                                                               ^
+      647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+
+      at FakeApi.getTimeline (src/api/fake/FakeBackend.ts:646:79)
+      at getTimeline (src/api/contract/contract.test.ts:435:56)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/api/contract/contract.test.ts:435:16)
+      at Object.tlIds (src/api/contract/contract.test.ts:457:25)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-2 keyset pages: no gaps or duplicates, limit capped at 50
+
+    ApiError: not built yet: get_timeline
+
+      644 |   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+    > 646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+          |                                                                               ^
+      647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+
+      at FakeApi.getTimeline (src/api/fake/FakeBackend.ts:646:79)
+      at getTimeline (src/api/contract/contract.test.ts:435:56)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/api/contract/contract.test.ts:435:16)
+      at Object.tlIds (src/api/contract/contract.test.ts:466:25)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-3 a hidden post is simply absent: the allowed person sees it, the excluded one never does
+
+    ApiError: not built yet: get_timeline
+
+      644 |   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+    > 646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+          |                                                                               ^
+      647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+
+      at FakeApi.getTimeline (src/api/fake/FakeBackend.ts:646:79)
+      at getTimeline (src/api/contract/contract.test.ts:435:56)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/api/contract/contract.test.ts:435:16)
+      at Object.tlIds (src/api/contract/contract.test.ts:482:20)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-3 drafts and deleted posts never appear
+
+    ApiError: not built yet: get_timeline
+
+      644 |   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+    > 646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+          |                                                                               ^
+      647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+
+      at FakeApi.getTimeline (src/api/fake/FakeBackend.ts:646:79)
+      at getTimeline (src/api/contract/contract.test.ts:435:56)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/api/contract/contract.test.ts:435:16)
+      at Object.tlIds (src/api/contract/contract.test.ts:496:27)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-4 years, newest first, with post and photo counts; the year follows the phone time zone
+
+    ApiError: not built yet: get_timeline_years
+
+      645 |   // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+      646 |   getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+    > 647 |   getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+          |                                                                                                ^
+      648 |   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
+      649 |   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
+      650 |   deletePost = (p: string) => this.run(() => this.be.deletePost(this.userId, p));
+
+      at FakeApi.getTimelineYears (src/api/fake/FakeBackend.ts:647:96)
+      at Object.getTimelineYears (src/api/contract/contract.test.ts:506:33)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-TIME-4 an unknown time zone is 22023
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "22023"
+    Received: "UNKNOWN"
+
+      514 |
+      515 |     it('BETA-TIME-4 an unknown time zone is 22023', async () => {
+    > 516 |       expect(await code(viewerIn.getTimelineYears(h.spaceId, 'Mars/Olympus'))).toBe('22023');
+          |                                                                                ^
+      517 |     });
+      518 |
+      519 |     it('BETA-BULK-6 create_post: batch id and size go together; a batch is 1-100 posts (23514)', async () => {
+
+      at Object.toBe (src/api/contract/contract.test.ts:516:80)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● FakeApi contract (API.md) › get_timeline / get_timeline_years (BETA-TIME-2..4, migration 0010) › BETA-BULK-6 create_post: batch id and size go together; a batch is 1-100 posts (23514)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "23514"
+    Received: "ok"
+
+      518 |
+      519 |     it('BETA-BULK-6 create_post: batch id and size go together; a batch is 1-100 posts (23514)', async () => {
+    > 520 |       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid() }))).toBe('23514');
+          |                                                                                                                                              ^
+      521 |       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchSize: 3 }))).toBe('23514');
+      522 |       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid(), batchSize: 101 }))).toBe('23514');
+      523 |       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid(), batchSize: 5, takenAt: '2024-07-04T14:00:00.000Z' }))).toBe('ok');
+
+      at Object.toBe (src/api/contract/contract.test.ts:520:142)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+FAIL src/media/__tests__/captureDate.test.ts
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 DateTimeOriginal + OffsetTimeOriginal gives the exact instant (11:15 pm EDT = 03:15 UTC next day)
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:12:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 a photo taken abroad keeps its own offset, whatever zone the phone is in now
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:17:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 no offset: the date is read as the phone's local time
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:22:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 iPhone shape: the date sits under {Exif} (expo-image-picker on iOS)
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:27:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 no EXIF date: falls back to the creation time
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:33:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 the edit date (DateTime) is not the capture date: falls back to creation time
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:39:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 a zeroed or malformed EXIF date is ignored
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:44:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 none: no EXIF date and no creation time gives null (it sorts by its shared date)
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:50:28)
+
+  ● BETA-BULK-1 takenAtFromAsset: EXIF date, offset, fallback, none › BETA-BULK-1 privacy: the result is just the date, never GPS or maker data
+
+    not built yet: takenAtFromAsset (BETA-BULK-1)
+
+      21 | /** ISO 8601 UTC instant ("2024-07-05T03:15:00.000Z") or null when the photo has no usable date. */
+      22 | export function takenAtFromAsset(_a: AssetDateSource, _o: PhoneZone = {}): string | null {
+    > 23 |   throw new Error('not built yet: takenAtFromAsset (BETA-BULK-1)');
+         |         ^
+      24 | }
+      25 |
+
+      at takenAtFromAsset (src/media/captureDate.ts:23:9)
+      at Object.<anonymous> (src/media/__tests__/captureDate.test.ts:56:31)
+
+FAIL src/share/__tests__/bulk.test.ts
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 48 photos from 3 days become 5 posts, oldest day first
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:32:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 pick order does not matter: photos sort by time inside each day
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:43:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 exactly 10 is one post; 11 is two (10 + 1)
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:53:21)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 time zones: an 11:30 pm vacation photo stays on the day it was taken
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:62:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 time zones: with only a creation time, the day is the phone's day (11:30 pm Eastern is still Jul 4)
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:69:21)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 undated photos go together, last, with no date
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:75:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 creation time is used when a photo has no EXIF date
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:83:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-2 a pick over 100 keeps the first 100 (pick order) and says so
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:90:27)
+
+  ● BETA-BULK-2 planBatch: one post per day, at most 10 photos each › BETA-BULK-1/2 privacy: a planned item carries the date only, no EXIF, GPS or maker data
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:102:27)
+
+  ● BETA-BULK-3 review screen words › BETA-BULK-3 "48 photos from 3 days"; singular forms read right
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:113:27)
+
+  ● BETA-BULK-5 videos, Live Photos, HEIC › BETA-BULK-5 videos are skipped with a plain line and do not count toward 100
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:121:27)
+
+  ● BETA-BULK-5 videos, Live Photos, HEIC › BETA-BULK-5 a Live Photo comes through as one still with its date; the motion part is dropped, not counted as a video
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:138:27)
+
+  ● BETA-BULK-5 videos, Live Photos, HEIC › BETA-BULK-5 Live Photo and HEIC each become one JPEG with no EXIF and keep their date
+
+    not built yet: planBatch (BETA-BULK-2)
+
+      42 | /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
+      43 | export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
+    > 44 |   throw new Error('not built yet: planBatch (BETA-BULK-2)');
+         |         ^
+      45 | }
+      46 |
+      47 | /** Review screen headline: "48 photos from 3 days". */
+
+      at planBatch (src/share/bulk.ts:44:9)
+      at Object.<anonymous> (src/share/__tests__/bulk.test.ts:145:27)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+
+Test Suites: 5 failed, 23 passed, 28 total
+Tests:       35 failed, 1 skipped, 247 passed, 283 total
+Snapshots:   0 total
+Time:        10.333 s, estimated 11 s
+Ran all test suites.

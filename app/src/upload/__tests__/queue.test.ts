@@ -3,7 +3,7 @@ import { ApiError, type HearthApi, type UploadItemSpec } from '../../api/HearthA
 import { FakeBackend, FIXTURE } from '../../api/fake/FakeBackend';
 import { encryptedSize } from '../../crypto/media';
 import { memoryKV } from '../../platform/kv';
-import { UploadQueue, backoffMs, jobLabel, type QueueDeps, type Prepared } from '../queue';
+import { UploadQueue, backoffMs, batchLabel, jobLabel, type QueueDeps, type Prepared } from '../queue';
 
 const CHASE = FIXTURE.users.chase.id;
 
@@ -284,5 +284,77 @@ describe('shared phone', () => {
     await qb.idle();
     expect(qb.jobs()).toEqual([]);
     expect(alexApi.calls.createPost ?? 0).toBe(0);
+  });
+});
+
+// ---------------- BETA-BULK-4 / BULK-6: a bulk pick sends as one batch ----------------
+describe('BETA-BULK-4 batch progress and resume after kill', () => {
+  /** 48 photos from 3 days, already planned as 5 posts (10, 10, 10, 10, 8). */
+  function batchInput() {
+    const sizes: [string, number][] = [['2024-07-04T14:00:00.000Z', 10], ['2024-07-04T20:00:00.000Z', 10], ['2024-07-05T15:00:00.000Z', 10],
+      ['2024-07-06T15:00:00.000Z', 10], ['2024-07-06T19:00:00.000Z', 8]];
+    let k = 0;
+    return {
+      space: FIXTURE.space.id, circleIds: [FIXTURE.circles.dadSide.id],
+      posts: sizes.map(([takenAt, n]) => ({
+        takenAt, items: Array.from({ length: n }, () => ({ uri: `file:///p${++k}.jpg`, kind: 'photo' as const, takenAt })),
+      })),
+    };
+  }
+
+  it('BETA-BULK-4 batchLabel reads "Sending 12 of 48 photos…" across the batch, then "Sent 48 photos"', () => {
+    expect(batchLabel({ done: 11, total: 48 })).toBe('Sending 12 of 48 photos…');
+    expect(batchLabel({ done: 0, total: 48 })).toBe('Sending 1 of 48 photos…');
+    expect(batchLabel({ done: 48, total: 48 })).toBe('Sent 48 photos');
+    expect(batchLabel({ done: 1, total: 1 })).toBe('Sent 1 photo');
+  });
+
+  it('BETA-BULK-4/6 each post is created with its taken_at and the same batch id and size', async () => {
+    const s = setup();
+    const created: Record<string, unknown>[] = [];
+    const api = wrap(s.be.clientFor(CHASE), { createPost: async (real) => real() });
+    const spy = new Proxy(api, { get: (t, p: string) => p === 'createPost'
+      ? (a: Record<string, unknown>) => { created.push(a); return t.createPost(a as never); }
+      : (t as unknown as Record<string, unknown>)[p] }) as typeof api;
+    const q = await UploadQueue.open(s.deps(spy));
+    const batchId = await q.enqueueBatch(batchInput());
+    await q.idle();
+    expect(created.map((a) => a.takenAt)).toEqual(batchInput().posts.map((p) => p.takenAt));
+    expect(new Set(created.map((a) => a.batchId))).toEqual(new Set([batchId]));
+    expect(created.every((a) => a.batchSize === 5)).toBe(true);
+    expect(s.live()).toHaveLength(5);
+    expect(q.batchProgress(batchId)).toEqual({ done: 48, total: 48 });
+  });
+
+  it('BETA-BULK-4 progress counts photos across posts while sending', async () => {
+    const s = setup();
+    // Post 2 hangs at create_post: post 1 (10 photos) is done, the rest wait.
+    const api = wrap(s.be.clientFor(CHASE), { createPost: async (real, n) => (n === 2 ? HANG() : real()) });
+    const q = await UploadQueue.open(s.deps(api));
+    const batchId = await q.enqueueBatch(batchInput());
+    await until(() => (api.calls.createPost ?? 0) >= 2);
+    await tick();
+    expect(q.batchProgress(batchId)).toEqual({ done: 10, total: 48 });
+    expect(batchLabel(q.batchProgress(batchId))).toBe('Sending 11 of 48 photos…');
+    q.stop();
+  });
+
+  it('BETA-BULK-4 killed mid-batch → reopened, the rest finish; 5 posts, 48 photos, no duplicates', async () => {
+    const s = setup();
+    // Killed while the 3rd post's bytes are going up.
+    const api1 = wrap(s.be.clientFor(CHASE), { putObject: async (real, n) => (n === 45 ? HANG() : real()) });
+    const q1 = await UploadQueue.open(s.deps(api1));
+    const batchId = await q1.enqueueBatch(batchInput());
+    await until(() => (api1.calls.putObject ?? 0) >= 45);
+    await tick();
+    q1.stop();
+
+    const q2 = await UploadQueue.open(s.deps(s.be.clientFor(CHASE)));
+    await q2.idle();
+    expect(s.live()).toHaveLength(5);
+    expect(s.live().every((p) => p.status === 'published')).toBe(true);
+    const media = Object.values(s.be.state.media).filter((m) => s.live().some((p) => p.id === m.post) && m.status === 'ready');
+    expect(media).toHaveLength(48);
+    expect(q2.batchProgress(batchId)).toEqual({ done: 48, total: 48 });
   });
 });
