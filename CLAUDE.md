@@ -18,6 +18,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - `docs/eng/MERGING.md`: when and how Claude merges PRs (only on Chase's word, CI green, merge commits).
 - `docs/eng/API.md`: the app↔backend contract. Change the contract tests before changing it.
 - `docs/product/PERSONAS.md`, `docs/product/CORE-FEATURES.md`, `docs/eng/TESTING.md`.
+- `docs/product/AI-FEATURES.md`: future AI and smart-photo features (people → group suggestions, duplicates), the rules they must meet, and the blocking AI positioning decision.
 - `docs/product/MARKETING.md`: positioning, claims register (what we can truthfully say), marketing ideas log. Owned by the `marketing` agent.
 
 ## Layout
