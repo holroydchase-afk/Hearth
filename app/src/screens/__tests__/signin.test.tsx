@@ -58,6 +58,7 @@ describe('BETA-JOIN-8: typing an invite code (links can open in a browser, or Ta
   it('BETA-JOIN-8: the invite card shows the code to read out, in two easy halves', async () => {
     await renderApp(<GroupsScreen />, { user: 'chase' });
     fireEvent.press(await screen.findByRole('button', { name: "Invite someone to Grandparents – Dad's side" }));
+    fireEvent.press(await screen.findByRole('radio', { name: 'Share all past photos' })); // BETA-AUD-19: the parent picks share history first
     fireEvent.press(await screen.findByRole('button', { name: 'Make the invite' }));
     expect(await screen.findByText(/^Or they can type this code in Hearth: [A-Z0-9]{5} [A-Z0-9]{5}$/)).toBeTruthy();
   });

@@ -6,11 +6,12 @@ import { BackHandler, FlatList, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { TimelinePost } from '../api/HearthApi';
 import { TimelineStore, startOfNextYear, timelineRows, type TimelineRow } from '../feed/timeline';
-import { useApp } from '../state/AppContext';
+import { useApp, useFeed } from '../state/AppContext';
 import { Button, Card, Loading, Notice, Txt } from '../ui/kit';
 import { photos, shortDate } from '../ui/format';
 import { MIN_TARGET, useTheme } from '../ui/theme';
 import { MediaImage } from './MediaImage';
+import { PostCard } from './PostCard';
 
 const SHOW_INLINE = 4;
 
@@ -23,18 +24,49 @@ export function TimelineScreen({ startAt, onClose }: { startAt: string | null; o
   );
   const state = useSyncExternalStore(store.subscribe, store.getState, store.getState);
   const [years, setYears] = useState(false);
+  // BETA-TIME-2: a card opens the full post (hearts and replies), with a labeled way back.
+  const [openId, setOpenId] = useState<string | null>(null);
+  const feedState = useFeed();
 
   useEffect(() => { void store.open(startAt); }, [store, startAt]);
 
   // Android (Grandaddy, Pawpaw): the phone's Back button steps back inside Hearth, never out of it.
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (years) setYears(false);
+      if (openId) setOpenId(null);
+      else if (years) setYears(false);
       else onClose();
       return true;
     });
     return () => sub.remove();
-  }, [years, onClose]);
+  }, [years, openId, onClose]);
+
+  const openPost = (p: TimelinePost) => {
+    app.feed?.adopt(p);
+    setOpenId(p.post_id);
+  };
+
+  if (openId) {
+    const post = feedState.posts.find((p) => p.post_id === openId) ?? feedState.opened[openId]
+      ?? state.posts.find((p) => p.post_id === openId);
+    return (
+      <SafeAreaView edges={['top', 'left', 'right']} style={{ flex: 1, backgroundColor: c.bg }}>
+        <FlatList
+          data={post ? [post] : []}
+          keyExtractor={(p) => p.post_id}
+          ListHeaderComponent={
+            <View style={{ gap: 12 }}>
+              <Button label="Back to the photos by date" text="Back" variant="secondary" onPress={() => setOpenId(null)} />
+            </View>
+          }
+          renderItem={({ item }) => <PostCard post={item} />}
+          contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 32 }}
+          keyboardShouldPersistTaps="handled"
+          removeClippedSubviews={false}
+        />
+      </SafeAreaView>
+    );
+  }
 
   const showYears = () => {
     setYears(true);
@@ -94,7 +126,7 @@ export function TimelineScreen({ startAt, onClose }: { startAt: string | null; o
         renderItem={({ item }) =>
           item.type === 'month'
             ? <Txt variant="display" role="header" style={{ marginTop: 8 }}>{item.label}</Txt>
-            : <TimelineCard post={item.post} />}
+            : <TimelineCard post={item.post} onOpen={() => openPost(item.post)} />}
         ListHeaderComponent={header}
         ListEmptyComponent={
           !state.loaded ? <Loading words="Loading the photos…" /> : <Txt variant="muted">No photos from before then.</Txt>
@@ -114,7 +146,7 @@ export function TimelineScreen({ startAt, onClose }: { startAt: string | null; o
 }
 
 /** A post in the timeline: who sent it, when it was taken, its photos and caption. */
-function TimelineCard({ post }: { post: TimelinePost }) {
+function TimelineCard({ post, onOpen }: { post: TimelinePost; onOpen: () => void }) {
   const [all, setAll] = useState(false);
   const ready = post.media.filter((m) => m.status === 'ready');
   const shown = all ? ready : ready.slice(0, SHOW_INLINE);
@@ -138,6 +170,7 @@ function TimelineCard({ post }: { post: TimelinePost }) {
           <Button label={`Show all ${photos(ready.length)}`} variant="secondary" onPress={() => setAll(true)} />
         ) : null}
         {post.caption ? <Txt>{post.caption}</Txt> : null}
+        <Button label={`Open ${post.author_name}'s post to love it or write back`} text="Open this post" variant="secondary" onPress={onOpen} />
       </View>
     </Card>
   );
