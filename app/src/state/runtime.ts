@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Linking, Platform } from 'react-native';
 import { FakeBackend, type FakeState } from '../api/fake/FakeBackend';
 import { SupabaseApi } from '../api/SupabaseApi';
-import { pickPhotos } from '../media/pick';
+import { pickBulk, pickPhotos } from '../media/pick';
 import { prepareItem } from '../media/prepare';
 import { saveToPhone } from '../platform/saveToPhone';
 import { secureSessionStorage } from '../platform/secureSession';
@@ -31,6 +31,7 @@ export function createRuntime(): AppDeps | { error: string } {
     kv: asyncStorageKV,
     prepare: prepareItem,
     pickPhotos: () => pickPhotos(),
+    pickBulk: () => pickBulk(),
     saveToPhone,
     openUrl: (u: string) => Linking.openURL(u),
   };

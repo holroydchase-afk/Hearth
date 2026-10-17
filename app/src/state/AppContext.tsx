@@ -7,6 +7,7 @@ import { MediaCache } from '../media/cache';
 import { clearArrivals, recordArrival } from '../notify/latency';
 import { listenForArrivals, registerForPush } from '../notify/push';
 import type { KV } from '../platform/kv';
+import type { PickedAsset } from '../share/bulk';
 import { BigTextContext } from '../ui/theme';
 import { UploadQueue, type Job, type Prepared, type QueueItem } from '../upload/queue';
 import { defaultPrefs, loadPrefs, savePrefs, serverPrefs, type Prefs } from './prefs';
@@ -18,6 +19,8 @@ export interface AppDeps {
   helpPhone?: string | null;
   prepare: (item: QueueItem) => Promise<Prepared>;
   pickPhotos: () => Promise<{ items: QueueItem[] } | { denied: true }>;
+  /** BETA-BULK-1: up to 100 photos with EXIF, read on the phone only (media/pick.ts pickBulk). */
+  pickBulk?: () => Promise<{ assets: PickedAsset[] } | { denied: true }>;
   saveToPhone: (bytes: Uint8Array, name: string) => Promise<'saved' | 'denied'>;
   openUrl: (url: string) => Promise<unknown>;
 }

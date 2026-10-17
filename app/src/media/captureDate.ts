@@ -64,8 +64,18 @@ function parseOffset(v: string | null): number | null {
   return m[1] === '-' ? -mins : mins;
 }
 
-/** Wall-clock fields of an instant in a zone. */
+/** Wall-clock fields of an instant in a zone. Without Intl time zones (some old Android
+ *  JS engines) it falls back to the phone's own clock, which is the zone used by default. */
 function wallIn(ms: number, timeZone: string): Wall {
+  try {
+    return wallInIntl(ms, timeZone);
+  } catch {
+    const d = new Date(ms);
+    return { y: d.getFullYear(), mo: d.getMonth() + 1, d: d.getDate(), h: d.getHours(), mi: d.getMinutes(), s: d.getSeconds() };
+  }
+}
+
+function wallInIntl(ms: number, timeZone: string): Wall {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit', second: '2-digit',

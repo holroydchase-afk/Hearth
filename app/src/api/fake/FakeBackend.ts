@@ -332,6 +332,7 @@ export class FakeBackend {
         seen_count: mine ? this.state.seen.filter((s) => s.post === p.id && reach.has(s.user)).length : null,
         reach_count: mine ? reach.size : null,
         reply_scope: this.replyScope(me, p),
+        taken_at: p.taken_at ?? null,
       };
   }
 

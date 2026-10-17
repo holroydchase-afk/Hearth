@@ -4,12 +4,14 @@ import { Image, View } from 'react-native';
 import type { Circle } from '../api/HearthApi';
 import { messageFor } from '../errors/messages';
 import { loadLastAudience, saveLastAudience } from '../share/audienceMemory';
+import { planBatch, type BatchPlan } from '../share/bulk';
 import { useApp } from '../state/AppContext';
 import { useNav } from '../state/nav';
 import { Button, Card, Choice, Field, Loading, Notice, Screen, Txt } from '../ui/kit';
 import { people, photos } from '../ui/format';
 import type { QueueItem } from '../upload/queue';
 import { AppGate } from './AppGate';
+import { BatchReview } from './BatchReview';
 import { QueueStatus } from './QueueStatus';
 
 const MAX = 10;
@@ -23,6 +25,8 @@ export function ShareScreen() {
   const [caption, setCaption] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // BETA-BULK-3: a bulk pick waiting on the review screen (dates only; EXIF already dropped).
+  const [plan, setPlan] = useState<BatchPlan | null>(null);
   const userId = app.session?.userId;
   const spaceId = app.space?.space_id;
   const canPost = !!app.space?.can_post;
@@ -54,6 +58,32 @@ export function ShareScreen() {
     else setItems((cur) => [...cur, ...r.items].slice(0, MAX));
   };
 
+  const pickMany = async () => {
+    if (!app.deps.pickBulk) return;
+    setNotice(null);
+    const r = await app.deps.pickBulk();
+    if ('denied' in r) setNotice('Hearth needs your OK to see your photos. Tap "Allow" when your phone asks.');
+    else if (r.assets.length) setPlan(planBatch(r.assets));
+  };
+
+  const sendBatch = async () => {
+    if (!plan || !plan.posts.length || !chosen.length || !app.queue || !userId) return;
+    setBusy(true);
+    try {
+      await saveLastAudience(app.deps.kv, userId, chosen);
+      await app.queue.enqueueBatch({
+        space: app.space!.space_id, circleIds: chosen,
+        posts: plan.posts.map((p) => ({ takenAt: p.takenAt, items: p.items })),
+      });
+      setPlan(null);
+      nav.goPhotos();
+    } catch (e) {
+      setNotice(messageFor(e, { inviter: app.helper, action: 'post' }));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const toggle = (id: string) => setChosen((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
 
   const post = async () => {
@@ -71,6 +101,13 @@ export function ShareScreen() {
       setBusy(false);
     }
   };
+
+  if (plan) {
+    return (
+      <BatchReview plan={plan} circles={circles} chosen={chosen} onToggle={toggle} busy={busy}
+        onSend={() => void sendBatch()} onCancel={() => setPlan(null)} />
+    );
+  }
 
   const chosenCircles = (circles ?? []).filter((x) => chosen.includes(x.circle_id));
   const ready = items.length > 0 && chosen.length > 0;
@@ -116,6 +153,14 @@ export function ShareScreen() {
       </Card>
 
       <Button label="Post" onPress={() => void post()} disabled={!ready} busy={busy} />
+
+      {app.deps.pickBulk ? (
+        <Card>
+          <Txt variant="title" role="header">Lots of photos?</Txt>
+          <Txt>Pick up to 100. Hearth puts them in order by the day they were taken.</Txt>
+          <Button label="Pick up to 100 photos at once" text="Pick lots of photos" variant="secondary" onPress={() => void pickMany()} />
+        </Card>
+      ) : null}
     </Screen>
   );
 }

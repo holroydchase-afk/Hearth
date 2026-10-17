@@ -268,19 +268,21 @@ language sql stable security definer set search_path = '' as $$
 $$;
 
 -- ---------------------------------------------------------------------------
--- get_feed (same contract as 0009), now reading the shared functions
+-- get_feed (0009's contract plus taken_at, for the "Added from earlier" card), now
+-- reading the shared functions
 -- ---------------------------------------------------------------------------
-create or replace function public.get_feed(
+drop function public.get_feed(uuid, timestamptz, uuid, integer);
+create function public.get_feed(
   p_space uuid, p_before_ts timestamptz default null, p_before_id uuid default null, p_limit integer default 20)
 returns table (post_id uuid, author_id uuid, author_name text, caption text, published_at timestamptz,
                media jsonb, heart_count integer, i_hearted boolean, comment_count integer,
-               audience jsonb, seen_count integer, reach_count integer, reply_scope text)
+               audience jsonb, seen_count integer, reach_count integer, reply_scope text, taken_at timestamptz)
 language plpgsql stable security definer set search_path = '' as $$
 #variable_conflict use_column
 begin
   return query
   select f.post_id, f.author_id, f.author_name, f.caption, f.published_at, f.media, f.heart_count, f.i_hearted,
-         f.comment_count, f.audience, f.seen_count, f.reach_count, f.reply_scope
+         f.comment_count, f.audience, f.seen_count, f.reach_count, f.reply_scope, f.taken_at
   from private.feed_rows(array(
          select v.post_id from private.visible_posts(p_space, 'shared', p_before_ts, p_before_id,
                                                      least(greatest(coalesce(p_limit, 20), 1), 50)) v)) f
