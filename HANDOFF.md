@@ -1,5 +1,9 @@
 # Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
+## Oct 17: one family hierarchy (spec only, staff-pm)
+1. **Specced, not built:** `docs/product/SPEC-HIERARCHY.md`. Everyone, sides, households, plus groups that can hold households from different places (the Charleston trip, now in STORY.md). A relative's replies reach their household, the parents and the post's author; the 0009 group switch is removed in migration 0010. New BETA-AUD-11 to 17 and BETA-REPLY-7 to 13 in BETA-SPEC; AUD-9 retires. Ships before milestone 3; next is privacy-security review, then qa-tdd writes the failing tests.
+2. **Your calls (one word each, spec §7):** group-post replies Household or Group (rec. Household); a relative's post goes to Everyone or Household (rec. Everyone); new households see past photos Yes or No (rec. Yes).
+
 ## Oct 16 afternoon: deploy needs only the access token
 1. **Built, test-first (DEPLOY-1, `backend/tests/deploy/deploy_test.sh`, 16 checks, stubbed, in CI and `test-all.sh`):** `backend/scripts/deploy.sh` now applies migrations and the notify cron through the Supabase Management API (`POST /v1/projects/{ref}/database/query`) instead of `supabase db push` and `psql`. Each migration runs in one transaction and is recorded in `supabase_migrations.schema_migrations` (the CLI's own table), so reruns skip what's applied. The `link` step is gone; steps are now 1/5–5/5.
 2. **Needs you:** only `SUPABASE_ACCESS_TOKEN`. `SUPABASE_DB_PASSWORD` and `SUPABASE_DB_URL` are no longer needed to deploy. The hosted SQL suites and `family-setup.sql` still use `psql`, so they will need a connection string or the same API route later.

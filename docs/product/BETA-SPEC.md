@@ -1,6 +1,6 @@
 # Hearth Beta Spec: single source of truth
 
-Owner: staff-pm. Updated Oct 16, 2026. **Milestones in `docs/product/ANCHORS.md` now set the order** (see "Milestone map and trace" at the end). Nov 22 / Thanksgiving is a soft target for milestones 3–4, pending Chase.
+Owner: staff-pm. Updated Oct 17, 2026 (hierarchy criteria at the end). **Milestones in `docs/product/ANCHORS.md` now set the order** (see "Milestone map and trace" at the end). Nov 22 / Thanksgiving is a soft target for milestones 3–4, pending Chase.
 
 Rules: no criterion, no build. qa-tdd writes each test red before app-engineer builds.
 - **Types:** `auto` means Playwright, SQL (RLS suite), or Deno. `manual` means a real phone or a real person, logged on the Test Log page.
@@ -199,3 +199,34 @@ NOTIFY-4 now reads: **Given** 5 photos in one post, or 3 posts within 10 minutes
 | 1: Chase | All M1 `auto` criteria green 3× against the hosted project; S16 closed; M1 `manual` criteria (SHARE-1, SHARE-4, SEE-3, NOTIFY-3, M-09) pass on Chase's iPhone; ≥10 posts over ≥2 days to a second test account, 0 lost; 0 crashes; `MEDIA_KEK` on paper ×2 | CI runs; Test Log entries; QA-3 sent vs received; `client_errors` count |
 | 2: Mom | Mom joins as a poster (adult) and passes JOIN-2 and SHARE-1 unaided (stopwatch); both post to both family sides' groups with 0 cross-side leaks; AUD-1 2 of 2; NOTIFY-1 p90 ≤ 60 s over ≥10 posts; 0 open P0 | Test Log times; latency log; ticket list |
 | 3+ | Defined when M2 passes. Grandparent test (above) is the M4 entry check; A2 "Seen by" decided before M4 | |
+
+## Hierarchy criteria (Oct 17, staff-pm; Chase: roll with it)
+Full spec, data model, reply rule and edge cases: `docs/product/SPEC-HIERARCHY.md`. One hierarchy: Everyone, sides, households, plus groups that can hold any households, sides or groups (many-to-many; the Charleston trip). A post reaches a level and everything under it; a relative's replies reach their household, the parents and the post's author; parents' replies reach the whole audience. Ships before milestone 3; does not block M1 or M2 (AUD-16 is the only M2 item, so the migration can't change anyone's feed).
+
+| ID | Type | Pri | M | Given / When / Then |
+|---|---|---|---|---|
+| BETA-AUD-11 | auto | P0 | 3 | **Given** a family with Everyone, 2 sides and 7 households, **When** a parent posts to a side, **Then** every person placed in a household under that side, plus both parents, can see it, and nobody placed only under the other side can (feed, post ID, media signer, push and email all deny). |
+| BETA-AUD-12 | auto | P0 | 3 | **Given** a Charleston trip group holding Pawpaw and Granny's household and Mom's sister's household, which sit under Mom's side, **When** a parent posts to the group, **Then** Pawpaw, Granny and the sister see it, Memaw and Great-Grandma don't, and the same households still see side and Everyone posts (many-to-many). |
+| BETA-AUD-13 | auto | P0 | 3 | **Given** levels in one space, **When** someone links a level under itself or its own child, links across two spaces, places a person in a side or group, or a viewer calls any setup RPC, **Then** each is refused (`23514` for bad shape, `P0002` for non-managers) and nothing changes. |
+| BETA-AUD-14 | auto | P0 | 3 | **Given** a relative (viewer), **When** they call every RPC and read every table they can, **Then** no level name, kind, link, member count, or other household's member comes back; their own feed shows only posts and their authors. |
+| BETA-AUD-15 | auto | P0 | 3 | **Given** a person removed from a household, or a household unlinked from a side, **When** they request that level's posts or media, **Then** the database denies them in the same transaction and issued media URLs expire within 10 minutes (as SEE-6). |
+| BETA-AUD-16 | auto | P0 | 2 | **Given** today's flat groups with their members and posts, **When** migration 0010 runs, **Then** for every user, `get_feed` and `can_view_post` return exactly what they returned before (snapshot diff, 0 changes), and one Everyone level exists per space. |
+| BETA-AUD-17 | manual | P0 | 3 | **Given** the share sheet on Chase's iPhone, **When** Chase and Mom each share one photo to Everyone and one to the Charleston trip, **Then** Everyone takes 1 tap, each choice reads as name plus "N people", and both answer "who sees this?" correctly from the screen alone (2 of 2). |
+| BETA-REPLY-7 | auto | P0 | 3 | **Given** a post to Everyone, **When** Gammy comments and hearts it, **Then** Chase, Mom, the post's author and Gammy's household read both; Grandaddy and Grandmomma read neither, and their heart and comment counts leave them out. |
+| BETA-REPLY-8 | auto | P0 | 3 | **Given** a post to the Charleston trip group, **When** Granny comments, **Then** Pawpaw, the parents and the author read it, and Mom's sister does not (unless Chase answers "Group" to open question 1, then this test flips). |
+| BETA-REPLY-9 | auto | P0 | 3 | **Given** a person placed in two households, **When** they comment, **Then** members of both households who can see the post read it, and a member of a third household does not; they read both households' replies. |
+| BETA-REPLY-10 | auto | P0 | 3 | **Given** a parent's comment or heart, **When** anyone who can see the post reads it, **Then** they see it; and a parent reads every reply on every post they can see. |
+| BETA-REPLY-11 | auto | P1 | 3 | **Given** each reply scope, **When** the comment box shows and after Send, **Then** `reply_readers` names exactly the people the server allows (a test compares the names to `can_see_reply` for every member), and the app says them in words, for example "Pawpaw, Chase and Mom will read this". |
+| BETA-REPLY-12 | auto | P0 | 3 | **Given** migration 0010, **When** anyone calls `set_group_replies_shared` or reads `circles.replies_shared`, **Then** the function and column are gone, `my_circles` has no `replies_shared`, and the Groups screen has no switch (Jest). |
+| BETA-REPLY-13 | auto | P1 | 4 | **Given** a relative allowed to post, **When** they post, **Then** it goes to Everyone with no picker and the screen says "Everyone in the family will see this"; they read every reply on it; their own replies on it reach its audience; others' replies on it follow REPLY-7. |
+
+**Amendments when migration 0010 ships**
+- **BETA-AUD-9 retired** (the per-group "members see each other's replies" switch). Chase, Oct 17: remove it once the hierarchy rule replaces it. REPLY-12 proves it's gone.
+- **BETA-REPLY-1 and REPLY-2:** "others only if the family or the group allows it" becomes "the commenter's household, the post's author and the parents; everyone only if the owner opened replies (AUD-10)".
+- **BETA-REPLY-6:** the words come from `reply_readers` (REPLY-11).
+- **Story problems with no passing criterion, #1 and #2:** covered by REPLY-7, REPLY-8 and AUD-14 once green.
+- **Not now:** a setup screen (create, drag, move levels), events with dates, group chat, family coordination. Data room only (spec §3).
+
+**Trace:** AUD-11, AUD-12, AUD-17: "for us 90% of the content we post will be to everyone"; birthday at Gigi's; the Charleston trip. AUD-13, AUD-15, AUD-16: A1. AUD-14: "Viewers never see group names or that other groups exist". REPLY-7 to REPLY-11: "Grandma A should be able to comment on a photo without divorced Grandpa B seeing it, and without worrying that he might"; A2. REPLY-12: Chase's Oct 17 call. REPLY-13: "Parents set it up; everyone else just posts".
+
+**Count:** 44 IDs before today (incl. AUD-8 to 10 and JOIN-8) + 7 AUD + 7 REPLY = 58; 57 live once AUD-9 retires. New ones by milestone: M2 1, M3 12, M4 1.
