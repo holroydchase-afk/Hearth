@@ -1,11 +1,13 @@
 // BETA-BULK-3/4/5: the one review screen before a bulk pick sends, and its progress.
-import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';
 import { FIXTURE, FakeBackend } from '../../api/fake/FakeBackend';
 import { memoryKV } from '../../platform/kv';
 import { saveLastAudience } from '../../share/audienceMemory';
 import type { PickedAsset } from '../../share/bulk';
 import { expectGrandparentSafe, renderApp, screenWords } from '../../test/renderApp';
+import { planBatch } from '../../share/bulk';
+import { BatchReview } from '../BatchReview';
 import { ShareScreen } from '../ShareScreen';
 
 const DAD = "Grandparents – Dad's side";
@@ -103,6 +105,22 @@ describe('BETA-BULK-3 batch review screen', () => {
     await screen.findAllByRole('checkbox');
     expectGrandparentSafe();
     expect(screenWords()).not.toMatch(/circle|batch|upload|EXIF|metadata/i);
+  });
+});
+
+describe('BETA-BULK-3 privacy-security review: Send never goes to a group it has not named', () => {
+  const plan = () => planBatch(pick48());
+  const noop = () => {};
+  it('BETA-BULK-3 while the groups are still loading, a remembered choice cannot be sent unnamed', () => {
+    render(<BatchReview plan={plan()} circles={null} chosen={[EVERYONE.id]} onToggle={noop} onSend={noop} onCancel={noop} busy={false} />);
+    expect(screen.queryByText(`Send to: ${EVERYONE.name}`)).toBeNull();
+    expect(screen.getByRole('button', { name: 'Send 48 photos' }).props.accessibilityState).toMatchObject({ disabled: true });
+  });
+  it('BETA-BULK-3 a chosen id that is not one of the loaded groups blocks Send', () => {
+    const circles = [{ circle_id: FIXTURE.circles.dadSide.id, name: DAD, member_count: 2, member_names: ['Gma', 'Gpa'] }];
+    render(<BatchReview plan={plan()} circles={circles as never} chosen={[FIXTURE.circles.dadSide.id, EVERYONE.id]}
+      onToggle={noop} onSend={noop} onCancel={noop} busy={false} />);
+    expect(screen.getByRole('button', { name: 'Send 48 photos' }).props.accessibilityState).toMatchObject({ disabled: true });
   });
 });
 

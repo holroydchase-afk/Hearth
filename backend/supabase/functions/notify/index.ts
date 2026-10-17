@@ -8,7 +8,9 @@
 // batches) -> release_notifications() for anything that failed, forget_push_tokens()
 // for phones Expo says are gone. Batching windows live in SQL.
 //
-// PRIVACY: messages carry the actor's chosen name ("Grandma June") and a post id only. No photo, caption,
+// PRIVACY: messages carry the actor's chosen name ("Grandma June"), counts and a post id only; a bulk
+// import also names the month and year taken ("from Jul 2024"), from posts that person can see
+// (privacy-security, Oct 17: coarse, no day, place or child). No photo, caption,
 // comment text or child's name, and nothing about them in the logs: never log tokens,
 // email addresses, URLs or message text.
 

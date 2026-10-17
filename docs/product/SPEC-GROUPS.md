@@ -1,6 +1,6 @@
 # Spec: groups, households, events, roles and share history
 
-Owner: staff-pm. Oct 17, 2026 (rework; replaces the "one family hierarchy" spec, commit e18d430, which was `SPEC-HIERARCHY.md`). Status: **Chase's direction given Oct 17, 2:47 am; 3 one-word questions open (section 9).** Needs privacy-security review of the data model, the reply rule and the share-history cutoff before any build: all three change who sees posts and replies. Acceptance criteria are copied into `docs/product/BETA-SPEC.md` ("Groups criteria, Oct 17"); that file wins if they ever differ.
+Owner: staff-pm. Oct 17, 2026 (rework; replaces the "one family hierarchy" spec, commit e18d430, which was `SPEC-HIERARCHY.md`). Status: **Chase's direction given Oct 17, 2:47 am; 3 one-word questions open (section 9).** privacy-security reviewed the data model, the reply rule and the share-history cutoff on Oct 17: build only with section 10's required changes. Acceptance criteria are copied into `docs/product/BETA-SPEC.md` ("Groups criteria, Oct 17"); that file wins if they ever differ.
 
 Chase, Oct 17, 2:47 am (verbatim): "I don't want to over complicate. This is a real use case: siblings. Because they will commonly be on both mom and dad's side. I'd rather have set groups with the work around to have folks in multiple groups or households. Also a custom group (probably largely covered by events). I think simply: Households slightly under groups. Maybe only parents can send to everyone or certain roles (we also need to invest time into roles staff pm). Also give folks the option to share all or not default to shell history / previous photos. Many of the edge cases were noodling are resolved with events because it has the ability to combine house holds and groups. ... Simple UX but hyper flexible for future."
 
@@ -188,3 +188,33 @@ If the timeline is cut, the family shape takes 0010 and the timeline the next fr
 1. **Event replies: Event or Household?** Should everyone in an event read each other's comments on its photos? Recommendation: **Event.** They were in one room; it's what makes an event worth having, and it settles the Charleston case. The event screen will say so.
 2. **A relative's post goes to: Groups or Everyone?** (milestone 4) Recommendation: **Groups**, the groups they're in, with no picker; matches "only parents send to everyone". Their post screen names who will see it.
 3. **Who sends to Everyone and makes events: Parents or Owner?** Parents = you and Mom; Owner = you only. Recommendation: **Parents.** Mom posts too (milestone 2), and making her ask you defeats "Sharing in 3 taps".
+
+## 10. Privacy review (Oct 17, privacy-security)
+
+Verdict: **the shape is sound; build 0011 only with the changes below.** Standards: ASVS L2 V4 (access control on every path, deny by default), LINDDUN (linkability, disclosure, unawareness). "Required" means 0011 does not merge without it and a failing test (AUD-/REPLY- ID) written first.
+
+**Server checks on who a post can go to (confirmed: today's insert policy only checked authorship).**
+1. Fixed now in 0010: `post_audiences` inserts (direct, `set_post_audience`) must name a group the caller is in or a family they manage, same as `create_post` (rls_test "BETA-AUD-4 review").
+2. Required in 0011: one predicate `can_send_to(circle)` used by `create_post`, the `post_audiences` insert policy **and** `publish_post` (re-checked at publish: a parent demoted after writing a draft to Everyone can't publish it). Rules: `kind = 'everyone'` needs `can(space, 'send_to_everyone')`; a relative may send only to containers they are a derived member of, never Everyone, and only when `can(space, 'post')`; nobody targets a container in another space (keep `tg_audience_same_space`). Test both ways: parent to Everyone succeeds; relative to Everyone is 42501 on all three paths.
+3. Required: `circle_members` becomes trigger-written only. Revoke client insert/update/delete on it, `circle_links` and `circle_people`; managers change them only through the RPCs. Same-space and loop checks are triggers, not just RPC code (a cross-space link would merge two households' families: threat 1).
+
+**Reply rule (section 6).**
+4. Rule 6 must mean "the same household row", from direct placements (`circle_people`), never derived group membership, or a group would relay replies. Test the sibling table both ways, including "Memaw does not read Pawpaw".
+5. Required: replies must not widen after they're written. Today's rule is read-time, so moving Memaw to another household, or adding a household to an event with "Share all past photos", lets new people read comments she wrote when her comment box named other readers (A1). Fix: stamp each comment and heart with the writer's households and events at write time (`reader_scope uuid[]`, set by trigger) and evaluate rules 6 and 7 against the stamp. Narrowing (someone removed) stays read-time. If this is too big for 0011, Chase must accept it in writing as a design limit, and the share-history words for events must say "past photos and their comments".
+6. Rule 7: an event that holds a whole group puts every household of that side in one reply room. The share sheet and the (future) event screen must say "everyone in this event reads each other's comments".
+7. `reply_readers(p_post)` lists only people who can see the post now (after the cutoff), first names only, and returns "not found" (null) for a post the caller can't see. 0010's page-level reply rule in `private.feed_rows` and `can_see_reply` change together; reply_test's "AUD-8/9/10 perf" parity tests must be extended to rules 6 and 7.
+
+**Share-history cutoff (section 5).**
+8. The cutoff compares `published_at` only, never `taken_at` (bulk imports count as new, as written). Authors can't change `published_at` (column grant: keep it that way).
+9. One predicate, called by `can_view_post`, `private.visible_posts`, `claim_notification_batches` (its `valid` check today duplicates visibility: make it call the predicate), `sign-media`, `get_comments` and `can_see_profile`. AUD-20 parity test across all of them, for an "all" and a "new" person.
+10. A removed-then-re-invited person gets a fresh choice; no old `sees_from` survives. "Only new" starts at invite creation: the words should say "from today".
+
+**Roles.**
+11. Making someone a Parent (`adult`) shows every post and every reply, including the other side's comments. Owner-only, with a confirmation that says exactly that. A co-parent from another household (Blair, AUD-4) stays a relative unless the owner chooses otherwise.
+
+**Data model and migration plan.**
+12. Required, high risk: today's "Everyone" is an ordinary group and not every member is in it (the co-parent isn't, in seed). If 0011 derives `kind = 'everyone'` membership from all members, the co-parent gains every Everyone post. 0011 must keep today's membership exactly (AUD-16). Prove it with a before/after snapshot of `can_view_post` and `can_see_reply` for every (member, post, reply) pair: no widening anywhere. List any narrowing (the dropped 0009 switch) for Chase.
+13. `my_circles` returns `kind` and `parent_ids`, but only for containers the caller can see. A relative never learns that other households, groups or events exist (threat 1).
+14. `family-setup.sql` v2 changes access, so it isn't neutral: run it first on a dump of hosted data, print each person's posts gained and lost, take a backup, and get Chase's yes before applying it on hosted.
+
+Scheduled, not blocking (milestone 7+): `member_grants` (ASVS V4.1.3 least privilege review when it lands); a LINDDUN pass on RSVPs and event chat before either is built.

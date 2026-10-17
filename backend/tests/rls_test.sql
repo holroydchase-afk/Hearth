@@ -373,6 +373,17 @@ select public.mark_media_upload_result(:'b_m1', true), public.mark_media_upload_
 set role authenticated;
 select set_config('request.jwt.claim.sub', :blair, false);
 select public.publish_post(:'b_pub');
+-- privacy-security review (Oct 17): an author may only add groups they could pick in create_post
+-- (theirs, or any if they manage the family). Otherwise the author-only audience row would hand a
+-- co-parent the name, size and "seen" count of a group she isn't in (threat 1, A2).
+select tests.throws(format('insert into post_audiences (post_id, circle_id) values (%L, %L)', :'b_pub', :c_a_gp),
+                    'BETA-AUD-4 review: a viewer-author cannot add a group she is not in to her post (direct insert)', 'row-level security');
+select tests.throws(format('select public.set_post_audience(%L, array[%L, %L]::uuid[])', :'b_pub', :c_a_co, :c_a_gp),
+                    'BETA-AUD-4 review: ...nor through set_post_audience', 'row-level security');
+select tests.ok(not exists (select 1 from post_audiences where post_id = :'b_pub' and circle_id = :c_a_gp),
+                'BETA-AUD-4 review: the grandparents group never joined her post''s audience');
+select tests.lives(format('select public.set_post_audience(%L, array[%L]::uuid[])', :'b_pub', :c_a_co),
+                   'BETA-AUD-4 review allowed: she can still set her post to a group she is in');
 reset role;
 update spaces set viewers_can_post = false where id = :space_a;
 set role authenticated;

@@ -92,6 +92,7 @@ grant execute on all functions in schema tests to authenticated, anon;
 \set as_alex     'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''a0000000-0000-0000-0000-00000000000a'', false);'
 \set as_blair    'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''b0000000-0000-0000-0000-00000000000b'', false);'
 \set as_gma_riv  'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''a0000000-0000-0000-0000-0000000000a1'', false);'
+\set as_gpa_riv  'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''a0000000-0000-0000-0000-0000000000a2'', false);'
 \set as_gma_chen 'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''b0000000-0000-0000-0000-0000000000b1'', false);'
 \set as_anon     'reset role; set role anon; select set_config(''request.jwt.claim.sub'', '''', false);'
 \set as_admin    'reset role; select set_config(''request.jwt.claim.sub'', '''', false);'
@@ -197,6 +198,11 @@ select tests.ok(not has_function_privilege('anon', 'public.get_feed(uuid, timest
                               where n.nspname = 'public' and p.proname in ('get_timeline', 'get_timeline_years')), false)
                 and exists (select 1 from pg_proc where proname = 'get_timeline'),
                 'BETA-TIME-3: anon cannot call get_timeline or get_timeline_years (same as get_feed)');
+
+select tests.ok((select bool_and(l.lanname = 'plpgsql') and count(*) = 2 from pg_proc p
+                 join pg_namespace n on n.oid = p.pronamespace join pg_language l on l.oid = p.prolang
+                 where n.nspname = 'private' and p.proname in ('feed_rows', 'visible_posts')),
+                'BETA-TIME-2 perf: private.feed_rows and visible_posts are plpgsql, so their plans are cached per connection (a SQL security-definer function is re-planned on every call)');
 
 -- ======================================================================
 -- BETA-TIME-2: order by coalesce(taken_at, published_at) desc
@@ -332,6 +338,29 @@ select tests.ok_sql(format($$select array_agg(post_id order by n) = array[%L, %L
 select tests.ok_sql(format($$select taken_at = '2024-07-04 15:00Z' from public.get_feed(%L, null, null, 50) where post_id = %L$$,
                            :space_a, tests.v('t_old')),
                     'BETA-TIME-1: get_feed rows carry taken_at, so Photos can put old photos in an "Added from earlier" card');
+
+-- ======================================================================
+-- privacy-security review (Oct 17): removed people lose the timeline and the years at once (threat 4)
+-- ======================================================================
+:as_admin
+delete from public.circle_members where circle_id = :c_a_gp and user_id = :gma_riv;
+:as_gma_riv
+select tests.ok(not (tests.tl(:space_a) && array[tests.v('t_old')::uuid, tests.v('t_old2')::uuid, :p_a_gp::uuid])
+                and tests.tl(:space_a) @> array[tests.v('t_new')::uuid],
+                'BETA-TIME-3 removed from a group: Grandma Rivera loses its posts from the timeline (keeps Everyone)');
+select tests.ok_sql(format($$select not exists (select 1 from public.get_timeline_years(%L, 'America/New_York') where year = 2024 and post_count > 1)
+                                    and (select sum(post_count) from public.get_timeline_years(%L, 'America/New_York')) = 4$$, :space_a, :space_a),
+                    'BETA-TIME-4 removed from a group: her years list no longer counts its posts (only the 4 Everyone posts)');
+:as_gpa_riv
+select tests.ok(tests.tl(:space_a) @> array[tests.v('t_old')::uuid, tests.v('t_old2')::uuid],
+                'BETA-TIME-3 allowed: Grandpa Rivera, still in the group, keeps those posts');
+:as_admin
+delete from public.space_members where space_id = :space_a and user_id = :gma_riv;
+:as_gma_riv
+select tests.ok(coalesce(cardinality(tests.tl(:space_a)), -1) = 0,
+                'BETA-TIME-3 removed from the family: her timeline is empty');
+select tests.ok_sql(format($$select count(*) = 0 from public.get_timeline_years(%L, 'UTC')$$, :space_a),
+                    'BETA-TIME-4 removed from the family: her years list is empty (no counts survive)');
 
 -- ======================================================================
 -- Summary

@@ -1,5 +1,18 @@
 # get_feed / get_timeline scale test: results
 
+## Oct 17, 2026 re-run (privacy-security review of 0010)
+Same fixture. `private.feed_rows` is now plpgsql (its plan is cached per connection; as a security-definer SQL function it was re-planned on every call), and it works the reply rule out once per post instead of calling `can_see_reply` per heart and comment. reply_test.sql proves the counts and `reply_scope` equal the per-reply rule for every member in every reply setting. Two back-to-back runs (`KEEP=1`):
+
+| scenario (p95 ms) | get_feed | get_timeline |
+|---|---:|---:|
+| viewer, first page | 4.13 / 5.74 | 3.65 / 2.18 |
+| viewer, deep page | 4.47 / 5.00 | 3.06 / 5.45 |
+| author, first page | 2.82 / 2.85 | 2.04 / 3.04 |
+| author, deep page | 2.85 / 3.20 | 2.87 / 5.18 |
+| co-parent, first page | 1.70 / 1.45 | 1.47 / 1.53 |
+
+- p50 is 1.3–3.2 ms everywhere. The planning cost of the set-based reply rule alone made no difference; the plpgsql change did. The first run passed every gate. On the second, two get_timeline deep pages were at 5.2–5.5 ms, just over the 5 ms target, on a shared 2 vCPU box. Call: accept this for the beta (the feed target is 30 ms), and re-measure on the hosted instance.
+
 ## Oct 17, 2026 run (migration 0010)
 `tests/perf/run.sh` on the same fixture shape, now with `taken_at` on 70% of posts. Raw output: `tests/perf/last-run.txt`.
 

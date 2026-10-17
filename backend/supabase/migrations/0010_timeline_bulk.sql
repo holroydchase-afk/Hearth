@@ -223,11 +223,25 @@ end $fn$;
 -- ---------------------------------------------------------------------------
 -- THE feed row builder: callers pass only ids that visible_posts returned
 -- ---------------------------------------------------------------------------
+-- The reply rule (0009's can_see_reply / reply_scope) is worked out ONCE per post here, not
+-- by a function call per heart and comment. Because every id is visible to the caller
+-- (visible_posts), can_view_post is already true, so a reply by A is readable exactly when:
+--   reads_all: the caller wrote the post, is a parent (owner/adult) or the family opened replies
+--   or A is the caller, the post's author or a parent,
+--   or A shares a live "members see each other's replies" group on this post with the caller.
+-- reply_scope is 'everyone' when reads_all, 'group' when the caller is in such a group, else
+-- 'parents'. reply_test.sql checks this equals can_see_reply / reply_scope for every member in
+-- every setting (AUD-8/9/10 perf); change both together or not at all.
+-- plpgsql, not SQL: a security-definer SQL function is planned on every call, and planning this
+-- query was most of get_feed/get_timeline's time (p95 ~8-12 ms -> ~2-5 ms on the 1M fixture).
 create or replace function private.feed_rows(p_posts uuid[])
 returns table (post_id uuid, author_id uuid, author_name text, caption text, published_at timestamptz,
                media jsonb, heart_count integer, i_hearted boolean, comment_count integer,
                audience jsonb, seen_count integer, reach_count integer, reply_scope text, taken_at timestamptz)
-language sql stable security definer set search_path = '' as $$
+language plpgsql stable security definer set search_path = '' as $$
+#variable_conflict use_column
+begin
+  return query
   select p.id, p.author_id, pr.display_name, p.caption, p.published_at,
          coalesce((select jsonb_agg(jsonb_build_object(
                             'media_id', m.id, 'kind', m.kind, 'width', m.width, 'height', m.height,
@@ -236,17 +250,38 @@ language sql stable security definer set search_path = '' as $$
                    where m.post_id = p.id and (m.upload_status = 'ready' or p.author_id = auth.uid())), '[]'::jsonb),
          -- counts show only what this viewer may see (AUD-8): hearts and comments follow the reply rule
          (select count(*)::integer from public.reactions r
-           where r.post_id = p.id and public.can_see_reply(p.id, r.user_id)),
+           where r.post_id = p.id
+             and (rr.reads_all or r.user_id = auth.uid() or r.user_id = p.author_id
+                  or r.user_id = any (rr.parents) or r.user_id = any (rr.peers))),
          exists (select 1 from public.reactions r where r.post_id = p.id and r.user_id = auth.uid()),
          (select count(*)::integer from public.comments cc
-           where cc.post_id = p.id and cc.deleted_at is null and public.can_see_reply(p.id, cc.author_id)),
+           where cc.post_id = p.id and cc.deleted_at is null
+             and (rr.reads_all or cc.author_id = auth.uid() or cc.author_id = p.author_id
+                  or cc.author_id = any (rr.parents) or cc.author_id = any (rr.peers))),
          case when p.author_id = auth.uid() then aud.audience end,
          case when p.author_id = auth.uid() then aud.seen end,
          case when p.author_id = auth.uid() then aud.reach end,
-         public.reply_scope(p.id),
+         case when rr.reads_all then 'everyone' when cardinality(rr.peers) > 0 then 'group' else 'parents' end,
          p.taken_at
   from public.posts p
   join public.profiles pr on pr.id = p.author_id
+  join public.spaces s on s.id = p.space_id
+  cross join lateral (
+    select (p.author_id = auth.uid()
+            or s.reply_audience = 'everyone'
+            or exists (select 1 from public.space_members sm
+                       where sm.space_id = p.space_id and sm.user_id = auth.uid() and sm.role in ('owner', 'adult')))
+             as reads_all,
+           array(select sm.user_id from public.space_members sm
+                 where sm.space_id = p.space_id and sm.role in ('owner', 'adult')) as parents,
+           -- everyone (the caller included) in a live sharing group on this post that the caller is in
+           array(select distinct a.user_id
+                 from public.post_audiences pa
+                 join public.circles c on c.id = pa.circle_id and c.deleted_at is null and c.replies_shared
+                 join public.circle_members v on v.circle_id = c.id and v.user_id = auth.uid()
+                 join public.circle_members a on a.circle_id = c.id
+                 where pa.post_id = p.id) as peers
+  ) rr
   left join lateral (
     select (select jsonb_agg(jsonb_build_object(
                      'circle_id', c.id, 'name', c.name,
@@ -264,8 +299,8 @@ language sql stable security definer set search_path = '' as $$
                   and p.author_id = auth.uid()) u              -- one-time filter: skipped for non-authors
           left join public.post_views pv on pv.post_id = p.id and pv.user_id = u.user_id) r
   ) aud on true
-  where p.id = any (p_posts) and p.deleted_at is null and p.status = 'published'
-$$;
+  where p.id = any (p_posts) and p.deleted_at is null and p.status = 'published';
+end $$;
 
 -- ---------------------------------------------------------------------------
 -- get_feed (0009's contract plus taken_at, for the "Added from earlier" card), now
@@ -528,3 +563,17 @@ grant execute on function public.get_feed(uuid, timestamptz, uuid, integer),
                           public.create_post(uuid, uuid, text, uuid[], timestamptz, uuid[], uuid, integer)
   to authenticated, service_role;
 grant execute on function public.claim_notification_batches(timestamptz) to service_role;
+
+-- ---------------------------------------------------------------------------
+-- privacy-security review (Oct 17): adding a group to a post's audience
+-- ---------------------------------------------------------------------------
+-- 0002's insert policy only checked that the caller wrote the post, so set_post_audience or a
+-- direct insert could add a group the author can't see (create_post already refused it). The
+-- author-only audience row would then hand a viewer-author (a co-parent with viewers_can_post)
+-- that group's name, size and "seen" count. Same rule as create_post: a group you are in, or
+-- any group of a family you manage. 0011 adds "only parents send to Everyone" here too.
+drop policy post_audiences_insert on public.post_audiences;
+create policy post_audiences_insert on public.post_audiences for insert to authenticated
+  with check (public.is_post_author(post_id)
+              and (circle_id = any ((select private.my_circle_ids())::uuid[])
+                   or circle_id = any ((select private.my_managed_circle_ids())::uuid[])));
