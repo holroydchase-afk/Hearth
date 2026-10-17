@@ -30,6 +30,8 @@ interface CircleRow { id: string; space: string; name: string; created_by: strin
 interface PostRow {
   id: string; space: string; author: string; caption: string | null; status: 'draft' | 'published';
   deleted: boolean; circles: string[]; client_id: string; created_at: string; published_at: string | null;
+  /** 0010: capture time read on the phone; batch id/size of a bulk pick. */
+  taken_at?: string | null; batch_id?: string | null; batch_size?: number | null;
 }
 interface MediaRow {
   id: string; post: string; position: number; kind: MediaKind; mime: string; width: number; height: number;
@@ -262,15 +264,56 @@ export class FakeBackend {
       });
   }
 
+  /** private.visible_posts (0010): the one visibility check for feed, timeline and years. */
+  visiblePosts(me: string, space: string): PostRow[] {
+    return Object.values(this.state.posts).filter((p) => p.space === space && p.status === 'published' && this.canView(me, p));
+  }
+
   getFeed(user: string | null, a: FeedArgs): FeedPost[] {
     const me = this.requireUser(user);
     const limit = Math.max(1, Math.min(50, a.limit ?? 20));
-    const rows = Object.values(this.state.posts)
-      .filter((p) => p.space === a.space && p.status === 'published' && this.canView(me, p))
+    const rows = this.visiblePosts(me, a.space)
       .sort((x, y) => (x.published_at! < y.published_at! ? 1 : x.published_at! > y.published_at! ? -1 : x.id < y.id ? 1 : -1))
       .filter((p) => !a.beforeTs || p.published_at! < a.beforeTs || (p.published_at === a.beforeTs && !!a.beforeId && p.id < a.beforeId))
       .slice(0, limit);
-    return rows.map((p) => {
+    return rows.map((p) => this.feedRow(me, p));
+  }
+
+  /** get_timeline (0010): newest taken first; keyset on (sort_at, id). */
+  getTimeline(user: string | null, a: TimelineArgs): TimelinePost[] {
+    const me = this.requireUser(user);
+    const limit = Math.max(1, Math.min(50, a.limit ?? 20));
+    const sortAt = (p: PostRow) => p.taken_at ?? p.published_at!;
+    const ms = (t: string) => new Date(t).getTime();
+    const before = a.beforeAt ? ms(a.beforeAt) : null;
+    return this.visiblePosts(me, a.space)
+      .sort((x, y) => ms(sortAt(y)) - ms(sortAt(x)) || (x.id < y.id ? 1 : -1))
+      .filter((p) => before === null || ms(sortAt(p)) < before || (ms(sortAt(p)) === before && !!a.beforeId && p.id < a.beforeId))
+      .slice(0, limit)
+      .map((p) => ({ ...this.feedRow(me, p), taken_at: p.taken_at ?? null, sort_at: sortAt(p) }));
+  }
+
+  /** get_timeline_years (0010): year of sort_at in the phone's zone; ready photos only. */
+  getTimelineYears(user: string | null, space: string, timeZone = 'UTC'): TimelineYear[] {
+    const me = this.requireUser(user);
+    let fmt: Intl.DateTimeFormat;
+    try {
+      fmt = new Intl.DateTimeFormat('en-US', { timeZone, year: 'numeric' });
+    } catch {
+      throw new ApiError('22023', 'unknown time zone');
+    }
+    const years = new Map<number, { post_count: number; photo_count: number }>();
+    for (const p of this.visiblePosts(me, space)) {
+      const y = Number(fmt.format(new Date(p.taken_at ?? p.published_at!)));
+      const photos = Object.values(this.state.media).filter((m) => m.post === p.id && m.kind === 'photo' && m.status === 'ready').length;
+      const cur = years.get(y) ?? { post_count: 0, photo_count: 0 };
+      years.set(y, { post_count: cur.post_count + 1, photo_count: cur.photo_count + photos });
+    }
+    return [...years.entries()].sort((a, b) => b[0] - a[0]).map(([year, c]) => ({ year, ...c }));
+  }
+
+  /** The feed row (get_feed and get_timeline share it, like private.feed_rows). */
+  private feedRow(me: string, p: PostRow): FeedPost {
       const mine = p.author === me;
       const reach = new Set(p.circles.flatMap((c) => this.circleMemberIds(c)).filter((u) => u !== p.author));
       const hearts = this.state.hearts.filter((h) => h.post === p.id && this.canSeeReply(me, p, h.user));
@@ -290,11 +333,12 @@ export class FakeBackend {
         reach_count: mine ? reach.size : null,
         reply_scope: this.replyScope(me, p),
       };
-    });
   }
 
   createPost(user: string | null, a: CreatePostArgs): string {
     const me = this.requireUser(user);
+    if ((a.batchId == null) !== (a.batchSize == null)) throw new ApiError('23514', 'batch id and size go together');
+    if (a.batchSize != null && (a.batchSize < 1 || a.batchSize > 100)) throw new ApiError('23514', 'a batch is 1 to 100 posts');
     const existing = Object.values(this.state.posts).find((p) => p.author === me && p.client_id === a.clientId);
     if (existing) return existing.id;
     if (!this.member(a.space, me)) throw new ApiError('42501', 'not a member');
@@ -305,6 +349,7 @@ export class FakeBackend {
     this.state.posts[id] = {
       id, space: a.space, author: me, caption: a.caption?.trim() || null, status: 'draft', deleted: false,
       circles: [...new Set(a.circleIds)], client_id: a.clientId, created_at: this.now(), published_at: null,
+      taken_at: a.takenAt ? new Date(a.takenAt).toISOString() : null, batch_id: a.batchId ?? null, batch_size: a.batchSize ?? null,
     };
     this.changed();
     return id;
@@ -642,9 +687,8 @@ export class FakeApi implements HearthApi {
   mySpaces = () => this.run(() => this.be.mySpaces(this.userId));
   myCircles = (space: string) => this.run(() => this.be.myCircles(this.userId, space));
   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
-  // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
-  getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
-  getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+  getTimeline = (a: TimelineArgs) => this.run(() => this.be.getTimeline(this.userId, a));
+  getTimelineYears = (space: string, tz?: string) => this.run(() => this.be.getTimelineYears(this.userId, space, tz));
   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
   deletePost = (p: string) => this.run(() => this.be.deletePost(this.userId, p));

@@ -50,6 +50,11 @@ export interface Job {
   progress: { done: number; total: number };
   errorCode?: ApiErrorCode;
   createdAt: number;
+  /** BETA-BULK-1: when the post's photos were taken (earliest), read on the phone. Only this date is sent. */
+  takenAt?: string | null;
+  /** BETA-BULK-4/6: posts from one bulk pick share a batch id; batchSize = posts in the batch. */
+  batchId?: string;
+  batchSize?: number;
 }
 
 export interface EnqueueInput { space: string; caption: string | null; circleIds: string[]; items: QueueItem[] }
@@ -57,9 +62,10 @@ export interface EnqueueInput { space: string; caption: string | null; circleIds
 /** BETA-BULK-4: one bulk pick, already planned into posts (share/bulk.ts planBatch). */
 export interface EnqueueBatchInput { space: string; circleIds: string[]; posts: { takenAt: string | null; items: QueueItem[] }[] }
 
-/** "Sending 12 of 48…" across the whole batch; "Sent 48 photos" when done. NOT BUILT YET (plan step 3). */
-export function batchLabel(_p: { done: number; total: number }): string {
-  throw new Error('not built yet: batchLabel (BETA-BULK-4)');
+/** "Sending 12 of 48…" across the whole batch; "Sent 48 photos" when done. */
+export function batchLabel(p: { done: number; total: number }): string {
+  if (p.done >= p.total) return `Sent ${p.total} ${p.total === 1 ? 'photo' : 'photos'}`;
+  return `Sending ${Math.min(p.done + 1, p.total)} of ${p.total}…`;
 }
 
 export interface QueueDeps {
@@ -154,15 +160,41 @@ export class UploadQueue {
 
   /**
    * BETA-BULK-4/6: enqueue every post of a bulk pick under one batch id (create_post p_batch_id,
-   * p_batch_size, p_taken_at). Returns the batch id. NOT BUILT YET (overnight plan step 3).
+   * p_batch_size, p_taken_at). All jobs are saved in one write before anything is sent, so an
+   * app kill at any point resumes the whole batch. Returns the batch id.
    */
-  async enqueueBatch(_input: EnqueueBatchInput): Promise<string> {
-    throw new Error('not built yet: enqueueBatch (BETA-BULK-4)');
+  async enqueueBatch(input: EnqueueBatchInput): Promise<string> {
+    const posts = input.posts.filter((p) => p.items.length > 0);
+    if (posts.length === 0 || posts.length > 100) throw new ApiError('23514', 'a batch is 1 to 100 posts');
+    const batchId = this.newId();
+    for (const p of posts) {
+      this.all.push({
+        id: this.newId(), userId: this.d.userId, clientId: this.newId(), space: input.space,
+        caption: null, circleIds: [...input.circleIds], items: [...p.items],
+        state: 'draft', attempts: 0, restarts: 0, progress: { done: 0, total: p.items.length }, createdAt: this.now(),
+        takenAt: p.takenAt ?? null, batchId, batchSize: posts.length,
+      });
+    }
+    await this.save();
+    this.kick();
+    return batchId;
   }
 
-  /** Photos sent so far / photos in the batch, across all its posts. NOT BUILT YET. */
-  batchProgress(_batchId: string): { done: number; total: number } {
-    throw new Error('not built yet: batchProgress (BETA-BULK-4)');
+  /** Photos sent so far / photos in the batch, across all its posts. */
+  batchProgress(batchId: string): { done: number; total: number } {
+    let done = 0, total = 0;
+    for (const j of this.mine()) {
+      if (j.batchId !== batchId) continue;
+      total += j.items.length;
+      done += j.state === 'published' ? j.items.length : j.state === 'finalizing' ? j.items.length : Math.min(j.progress.done, j.items.length);
+    }
+    return { done, total };
+  }
+
+  /** Batches that still have something to send (for "Sending 12 of 48…"). */
+  activeBatches(): { batchId: string; done: number; total: number }[] {
+    const ids = [...new Set(this.mine().filter((j) => j.batchId && j.state !== 'published').map((j) => j.batchId!))];
+    return ids.map((batchId) => ({ batchId, ...this.batchProgress(batchId) }));
   }
 
   /** Run due jobs now (app came to the front, network came back, timer fired). */
@@ -285,7 +317,11 @@ export class UploadQueue {
   }
 
   private async stepDraft(job: Job): Promise<void> {
-    const postId = await this.d.api.createPost({ clientId: job.clientId, space: job.space, caption: job.caption, circleIds: job.circleIds });
+    const postId = await this.d.api.createPost({
+      clientId: job.clientId, space: job.space, caption: job.caption, circleIds: job.circleIds,
+      ...(job.takenAt ? { takenAt: job.takenAt } : {}),
+      ...(job.batchId ? { batchId: job.batchId, batchSize: job.batchSize ?? null } : {}),
+    });
     if (this.stopped) throw new Killed();
     job.postId = postId;
     job.state = 'uploading';
