@@ -74,8 +74,15 @@ begin
   delete from t.access where phase = p_phase;
   for u in select user_id from public.space_members where space_id = t.space() loop
     perform set_config('request.jwt.claim.sub', u.user_id::text, true);
+    -- 'before' is the rule the family lives with today (0010: author or a member of a group on the post), so the
+    -- report also shows what 0011 itself changes: a Parent sees every post (S-0011-4, privacy item 14)
     insert into t.access select p_phase, u.user_id, p.id from public.posts p
-    where p.space_id = t.space() and p.status = 'published' and p.deleted_at is null and public.can_view_post(p.id);
+    where p.space_id = t.space() and p.status = 'published' and p.deleted_at is null
+      and case when p_phase = 'before'
+               then p.author_id = u.user_id
+                    or exists (select 1 from public.post_audiences pa join public.circles c on c.id = pa.circle_id and c.deleted_at is null
+                               join public.circle_members cm on cm.circle_id = c.id and cm.user_id = u.user_id where pa.post_id = p.id)
+               else public.can_view_post(p.id) end;
   end loop;
 end $$;
 select t.snap('before');
@@ -114,6 +121,8 @@ for name in Mom Gammy Grandaddy Grandmomma Memaw Pawpaw Granny "Test viewer"; do
   echo "$out" | grep -Eq "^${name}: gains [0-9]+ posts?, loses [0-9]+ posts?$" || { missing=1; echo "        no report line for $name"; }
 done
 ok $missing "setup v2 dry run: one \"<name>: gains N posts, loses M posts\" line for every member of the family"
+echo "$out" | grep -q "^Mom: gains 3 posts, loses 0 posts$" && echo "$out" | grep -q "^Mom is a Parent: from 0011 on, sees every post and reads every reply"
+ok $? "S-0011-4 / privacy item 14: the dry run counts what 0011 gives a Parent (Mom gains the 3 posts outside her v1 groups) and says why"
 
 # 2. apply: the report must match what actually changed
 out2=$(psql -d "$DB" -X -q -v chase_email=chase@example.com -v space_name='Our kids' -v apply=yes -f "$SCRIPT" 2>&1); rc=$?

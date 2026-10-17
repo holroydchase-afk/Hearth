@@ -61,14 +61,20 @@ begin
     raise exception 'no family named "%" owned by this account (run family-setup.sql first)', current_setting('hearth.space_name');
   end if;
 
-  -- who sees what, before
+  -- who sees what, before: the rule the family lives with today (0010: the author, or a member of a group on the
+  -- post). Not can_view_post: on a copy with 0011 applied, that already includes 0011's "a Parent sees every
+  -- post", and Chase must see that gain too (S-0011-4, privacy item 14). Read as the owner (bypasses no RLS:
+  -- this runs as the authenticated role, and Chase manages the family, so he reads its memberships).
   select coalesce(array_agg(p.id), '{}') into v_posts from public.posts p
   where p.space_id = v_space and p.status = 'published' and p.deleted_at is null;
-  for m in select sm.user_id from public.space_members sm where sm.space_id = v_space loop
-    perform set_config('request.jwt.claim.sub', m.user_id::text, true);
-    insert into v2_seen select 'before', m.user_id, x from unnest(v_posts) x where public.can_view_post(x);
-  end loop;
-  perform set_config('request.jwt.claim.sub', v_chase::text, true);
+  insert into v2_seen
+  select 'before', sm.user_id, p.id
+  from public.space_members sm join public.posts p on p.id = any (v_posts)
+  where sm.space_id = v_space
+    and (p.author_id = sm.user_id
+         or exists (select 1 from public.post_audiences pa join public.circles c on c.id = pa.circle_id and c.deleted_at is null
+                    join public.circle_members cm on cm.circle_id = c.id and cm.user_id = sm.user_id
+                    where pa.post_id = p.id));
 
   -- containers (reused by kind and name if they exist)
   for r in select * from (values
@@ -159,6 +165,11 @@ begin
            order by pr.display_name loop
     insert into v2_report (line) values (format('%s: gains %s post%s, loses %s post%s', m.display_name,
       m.gained, case when m.gained = 1 then '' else 's' end, m.lost, case when m.lost = 1 then '' else 's' end));
+  end loop;
+  for m in select pr.display_name from public.space_members sm join public.profiles pr on pr.id = sm.user_id
+           where sm.space_id = v_space and sm.role = 'adult' order by pr.display_name loop
+    insert into v2_report (line) values (format('%s is a Parent: from 0011 on, sees every post and reads every reply, '
+      || 'including the other side''s comments (counted above). To keep a Parent to their groups, make them a relative before applying.', m.display_name));
   end loop;
   for m in select pr.display_name from public.space_members sm join public.profiles pr on pr.id = sm.user_id
            where sm.space_id = v_space and sm.role = 'viewer'
