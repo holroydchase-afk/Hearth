@@ -17,7 +17,7 @@ Your morning doc. Do the steps in order and Claude handles the rest. The gate is
 | # | Step | Time | Unblocks |
 |---|---|---|---|
 | 1 | Cloud environment settings: allow `mcp.supabase.com`, `api.supabase.com`, `jqvgjfbhzbvfdhtnvgzr.supabase.co`, `exp.host`, `expo.dev`, `api.expo.dev`, `api.resend.com` | 5 min | Claude can deploy |
-| 2 | Supabase → Account → Access Tokens: make one; save it as environment secret `SUPABASE_ACCESS_TOKEN`. That is the only Supabase secret the deploy needs: migrations and the cron run through the Management API. The hosted test runs and family setup (steps 3 and 5 below) still use `psql`, so also save the connection string (Supabase → Connect → URI) as `SUPABASE_DB_URL` | 5 min | Migrations, function deploys, cron; with `SUPABASE_DB_URL`, hosted test runs and family setup |
+| 2 | Supabase → Account → Access Tokens: make one; save it as environment secret `SUPABASE_ACCESS_TOKEN`. That is the only Supabase secret the deploy needs: migrations and the cron run through the Management API. Family setup (step 5 below) goes through the same API. Only the hosted test runs (step 3) still use `psql`, so also save the connection string (Supabase → Connect → URI) as `SUPABASE_DB_URL` | 5 min | Migrations, function deploys, cron, family setup; with `SUPABASE_DB_URL`, hosted test runs |
 | 3 | Make a free account at expo.dev; Access tokens → save as environment secret `EXPO_ACCESS_TOKEN` (`npm run eas -- …` in `app/` passes it to EAS CLI as `EXPO_TOKEN`) | 5 min | Push project ID, builds |
 | 4 | Make a free account at resend.com and save its API key as a **Supabase** function secret, not here: Supabase → Edge Functions → Secrets → `RESEND_API_KEY` | 5 min | Email notices. For M1, Resend's test sender can mail only you, which is all M1 needs |
 | 5 | Make a second email for a test account (e.g. `you+test@gmail.com`) | 1 min | The "second test account" in the gate |
@@ -32,7 +32,7 @@ Never paste a key, token or password into chat. Secrets go in the environment se
 2. Runs `bash backend/scripts/deploy.sh` (try `--dry-run` first): applies migrations 0001–0009 through the Management API (no demo data; ones already applied are skipped), sets the function secrets from `backend/supabase/functions/.env`, deploys `sign-media` and `notify`, and schedules `notify` every minute with its own cron secret (never the service_role key).
 3. Runs the SQL suites against the hosted project 3× (gate line 1; needs `SUPABASE_DB_URL`). They wipe the database, so this happens only before any real photos; after that the project keeps its data.
 4. Sets `app/.env.local` to the hosted project and gives you the Expo Go QR code.
-5. After you sign in once: runs `backend/scripts/family-setup.sql` with `SUPABASE_DB_URL` (as you, through the app's own rules). It creates your space and starter groups ("Test viewer", "Chase's mom's side", "Chase's dad's side", "Mom's mom's side", "Mom's dad's side"; rename them in Groups) and prints a viewer invite for account B, plus Mom's poster invite for milestone 2. The app has no screens for creating a space or groups yet.
+5. After you sign in once: runs `bash backend/scripts/family-setup.sh --chase-email <yours> --space-name 'Our kids' --mom-email <hers>`. It needs only `SUPABASE_ACCESS_TOKEN` (no `SUPABASE_DB_URL`, no `psql`) and works as you, through the app's own rules. It creates your family in the groups shape: Everyone, Chase's side and Mom's side, each grandparent's house under its side, a **Test house** for account B (under no group), and the Charleston trip and Birthday at Gigi's events. It prints account B's invite code (Test house) and, for milestone 2, Mom's poster invite. Re-running prints fresh codes; once anyone else has joined it stops (then `family-setup-v2.sql`'s dry run is the tool). The app has no screens for creating a family or groups yet.
 
 ## Will it run in Expo Go? (checked Oct 16, without a phone)
 
@@ -52,10 +52,10 @@ Phone A = your iPhone (you). Account B = your test email, signed in on the web b
 | Day | Do | Expect | Criterion |
 |---|---|---|---|
 | 1 | Sign in with the 6-digit email code | In within a minute; no password | JOIN-2 |
-| 1 | Open the "Test viewer" invite as account B (web build, `/join/<code>`) | B joins and sees only "Test viewer" posts | JOIN-1 |
-| 1 | Post 3 photos to "Test viewer" in 3 taps or fewer | At the top of your Photos right away; B sees all 3 within a minute | SHARE-1 |
+| 1 | As account B, tap "I have an invite code" and type the Test house code (web build) | B joins and sees only Everyone and Test house posts | JOIN-1 |
+| 1 | Post 3 photos to "Test house" in 3 taps or fewer | At the top of your Photos right away; B sees all 3 within a minute | SHARE-1 |
 | 1 | As B: tap a photo, use Next/Back, then Close | Full screen; buttons work, not just swipes | SEE-3 |
-| 1 | Post 1 photo to "Chase's mom's side" only | B never sees it | AUD-1 |
+| 1 | Post 1 photo to "Gammy's house" only | B never sees it | AUD-1 |
 | 1 | Turn on airplane mode, post, turn it off | It sends on its own | SHARE-4 |
 | 1 | As B: comment and heart | You get one notice (email in Expo Go; push after the $99 build) | REPLY-3, NOTIFY-4 |
 | 1 | Save a photo to your phone; check its info in Photos | It's there at 2048 px with no location | M-09, SEE-5 |
