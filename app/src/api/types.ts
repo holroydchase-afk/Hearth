@@ -13,16 +13,24 @@ export interface Space {
 }
 
 export type ReplyAudience = 'parents' | 'everyone';
-/** AUD-8/9: who will read MY replies on this post. */
+/** AUD-8 / REPLY-7: who will read MY replies on this post ('group' = my household or event too). */
 export type ReplyScope = 'parents' | 'group' | 'everyone';
+
+/** 0011 (SPEC-GROUPS): every container is a "group" in the app's words; kind says which part of the family shape. */
+export type CircleKind = 'everyone' | 'group' | 'household' | 'event';
+
+/** BETA-AUD-19: when someone is added, do they see photos already shared? No default. */
+export type ShareHistory = 'all' | 'new';
 
 export interface Circle {
   circle_id: string;
   name: string;
   member_count: number;
   member_names: string[];
-  /** AUD-9: members see each other's replies on posts shared to this group. */
-  replies_shared?: boolean;
+  /** 0011. Older servers omit it (treat as 'group'). */
+  kind?: CircleKind;
+  /** 0011: the groups and events this one sits under. */
+  parent_ids?: string[];
 }
 
 export type MediaKind = 'photo' | 'video';
@@ -138,6 +146,8 @@ export interface CreateInviteArgs {
   maxUses?: number;
   /** What the family calls the invitee ("Grandma June"); becomes their name on joining (JOIN-1). */
   name?: string | null;
+  /** BETA-AUD-19 (0011): required for a relative ('viewer'); the server refuses the invite without it (23514). */
+  history?: ShareHistory | null;
 }
 
 export interface Session {

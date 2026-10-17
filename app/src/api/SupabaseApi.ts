@@ -129,7 +129,7 @@ export class SupabaseApi implements HearthApi {
   markSeen = (p: string) => this.rpc<void>('mark_seen', { p_post: p });
   registerPushToken = (token: string, platform: PushPlatform) =>
     this.rpc<void>('register_push_token', { p_token: token, p_platform: platform });
-  setGroupRepliesShared = (circle: string, on: boolean) => this.rpc<void>('set_group_replies_shared', { p_circle: circle, p_on: on });
+  replyReaders = (post: string) => this.rpc<string[] | null>('reply_readers', { p_post: post }).then((d) => d ?? null);
   setReplyAudience = (space: string, choice: ReplyAudience) => this.rpc<void>('set_reply_audience', { p_space: space, p_choice: choice });
   requestAccountDeletion = () => this.rpc<void>('request_account_deletion', {});
   myProfile = () => this.rpc<unknown>('my_profile', {}).then((d) => one<MyProfile>(d));
@@ -148,6 +148,7 @@ export class SupabaseApi implements HearthApi {
       p_space: a.space, p_role: a.role, p_circle_ids: a.circleIds, p_channel: a.channel ?? 'link',
       p_target_email: a.targetEmail ?? null, p_target_phone: a.targetPhone ?? null,
       p_ttl: `${Math.min(30, a.ttlDays ?? 30)} days`, p_max_uses: a.maxUses ?? 1, p_name: a.name ?? null,
+      p_history: a.history ?? null,
     });
     const r = one<{ code: string; link?: string }>(d);
     return { code: r.code, link: r.link ?? JOIN_LINK_BASE + r.code };

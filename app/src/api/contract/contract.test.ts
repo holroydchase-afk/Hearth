@@ -207,11 +207,11 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
 
   describe('invites (BETA-JOIN-1, -3, -4)', () => {
     it('viewers cannot create invites (42501)', async () => {
-      expect(await code(viewerIn.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn] }))).toBe('42501');
+      expect(await code(viewerIn.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all' }))).toBe('42501');
     });
 
     it('preview works signed out and leaks only inviter and space name', async () => {
-      const { code: c, link } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn] });
+      const { code: c, link } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all' });
       expect(link).toMatch(/^https:\/\//); // may carry a separate link token rather than the code
       const prev = await h.anon().invitePreview(c);
       expect(Object.keys(prev).sort()).toEqual(['inviter_name', 'space_name']);
@@ -224,7 +224,7 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
 
     itJoiner('redeeming places the person in the invite circles, once', async () => {
       const id = await publishedPost('for the joiner');
-      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], channel: 'email', targetEmail: h.joinerEmail });
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', channel: 'email', targetEmail: h.joinerEmail });
       const joiner = h.as('joiner');
       expect(await joiner.redeemInvite(c)).toBe(h.spaceId);
       expect(await feedIds(joiner)).toContain(id);
@@ -232,14 +232,14 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
     });
 
     itJoiner('an invite addressed to someone else is refused (22023)', async () => {
-      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], channel: 'email', targetEmail: 'someone.else@example.com' });
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', channel: 'email', targetEmail: 'someone.else@example.com' });
       expect(await code(h.as('joiner').redeemInvite(c))).toBe('22023');
     });
 
     itRate('S10: 10 failures in 10 minutes, then 54000 even for a good code', async () => {
       const rl = h.as('ratelimit');
       for (let i = 0; i < 10; i++) expect(await code(rl.redeemInvite(`BAD${i}BAD${i}XX`))).toBe('22023');
-      const { code: good } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn] });
+      const { code: good } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all' });
       expect(await code(rl.redeemInvite(good))).toBe('54000');
     });
   });
@@ -348,12 +348,12 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
     });
 
     it('JOIN-1: an invite can carry the name the family uses; an email-like one is 23514', async () => {
-      expect(await code(poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], name: 'Grandma June' }))).toBe('ok');
-      expect(await code(poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], name: 'june@example.com' }))).toBe('23514');
+      expect(await code(poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', name: 'Grandma June' }))).toBe('ok');
+      expect(await code(poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', name: 'june@example.com' }))).toBe('23514');
     });
 
     itJoiner('JOIN-1: joining gives a person with no chosen name the name on the invite', async () => {
-      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], channel: 'email', targetEmail: h.joinerEmail, name: 'Grandma June' });
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', channel: 'email', targetEmail: h.joinerEmail, name: 'Grandma June' });
       const joiner = h.as('joiner');
       const before = await joiner.myProfile();
       await joiner.redeemInvite(c);
@@ -386,7 +386,7 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
 
   describe('request_account_deletion (BETA-JOIN-7)', () => {
     itJoiner('BETA-JOIN-7: a member who deletes their account is out of every space', async () => {
-      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], channel: 'email', targetEmail: h.joinerEmail });
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', channel: 'email', targetEmail: h.joinerEmail });
       const joiner = h.as('joiner');
       await joiner.redeemInvite(c);
       expect((await joiner.mySpaces()).length).toBeGreaterThan(0);
@@ -410,11 +410,19 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(theirs.reply_scope).toBe('everyone');
     });
 
-    it('BETA-AUD-9: posters flip "members see each other\'s replies" on a group; viewers get not found', async () => {
-      expect(await code(poster.setGroupRepliesShared(h.circleIn, true))).toBe('ok');
-      expect((await poster.myCircles(h.spaceId)).find((c) => c.circle_id === h.circleIn)?.replies_shared).toBe(true);
-      expect(await code(viewerIn.setGroupRepliesShared(h.circleIn, false))).toBe('P0002');
-      expect(await code(poster.setGroupRepliesShared(h.circleIn, false))).toBe('ok');
+    it('BETA-REPLY-12: the per-group switch is gone; containers report their kind', async () => {
+      expect((poster as unknown as Record<string, unknown>).setGroupRepliesShared).toBeUndefined();
+      const mine = (await poster.myCircles(h.spaceId)).find((c) => c.circle_id === h.circleIn)!;
+      expect(mine).not.toHaveProperty('replies_shared');
+      expect(['everyone', 'group', 'household', 'event']).toContain(mine.kind);
+    });
+
+    it('BETA-REPLY-11: reply_readers names who will read my reply; null for a post I cannot see', async () => {
+      const id = await publishedPost('who reads');
+      const names = await viewerIn.replyReaders(id);
+      expect(Array.isArray(names)).toBe(true);
+      expect(names!.length).toBeGreaterThan(0);
+      expect(await viewerOut.replyReaders(id)).toBeNull();
     });
 
     it('BETA-AUD-10: only the owner changes the family default; an unknown choice is 23514', async () => {

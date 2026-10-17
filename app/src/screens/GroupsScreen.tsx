@@ -1,7 +1,7 @@
 // Groups (posters only): see groups and who is in them; basic rename; invite someone.
 import React, { useCallback, useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
-import type { Circle } from '../api/HearthApi';
+import type { Circle, ShareHistory } from '../api/HearthApi';
 import { messageFor } from '../errors/messages';
 import { useApp } from '../state/AppContext';
 import { Button, Card, Choice, Field, Loading, Notice, Screen, Txt } from '../ui/kit';
@@ -19,6 +19,9 @@ export function GroupsScreen() {
   const [notice, setNotice] = useState<string | null>(null);
   const [asking, setAsking] = useState<string | null>(null); // circle id whose invite form is open
   const [inviteName, setInviteName] = useState('');
+  // BETA-AUD-19: "Share all past photos" or "Only new photos"; neither is picked until the parent picks one.
+  const [history, setHistory] = useState<ShareHistory | null>(null);
+  const [needHistory, setNeedHistory] = useState(false);
   const [myName, setMyName] = useState<string | null>(null);
   useEffect(() => { app.deps.api.myProfile().then((p) => setMyName(p.display_name)).catch(() => {}); }, [app.deps.api]);
   const spaceId = app.space?.space_id;
@@ -49,13 +52,17 @@ export function GroupsScreen() {
     }
   };
 
+  const closeForm = () => { setAsking(null); setInviteName(''); setHistory(null); setNeedHistory(false); };
+
   const makeInvite = async (id: string) => {
+    if (!history) { setNeedHistory(true); return; }
     try {
       // JOIN-1: the name the family uses becomes theirs when they join, so they type nothing.
-      const r = await app.deps.api.createInvite({ space: app.space!.space_id, role: 'viewer', circleIds: [id], ttlDays: 30, name: inviteName.trim() || null });
+      const r = await app.deps.api.createInvite({
+        space: app.space!.space_id, role: 'viewer', circleIds: [id], ttlDays: 30, name: inviteName.trim() || null, history,
+      });
       setInvite({ circle: id, link: r.link, code: r.code });
-      setAsking(null);
-      setInviteName('');
+      closeForm();
     } catch (e) {
       setNotice(messageFor(e, { action: 'invite' }));
     }
@@ -86,19 +93,6 @@ export function GroupsScreen() {
               </View>
             ))}
           </View>
-          {/* BETA-AUD-9: off by default; only the parents read what members write */}
-          <Choice
-            kind="switch"
-            label={`${g.name}: members see each other's replies`}
-            title="Members see each other's replies"
-            detail={g.replies_shared ? 'People in this group can read what each other write.' : 'Off: only you and the other parents read what they write.'}
-            checked={!!g.replies_shared}
-            onPress={() => {
-              app.deps.api.setGroupRepliesShared(g.circle_id, !g.replies_shared)
-                .then(() => load())
-                .catch((e) => setNotice(messageFor(e, { action: 'group' })));
-            }}
-          />
           {renaming === g.circle_id ? (
             <>
               <Field label="New name for this group" value={name} onChangeText={setName} autoFocus maxLength={60} />
@@ -121,11 +115,29 @@ export function GroupsScreen() {
             <>
               <Field label="Their name, the way your family says it" value={inviteName} onChangeText={setInviteName} placeholder='Like "Grandma June"' maxLength={40} />
               <Txt variant="muted">They'll see this name on Hearth and won't have to type it.</Txt>
-              <Button label="Make the invite" onPress={() => void makeInvite(g.circle_id)} />
-              <Button label="Cancel" variant="secondary" onPress={() => { setAsking(null); setInviteName(''); }} />
+              <Txt variant="title" role="header">Should they see photos already shared?</Txt>
+              <Choice
+                kind="radio"
+                label="Share all past photos"
+                title="Share all past photos"
+                detail={`They'll see every photo already shared with ${g.name}.`}
+                checked={history === 'all'}
+                onPress={() => { setHistory('all'); setNeedHistory(false); }}
+              />
+              <Choice
+                kind="radio"
+                label="Only new photos"
+                title="Only new photos"
+                detail="They'll see photos shared from today on, including older photos you add later."
+                checked={history === 'new'}
+                onPress={() => { setHistory('new'); setNeedHistory(false); }}
+              />
+              {needHistory ? <Txt variant="strong">Pick one above first.</Txt> : null}
+              <Button label="Make the invite" onPress={() => void makeInvite(g.circle_id)} softDisabled={!history} />
+              <Button label="Cancel" variant="secondary" onPress={closeForm} />
             </>
           ) : (
-            <Button label={`Invite someone to ${g.name}`} text="Invite someone" variant="secondary" onPress={() => setAsking(g.circle_id)} />
+            <Button label={`Invite someone to ${g.name}`} text="Invite someone" variant="secondary" onPress={() => { closeForm(); setAsking(g.circle_id); }} />
           )}
         </Card>
       ))}

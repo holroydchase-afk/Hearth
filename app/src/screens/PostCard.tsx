@@ -5,7 +5,7 @@ import type { CommentView } from '../feed/store';
 import { useApp, useFeed } from '../state/AppContext';
 import { useNav } from '../state/nav';
 import { Button, Card, Confirm, Field, Txt } from '../ui/kit';
-import { people, photos, shortDate } from '../ui/format';
+import { andList, people, photos, shortDate } from '../ui/format';
 import { MIN_TARGET, useTheme } from '../ui/theme';
 import { MediaImage } from './MediaImage';
 
@@ -89,8 +89,25 @@ function Hearts({ post }: { post: FeedPost }) {
   );
 }
 
+/** REPLY-11: "Memaw, Pawpaw, Granny, Chase and Mom"; a long list ends "and 6 more people". */
+function readerNames(names: string[]): string {
+  if (names.length <= 6) return andList(names);
+  return `${names.slice(0, 5).join(', ')} and ${names.length - 5} more people`;
+}
+
 function Comments({ post, mine }: { post: FeedPost; mine: boolean }) {
-  const { feed, session } = useApp();
+  const { feed, session, deps } = useApp();
+  // REPLY-11 (0011): the server names exactly who will read my reply; until it answers (or on an older
+  // server) the box falls back to the reply_scope words.
+  const [names, setNames] = useState<string[] | null>(null);
+  useEffect(() => {
+    if (mine) return undefined;
+    let alive = true;
+    Promise.resolve(deps.api.replyReaders?.(post.post_id))
+      .then((n) => { if (alive && Array.isArray(n) && n.length) setNames(n); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [deps.api, post.post_id, mine]);
   const state = useFeed();
   const list: CommentView[] = state.comments[post.post_id] ?? [];
   const draft = state.drafts[post.post_id] ?? '';
@@ -101,11 +118,13 @@ function Comments({ post, mine }: { post: FeedPost; mine: boolean }) {
   const scope = post.reply_scope ?? 'everyone';
   const readers = mine
     ? 'The family you shared this photo with can read this.'
+    : names ? `${readerNames(names)} will read this.`
     : scope === 'parents' ? "Only the kids' parents can read this."
     : scope === 'group' ? "The kids' parents and your part of the family can read this."
     : `${post.author_name} and the family ${post.author_name} shared this photo with can read this.`;
   const sentWords = mine
     ? 'Sent. The family you shared this photo with can read it.'
+    : names ? `Sent. ${readerNames(names)} will read it.`
     : scope === 'parents' ? "Sent. Only the kids' parents can read it."
     : scope === 'group' ? "Sent. The kids' parents and your part of the family can read it."
     : `Sent. ${post.author_name} and the family who got this photo can read it.`;

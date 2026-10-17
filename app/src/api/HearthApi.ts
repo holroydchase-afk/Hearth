@@ -84,9 +84,10 @@ export interface HearthApi {
   registerPushToken(token: string, platform: PushPlatform): Promise<void>;
   setNotificationPrefs(space: string, prefs: NotificationPrefs): Promise<void>;
 
-  // --- who reads replies (BETA-AUD-9/10) ---
-  setGroupRepliesShared(circle: string, on: boolean): Promise<void>;
+  // --- who reads replies (BETA-AUD-10, REPLY-11; the AUD-9 group switch is gone in 0011) ---
   setReplyAudience(space: string, choice: ReplyAudience): Promise<void>;
+  /** REPLY-11: the names of everyone who will read the caller's reply on this post; null = not found. */
+  replyReaders(post: string): Promise<string[] | null>;
 
   // --- account deletion (BETA-JOIN-7) ---
   requestAccountDeletion(): Promise<void>;
