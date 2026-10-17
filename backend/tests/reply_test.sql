@@ -141,29 +141,38 @@ select tests.ok_sql(format($$select (public.toggle_heart(%L)).heart_count = 0$$,
 select tests.lives(format('select public.toggle_heart(%L)', :p_a_gp), 'setup: Grandma hearts again');
 
 -- ======================================================================
--- The switch: a group whose members read each other's replies (AUD-9)
+-- 0011 (SPEC-GROUPS, Chase Oct 17): the per-group switch is gone (AUD-9 retired, REPLY-12); a household is
+-- what lets relatives read each other (REPLY-7), and readers are fixed when a reply is written (privacy item 5)
 -- ======================================================================
-:as_gma_riv
-select tests.throws_code(format('select public.set_group_replies_shared(%L, true)', :c_a_gp),
-                         'AUD-9: a viewer can''t flip the switch (not found)', 'P0002');
 :as_alex
-select tests.lives(format('select public.set_group_replies_shared(%L, true)', :c_a_gp),
-                   'AUD-9: the parent turns on "members see each other''s replies" for the grandparents group');
-select tests.ok_sql(format($$select replies_shared from public.my_circles(%L) where circle_id = %L$$, :space_a, :c_a_gp),
-                    'AUD-9: my_circles shows the switch');
+select tests.throws_code(format('select public.set_group_replies_shared(%L, true)', :c_a_gp),
+                         'REPLY-12 (was AUD-9): set_group_replies_shared no longer exists', '42883');
+select tests.ok_sql(format($$select kind = 'group' from public.my_circles(%L) where circle_id = %L$$, :space_a, :c_a_gp),
+                    'REPLY-12 (was AUD-9): my_circles shows the kind, not a switch');
+select tests.setv('h_riv', format($$select public.create_level(%L, 'household', 'Rivera house')$$, :space_a));
+select tests.lives(format($$select public.place_person(%L, %L, 'all'), public.place_person(%L, %L, 'all')$$,
+                          tests.v('h_riv'), :gma_riv, tests.v('h_riv'), :gpa_riv),
+                   'setup: the parent puts Grandma and Grandpa Rivera in one household');
 :as_gma_riv
-select tests.ok_sql(format('select tests.comments_seen(%L) = 2', :p_a_gp),
-                    'AUD-9: now Grandma reads Grandpa''s comment (and the parent''s)');
+select tests.ok_sql(format('select tests.comments_seen(%L) = 1', :p_a_gp),
+                    'REPLY-7 / privacy item 5: Grandpa''s earlier comment stays with the parents (written before they shared a house); she sees the parent''s');
 select tests.ok_sql(format($$select tests.feed_row(%L, %L)->>'reply_scope' = 'group'$$, :space_a, :p_a_gp),
-                    'AUD-9: the app is told her replies reach her group');
--- a post to "Everyone" (not switched on): the grandparents' replies stay with the parents
+                    'REPLY-7: the app is told her replies now reach her household too');
 :as_gpa_riv
 select tests.lives(format($$select public.add_comment(gen_random_uuid(), %L, 'Go team')$$, :p_a_all), 'setup: Grandpa comments on the Everyone post');
 :as_gma_riv
+select tests.ok_sql(format('select tests.comments_seen(%L) = 1', :p_a_all),
+                    'REPLY-7: on the Everyone post, Grandma reads her household''s new comment');
+:as_gma_chen
 select tests.ok_sql(format('select tests.comments_seen(%L) = 0', :p_a_all),
-                    'AUD-9: the switch follows the post''s groups: on the Everyone post, Grandpa''s reply stays private');
+                    'REPLY-7: ...and Grandma Chen (not in their house) doesn''t');
 :as_alex
-select tests.lives(format('select public.set_group_replies_shared(%L, false)', :c_a_gp), 'setup: switch back off');
+select tests.lives(format($$select public.unplace_person(%L, %L), public.unplace_person(%L, %L)$$,
+                          tests.v('h_riv'), :gma_riv, tests.v('h_riv'), :gpa_riv),
+                   'setup: the household is undone');
+:as_gma_riv
+select tests.ok_sql(format('select tests.comments_seen(%L) = 0', :p_a_all),
+                    'REPLY-7 narrowing is read-time: out of the house, she stops reading Grandpa''s comment at once');
 
 -- ======================================================================
 -- The family can change the default (AUD-10)
@@ -277,10 +286,31 @@ create function tests.reply_rows_all_match() returns text language sql as $$
                           'f0000000-0000-0000-0000-0000000000c9']::uuid[]) u) t $$;
 select tests.ok(tests.reply_rows_all_match() = '',
                 'AUD-8 perf: default (parents read replies): every member''s feed and timeline counts and reply_scope equal the per-reply rule');
-update public.circles set replies_shared = true where id in (:c_a_gp, '33333333-0000-0000-0000-0000000000c9');
+-- 0011: two households (was AUD-9's two sharing groups): the Riveras in one, the cousin and Grandma Chen in another,
+-- an event on the "Both groups" post holding the cousins' house, and replies written before and after the placements
+insert into public.circles (id, space_id, name, kind, created_by) values
+  ('33333333-0000-0000-0000-0000000000d1', :space_a, 'Grandparents house', 'household', :alex),
+  ('33333333-0000-0000-0000-0000000000d2', :space_a, 'Cousins house', 'household', :alex),
+  ('33333333-0000-0000-0000-0000000000d3', :space_a, 'Reunion', 'event', :alex);
+insert into public.circle_people (circle_id, user_id) values
+  ('33333333-0000-0000-0000-0000000000d1', :gma_riv), ('33333333-0000-0000-0000-0000000000d1', :gpa_riv),
+  ('33333333-0000-0000-0000-0000000000d2', 'f0000000-0000-0000-0000-0000000000c9'), ('33333333-0000-0000-0000-0000000000d2', :gma_chen);
+insert into public.circle_links (parent_id, child_id) values
+  ('33333333-0000-0000-0000-0000000000d3', '33333333-0000-0000-0000-0000000000d1'),
+  ('33333333-0000-0000-0000-0000000000d3', '33333333-0000-0000-0000-0000000000d2');
+insert into public.post_audiences (post_id, circle_id) values ('55555555-0000-0000-0000-0000000000c9', '33333333-0000-0000-0000-0000000000d3');
+-- Grandma Chen (in the event through the cousins' house) replies for the first time after the placements
+insert into public.comments (post_id, author_id, body) values ('55555555-0000-0000-0000-0000000000c9', :gma_chen, 'Grandma Chen at the reunion');
+insert into public.reactions (post_id, user_id, emoji) values ('55555555-0000-0000-0000-0000000000c9', :gma_chen, '❤️');
 select tests.ok(tests.reply_rows_all_match() = '',
-                'AUD-9 perf: with two groups sharing replies (the cousin and Grandma in different ones), counts and reply_scope still equal the per-reply rule');
-update public.circles set replies_shared = false where id in (:c_a_gp, '33333333-0000-0000-0000-0000000000c9');
+                'REPLY-7/8 perf (was AUD-9): with two households and an event, replies before and after the placements, counts and reply_scope still equal the per-reply rule');
+:as_gma_riv
+select tests.ok_sql($$select array_agg(body order by body) = array['Grandma Chen at the reunion', 'Grandma on both']
+                      from public.get_comments('55555555-0000-0000-0000-0000000000c9')$$,
+                    'REPLY-8 / privacy item 5: Grandma Rivera reads her event-mate''s new comment, not the cousin''s from before the event');
+:as_admin
+delete from public.post_audiences where circle_id = '33333333-0000-0000-0000-0000000000d3';
+delete from public.circle_people where circle_id in ('33333333-0000-0000-0000-0000000000d1', '33333333-0000-0000-0000-0000000000d2');
 update public.spaces set reply_audience = 'everyone' where id = :space_a;
 select tests.ok(tests.reply_rows_all_match() = '',
                 'AUD-10 perf: with replies open to everyone, counts and reply_scope still equal the per-reply rule');

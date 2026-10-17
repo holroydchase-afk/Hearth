@@ -177,7 +177,7 @@ select set_config('request.jwt.claim.sub', :gpa_riv, false);
 select tests.ok(exists (select 1 from posts where id = :p_a_co),               '...and grants Dad-side grandpa access');
 -- removing someone from a circle revokes too
 select set_config('request.jwt.claim.sub', :alex, false);
-delete from circle_members where circle_id = :c_a_gp and user_id = :gpa_riv;
+select public.unplace_person(:c_a_gp, :gpa_riv);   -- 0011: memberships change only through the setup RPCs (privacy item 3)
 select set_config('request.jwt.claim.sub', :gpa_riv, false);
 select tests.ok(not exists (select 1 from posts where id = :p_a_gp),           'Removing grandpa from the circle revokes his access');
 -- empty audience is refused
@@ -251,7 +251,7 @@ reset role;
 insert into auth.users (id, email) values ('d0000000-0000-0000-0000-0000000000d1', 'uncle.ray@example.com');
 set role authenticated;
 select set_config('request.jwt.claim.sub', :alex, false);
-select code as invite_code from public.create_invite(:space_a, 'viewer', array[:c_a_gp]::uuid[], 'email', 'Uncle.Ray@example.com') \gset
+select code as invite_code from public.create_invite(:space_a, 'viewer', array[:c_a_gp]::uuid[], 'email', 'Uncle.Ray@example.com', p_history => 'all') \gset
 reset role;   -- (S9) clients can no longer read code_hash at all; check the stored value as superuser
 select tests.ok(not exists (select 1 from invites where code_hash = :'invite_code'), 'Invite code stored hashed, not plaintext');
 set role authenticated;
