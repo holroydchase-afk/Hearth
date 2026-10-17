@@ -1,5 +1,10 @@
 # Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
+## Oct 17: groups, households, events built (SPEC-GROUPS first build, app-engineer)
+1. **Built, test-first (qa-tdd's red tests now green):** migration 0011 (family shape, section 10 privacy review), `backend/scripts/family-setup-v2.sql` (dry run by default), and the app (share-history pick with no default, comment box names its readers, per-group switch gone, events in the share sheet, timeline card opens the post, future capture dates ignored). 0012 (households only) is not built yet. Contract notes: `docs/eng/API.md` "As built (0011)".
+2. **Tests:** backend SQL 607, deploy 20, EAS 6, prototype 33, Jest 329 + 1 skipped, typecheck clean, web e2e 1. Deno is not installed in this sandbox.
+3. **Chase:** don't deploy 0011 yet. Run the v2 dry run on a copy of the database with `-v sister_name=...`, read the gains/losses with staff-pm, then take a backup and apply with `-v apply=yes`.
+
 ## Oct 17, 3 am: groups, households, events, roles (spec only, staff-pm; replaces "one family hierarchy")
 1. **Specced, not built:** `docs/product/SPEC-GROUPS.md` (renamed from SPEC-HIERARCHY.md), from your 2:47 am answer. Fixed shape: Everyone, set groups (your side, Danielle's side), households just under them; a person can be in several households and groups (Danielle's sister in Memaw's and Pawpaw's houses). Events combine any groups and households (Charleston trip, Gigi's birthday, custom groups). Only parents send to Everyone. Adding anyone asks "Share all past photos" or "Only new photos", no default. Criteria BETA-AUD-11 to 22, REPLY-7 to 13; AUD-9 retires.
 2. **Migration order (also in the overnight plan):** 0010 timeline, 0011 family shape (removes the 0009 switch), `family-setup.sql` v2 re-seed, 0012 households-only. Next: privacy-security review, then qa-tdd failing tests. Before milestone 3; doesn't block M1 or M2.
