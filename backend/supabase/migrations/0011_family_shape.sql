@@ -508,8 +508,9 @@ begin
   end if;
   select reply_audience into v_aud from public.spaces where id = v_post.space_id;
   if v_aud = 'everyone' then return true; end if;
-  -- household and event rules, fixed when the reply was written: the reader could already see the post ...
-  select min(cm.added_at) into v_since
+  -- household and event rules, fixed when the reply was written: the reader could already see the post (through a
+  -- container that was already on its audience: S-0011-1) ...
+  select min(greatest(cm.added_at, pa.added_at)) into v_since
   from public.post_audiences pa
   join public.circles c on c.id = pa.circle_id and c.deleted_at is null
   join public.circle_members cm on cm.circle_id = pa.circle_id and cm.user_id = p_reader
@@ -528,7 +529,7 @@ begin
                  join public.circles e on e.id = pa.circle_id and e.kind = 'event' and e.deleted_at is null
                  join public.circle_members r on r.circle_id = e.id and r.user_id = p_reader and r.added_at <= p_at
                  join public.circle_members w on w.circle_id = e.id and w.user_id = p_writer and w.added_at <= p_at
-                 where pa.post_id = p_post);
+                 where pa.post_id = p_post and pa.added_at <= p_at);
 end $$;
 
 -- The caller reading one reply at its written time (RLS on comments and reactions).
@@ -604,6 +605,9 @@ create policy reactions_select on public.reactions for select to authenticated
 -- a heart's time decides who reads it: app users can't choose it
 revoke insert on public.reactions from authenticated;
 grant insert (post_id, user_id, emoji) on public.reactions to authenticated;
+-- an audience row's time decides who reads earlier replies (S-0011-1): app users can't choose it either
+revoke insert on public.post_audiences from authenticated;
+grant insert (post_id, circle_id) on public.post_audiences to authenticated;
 
 create or replace function public.get_comments(p_post uuid, p_limit integer default 50)
 returns table (comment_id uuid, author_id uuid, author_name text, body text, created_at timestamptz)
@@ -646,7 +650,7 @@ begin
       join public.circles h on h.id = r.circle_id and h.kind = 'household' and h.deleted_at is null and h.space_id = p.space_id
       join public.circle_people w on w.circle_id = r.circle_id and w.user_id <> v_uid
       union all
-      select p.id, w.user_id, greatest(r.added_at, w.added_at)
+      select p.id, w.user_id, greatest(r.added_at, w.added_at, pa.added_at)
       from pg p
       join public.post_audiences pa on pa.post_id = p.id
       join public.circles e on e.id = pa.circle_id and e.kind = 'event' and e.deleted_at is null
@@ -690,7 +694,7 @@ begin
              as reads_all,
            array(select sm.user_id from public.space_members sm
                  where sm.space_id = p.space_id and sm.role in ('owner', 'adult')) as parents,
-           (select min(cm.added_at)
+           (select min(greatest(cm.added_at, pa.added_at))
               from public.post_audiences pa
               join public.circles c on c.id = pa.circle_id and c.deleted_at is null
               join public.circle_members cm on cm.circle_id = pa.circle_id and cm.user_id = v_uid
@@ -1040,6 +1044,19 @@ begin
   select ic.circle_id into v_house from public.invite_circles ic
    join public.circles c on c.id = ic.circle_id and c.deleted_at is null and c.kind = 'household'
    where ic.invite_id = v_inv.id limit 1;
+  -- S-0011-3 (until 0012): a relative's invite without a household places them straight into the groups it
+  -- names. Only while each is still a live Everyone or a group with nothing under it; else the parent's choice
+  -- no longer means the same thing (the group was retired, or now holds households): ask for a new invite.
+  if v_house is null and v_inv.role = 'viewer'
+     and (not exists (select 1 from public.invite_circles ic join public.circles c on c.id = ic.circle_id and c.deleted_at is null
+                      where ic.invite_id = v_inv.id)
+          or exists (select 1 from public.invite_circles ic join public.circles c on c.id = ic.circle_id
+                     where ic.invite_id = v_inv.id
+                       and (c.deleted_at is not null or c.kind not in ('everyone', 'group')
+                            or exists (select 1 from public.circle_links l join public.circles k on k.id = l.child_id and k.deleted_at is null
+                                       where l.parent_id = c.id)))) then
+    return private.api_error('22023', 'invite is invalid or expired', 400);
+  end if;
   insert into public.space_members (space_id, user_id, role, invited_by, sees_from, in_everyone)
   values (v_inv.space_id, auth.uid(), v_inv.role, v_inv.created_by, v_from, v_house is not null)
   on conflict (space_id, user_id) do nothing;          -- never silently changes an existing role or choice

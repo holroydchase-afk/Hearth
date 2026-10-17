@@ -124,8 +124,8 @@ export function ReplyAudience() {
   return (
     <Card>
       <Txt variant="title" role="header">Who reads what family members write</Txt>
-      <Txt variant="muted">For comments and hearts. Your own replies always reach everyone the photo went to. Groups can also be set so their members see each other's replies.</Txt>
-      <Choice kind="radio" label="Only the kids' parents (safest)" title="Only the kids' parents (safest)" checked={choice === 'parents'} onPress={() => pick('parents')} />
+      <Txt variant="muted">For comments and hearts. The kids' parents read them all, and your own replies reach everyone the photo went to. People in the same household, or in the same event, read each other's.</Txt>
+      <Choice kind="radio" label="The parents, plus their own household and events (safest)" title="The parents, plus their own household and events (safest)" checked={choice === 'parents'} onPress={() => pick('parents')} />
       <Choice kind="radio" label="Everyone the photo was shared with" title="Everyone the photo was shared with" checked={choice === 'everyone'} onPress={() => pick('everyone')} />
     </Card>
   );

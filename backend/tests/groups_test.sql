@@ -845,6 +845,98 @@ select tests.ok(tests.sees('gigi', 'p_old_gigi') and tests.sees('gigi', 'p_old')
                 'privacy item 10: re-invited with "Share all past photos", Gigi now sees the posts from before her first invite');
 
 -- ======================================================================
+-- privacy review of the first build (privacy-security, Oct 17): S-0011-1..3
+-- ======================================================================
+-- S-0011-1 (privacy item 5): adding a container to a post's audience must not let its people read replies
+-- written before it was added. The sister writes on a post only her own house gets; Chase then adds Memaw's
+-- house (the sister lives there too). Memaw sees the photo, but the sister's box never named her.
+select tests.post('p_aud', array['h_sis']);
+select tests.say('c_sis_aud', 'sister', 'p_aud');
+select tests.heart('sister', 'p_aud');
+select tests.ok(tests.readers('sister', 'p_aud') = tests.names(array['Chase', 'Danielle']),
+                'S-0011-1 setup: the sister''s comment box names only Chase and Danielle');
+select tests.q('chase', format('select public.set_post_audience(%L, array[%L, %L]::uuid[])', tests.v('p_aud'), tests.v('h_sis'), tests.v('h_memaw')));
+select tests.ok(tests.sees('memaw', 'p_aud'), 'S-0011-1 allowed: Memaw''s house added to the post: Memaw sees the photo');
+select tests.ok(not tests.reads('memaw', 'c_sis_aud') and not tests.reads_heart('memaw', 'p_aud', 'sister'),
+                'S-0011-1 excluded: ... but not the sister''s comment or heart written before her house was added');
+select tests.ok(tests.counts('memaw', 'p_aud') = '0:0',
+                'S-0011-1 counts: Memaw''s feed counts leave them out too (0 hearts, 0 comments)');
+select tests.say('c_sis_aud2', 'sister', 'p_aud');
+select tests.ok(tests.reads('memaw', 'c_sis_aud2') and tests.reads('chase', 'c_sis_aud'),
+                'S-0011-1 allowed: the sister''s next comment reaches Memaw; Chase still reads both');
+select tests.ok(not has_column_privilege('authenticated', 'public.post_audiences', 'added_at', 'INSERT'),
+                'S-0011-1: app users can''t choose post_audiences.added_at (the time that fixes who reads replies)');
+
+-- S-0011-2: retire_level is parents-only, keeps Everyone, and never widens anyone's access.
+create table tests.before_retire as
+  select pe.k, p.id as post_id from tests.people pe cross join public.posts p
+  where p.space_id = :space_h and p.status = 'published' and p.deleted_at is null and false;
+do $$
+declare r record;
+begin
+  for r in select k from tests.people loop
+    perform tests.act(r.k);
+    insert into tests.before_retire select r.k, p.id from public.posts p
+    where p.space_id = '22222222-0000-0000-0000-0000000000f0' and p.status = 'published' and public.can_view_post(p.id);
+  end loop;
+end $$;
+select tests.ok(tests.q('memaw', format('select public.retire_level(%L)', tests.v('h_pg'))) is null
+                and tests.q('danielle', format('select public.retire_level(%L)', tests.v('h_other'))) is null
+                and exists (select 1 from public.circles where id = tests.c('h_pg') and deleted_at is null),
+                'S-0011-2 excluded: a relative (Memaw, her own house) and a parent of another family can''t retire a container');
+select tests.ok(tests.q('chase', format('select public.retire_level(%L)', tests.v('all'))) is null
+                and exists (select 1 from public.circles where id = tests.c('all') and deleted_at is null),
+                'S-0011-2: Everyone can''t be retired');
+select tests.q('danielle', format('select public.retire_level(%L)', tests.v('h_pg')));
+select tests.ok(not tests.sees('pawpaw', 'p_pg') and not tests.sees('granny', 'p_pg'),
+                'S-0011-2 allowed: Danielle (parent) retires Pawpaw and Granny''s house: they lose its posts at once');
+select tests.ok(tests.sees('chase', 'p_pg') and tests.sees('danielle', 'p_pg') and not tests.sees('memaw', 'p_pg') and not tests.sees('gammy', 'p_pg'),
+                'S-0011-2: the house''s posts stay with the parents and the author only (no one else picks them up)');
+create table tests.after_retire (k text, post_id uuid);
+do $$
+declare r record;
+begin
+  for r in select k from tests.people loop
+    perform tests.act(r.k);
+    insert into tests.after_retire select r.k, p.id from public.posts p
+    where p.space_id = '22222222-0000-0000-0000-0000000000f0' and p.status = 'published' and public.can_view_post(p.id);
+  end loop;
+end $$;
+select tests.ok((select count(*) from (select * from tests.after_retire except select * from tests.before_retire) x) = 0,
+                'S-0011-2: retiring widens nobody: no (person, post) pair is visible after that wasn''t before');
+
+-- S-0011-3 (until 0012): a relative's invite naming a group from before 0011 places them directly. If that group
+-- was retired or has since been given households, the invite no longer means what the parent chose: refused.
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('f0000000-0000-0000-0000-000000000031', 'aunt@hearth.test', '{"display_name":"Aunt Bea"}'),
+  ('f0000000-0000-0000-0000-000000000032', 'uncle@hearth.test', '{"display_name":"Uncle Ray"}'),
+  ('f0000000-0000-0000-0000-000000000033', 'cousin@hearth.test', '{"display_name":"Cousin Lu"}');
+select tests.level('g_old', 'group', 'Old group');
+select tests.post('p_old_group', array['g_old']);
+select tests.setq('inv_old1', 'chase', format($$select code from public.create_invite(p_space => %L, p_role => 'viewer', p_circle_ids => array[%L]::uuid[], p_history => 'all')$$, :space_h, tests.v('g_old')));
+select tests.setq('inv_old2', 'chase', format($$select code from public.create_invite(p_space => %L, p_role => 'viewer', p_circle_ids => array[%L]::uuid[], p_history => 'all')$$, :space_h, tests.v('g_old')));
+select tests.setq('inv_old3', 'chase', format($$select code from public.create_invite(p_space => %L, p_role => 'viewer', p_circle_ids => array[%L]::uuid[], p_history => 'all')$$, :space_h, tests.v('g_old')));
+create function tests.redeem_as(p_uid uuid, p_code text) returns text language plpgsql as $$
+declare v json;
+begin
+  perform set_config('request.jwt.claim.sub', p_uid::text, true);
+  v := public.redeem_invite(p_code);
+  return v::text;
+exception when others then return 'error ' || sqlstate;
+end $$;
+select tests.redeem_as('f0000000-0000-0000-0000-000000000031', tests.v('inv_old1'));
+select tests.ok(exists (select 1 from public.space_members where space_id = :space_h and user_id = 'f0000000-0000-0000-0000-000000000031'),
+                'S-0011-3 allowed: an invite to an old group with nothing under it still works until 0012 (Aunt Bea joins)');
+select tests.link('g_old', 'h_gammy', 'all');
+select tests.ok(tests.redeem_as('f0000000-0000-0000-0000-000000000032', tests.v('inv_old2')) like '%22023%'
+                and not exists (select 1 from public.space_members where space_id = :space_h and user_id = 'f0000000-0000-0000-0000-000000000032'),
+                'S-0011-3 excluded: once the old group has a household under it, its open invite is refused (Uncle Ray isn''t placed straight into the group)');
+select tests.q('chase', format('select public.retire_level(%L)', tests.v('g_old')));
+select tests.ok(tests.redeem_as('f0000000-0000-0000-0000-000000000033', tests.v('inv_old3')) like '%22023%'
+                and not exists (select 1 from public.space_members where space_id = :space_h and user_id = 'f0000000-0000-0000-0000-000000000033'),
+                'S-0011-3 excluded: an invite whose group was retired is refused (no member who is placed nowhere)');
+
+-- ======================================================================
 -- Summary
 -- ======================================================================
 reset role;
