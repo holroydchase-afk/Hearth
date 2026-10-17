@@ -4,6 +4,14 @@
 1. **Specced, not built:** `docs/product/SPEC-HIERARCHY.md`. Everyone, sides, households, plus groups that can hold households from different places (the Charleston trip, now in STORY.md). A relative's replies reach their household, the parents and the post's author; the 0009 group switch is removed in migration 0010. New BETA-AUD-11 to 17 and BETA-REPLY-7 to 13 in BETA-SPEC; AUD-9 retires. Ships before milestone 3; next is privacy-security review, then qa-tdd writes the failing tests.
 2. **Your calls (one word each, spec §7):** group-post replies Household or Group (rec. Household); a relative's post goes to Everyone or Household (rec. Everyone); new households see past photos Yes or No (rec. Yes).
 
+## Oct 17, 2 am: first real deploy (Chase's ask, without function keys)
+1. **Live on `jqvgjfbhzbvfdhtnvgzr`:** migrations 0001–0009 (the Management API accepts begin/commit, so the migration-transaction question is settled), both edge functions, `NOTIFY_CRON_SECRET`, and the `hearth-notify` and `hearth-purge-client-errors` cron jobs.
+2. **Failed, step 5/5 (sign-in email: 6-digit code):** `PATCH config/auth` returned 403 "Missing required permission(s): project_admin_write". The access token is scoped and can't change project settings. Until this is fixed, sign-in emails send Supabase's default link, not a code.
+3. **Action items for Chase:**
+   - [ ] **Sign-in code email.** Either paste the templates in the Supabase dashboard (Authentication → email templates: Magic Link and Confirm signup, subject `Your Hearth code: {{ .Token }}`, bodies from `backend/supabase/templates/`; code length 6, expiry 3600 s), or make a token with project admin write, replace the `SUPABASE_ACCESS_TOKEN` secret, and rerun `deploy.sh` (applied steps are skipped).
+   - [ ] **Function keys.** Fill the values in `backend/supabase/functions/.env.example` (Backblaze B2, `MEDIA_KEK`, `ALLOWED_ORIGINS`, Resend, `APP_LINK_BASE`, Expo). Add them as Hearth environment secrets so a session can write `.env` and rerun the deploy. Until then, photos (sign-media) and notifications (notify) are deployed but can't work.
+   - [ ] **Cleanup after the keys are in:** delete the placeholder Supabase secret `HEARTH_KEYS_PENDING`. It was set only because `supabase secrets set --env-file` rejects an empty file.
+
 ## Oct 17: deploy review fixes (DEPLOY-2, DEPLOY-3)
 1. **Built, test-first (`backend/tests/deploy/deploy_test.sh`, now 20 checks):** function deploys pass `--use-api`, so Supabase bundles them and no Docker is needed (DEPLOY-2). A migration the API rejects now prints its file name and the Postgres error, with the cron secret redacted; before, it said only "failed" (DEPLOY-3).
 2. **Doc:** `docs/product/MILESTONE-1.md` step 2 now says the hosted test runs and `family-setup.sql` still need `SUPABASE_DB_URL`.
