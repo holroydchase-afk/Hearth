@@ -37,7 +37,7 @@ describe('BETA-AUD-19 invite form: share history, no default', () => {
     expect(all.props.accessibilityState).toMatchObject({ checked: false });
     expect(fresh.props.accessibilityState).toMatchObject({ checked: false });
     // words under each, so nobody has to guess (grandparent-ux owns the final wording)
-    expect(screen.getByText(/see every photo already shared/i)).toBeTruthy();
+    expect(screen.getByText(/see every photo .* can already see/i)).toBeTruthy();
     expect(screen.getByText(/from today on, including older photos you add later/i)).toBeTruthy();
     expectGrandparentSafe();
   });
