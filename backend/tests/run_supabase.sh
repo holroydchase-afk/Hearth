@@ -14,4 +14,8 @@ for suite in tests/rls_test.sql tests/api_test.sql tests/notify_test.sql tests/s
   $SB db reset --local >&2
   psql "$DB_URL" -X -q -f "$suite" || STATUS=1
 done
+# SETUP-API on the real stack: the setup switches to the authenticated role as Chase, like the hosted API call
+echo "== tests/setup_api_test.sh (fresh db reset)" >&2
+$SB db reset --local >&2
+SETUP_TEST_DB_URL=$DB_URL bash tests/setup_api_test.sh || STATUS=1
 exit $STATUS

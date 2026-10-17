@@ -1,5 +1,10 @@
 # Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
+## Oct 17, afternoon: family setup in one command, no database password (SETUP-API)
+1. **Built, test-first (`backend/tests/setup_api_test.sh`, 34 checks; in `tests/run.sh` and on the real stack in CI):** `bash backend/scripts/family-setup.sh --chase-email <yours> --space-name 'Our kids' [--danielle-email <hers>]` sets up your family in the groups shape through the Management API, like `deploy.sh`. It needs only `SUPABASE_ACCESS_TOKEN` (no `SUPABASE_DB_URL`, no `psql`) and runs as you through the app's RPCs and RLS. It makes Everyone, both sides, each grandparent's house, a Test house for account B, the two events, and prints the invite codes. It stops once anyone else has joined (then use `family-setup-v2.sql`'s dry run).
+2. **Why:** hosted now runs 0001–0011 and is empty, so the v1 `family-setup.sql` then v2 would hand account B an invite to a group v2 retires. MILESTONE-1 step 5 and the demo rows now use this script and the Test house.
+3. **Next for you:** paste the sign-in code email templates (action item below), sign in once in Expo Go or the web build, then Claude runs the script and gives you account B's code.
+
 ## Oct 17 overnight: bulk upload + timeline, family shape, two review rounds (PR #9)
 1. **Built, test-first:** bulk upload by date taken + timeline + Jump to year (migration 0010; one batch notice per bulk import); family shape: Everyone, groups, households, events, Parents, share history (migration 0011) and `backend/scripts/family-setup-v2.sql` (dry run by default). 0012 (households only) is not built.
 2. **Reviews and fixes:** privacy-security on 0010 and 0011 (S-0011-1..8: replies fixed by when a house joined a post or when someone's share history was widened; Everyone can't be retired even by a direct update; retiring is one-way, so a direct update can't un-retire a group or household; stale invites refused). grandparent-ux (UX-G1..G9: plainer share and group words; an invite that no longer works says "Ask Chase for a new one." before anyone types, signed in or out; signed in, that screen has a "Go to Photos" button).

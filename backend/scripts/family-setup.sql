@@ -1,3 +1,5 @@
+-- v1, kept for its tests. For a NEW family use scripts/family-setup.sh (0011 shape, token only): on 0011 this
+-- file's test-viewer invite names a v1 group that family-setup-v2.sql later retires.
 -- Milestone 1 + 2 setup: the app can't create a family space or groups yet, so this
 -- does it once, AS CHASE, through the same RPCs and RLS the app uses (no RLS bypass).
 -- Chase must have signed in once first (so his account exists).
