@@ -1,4 +1,21 @@
-# get_feed scale test: results
+# get_feed / get_timeline scale test: results
+
+## Oct 17, 2026 run (migration 0010)
+`tests/perf/run.sh` on the same fixture shape, now with `taken_at` on 70% of posts. Raw output: `tests/perf/last-run.txt`.
+
+| scenario (p95 ms, 200 calls, limit 20) | get_feed | get_timeline |
+|---|---:|---:|
+| viewer, first page | 8.40 | 9.93 |
+| viewer, deep page | 9.22 | 14.09 |
+| author, first page | 13.02 | 11.17 |
+| author, deep page | 13.49 | 10.49 |
+| co-parent, first page | 7.45 | 6.07 |
+
+- **get_feed: pass** (target 30 ms). Before 0010 it measured about 50–60 ms p95 here: 0009's per-row reply helpers (`can_see_reply`, `reply_scope`, `can_view_post`) were SQL functions, re-planned on every call. 0010 makes them plpgsql (same bodies), which caches the plans.
+- **get_timeline: misses the 5 ms target** (6–14 ms p95). Finding the page (`private.visible_posts`, index scans on `post_audiences_timeline_idx` and `posts_author_timeline_idx`) takes about 0.6 ms. The rest is the shared row builder (`private.feed_rows`): `reply_scope` is about 0.25 ms per post, so 20 posts cost about 5 ms on their own. Reaching 5 ms would mean working out the reply rule for the whole page at once instead of per post. That's a privacy-rule change, so it's left for a staff-pm / privacy-security call.
+- The gate in `run.sh` stays honest: it exits 1 while a get_timeline p95 is 5 ms or more.
+
+## Oct 15, 2026 run (before 0009)
 
 **Run:** Oct 15, 2026 · `tests/perf/run.sh` (fixture `generate.sql`, benchmark `bench.sql`). Raw output from the last run: `tests/perf/last-run.txt`.
 **Target (docs/eng/API.md):** p95 under 30 ms in the database, for a viewer in a space with 20,000 posts, on about 1M posts across about 50k spaces.

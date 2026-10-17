@@ -353,6 +353,9 @@ select tests.throws_code(format($$select public.set_notification_prefs(%L, true,
 -- ======================================================================
 :as_admin
 delete from public.notification_outbox;
+-- Fixture: both grandparents on push (gma_riv's phone was removed by the "no phone registered" case above).
+insert into public.push_tokens (user_id, expo_token, platform) values (:gma_riv, 'ExponentPushToken[gma_riv]', 'android')
+  on conflict (expo_token) do update set user_id = excluded.user_id;
 -- One post of a batch by Alex to the Dad's-side grandparents: create_post with p_batch_id / p_batch_size,
 -- ready photos, published. Dynamic SQL, so a missing parameter is a failed test, not an abort.
 create function tests.mkbatchpost(p_key text, p_batch uuid, p_size int, p_photos int, p_taken timestamptz) returns void
@@ -422,9 +425,11 @@ select tests.ok_sql(format($$select tests.v('k1') is not null
                                     and tests.claim(%L::timestamptz + interval '20 minutes') >= 0 and tests.batch_count(%L) = 0$$,
                            :gma_riv, tests.v('tk'), :gma_riv),
                     'BETA-BULK-6: an unfinished batch waits (1 of 3 posts sent, 20 minutes in)');
-select tests.ok_sql(format($$select tests.claim(%L::timestamptz + interval '31 minutes') >= 0 and tests.batch_count(%L) = 1
+-- claim in its own statement: a subquery on tests.batches in the same statement would read the pre-claim snapshot
+select tests.setv('n', format($$select tests.claim(%L::timestamptz + interval '31 minutes')$$, tests.v('tk')));
+select tests.ok_sql(format($$select tests.batch_count(%L) = 1
                                     and (select photo_count from tests.batches where recipient_id = %L) = 4$$,
-                           tests.v('tk'), :gma_riv, :gma_riv),
+                           :gma_riv, :gma_riv),
                     'BETA-BULK-6: ...and goes out as 1 notice (4 photos) 30 minutes after it was queued');
 
 -- ======================================================================

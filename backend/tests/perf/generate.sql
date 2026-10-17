@@ -59,7 +59,7 @@ select perf.id('cK', 1), perf.id('u', 200031);
 
 -- posts: n = 1..20000 in space 1; n = 20001..1000000 spread over spaces 2..50000.
 -- ~1% deleted, ~0.5% drafts. Space 1 posts are ~1.3 h apart (about 3 years).
-insert into public.posts (id, space_id, author_id, caption, status, published_at, created_at, deleted_at, media_count)
+insert into public.posts (id, space_id, author_id, caption, status, published_at, created_at, deleted_at, media_count, taken_at)
 select perf.id('p', n),
        perf.id('s', sp),
        perf.id('u', sp),
@@ -68,7 +68,9 @@ select perf.id('p', n),
        case when n % 200 = 7 then null else ts end,
        ts,
        case when n % 100 = 3 then ts + interval '1 day' end,
-       1 + (n % 4 = 0)::int
+       1 + (n % 4 = 0)::int,
+       -- 0010: 70% carry a capture date, up to ~4 years before sharing (bulk imports of old photos)
+       case when n % 10 < 7 then ts - make_interval(secs => (n::bigint * 104729) % 126144000) end
 from (select n,
              case when n <= 20000 then 1 else 2 + (n % 49999) end as sp,
              case when n <= 20000 then now() - make_interval(secs => n * 4733)
@@ -76,9 +78,10 @@ from (select n,
       from generate_series(1, 1000000) n) x;
 
 -- audiences: 60% Everyone, 30% Grandparents, 10% Co-parent; every 7th post also to Grandparents.
-insert into public.post_audiences (post_id, circle_id, feed_at)
+insert into public.post_audiences (post_id, circle_id, feed_at, timeline_at)
 select p.id, perf.id(c, x.sp),
-       case when p.status = 'published' and p.deleted_at is null then p.published_at end
+       case when p.status = 'published' and p.deleted_at is null then p.published_at end,
+       case when p.status = 'published' and p.deleted_at is null then coalesce(p.taken_at, p.published_at) end
 from (select n, case when n <= 20000 then 1 else 2 + (n % 49999) end as sp,
              case when n % 10 < 6 then 'cE' when n % 10 < 9 then 'cG' else 'cK' end as c1
       from generate_series(1, 1000000) n) x
