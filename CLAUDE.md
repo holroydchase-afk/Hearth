@@ -15,6 +15,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - `docs/product/MILESTONE-1.md`: Chase's setup steps and the 2-day demo for milestone 1 (incl. the $99 Apple answer).
 - `docs/product/REMAINING.md`: the critical path to the Ring 0 gate (Oct 29) and the beta.
 - `docs/product/BETA-SPEC.md`: 35 acceptance criteria (BETA-*), the scope source of truth.
+- `docs/eng/MERGING.md`: when and how Claude merges PRs (only on Chase's word, CI green, merge commits).
 - `docs/eng/API.md`: the app↔backend contract. Change the contract tests before changing it.
 - `docs/product/PERSONAS.md`, `docs/product/CORE-FEATURES.md`, `docs/eng/TESTING.md`.
 - `docs/product/MARKETING.md`: positioning, claims register (what we can truthfully say), marketing ideas log. Owned by the `marketing` agent.
