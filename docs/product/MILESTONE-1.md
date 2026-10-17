@@ -4,13 +4,13 @@ Your morning doc. Do the steps in order and Claude handles the rest. The gate is
 
 ## The $99 question, answered first
 
-**You need the $99 Apple Developer membership to pass milestone 1, but not to start it.**
+**You don't need the $99 Apple Developer membership for milestone 1** (Chase, Oct 17: milestone 1 runs in Expo Go; the push check moved to milestone 2).
 
 - **Expo Go** (free, from the App Store) runs Hearth on your iPhone today: sign in, post, see photos, comment, heart, save to phone. It **cannot receive push notifications** from our server (Expo SDK 53+); push needs a "development build" of our own app.
 - **A push-enabled iPhone build needs a paid Apple Developer account.** A free Apple ID can't sign the push permission.
-- The M1 gate includes NOTIFY-3 (tap a push and the post opens), so the $99 is on the M1 path. Email notices work without it.
+- NOTIFY-3 (tap a push and the post opens) is now a milestone 2 check, so the $99 is off the M1 path. In milestone 1, notices come by email.
 
-**Suggested order:** start in Expo Go now (steps 1–4). Enroll in Apple ($99, approval can take 1–2 days) the day the Expo Go run works. Then switch to the real build for push.
+**Order:** run all of milestone 1 in Expo Go. Enroll in Apple ($99, approval can take 1–2 days) when milestone 2 starts.
 
 ## What you do (about 40 minutes plus Apple's wait)
 
@@ -22,7 +22,7 @@ Your morning doc. Do the steps in order and Claude handles the rest. The gate is
 | 4 | Make a free account at resend.com and save its API key as a **Supabase** function secret, not here: Supabase → Edge Functions → Secrets → `RESEND_API_KEY` | 5 min | Email notices. For M1, Resend's test sender can mail only you, which is all M1 needs |
 | 5 | Make a second email for a test account (e.g. `you+test@gmail.com`) | 1 min | The "second test account" in the gate |
 | 6 | Print `MEDIA_KEK` twice and keep the copies in two places (Claude will show you how to generate it once; never in chat) | 5 min | Gate: key on paper ×2 |
-| 7 | Later, after the Expo Go run works: enroll at developer.apple.com ($99/yr) | 10 min + wait | Push on your iPhone (NOTIFY-3) |
+| 7 | At milestone 2, not before: enroll at developer.apple.com ($99/yr) | 10 min + wait | Push on your iPhone (NOTIFY-3, now a milestone 2 check) |
 
 Never paste a key, token or password into chat. Secrets go in the environment settings or in Supabase.
 
@@ -60,6 +60,6 @@ Phone A = your iPhone (you). Account B = your test email, signed in on the web b
 | 1 | As B: comment and heart | You get one notice (email in Expo Go; push after the $99 build) | REPLY-3, NOTIFY-4 |
 | 1 | Save a photo to your phone; check its info in Photos | It's there at 2048 px with no location | M-09, SEE-5 |
 | 2 | Keep posting until 10+ posts over 2 days | Sent = received, 0 lost; 0 crash reports | Gate |
-| After $99 | Real build: lock the phone, have B post, tap the notice | Opens that post (cold and warm start) | NOTIFY-3 |
+| Milestone 2 | Real build ($99): lock the phone, have B post, tap the notice | Opens that post (cold and warm start) | NOTIFY-3 (not in the M1 gate) |
 
 Log each line in the Test Log as you go, or tell Claude and it will.
