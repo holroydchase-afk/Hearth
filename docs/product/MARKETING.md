@@ -34,6 +34,11 @@ Say only what's in **True today**. Update when the code or vendors change.
 | Same quality on iPhone and Android | Photos: true today | Video: future (CF-17). Android app is milestone 5 |
 | Nobody can see if you've looked | **Not yet** | "Seen by N of M" conflicts with A2; decision pending |
 | Comments stay private to the right people | Partly | Comments are seen by the post's whole audience today |
+| No AI on your photos | True today | Hearth runs no AI on media at all. Say this, not "AI is optional" (that implies AI features exist). Re-check after the AI positioning session |
+| Personal / private server for your family | **Not built** | Undefined (self-host vs per-family store). Never claim. ANCHORS ideas log, staff-pm owns |
+| "Only app that lets you pick who sees each photo" | **False** | FamilyAlbum Premium has Share Groups (as of Oct 17, 2026). Say what's ours instead: households, hidden groups, scoped replies, once SPEC-GROUPS ships |
+| "Unlike X, Hearth is end-to-end encrypted / more private than Ente" | **False** | Ente is E2EE, open source and audited. Never compare on encryption |
+| "Unlike FamilyAlbum, your photos stay in the US" | **Unverified** | FamilyAlbum is run by MIXI (Tokyo, Japanese law); its storage location wasn't found. Don't name them on A3 until verified from their policy |
 
 ## Audiences
 
@@ -69,10 +74,51 @@ Not legal advice. These are web and App Store search checks, not a trademark cle
 | ~~Mantel~~ | Where family photos sit | **Dropped:** "Mantel: Family Album" is an invite-only family photo app ([AppGoblin](https://appgoblin.info/apps/6764519748)) | — |
 | ~~Quilt~~ | Pieces from many households | **Dropped:** Chatbooks' Quilt is a family photo journal ([App Store id6742336887](https://apps.apple.com/us/app/-/id6742336887)) | — |
 
+## Competition and moat (DRAFT, Oct 17, 2026)
+
+Internal only. Never public copy. Every competitor fact below is as of Oct 17, 2026, mostly from search results. family-album.com and its help center didn't load from here, so FamilyAlbum facts come from search snippets of their own pages. Re-verify before any comparison is used.
+
+**Verdict:** a crowded market for "private family photos", a thin one for "split families with a grandparent who won't use an app." Big players serve one happy family; nobody we found is built around households who must not see each other.
+
+| Competitor | Price | Privacy stance | Data location | Per-post audience, groups hidden from each other? | Non-app grandparents | Source |
+|---|---|---|---|---|---|---|
+| FamilyAlbum (MIXI, Tokyo) | Free; Premium $5.99/mo or $59/yr, Pro $10.99/mo or $109/yr | Private album, encrypted in transit. App Store label lists data "used to track you" | Controller is MIXI, Inc., Japan; Japanese law governs Premium. **Storage location not found** | **Yes, partly:** Premium "Share Groups" limit a photo to a chosen group, admins only. Reply scoping and households: not found | App plus web/email notices (not verified) | [policy](https://family-album.com/privacy_policy), [Share Groups](https://help.family-album.com/hc/en-us/articles/360038780473-How-do-I-use-visibility-settings-other-than-Share-with-Family-and-Admins-Only), [pricing blog](https://blog.family-album.com/blog/is-familyalbum-really-free-what-you-get-without-paying/), [App Store](https://apps.apple.com/us/app/-/id935672069) |
+| Tinybeans (ASX-listed) | About $74.99/yr Premium (per FamilyAlbum's blog; not neutral) | Says it doesn't sell data; you control followers | Not checked | **No:** journal-level access; a moment can be "hidden", not sent to a subset | Email updates (not verified) | [access levels](https://tinybeans.helpscoutdocs.com/article/105-what-are-the-different-access-levels-i-can-grant-followers), [App Store](https://apps.apple.com/us/app/-/id521633042) |
+| Apple Shared Albums | Free | Shared Albums are **not** covered by Advanced Data Protection (standard encryption) | Apple, multi-region | Per-album, not per-post; members of one album see each other | Public web link for non-Apple viewers | [Apple security guide](https://support.apple.com/en-us/guide/security/sec973254c5f/web) |
+| Google Photos shared albums | Free / Google One | Link albums viewable by anyone with the link; AI training stance unclear (competitor sources) | Google, multi-region | Per-album | Link, no app needed | [Google help](https://support.google.com/photos/answer/6131416), [Proton (biased)](https://proton.me/zh/blog/is-google-photos-safe) |
+| Ente | Free 10 GB; ~$2.49 to $19.99/mo, family of 5 shares a plan | E2EE, open source (AGPL), audited | Ente's cloud or self-hosted | Shared albums; not a split-family model | Public links; still an app | [ente.com](https://ente.com/photo-backup-for-families/), [reclaimthenet](https://reclaimthenet.org/recommended-tool/ente) |
+| Immich / PhotoPrism | Free, self-hosted | Your own server | Wherever you host it | Shared albums, partner sharing | Links; someone techy must run it | [elest.io](https://blog.elest.io/immich-vs-photoprism-which-self-hosted-photo-manager-for-your-family/) |
+| Lifecake / Cluster | n/a | — | — | — | — | Lifecake discontinued by Canon in 2020 ([Dealroom](https://app.dealroom.co/companies/lifecake)); Cluster announced shutdown 2022, status unclear ([App Store reviews](https://apps.apple.com/app/id596595032)) |
+| Hearth Display | $9/mo Family Membership + hardware | Family organizer screen | Not checked | No | It's a wall screen | See Name candidates |
+| Hearth: Family Care | Not checked | Photos, voice, check-ins for an aging parent | Not checked | Not checked | Not checked | See Name candidates |
+| Aura frames | Hardware ~$199 to $229, no subscription | App uploads face-recognition metadata if given library access (per review) | Not checked | No (one frame, shared senders) | **Best in class:** frame, no app for viewer; email upload | [mightygadget](https://mightygadget.com/aura-frames-mason-luxe-review/), [TechCrunch](https://techcrunch.com/2025/04/16/digital-frame-maker-aura-introduces-the-aspen-a-229-frame-with-more-intelligent-features) |
+| Skylight frames | Hardware + Plus ~$39/yr | Private mode: approved senders only | Not checked | No | Frame; email photos to it works free | [Skylight](https://www.skylightframe.com/pages/how-to-use-skylight-plus), [wetried.it](https://wetried.it/skylight-frame-review/) |
+
+### Chase's 4 candidate moats, scored
+
+| Candidate | True today? | Competitor already has it? | Cheap to copy? | Do buyers pay for it? | Score |
+|---|---|---|---|---|---|
+| 1. AI 100% optional | Yes, and stronger: no AI on photos at all | Ente, Immich, Skylight-style frames | Yes (it's not doing something) | Rarely; it's a trust reason, not a purchase reason | **Table stakes for our buyer.** Keep as a pillar, not a moat |
+| 2. US-based servers | Stored in the US: yes. "Never leaves": not yet (A3 gaps) | Most US apps; self-hosters | Yes, pick a region | Some parents care; vs FamilyAlbum (Japan-run) it's a real contrast if verified | **Real differentiator vs one rival, not a moat.** Keep calm, not fear |
+| 3. Personal server | Not built; not defined | Ente and Immich self-host | Self-host: already free. Per-family store: copyable | Grandparents won't run a server | **Not a moat for this audience.** Park until Chase defines it |
+| 4. Hyper privacy | Partly: invite-only, EXIF stripped, encrypted, but server-held keys | Ente is stronger (E2EE, audited, open source) | — | Yes, but Ente wins that buyer | **Can't win on privacy alone.** Win on *privacy between relatives*, which Ente doesn't do |
+
+### Moat candidates (draft; test, don't assume)
+
+| Candidate | Why it's hard to copy | What proves it | What kills it |
+|---|---|---|---|
+| **A. Privacy between relatives** (split-family model): post once, households, hidden groups, scoped replies, events (SPEC-GROUPS) | Workflow and data depth (RLS reply rules, share history) that big apps won't add because it complicates the median family. FamilyAlbum has Share Groups but nothing found on households or reply scoping | Danielle posts to both sides for a month with zero slips; a grandparent says "I comment because the other side can't see it" | FamilyAlbum adds reply scoping; or families find groups too complex and use "Everyone" only |
+| **B. The least-techy relative still gets the photos**: no password, email digest, real-name notices, printed guide, later a frame (CF-18, M6) | Requires A2 and grandparent-UX discipline across every surface, not one feature. Frames do this but can't do A | Earl-type relatives see photos weekly without installing anything; under 10 min setup unaided | Apple or Google make shared albums truly easy on Android and email; or a frame maker adds per-household audiences |
+| **C. Trust and distribution**: founder story, WV homeplace, churches, co-parenting mediators and parenting classes | Relationships and word of mouth, not code. Slow, but rivals can't buy it | Families outside Chase's own join through a person they trust, no ads | Chase's time; it doesn't spread beyond one family's network |
+| **D. Switching cost**: a family's households, groups and years of archive | Rebuilding the structure elsewhere is painful | A family stays a year | Must never trap anyone: export stays honest (A2). Weak until there's data |
+
+Leading pick (draft): **A + B together**, aimed at one wedge: split families with a relative who won't use an app. Nobody found does both. C is how it spreads; D follows if A and B work.
+
 ## Ideas log (newest first)
 
 | Date | Idea (Chase's words) | Serves | Status | Notes |
 |---|---|---|---|---|
+| Oct 17 | "Is there a ton of competition? Consider our moat. If you don't see a moat, work with me to determine one." Candidates: "(1) AI 100% optional, (2) US-based servers, (3) personal server, (4) hyper privacy" | A1, A3; problems: split families, kids' privacy | Open: Chase answers 3 questions | See "Competition and moat". All 4 are pillars or table stakes, not moats; personal server is not built (ANCHORS ideas log, staff-pm). Leading moat: privacy between relatives + least-techy access |
 | Oct 17 | "Name: Hearth may not work; what are the other options?" (an earlier session said the name wouldn't work; no record of that in the repo) | All; CH-3 | Open: Chase decides | Live check found two family apps already named Hearth (see Name candidates). Top 3: Homeplace, Lamplight, Fridge Door. Nothing renamed in code or docs. Do a USPTO search and a lawyer's look before buying any domain |
 | Oct 16 | "Distributed families": families spread across households, places and generations. "We want to build for all family types, optimized for highly complex families." | A1, A2 | Logged; term to use | Candidate audience line: "for distributed families". Check positioning draft wording ("complicated families") against it |
 | Oct 16 | A3 positioning: "your kids' photos never leave the US / never sent to China", not partisan | A3 | Logged (from ANCHORS.md) | Use "stored in the US" until the A3 gaps close |
