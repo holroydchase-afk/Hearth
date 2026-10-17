@@ -147,7 +147,7 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 | AUD-6 | 3 | A1: a wrong audience can be fixed | Moved 2→3 (Oct 16 review): no app UI yet; delete + repost covers M2 |
 | NOTIFY-1 | 2 | Guilt: photos actually reach grandparents | |
 | NOTIFY-2 | 1 | A1; A3 (alerts transit Apple/Google with no photo, caption or child's name) | |
-| NOTIFY-3 | 1 | Viewing built for WV | |
+| NOTIFY-3 | 2 | Viewing built for WV | Moved 1→2 (Chase, Oct 17): M1 runs in Expo Go, which can't receive push; tested on the first real build |
 | NOTIFY-4 | 3 | STORY parental guilt: "one notice per post, so you can share often without spamming"; Kim | |
 | NOTIFY-5 | 4 | Someone will never install an app (Earl's morning email); bridge to CF-18 | |
 | NOTIFY-6 | 2 | Megan "know Grandma saw it"; parental guilt | **Flag: conflicts with A2.** Awaiting Chase's decision before M4 (ANCHORS conflicts table). Built code stays |
@@ -196,8 +196,8 @@ NOTIFY-4 now reads: **Given** 5 photos in one post, or 3 posts within 10 minutes
 ### Milestone gates (replace the ring gates)
 | Milestone | Gate (all must be met) | Evidence |
 |---|---|---|
-| 1: Chase | All M1 `auto` criteria green 3× against the hosted project; S16 closed; M1 `manual` criteria (SHARE-1, SHARE-4, SEE-3, NOTIFY-3, M-09) pass on Chase's iPhone; ≥10 posts over ≥2 days to a second test account, 0 lost; 0 crashes; `MEDIA_KEK` on paper ×2 | CI runs; Test Log entries; QA-3 sent vs received; `client_errors` count |
-| 2: Danielle | Danielle joins as a poster (adult) and passes JOIN-2 and SHARE-1 unaided (stopwatch); both post to both family sides' groups with 0 cross-side leaks; AUD-1 2 of 2; NOTIFY-1 p90 ≤ 60 s over ≥10 posts; 0 open P0 | Test Log times; latency log; ticket list |
+| 1: Chase | All M1 `auto` criteria green 3× against the hosted project; S16 closed; M1 `manual` criteria (SHARE-1, SHARE-4, SEE-3, M-09) pass on Chase's iPhone in Expo Go; notices arrive by email; ≥10 posts over ≥2 days to a second test account, 0 lost; 0 crashes; `MEDIA_KEK` on paper ×2 | CI runs; Test Log entries; QA-3 sent vs received; `client_errors` count |
+| 2: Danielle | Danielle joins as a poster (adult) and passes JOIN-2 and SHARE-1 unaided (stopwatch); NOTIFY-3 passes on a real build (needs the $99 Apple account); both post to both family sides' groups with 0 cross-side leaks; AUD-1 2 of 2; NOTIFY-1 p90 ≤ 60 s over ≥10 posts; 0 open P0 | Test Log times; latency log; ticket list |
 | 3+ | Defined when M2 passes. Grandparent test (above) is the M4 entry check; A2 "Seen by" decided before M4 | |
 
 ## Bulk photos and timeline criteria (Oct 17, overnight plan)
