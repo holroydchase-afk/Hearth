@@ -263,6 +263,28 @@
    "fixed": "2026-10-15"
   },
   {
+   "id": "T3",
+   "kind": "test fix",
+   "layer": "app",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "pick.test used a dynamic import, which Jest can't run without VM modules; switched to a static import",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "T4",
+   "kind": "test fix",
+   "layer": "app",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Time-zone tests set process.env.TZ, which Jest's sandbox ignores, so no-offset dates were read as UTC. The phone's zone is now an explicit option (default from Intl)",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
    "id": "S1",
    "kind": "bug",
    "layer": "backend",

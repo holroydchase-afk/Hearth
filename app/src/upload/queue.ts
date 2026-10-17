@@ -26,7 +26,7 @@ const GRANT_MARGIN_MS = 60_000;
 export type JobState = 'draft' | 'uploading' | 'finalizing' | 'published' | 'failed-retryable' | 'failed';
 type ActiveState = 'draft' | 'uploading' | 'finalizing';
 
-export interface QueueItem { uri: string; kind: 'photo' | 'video'; width?: number; height?: number; durationMs?: number | null }
+export interface QueueItem { uri: string; kind: 'photo' | 'video'; width?: number; height?: number; durationMs?: number | null; /** BETA-BULK-1: capture time read on the phone (ISO). */ takenAt?: string | null }
 export interface Prepared { spec: UploadItemSpec; display: Uint8Array; thumb: Uint8Array }
 
 export interface Job {
@@ -53,6 +53,14 @@ export interface Job {
 }
 
 export interface EnqueueInput { space: string; caption: string | null; circleIds: string[]; items: QueueItem[] }
+
+/** BETA-BULK-4: one bulk pick, already planned into posts (share/bulk.ts planBatch). */
+export interface EnqueueBatchInput { space: string; circleIds: string[]; posts: { takenAt: string | null; items: QueueItem[] }[] }
+
+/** "Sending 12 of 48…" across the whole batch; "Sent 48 photos" when done. NOT BUILT YET (plan step 3). */
+export function batchLabel(_p: { done: number; total: number }): string {
+  throw new Error('not built yet: batchLabel (BETA-BULK-4)');
+}
 
 export interface QueueDeps {
   api: HearthApi;
@@ -142,6 +150,19 @@ export class UploadQueue {
     await this.save();
     this.kick();
     return { ...job };
+  }
+
+  /**
+   * BETA-BULK-4/6: enqueue every post of a bulk pick under one batch id (create_post p_batch_id,
+   * p_batch_size, p_taken_at). Returns the batch id. NOT BUILT YET (overnight plan step 3).
+   */
+  async enqueueBatch(_input: EnqueueBatchInput): Promise<string> {
+    throw new Error('not built yet: enqueueBatch (BETA-BULK-4)');
+  }
+
+  /** Photos sent so far / photos in the batch, across all its posts. NOT BUILT YET. */
+  batchProgress(_batchId: string): { done: number; total: number } {
+    throw new Error('not built yet: batchProgress (BETA-BULK-4)');
   }
 
   /** Run due jobs now (app came to the front, network came back, timer fired). */

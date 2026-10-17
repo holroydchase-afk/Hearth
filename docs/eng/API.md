@@ -27,6 +27,12 @@ Any change requires a contract-test update first; the contract tests live in `ap
 | `my_circles` | `p_space` | `[{circle_id, name, member_count, member_names: text[]}]` | Only circles the caller owns or manages (posters). Viewers get `[]`. Names are "group" in the UI. |
 | `get_feed` | `p_space, p_before_ts timestamptz = null, p_before_id uuid = null, p_limit int = 20 (max 50)` | `[{post_id, author_id, author_name, caption, published_at, media: [{media_id, kind, width, height, duration_ms, status}], heart_count, i_hearted, comment_count, audience: [{circle_id, name, member_count}] \| null, seen_count \| null, reach_count \| null}]` | Newest first, using a keyset on `(published_at, id)`. `audience`, `seen_count` and `reach_count` are non-null **only for the author**. Only published, non-deleted, visible posts appear. One round trip, with no N+1 queries. |
 | `create_post` | `p_client_id, p_space, p_caption, p_circle_ids uuid[], p_taken_at = null` | `post_id` | Creates a **draft**. Idempotent on `(author, p_client_id)`. At least one circle is required (`23514`). |
+| `create_post` (0010 adds) | `+ p_batch_id uuid = null, p_batch_size int = null` | `post_id` | BULK-6. Posts from one bulk pick share `p_batch_id`; `p_batch_size` is how many posts the batch has (1–100). Both or neither, else `23514`. `p_taken_at` is the capture time read on the phone (BULK-1); only the date leaves the phone. |
+| `get_timeline` (0010) | `p_space, p_before_at timestamptz = null, p_before_id uuid = null, p_limit int = 20 (max 50)` | same rows as `get_feed`, plus `taken_at timestamptz \| null, sort_at timestamptz` | TIME-2/3. Newest taken first: keyset on `(sort_at, id)` where `sort_at = coalesce(taken_at, published_at)`. Visibility comes from the **same function as `get_feed`** (`private.visible_posts`, below); a post you can't see is simply absent. Not a member: empty. Index on `(space_id, coalesce(taken_at, published_at) desc, id desc)`. |
+| `get_timeline_years` (0010) | `p_space, p_tz text = 'UTC'` | `[{year int, post_count int, photo_count int}]` | TIME-3/4 "Jump to year". Newest year first. Year of `sort_at` in `p_tz` (the app sends the phone's time zone). Counts include only posts the caller can see and only ready photos. Not a member: empty. Bad time zone: `22023`. |
+
+**One visibility check (0010).** `private.visible_posts(p_space uuid)` returns the published, non-deleted posts in that space the caller may see (`post_id, published_at, taken_at`). `get_feed` and `get_timeline` (and `get_timeline_years`) both read it; neither has its own copy, so 0011's share-history cutoff (AUD-20) lands in one place. Checked by `backend/tests/timeline_test.sql`.
+
 | `publish_post` | `p_post` | void | All media must be `ready`. Idempotent: publishing an already published post is a no-op. |
 | `delete_post` | `p_post` | void | Author only. Soft delete; the post vanishes from every feed immediately, and media is queued for purge. Idempotent. |
 | `toggle_heart` | `p_post` | `{i_hearted, heart_count}` | Viewers allowed |
@@ -51,12 +57,15 @@ A reply is a comment or a heart. A relative's reply is readable by: its author; 
 ## Notifications (server only)
 Triggers queue a notice on publish (audience members, not the author) and on a comment or heart (the post's author, never the reactor). The `notify` edge function runs on a 1-minute cron, calls `claim_notification_batches()` (service_role only) and sends one notice per recipient: at most 1 push per 10 minutes; email goes out when the Help screen promises (Eastern): each evening from 6 pm, or Sunday from 8 am. **Payload:** the actor's chosen display name, counts and post id only; never a photo, caption, comment text or child's name. Push `data.post_id` opens the post.
 
+**Batch notice (BULK-6, 0010).** Post notices for posts with a `batch_id` wait until all `batch_size` posts of the batch are published, or 30 minutes after the first one was queued (a killed batch still tells people), then go out as **1 notice per recipient** for the whole batch. `claim_notification_batches()` adds `is_batch boolean` (true when the claimed post notices all come from bulk batches), `photo_count int` (ready photos in the claimed posts the recipient can see), `taken_from timestamptz` and `taken_to timestamptz` (min/max `taken_at` of those posts, null if none). Push text: "Chase added 48 photos from Jul 2024" (month in Eastern time). Still no photo, caption or child's name.
+
 ## Edge function `sign-media`
 The request and response shapes documented at the top of `backend/supabase/functions/sign-media/index.ts` (GET view, POST upload, POST finalize) are the contract.
 - **Upload:** the client encrypts each file with AES-256-GCM using the returned per-item key before the PUT.
 - **Order:** `create_post` (draft) → `sign-media upload` → PUT encrypted bytes → `finalize` → `publish_post`.
 
 ## Scale targets (checked by `backend/tests/perf/`)
+- **`get_timeline` (0010):** p95 under 5 ms in the database at 1M posts (plan target, matches `get_feed`'s measured p95).
 - **`get_feed`:** p95 under 30 ms in the database for a viewer in a space with 20,000 posts, on a table of about 1M posts across about 50k spaces.
 - **Per-row work:** RLS helpers are wrapped as `(select auth.uid())` so they run once per statement, not once per row.
 - **Indexes:** every foreign key and every RLS lookup path is indexed.

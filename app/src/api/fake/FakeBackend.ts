@@ -13,6 +13,7 @@ import type {
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
   HeartState, InvitePreview, MediaKind, MediaStatus, Role, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
+  TimelineArgs, TimelinePost, TimelineYear,
 } from '../types';
 import { fromBase64, toBase64 } from '../../crypto/base64';
 import { randomBytes, uuid } from '../../crypto/random';
@@ -641,6 +642,9 @@ export class FakeApi implements HearthApi {
   mySpaces = () => this.run(() => this.be.mySpaces(this.userId));
   myCircles = (space: string) => this.run(() => this.be.myCircles(this.userId, space));
   getFeed = (a: FeedArgs) => this.run(() => this.be.getFeed(this.userId, a));
+  // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+  getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+  getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
   deletePost = (p: string) => this.run(() => this.be.deletePost(this.userId, p));

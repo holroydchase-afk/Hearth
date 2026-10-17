@@ -10,6 +10,7 @@ import type {
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
   HeartState, InvitePreview, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
+  TimelineArgs, TimelinePost, TimelineYear,
 } from './types';
 import { toApiError } from '../errors/messages';
 
@@ -106,6 +107,9 @@ export class SupabaseApi implements HearthApi {
       p_space: a.space, p_before_ts: a.beforeTs ?? null, p_before_id: a.beforeId ?? null,
       p_limit: Math.max(1, Math.min(50, a.limit ?? 20)),
     }).then((d) => d ?? []);
+  // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
+  getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
+  getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
   createPost = (a: CreatePostArgs) =>
     this.rpc<string>('create_post', { p_client_id: a.clientId, p_space: a.space, p_caption: a.caption, p_circle_ids: a.circleIds, p_taken_at: a.takenAt ?? null });
   publishPost = (p: string) => this.rpc<void>('publish_post', { p_post: p });

@@ -111,6 +111,8 @@ manual = [
  ("M-10", "Removed person loses access on their own phone", "Any", "Remove someone from a circle while they have the post open.", "Gone for them within 10 minutes; they can't reopen it."),
  ("M-11", "Co-parent separation with real accounts", "Any", "Two real households. Co-parent opens every screen.", "They never see the other side's circles, relatives, or posts not shared with them."),
  ("M-12", "Email digest arrives and links work", "Email", "Set a tester to Daily email digest; post 2 photos.", "One email that evening; links open the right photos."),
+ ("M-13", "BETA-BULK-1/7 Bulk pick keeps the date taken (Expo Go)", "iPhone", "In Expo Go, bulk-pick 20 photos from 2 trips: one abroad, one Live Photo, one HEIC, one screenshot with no date. Send to a test group. Open By date.", "Each photo sits under the month and day it was taken (the abroad one on its local day); the screenshot sorts by today. If Expo Go returns no EXIF date, stop and report (plan stop rule)."),
+ ("M-14", "BETA-BULK-4/7 Bulk send survives no network, then network", "iPhone", "Bulk-pick 48 photos. Tap Send, then turn on airplane mode at about 'Sending 12 of 48'. Force-quit. Wait 1 minute, turn airplane mode off, reopen Hearth.", "It finishes on its own: 48 photos in the right posts, none twice. The other phone gets 1 notice. A downloaded copy has no location."),
 ]
 write("suites", "manual", {"name": "Manual tests (people + real phones)", "kind": "manual",
       "how": "Run on a real phone, then log the result on this page.", "order": 4,
@@ -140,6 +142,8 @@ tickets = [
  ("E8", "enhancement", P, "Medium", "fixed", "Removing someone from a circle says how many posts they lost", ["VIS-06"]),
  ("T1", "test fix", P, "Low", "fixed", "Test selector also matched the Share tab (shared 'post' class). Renamed the tab's class in the app and tightened the test.", ["VIS-01"]),
  ("T2", "test fix", P, "Low", "fixed", "Blocked web fonts were counted as script errors in tests", ["A11Y-04"]),
+ ("T3", "test fix", "app", "Low", "fixed", "pick.test used a dynamic import, which Jest can't run without VM modules; switched to a static import", []),
+ ("T4", "test fix", "app", "Medium", "fixed", "Time-zone tests set process.env.TZ, which Jest's sandbox ignores, so no-offset dates were read as UTC. The phone's zone is now an explicit option (default from Intl)", []),
  # backend security review (agent, 2026-10-15)
  ("S1", "bug", B, "High", "fixed", "Someone removed from the family space kept access to their own old posts: new comments, photos and keys", []),
  ("S2", "bug", B, "Medium", "fixed", "A view-only member could publish a draft after posting was turned off for viewers", []),
@@ -198,6 +202,12 @@ run("r5", suite="edge", at="2026-10-15T00:55:00-04:00", label="Day 1 baseline", 
 run("r6", suite="edge", at="2026-10-15T08:05:00-04:00", label="After type fixes, type-checking on",
     passed=sum(edge_res.values()), failed=len(edge_res) - sum(edge_res.values()), results={k: ("pass" if v else "fail") for k, v in edge_res.items()})
 
+run("r7", suite="backend", at="2026-10-17T05:30:00-04:00", label="Bulk photos + timeline tests written first (red, no 0010 yet)",
+    passed=376, failed=39, results={},
+    note="Red on purpose. New: timeline_test.sql 30 of 31 red (missing get_timeline, get_timeline_years, private.visible_posts, index); notify_test.sql 9 BETA-BULK-6 batch-notice cases red (create_post has no p_batch_id). Existing suites unchanged and green: rls 116, api 169, notify 48, setup 5, reply 37. Timeline tests checked green against a throwaway reference. Deno notify wording tests (4) not run here: no deno binary.")
+run("r8", suite="app", at="2026-10-17T05:30:00-04:00", label="Bulk photos + timeline app tests written first (red)",
+    passed=247, failed=35, results={},
+    note="Red on purpose: not-built stubs for takenAtFromAsset, planBatch, pickBulk, enqueueBatch/batchProgress/batchLabel and getTimeline/getTimelineYears; FakeApi accepts batchId without batchSize. Existing 245 still green; typecheck clean. 2 test bugs found and fixed before this run: T3 (dynamic import in pick.test) and T4 (process.env.TZ ignored by Jest's sandbox; the phone zone is now an explicit option).")
 print("proto", len(proto_cases), "red", sum(v == "fail" for v in red_map.values()), "| sql", len(sql_cases), "| edge", len(edge_cases),
       "| tickets", len(tickets), "| sec-linked", {t[0]: len(t[6]) for t in tickets if t[0].startswith("S")})
 print("areas", sorted({c['area'] for c in sql_cases}))
