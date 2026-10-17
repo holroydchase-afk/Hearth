@@ -16,9 +16,10 @@ mkdir -p "$T/bin"
 # Stub curl: logs method, URL and body (decoded SQL for database/query); answers the "already applied" query with 0001 only.
 cat > "$T/bin/curl" <<'STUB'
 #!/usr/bin/env bash
-url=""; method=GET; data=""
+url=""; method=GET; data=""; fwb=0
 while (( $# )); do
   case $1 in
+    --fail-with-body) fwb=1 ;;
     -X) method=$2; shift ;;
     -H) shift ;;
     --data-binary) data=$2; shift ;;
@@ -30,6 +31,11 @@ done
 [[ $url == */database/query ]] && data=$(python3 -I -c 'import json, sys; print(json.load(sys.stdin)["query"])' <<< "$data")
 n=$(ls "$STUB_LOG" | wc -l)
 printf '%s %s\n%s' "$method" "$url" "$data" > "$STUB_LOG/$(printf %03d "$n")"
+# STUB_FAIL_ON: answer a matching query like the API rejecting bad SQL (HTTP 400; curl exits 22).
+if [[ -n ${STUB_FAIL_ON:-} && $data == *"$STUB_FAIL_ON"* ]]; then
+  (( fwb )) && echo '{"message":"ERROR: 42P01: relation \"stub_missing\" does not exist"}'
+  exit 22
+fi
 if [[ $data == *schema_migrations* && $data == *"select version"* ]]; then echo '[{"version":"0001"}]'; else echo '[]'; fi
 STUB
 printf '#!/usr/bin/env bash\necho "$*" >> "$STUB_CLI"\n' > "$T/bin/fakecli"
@@ -70,6 +76,18 @@ check "DEPLOY-1 each migration runs in one transaction" \
   'for f in $(grep -l "insert into supabase_migrations.schema_migrations" "$T"/log/*); do grep -q "^begin;" "$f" && grep -q "^commit;" "$f" || exit 1; done'
 check "DEPLOY-1 cron step goes through the API" 'grep -q "cron.schedule(.hearth-notify" <<< "$ALL"'
 check "DEPLOY-1 never prints the token" '[[ $OUT != *$TOKEN* ]]'
+check "DEPLOY-2 function deploys bundle server-side (--use-api, no Docker)" \
+  '(( $(grep -c "functions deploy .*--use-api" "$T/cli") == 2 ))'
+
+# ---- a migration the API rejects: stop, and say why ----
+rm -rf "$T/log" "$T/cli"; mkdir -p "$T/log"
+FOUT=$(env -u SUPABASE_DB_PASSWORD -u SUPABASE_DB_URL SUPABASE_ACCESS_TOKEN=$TOKEN \
+  PATH="$T/bin:$PATH" STUB_LOG="$T/log" STUB_CLI="$T/cli" SUPABASE_CLI=fakecli STUB_FAIL_ON="values ('0003'" \
+  DEPLOY_ENV_FILE="$T/env" bash scripts/deploy.sh 2>&1); FRC=$?
+check "DEPLOY-3 a rejected migration stops the deploy" '(( FRC != 0 )) && [[ ! -e $T/cli ]]'
+check "DEPLOY-3 a rejected migration names the file and shows the API error" \
+  '[[ $FOUT == *0003_notifications.sql* && $FOUT == *"stub_missing"* ]]'
+check "DEPLOY-3 a rejected migration never prints the token" '[[ $FOUT != *$TOKEN* ]]'
 
 echo "deploy: $PASS passed, $FAIL failed"
 (( FAIL == 0 ))
