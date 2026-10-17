@@ -42,7 +42,7 @@ Supabase Auth: enable Email, and change the "Magic Link" email template to show 
 6-digit code) instead of a link. The app calls `signInWithOtp` + `verifyOtp({type:'email'})`.
 Deep links: scheme `hearth://join/<code>`, plus `https://hearth.family/join/<code>` (associated
 domains / Android intent filter in `app.json`; the AASA/assetlinks files still have to be hosted).
-Push: add `extra.eas.projectId` to `app.json`; without it push is a no-op.
+Push: `app.json` has `extra.eas.projectId` (Expo project `@thefreighttrains-team/hearth`, linked Oct 17, 2026 with `npm run eas -- init`). Without it push is a no-op. Don't commit what `eas init` writes back: it expands the config and adds Android permissions (RECORD_AUDIO, storage); keep only `owner` and `extra.eas` (EXPO-2).
 
 Contract tests against any PostgREST/Supabase stack:
 
