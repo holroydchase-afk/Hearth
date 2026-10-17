@@ -18,6 +18,9 @@ export function JoinScreen({ code }: { code: string }) {
   const [triedEmail, setTriedEmail] = useState<string | null>(null);
   const started = useRef(false);
 
+  const inviterOf = (c: string): Promise<string | null> =>
+    app.deps.api.invitePreview(c).then((p) => p.inviter_name || null, (e: unknown) => (isApiError(e) ? e.inviter ?? null : null));
+
   const redeem = async (inviter: string | null, email: string | null = null) => {
     setStep('joining');
     try {
@@ -32,7 +35,10 @@ export function JoinScreen({ code }: { code: string }) {
         nav.goPhotos();
         return;
       }
-      setMsg(messageFor(e, { inviter, action: 'join' }));
+      // UX-G8: signed in, she never saw the preview; ask it for the inviter's name (redeem's answer can't say:
+      // BETA-JOIN-3 keeps it identical for every bad invite).
+      const who = inviter ?? (isApiError(e) && e.code === '22023' ? await inviterOf(code) : null);
+      setMsg(messageFor(e, { inviter: who, action: 'join' }));
       // BETA-JOIN-3 keeps "wrong email" and "old invite" identical on the server, so say both here.
       setTriedEmail(isApiError(e) && e.code === '22023' ? email : null);
       setStep('bad');
@@ -48,7 +54,7 @@ export function JoinScreen({ code }: { code: string }) {
     }
     app.deps.api.invitePreview(code)
       .then((p) => { setPreview(p); setStep('preview'); })
-      .catch((e) => { setMsg(messageFor(e, { action: 'join' })); setStep('bad'); });
+      .catch((e) => { setMsg(messageFor(e, { action: 'join', inviter: isApiError(e) ? e.inviter : null })); setStep('bad'); });
   }, [app.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const who = preview?.inviter_name ?? null;

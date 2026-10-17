@@ -236,6 +236,10 @@ export class FakeBackend {
   inviteUsable(inv: InviteRow | undefined): inv is InviteRow {
     return !!inv && !inv.revoked && inv.uses < inv.max_uses && new Date(inv.expires_at).getTime() > Date.now();
   }
+  /** Server: private.invite_places. The fake has no households: a relative's invite needs every group live. */
+  invitePlaces(inv: InviteRow): boolean {
+    return inv.role !== 'viewer' || (inv.circles.length > 0 && inv.circles.every((c) => this.state.circles[c] && !this.state.circles[c]!.deleted));
+  }
   signUrl(op: 'get' | 'put', key: string): string {
     return `fake://b2/${encodeURIComponent(key)}?op=${op}&exp=${Date.now() + TTL_MS}`;
   }
@@ -493,6 +497,8 @@ export class FakeBackend {
     if (this.rateLimited(key)) throw new ApiError('54000', 'rate limited');
     const inv = this.findInvite(code);
     if (!this.inviteUsable(inv)) this.fail(key);
+    // UX-G7: refused like redeem, naming the inviter
+    if (!this.invitePlaces(inv)) throw new ApiError('22023', 'invalid invite', this.state.users[inv.created_by]?.name);
     return { inviter_name: this.state.users[inv.created_by]?.name ?? '', space_name: this.state.spaces[inv.space]!.name };
   }
 
@@ -505,6 +511,7 @@ export class FakeBackend {
     const email = this.state.users[me]?.email.toLowerCase();
     if (inv.target_email && inv.target_email.toLowerCase() !== email) this.fail(key);
     if (this.member(inv.space, me)) this.fail(key);
+    if (!this.invitePlaces(inv)) throw new ApiError('22023', 'invalid invite');
     inv.uses += 1;
     this.state.members.push({ space: inv.space, user: me, role: inv.role, invited_by: inv.created_by });
     const u = this.state.users[me];

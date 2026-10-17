@@ -937,6 +937,76 @@ select tests.ok(tests.redeem_as('f0000000-0000-0000-0000-000000000033', tests.v(
                 'S-0011-3 excluded: an invite whose group was retired is refused (no member who is placed nowhere)');
 
 -- ======================================================================
+-- Reviews of the groups first build, round 2 (grandparent-ux UX-G7/G8, privacy-security S-0011-6/7, Oct 17)
+-- ======================================================================
+-- UX-G7: invite_preview refuses (22023) every invite redeem_invite would refuse, before anyone types anything.
+-- For a real, unexpired, unused invite refused only because it no longer places anyone (its group was retired or
+-- now has households under it, or its household was retired), details carries the inviter's name (preview showed
+-- that name before this change, so nothing new leaks). Expired, used and unknown codes stay nameless (BETA-JOIN-3).
+select tests.level('h_ux', 'household', 'UX test house');
+select tests.setq('inv_ux_house', 'chase', format($$select code from public.create_invite(p_space => %L, p_role => 'viewer', p_circle_ids => array[%L]::uuid[], p_history => 'all')$$, :space_h, tests.v('h_ux')));
+select tests.setq('inv_ux_ok', 'chase', format($$select code from public.create_invite(p_space => %L, p_role => 'viewer', p_circle_ids => array[%L]::uuid[], p_history => 'all')$$, :space_h, tests.v('h_gammy')));
+select tests.q('chase', format('select public.retire_level(%L)', tests.v('h_ux')));
+:as_admin
+set role anon;
+select tests.throws_code(format('select public.invite_preview(%L)', tests.v('inv_old3')),
+                         'UX-G7: invite_preview refuses an invite to a retired group (22023), as redeem does', '22023');
+select tests.throws_code(format('select public.invite_preview(%L)', tests.v('inv_old2')),
+                         'UX-G7: invite_preview refuses an invite to an old group that now has households under it (22023)', '22023');
+select tests.throws_code(format('select public.invite_preview(%L)', tests.v('inv_ux_house')),
+                         'UX-G7: invite_preview refuses an invite whose household was retired (22023)', '22023');
+select tests.ok_sql(format($q$select tests.rest(format('select public.invite_preview(%%L)', %L)) @> '{"status":"400","body":{"code":"22023","details":"Chase"}}'$q$, tests.v('inv_old3')),
+                    'UX-G7: over PostgREST the refusal names the inviter in details ("Ask Chase for a new one.")');
+select tests.ok_sql(format($q$select tests.rest(format('select public.invite_preview(%%L)', %L))->'body'->>'details' is null$q$, 'NOPE234567'),
+                    'UX-G7 excluded: an unknown code still names no one (BETA-JOIN-3)');
+select tests.ok_sql(format($q$select public.invite_preview(%L)->>'inviter_name' = 'Chase'$q$, tests.v('inv_ux_ok')),
+                    'UX-G7 allowed: an invite to a live household still previews ("Chase invited you")');
+:as_admin
+select tests.ok(tests.redeem_as('f0000000-0000-0000-0000-000000000033', tests.v('inv_ux_house')) like '%22023%'
+                and not exists (select 1 from public.space_members where space_id = :space_h and user_id = 'f0000000-0000-0000-0000-000000000033'),
+                'UX-G7: redeem refuses the same retired-household invite (preview and redeem agree)');
+:as_admin
+
+-- S-0011-6 (privacy item 5): widening someone's share history in place must not let them read replies written
+-- while they couldn't see the post. Cousin Lu joins her house with "Only new photos"; her housemate Jo (all past
+-- photos) comments on an older Danielle's side post Lu can't see. Chase then also places Lu in Grandma Phyllis's
+-- house with "Share all past photos": her Danielle's side membership is widened in place. Lu now sees the post,
+-- but not Jo's comment or heart from before; Jo's next comment reaches her.
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('f0000000-0000-0000-0000-000000000034', 'jo@hearth.test', '{"display_name":"Cousin Jo"}');
+insert into tests.people values
+  ('lu', 'f0000000-0000-0000-0000-000000000033', 'Cousin Lu', 'viewer'),
+  ('jo', 'f0000000-0000-0000-0000-000000000034', 'Cousin Jo', 'viewer');
+select tests.level('h_lu', 'household', 'Lu and Jo''s house');
+select tests.link('g_dan', 'h_lu', 'all');
+select tests.post('p_lu_old', array['g_dan'], 'chase', now() - interval '1 day');
+select tests.join('jo', 'h_lu', 'all');
+select tests.join('lu', 'h_lu', 'new');
+select tests.ok(not tests.sees('lu', 'p_lu_old') and tests.sees('jo', 'p_lu_old'),
+                'S-0011-6 setup: Lu ("Only new photos") can''t see the older post; Jo (all past photos) can');
+select tests.say('c_jo_old', 'jo', 'p_lu_old');
+select tests.heart('jo', 'p_lu_old');
+select tests.place('h_phyl', 'lu', 'all');
+select tests.ok(tests.sees('lu', 'p_lu_old'),
+                'S-0011-6 allowed: placed again with "Share all past photos", Lu now sees the older post');
+select tests.ok(not tests.reads('lu', 'c_jo_old') and not tests.reads_heart('lu', 'p_lu_old', 'jo'),
+                'S-0011-6 excluded: ... but not Jo''s comment or heart written while she couldn''t see it');
+select tests.ok(tests.counts('lu', 'p_lu_old') = '0:0',
+                'S-0011-6 counts: Lu''s feed counts leave them out too (0 hearts, 0 comments)');
+select tests.say('c_jo_new', 'jo', 'p_lu_old');
+select tests.ok(tests.reads('lu', 'c_jo_new') and tests.reads('chase', 'c_jo_old'),
+                'S-0011-6 allowed: Jo''s next comment reaches Lu; Chase still reads both');
+
+-- S-0011-7: Everyone can't be retired by a direct update either (retire_level's "Everyone stays", server-side).
+:as_chase
+select tests.throws_code('update public.circles set deleted_at = now()',
+                         'S-0011-7: a parent''s direct update can''t soft-delete Everyone (23514)', '23514');
+:as_admin
+select tests.ok(exists (select 1 from public.circles where id = tests.c('all') and deleted_at is null)
+                and exists (select 1 from public.circles where id = tests.c('g_chase') and deleted_at is null),
+                'S-0011-7: Everyone (and everything else) is still live after the refused update');
+
+-- ======================================================================
 -- Summary
 -- ======================================================================
 reset role;
