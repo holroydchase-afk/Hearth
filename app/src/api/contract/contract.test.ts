@@ -449,6 +449,15 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(u.sort_at).toBe(u.published_at);
     });
 
+    it('BETA-TIME-1 feed rows carry taken_at (for the "Added from earlier" card); null when none', async () => {
+      const old = await datedPost('2024-07-04T14:00:00.000Z');
+      const undated = await datedPost(null);
+      const rows = await viewerIn.getFeed({ space: h.spaceId, limit: 50 });
+      const o = rows.find((r) => r.post_id === old)!;
+      expect(o.taken_at && new Date(o.taken_at).toISOString()).toBe('2024-07-04T14:00:00.000Z');
+      expect(rows.find((r) => r.post_id === undated)!.taken_at).toBeNull();
+    });
+
     it('BETA-TIME-1 the feed is unchanged: still newest shared first', async () => {
       const a = await datedPost('2020-01-01T12:00:00.000Z');
       const b = await datedPost('2025-01-01T12:00:00.000Z');

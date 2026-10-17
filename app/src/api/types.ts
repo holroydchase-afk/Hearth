@@ -59,6 +59,8 @@ export interface FeedPost {
   reach_count: number | null;
   /** AUD-8/9: who will read the caller's replies on this post. */
   reply_scope?: ReplyScope;
+  /** 0010 (BETA-TIME-1): when it was taken, read on the phone; null if unknown. Older servers omit it. */
+  taken_at?: string | null;
 }
 
 export interface FeedArgs {

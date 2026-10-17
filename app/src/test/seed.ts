@@ -10,9 +10,9 @@ export const fakeJpegBytes = (seed: number, n = 600) => {
   return b;
 };
 
-export async function seedPost(be: FakeBackend, opts: { author?: string; caption?: string; circles?: string[]; photos?: number } = {}) {
+export async function seedPost(be: FakeBackend, opts: { author?: string; caption?: string; circles?: string[]; photos?: number; takenAt?: string | null } = {}) {
   const api = be.clientFor(opts.author ?? FIXTURE.users.chase.id);
-  const id = await api.createPost({ clientId: uuid(), space: FIXTURE.space.id, caption: opts.caption ?? 'Mia at the park', circleIds: opts.circles ?? [FIXTURE.circles.dadSide.id] });
+  const id = await api.createPost({ clientId: uuid(), space: FIXTURE.space.id, caption: opts.caption ?? 'Mia at the park', circleIds: opts.circles ?? [FIXTURE.circles.dadSide.id], takenAt: opts.takenAt ?? null });
   const n = opts.photos ?? 1;
   const plains: Uint8Array[] = [];
   if (n > 0) {

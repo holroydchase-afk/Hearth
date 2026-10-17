@@ -329,6 +329,10 @@ select tests.ok_sql(format($$select array_agg(post_id order by n) = array[%L, %L
                            tests.v('t_nye'), tests.v('t_old2'), tests.v('t_old'), tests.v('t_new'), :p_a_all, :space_a),
                     'BETA-TIME-1: get_feed still orders by shared date, so old photos imported today don''t reorder by date taken');
 
+select tests.ok_sql(format($$select taken_at = '2024-07-04 15:00Z' from public.get_feed(%L, null, null, 50) where post_id = %L$$,
+                           :space_a, tests.v('t_old')),
+                    'BETA-TIME-1: get_feed rows carry taken_at, so Photos can put old photos in an "Added from earlier" card');
+
 -- ======================================================================
 -- Summary
 -- ======================================================================
