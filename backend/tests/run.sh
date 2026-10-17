@@ -37,4 +37,6 @@ psql -d "$DB" -X -q -f tests/aud16/after.sql || STATUS=1
 
 # family-setup v2 dry run (SPEC-GROUPS section 8 step 3, privacy item 14)
 bash tests/setup_v2_test.sh || STATUS=1
+# one-command family setup through the Management API (SETUP-API; curl stubbed, SQL real)
+bash tests/setup_api_test.sh || STATUS=1
 exit $STATUS
