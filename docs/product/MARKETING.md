@@ -35,7 +35,8 @@ Say only what's in **True today**. Update when the code or vendors change.
 | Nobody can see if you've looked | **Not yet** | "Seen by N of M" conflicts with A2; decision pending |
 | Comments stay private to the right people | Partly | Comments are seen by the post's whole audience today |
 | No AI on your photos | True today | Hearth runs no AI on media at all. Say this, not "AI is optional" (that implies AI features exist). Re-check after the AI positioning session |
-| Personal / private server for your family | **Not built** | Undefined (self-host vs per-family store). Never claim. ANCHORS ideas log, staff-pm owns |
+| Personal / private server for your family | **Not built** | Undefined (self-host vs per-family store). Never claim. ANCHORS ideas log, staff-pm owns. Don't use Discord as the model: a Discord "server" is a space on Discord's shared cloud, and its text isn't end-to-end encrypted ([TechRepublic](https://www.techrepublic.com/article/news-discord-dave-end-to-end-encryption/), as of Oct 17, 2026) |
+| "Signal-level privacy" / "end-to-end encrypted" / "not even we can see your photos" | **Not yet** | Hearth holds the keys (MEDIA_KEK wraps each photo's key on the server). True only after the E2EE step in "Privacy-first path". Captions, names and replies are stored readable by Hearth today |
 | "Only app that lets you pick who sees each photo" | **False** | FamilyAlbum Premium has Share Groups (as of Oct 17, 2026). Say what's ours instead: households, hidden groups, scoped replies, once SPEC-GROUPS ships |
 | "Unlike X, Hearth is end-to-end encrypted / more private than Ente" | **False** | Ente is E2EE, open source and audited. Never compare on encryption |
 | "Unlike FamilyAlbum, your photos stay in the US" | **Unverified** | FamilyAlbum is run by MIXI (Tokyo, Japanese law); its storage location wasn't found. Don't name them on A3 until verified from their policy |
@@ -48,6 +49,7 @@ Say only what's in **True today**. Update when the code or vendors change.
 | Parents who don't post kids online | Privacy, AI training, strangers | — |
 | Grandparents who avoid social media | Want photos, not Facebook | Reached through their kids, not directly |
 | Co-parents | Separate households, no overlap | — |
+| Privacy-aware parents (tech-savvy, read the news, often called "overprotective") | They read the policy and the breach stories; they're usually the one who picks the family's app | Developer and privacy communities; to verify. They choose, grandparents use |
 
 ## Name candidates (Oct 17, 2026; not adopted)
 
@@ -114,10 +116,28 @@ Internal only. Never public copy. Every competitor fact below is as of Oct 17, 2
 
 Leading pick (draft): **A + B together**, aimed at one wedge: split families with a relative who won't use an app. Nobody found does both. C is how it spreads; D follows if A and B work.
 
+## Privacy-first path (draft, Oct 17, 2026)
+
+For Chase's "Signal-level privacy" idea. Internal only. Each step makes one more claim true; nothing here is built or decided.
+
+**What "Signal-level" means:** only the people in the conversation hold the keys (end-to-end), the server keeps as little metadata as possible, and the code is open and audited. Hearth today: photos are encrypted before upload, but Hearth holds the keys; captions, names and replies are readable by Hearth; push notices carry real names through Expo, Apple and Google.
+
+| Step | What changes | Claim it unlocks | Cost / tension |
+|---|---|---|---|
+| 1. Say it plainly | CF-13 "where your photos live" page: who holds keys, what Hearth can and can't read, every vendor | "Here's exactly what we can see" (true today) | Cheap. Honesty is the pitch to this audience |
+| 2. Less metadata | Plain push text with no names or counts ("New photos on Hearth"), shorter log retention, no IPs kept | "Your phone's lock screen and Apple/Google don't learn who posted" | Fights BETA-NOTIFY-7 (real names help grandparents). Could be a setting |
+| 3. Per-family keys | Each family space gets its own key under MEDIA_KEK; deleting a family destroys its key | "Delete your family and its photos are unreadable, even on backups" | Moderate backend work; fits CF-12 real deletion |
+| 4. Encrypt words too | Captions and replies encrypted like photos | "Your captions and replies are encrypted, not just photos" | Breaks caption search later (ANCHORS); server-held keys still |
+| 5. Open source + outside review | Publish the code; one independent review before launch | "Check our work" | Exposes the code; a review costs money (milestone 7) |
+| 6. End-to-end vault | Keys live only on family devices, with a recovery key on paper | "Not even Hearth can see your photos" (Signal-level) | Lost phone with no recovery key = lost photos; Earl's web link (CF-18) gets much harder; adding someone to "Share all past photos" means re-sharing keys. CORE-FEATURES question 2 |
+
+**Leading pick (draft):** steps 1 to 3 fit the proof of concept and stay true to A1. Step 6 as an opt-in vault for privacy-aware parents, after the beta, so grandparents never face a recovery key. Ente already wins buyers who want E2EE alone, so pair it with privacy between relatives (moat A).
+
 ## Ideas log (newest first)
 
 | Date | Idea (Chase's words) | Serves | Status | Notes |
 |---|---|---|---|---|
+| Oct 17 | "Hyperfocus on privacy. Signal level privacy. I always thought discord had my own personal server or cloud server where only data lived." Audience: "educated, smart, tech savvy, developer, aware, X% thinks they are overprotective, but in reality they are just the ones reading the news" | A1, A3; problem: kids' privacy | Open: Chase answers 2 questions | Discord correction: a Discord "server" is a space on Discord's shared cloud, and text isn't E2EE (calls are, since March 2026). See "Privacy-first path" and the new audience row. Sharper: "Not overprotective. Paying attention." / "For parents who read the privacy policy." Objection: Ente already is E2EE and open source; and Signal-level keys make a lost phone lose photos, which breaks A1 for grandparents. Don't invent the X%; find a real survey (e.g. Pew) before using a number. No fear selling |
 | Oct 17 | "Is there a ton of competition? Consider our moat. If you don't see a moat, work with me to determine one." Candidates: "(1) AI 100% optional, (2) US-based servers, (3) personal server, (4) hyper privacy" | A1, A3; problems: split families, kids' privacy | Open: Chase answers 3 questions | See "Competition and moat". All 4 are pillars or table stakes, not moats; personal server is not built (ANCHORS ideas log, staff-pm). Leading moat: privacy between relatives + least-techy access |
 | Oct 17 | "Name: Hearth may not work; what are the other options?" (an earlier session said the name wouldn't work; no record of that in the repo) | All; CH-3 | Open: Chase decides | Live check found two family apps already named Hearth (see Name candidates). Top 3: Homeplace, Lamplight, Fridge Door. Nothing renamed in code or docs. Do a USPTO search and a lawyer's look before buying any domain |
 | Oct 16 | "Distributed families": families spread across households, places and generations. "We want to build for all family types, optimized for highly complex families." | A1, A2 | Logged; term to use | Candidate audience line: "for distributed families". Check positioning draft wording ("complicated families") against it |
