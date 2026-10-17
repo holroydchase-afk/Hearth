@@ -77,8 +77,11 @@ describe('BETA-BULK-3 batch review screen', () => {
     expect(new Set(posts.map((p) => p.batch_id)).size).toBe(1);
     expect(posts.every((p) => p.batch_size === 5 && p.circles.join() === FIXTURE.circles.dadSide.id)).toBe(true);
     expect(posts.map((p) => p.taken_at).sort()[0]).toBe('2024-07-04T12:00:00.000Z');
-    // only the date left the phone: nothing in the backend state carries EXIF or GPS
-    expect(JSON.stringify(be.state)).not.toMatch(/GPS|35\.22|Apple|DateTimeOriginal/);
+    // only the date left the phone: nothing in the backend state carries EXIF or GPS.
+    // T5: leave out `objects` (random base64 ciphertext, which sometimes spells "GPS" by chance);
+    // the bytes themselves are checked for EXIF by the pipeline tests before encryption.
+    const { objects: _ciphertext, ...meta } = be.state;
+    expect(JSON.stringify(meta)).not.toMatch(/GPS|35\.22|Apple|DateTimeOriginal/);
   });
 
   it('BETA-BULK-3 "Don\'t send" goes back without sending anything', async () => {
