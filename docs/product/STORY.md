@@ -51,6 +51,7 @@ These are the stories Chase has shared in this project and related chats. The pe
 | Danielle's side | About the same level of divorce and separation. Danielle was born in Charleston, WV | Two families' worth of households, not one |
 | 5+ group texts | Relatives won't sit in a room together, let alone comment on each other's photos | The core use case: comment without being seen by the other side |
 | Birthday at Gigi's | "We had a birthday party at Gigi's house. My dad's side was there, Danielle's dad's side was there. I'd want to only post to those groups." | Some posts belong to an occasion: share with the people who were there (the events idea) |
+| The Charleston trip | "Danielle's dad and stepmom and her sister (who lives in Texas) were all together with us in Charleston, WV. That would be a natural group." (Oct 17) | A natural group crosses households and states: Pawpaw and Granny's house plus a sister in Texas. Groups must combine households from different places, not only follow a strict family tree (`docs/product/SPEC-HIERARCHY.md`) |
 | The stepmom workaround | Sends videos to his stepmom separately and worries about offending his dad. With the in-laws, people really do get offended | Video quality turns into a family relationships problem |
 | Android grandpas | Every grandpa has an Android; everyone else has an iPhone | Cross-platform quality is a must-have |
 | No kids on social media | Chase and Danielle don't post the kids, and neither do many of their peers | Privacy is the reason to switch, not a feature |
