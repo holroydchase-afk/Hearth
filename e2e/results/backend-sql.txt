@@ -504,9 +504,10 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 TIMELINE RESULT: 38 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
-psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('72b8e552-6b23-42e0-b182-22efb2654c8a'))
-psql:tests/groups_test.sql:886: WARNING:  as danielle: P0002 not found (select public.retire_level('dc8c6e19-6484-4158-b4ee-5e6084506815'))
-psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('a0608907-dd0a-43ef-b2ab-7b00b5be9841'))
+psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('05c0d1a8-2055-4531-aabb-beb8576dcf88'))
+psql:tests/groups_test.sql:886: WARNING:  as danielle: P0002 not found (select public.retire_level('70073e8a-de44-43dc-98dd-784a30a0759f'))
+psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('ad57b78a-cec7-404c-9cda-52e450401918'))
+psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = '103f69e4-62f9-4905-9952-65f5a0a42ede')
   n  | result |                                                                                  description                                                                                   
 -----+--------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    1 | ok     | BETA-AUD-11 shape: circles.kind exists (everyone | group | household | event)
@@ -674,9 +675,12 @@ psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select
  163 | ok     | S-0011-6 allowed: Jo's next comment reaches Lu; Chase still reads both
  164 | ok     | S-0011-7: a parent's direct update can't soft-delete Everyone (23514)  [23514 Everyone stays]
  165 | ok     | S-0011-7: Everyone (and everything else) is still live after the refused update
+ 166 | ok     | S-0011-8: a parent's direct update can't un-retire a retired group or household (23514)  [23514 a retired level stays retired]
+ 167 | ok     | S-0011-8: both stay retired after the refused updates
+ 168 | ok     | S-0011-8 allowed: a live group is still updatable and stays live
 
 
-GROUPS RESULT: 165 passed, 0 failed
+GROUPS RESULT: 168 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
  n | result |                                                       description                                                       
 ---+--------+-------------------------------------------------------------------------------------------------------------------------
@@ -694,9 +698,9 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 Narrowing for Chase (readable before 0011 only through "members see each other's replies"):
      reader     |  kind   |                                 reply_id                                  
 ----------------+---------+---------------------------------------------------------------------------
- Grandma Rivera | comment | 2604a90b-d654-4237-baf4-4355cb9a18ee
+ Grandma Rivera | comment | 3ca61ecf-340d-49e4-943e-1be8ac14a52f
  Grandma Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a2
- Grandpa Rivera | comment | 4963e6a1-dac9-42a7-80e1-0e6055ab6e9b
+ Grandpa Rivera | comment | 125143c5-881f-424b-afac-61f2d2d445e7
  Grandpa Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a1
 
  n  | result |                                                     description                                                      

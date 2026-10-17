@@ -88,7 +88,8 @@ export function JoinScreen({ code }: { code: string }) {
         <Card>
           <Txt variant="title">{msg}</Txt>
           <Txt>That's okay, it happens.</Txt>
-          {app.session ? null : <Button label="I already have Hearth. Sign in." text="Sign in" variant="secondary" onPress={nav.goSignIn} />}
+          {/* UX-G9: signed in, she still needs a way on (Photos; with no family yet it offers the code entry). */}
+          {app.session ? <Button label="Go to Photos" onPress={nav.goPhotos} /> : <Button label="I already have Hearth. Sign in." text="Sign in" variant="secondary" onPress={nav.goSignIn} />}
         </Card>
       ) : null}
     </Screen>
