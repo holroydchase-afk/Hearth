@@ -12,6 +12,7 @@ on by default for viewers, 48 pt targets, 17 pt+ text, "Love it", "Save to my ph
 | `npm run typecheck` | `tsc --noEmit`, strict + `noUncheckedIndexedAccess`. |
 | `npm run e2e:web` | Exports the web bundle in FakeApi mode (`EXPO_PUBLIC_HEARTH_FAKE=1`) and runs the Playwright core-loop smoke test at 360×740. |
 | `npm run test:contract:real` | Starts `../backend/tests/integration/start.sh` (fresh DB + PostgREST :3001), runs the docs/eng/API.md contract tests through `SupabaseApi`, stops it. |
+| `npm run eas -- <command>` | EAS CLI (`whoami`, `build`, `update`) with the environment's `EXPO_ACCESS_TOKEN` passed as `EXPO_TOKEN`. Tested by `scripts/tests/eas_test.sh` (EXPO-1). Needs `api.expo.dev` on the network allowlist. |
 | `npx expo start` | Dev server (needs the env below, or `EXPO_PUBLIC_HEARTH_FAKE=1`). |
 
 ## Architecture
@@ -41,7 +42,7 @@ Supabase Auth: enable Email, and change the "Magic Link" email template to show 
 6-digit code) instead of a link. The app calls `signInWithOtp` + `verifyOtp({type:'email'})`.
 Deep links: scheme `hearth://join/<code>`, plus `https://hearth.family/join/<code>` (associated
 domains / Android intent filter in `app.json`; the AASA/assetlinks files still have to be hosted).
-Push: add `extra.eas.projectId` to `app.json`; without it push is a no-op.
+Push: `app.json` has `extra.eas.projectId` (Expo project `@thefreighttrains-team/hearth`, linked Oct 17, 2026 with `npm run eas -- init`). Without it push is a no-op. Don't commit what `eas init` writes back: it expands the config and adds Android permissions (RECORD_AUDIO, storage); keep only `owner` and `extra.eas` (EXPO-2).
 
 Contract tests against any PostgREST/Supabase stack:
 

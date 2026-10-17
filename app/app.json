@@ -42,6 +42,8 @@
       ["expo-media-library", { "photosPermission": "Hearth saves family photos to your phone.", "savePhotosPermission": "Hearth saves family photos to your phone.", "isAccessMediaLocationEnabled": false }],
       "expo-notifications"
     ],
-    "experiments": { "typedRoutes": false }
+    "experiments": { "typedRoutes": false },
+    "owner": "thefreighttrains-team",
+    "extra": { "eas": { "projectId": "676e8cec-57a6-472f-9086-9a9318eaf556" } }
   }
 }
