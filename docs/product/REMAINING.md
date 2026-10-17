@@ -39,7 +39,7 @@ Sizes: **S** = under half an agent-day · **M** = about 1 agent-day · **L** = 2
 | 3 | 0004 migration test-first: `report_client_error` (OPS-1, AE-7) + S12 (REPLY-4, AE-8) | qa-tdd → app-engineer | No | OPS-1, REPLY-4 |
 | 4 | **Access for deploys:** allow `mcp.supabase.com`, `api.supabase.com`, the project host; add `SUPABASE_ACCESS_TOKEN` | **Chase** | Yes (10 min) | 5 |
 | 5 | **Backblaze B2 account, US East** (region can't change) + bucket keys into Supabase secrets; `MEDIA_KEK` on paper ×2 (CH-5) | **Chase** | Yes (30 min, ~$0 at this size) | 6 |
-| 6 | `supabase db push`; deploy `sign-media` + `notify`; 1-minute cron; smoke test green on hosted | infra (Claude) | No, after 4–5 | 7, QA-2 |
+| 6 | `bash backend/scripts/deploy.sh` (migrations + cron via the Management API); deploy `sign-media` + `notify`; 1-minute cron; smoke test green on hosted | infra (Claude) | No, after 4–5 | 7, QA-2 |
 | 7 | **App on Chase's iPhone.** First try Expo Go (all current deps are Expo Go SDK 54 modules; push and links need checking). If Expo Go can't do push or tap-to-open, an EAS dev build needs the **Apple Developer account ($99, CH-1)** | app-engineer + **Chase** | Yes (install; maybe $99) | 8 |
 | 8 | Device pass on the iPhone: resize, EXIF scan (M-09), encrypted PUT, Save to phone, OTP code, push tap-to-open cold/warm (AE-3, iPhone half) | app-engineer, qa-tdd | Chase holds the phone | gate |
 | 9 | QA-2: all M1 auto criteria 3× on hosted; QA-3 sent-vs-received script | qa-tdd | No | gate |

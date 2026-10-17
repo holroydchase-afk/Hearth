@@ -123,8 +123,10 @@ Deno.test("create -> publish -> heart -> comment -> delete, as two users, with v
 
   await t.step("BETA-REPLY-1 toggle_heart", async () => {
     assertEquals(ok(await rpc(as("grandma_rivera"), "toggle_heart", { p_post: postId }), "heart"), { i_hearted: true, heart_count: 1 });
-    const who = ok(await call(as("grandpa_rivera"), `reactions?post_id=eq.${postId}&select=user_id`), "who hearted") as any[];
+    // AUD-8: the author (a parent) reads who hearted; another viewer does not.
+    const who = ok(await call(as("alex"), `reactions?post_id=eq.${postId}&select=user_id`), "author sees who hearted") as any[];
     assertEquals(who.map((r) => r.user_id), [H.users.grandma_rivera.id]);
+    assertEquals(ok(await call(as("grandpa_rivera"), `reactions?post_id=eq.${postId}&select=user_id`), "viewer sees none"), []);
     assertEquals(ok(await rpc(as("grandma_rivera"), "toggle_heart", { p_post: postId }), "unheart"), { i_hearted: false, heart_count: 0 });
   });
 

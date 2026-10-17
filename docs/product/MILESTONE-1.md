@@ -17,7 +17,7 @@ Your morning doc. Do the steps in order and Claude handles the rest. The gate is
 | # | Step | Time | Unblocks |
 |---|---|---|---|
 | 1 | Cloud environment settings: allow `mcp.supabase.com`, `api.supabase.com`, `jqvgjfbhzbvfdhtnvgzr.supabase.co`, `exp.host`, `expo.dev`, `api.resend.com` | 5 min | Claude can deploy |
-| 2 | Supabase → Account → Access Tokens: make one; save it as environment secret `SUPABASE_ACCESS_TOKEN`. Also save the database password as `SUPABASE_DB_PASSWORD` and the connection string (Supabase → Connect → URI) as `SUPABASE_DB_URL` | 5 min | `db push`, function deploys, hosted test runs |
+| 2 | Supabase → Account → Access Tokens: make one; save it as environment secret `SUPABASE_ACCESS_TOKEN`. That is the only Supabase secret the deploy needs: migrations and the cron run through the Management API, so no database password or connection string | 5 min | Migrations, function deploys, cron |
 | 3 | Make a free account at expo.dev; Access tokens → save as `EXPO_TOKEN` | 5 min | Push project ID, builds |
 | 4 | Make a free account at resend.com and save its API key as a **Supabase** function secret, not here: Supabase → Edge Functions → Secrets → `RESEND_API_KEY` | 5 min | Email notices. For M1, Resend's test sender can mail only you, which is all M1 needs |
 | 5 | Make a second email for a test account (e.g. `you+test@gmail.com`) | 1 min | The "second test account" in the gate |
@@ -29,7 +29,7 @@ Never paste a key, token or password into chat. Secrets go in the environment se
 ## What Claude does after steps 1–3
 
 1. Confirms it can see the project through the Supabase connection (read-only).
-2. Runs `bash backend/scripts/deploy.sh` (try `--dry-run` first): links the project, pushes migrations 0001–0009 (no demo data), sets the function secrets from `backend/supabase/functions/.env`, deploys `sign-media` and `notify`, and schedules `notify` every minute with its own cron secret (never the service_role key).
+2. Runs `bash backend/scripts/deploy.sh` (try `--dry-run` first): applies migrations 0001–0009 through the Management API (no demo data; ones already applied are skipped), sets the function secrets from `backend/supabase/functions/.env`, deploys `sign-media` and `notify`, and schedules `notify` every minute with its own cron secret (never the service_role key).
 3. Runs the SQL suites against the hosted project 3× (gate line 1). They wipe the database, so this happens only before any real photos; after that the project keeps its data.
 4. Sets `app/.env.local` to the hosted project and gives you the Expo Go QR code.
 5. After you sign in once: runs `backend/scripts/family-setup.sql` (as you, through the app's own rules). It creates your space and starter groups ("Test viewer", "Chase's mom's side", "Chase's dad's side", "Mom's mom's side", "Mom's dad's side"; rename them in Groups) and prints a viewer invite for account B, plus Mom's poster invite for milestone 2. The app has no screens for creating a space or groups yet.
