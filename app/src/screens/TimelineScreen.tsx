@@ -1,8 +1,8 @@
 // BETA-TIME-2..4: photos by the date they were taken, with big month headers ("July 2024"),
-// a "Jump to year" list, and "Show older photos". Every action is a labeled button: no
+// a "Pick a year" list, and "Show older photos". Every action is a labeled button: no
 // scrubber, no gesture-only control. Opened from Photos ("Show by date" or a card's "See them").
 import React, { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
-import { FlatList, View } from 'react-native';
+import { BackHandler, FlatList, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { TimelinePost } from '../api/HearthApi';
 import { TimelineStore, startOfNextYear, timelineRows, type TimelineRow } from '../feed/timeline';
@@ -26,6 +26,16 @@ export function TimelineScreen({ startAt, onClose }: { startAt: string | null; o
 
   useEffect(() => { void store.open(startAt); }, [store, startAt]);
 
+  // Android (Grandaddy, Pawpaw): the phone's Back button steps back inside Hearth, never out of it.
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (years) setYears(false);
+      else onClose();
+      return true;
+    });
+    return () => sub.remove();
+  }, [years, onClose]);
+
   const showYears = () => {
     setYears(true);
     void store.loadYears();
@@ -39,7 +49,7 @@ export function TimelineScreen({ startAt, onClose }: { startAt: string | null; o
     <View style={{ gap: 12 }}>
       <Txt variant="display" role="header">Photos by date</Txt>
       <Button label="Back to Photos" variant="secondary" onPress={onClose} />
-      {years ? null : <Button label="Jump to year" onPress={showYears} />}
+      {years ? null : <Button label="Pick a year" onPress={showYears} />}
       {!years && state.startAt ? (
         <Button label="Show the newest photos first" text="Show the newest first" variant="secondary" onPress={() => void store.open(null)} />
       ) : null}
@@ -56,7 +66,7 @@ export function TimelineScreen({ startAt, onClose }: { startAt: string | null; o
           ListHeaderComponent={
             <View style={{ gap: 12 }}>
               {header}
-              <Txt variant="title" role="header">Pick a year</Txt>
+              <Txt variant="title" role="header">Which year?</Txt>
               <Button label="Go back to the photos" text="Go back" variant="secondary" onPress={() => setYears(false)} />
             </View>
           }

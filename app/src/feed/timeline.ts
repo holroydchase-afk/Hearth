@@ -1,4 +1,4 @@
-// BETA-TIME-1..4: Photos' "Added from earlier" card and the "by date" timeline.
+// BETA-TIME-1..4: Photos' "Older photos" card and the "by date" timeline.
 // Months and years are the phone's local time, with plain Date math (no Intl dependency,
 // like ui/format.ts). The server decides what the caller may see (get_timeline uses the same
 // visibility function as get_feed); nothing here filters for privacy.
@@ -25,17 +25,20 @@ export interface EarlierGroup {
   postIds: string[];
   /** The newest date taken among them: the card opens the timeline at this month. */
   openAt: string;
+  /** The oldest date taken among them, for "from December 2023 to July 2024". */
+  fromAt: string;
 }
 
-/** One "Added from earlier" card per sender, in the order they appear in Photos. */
+/** One "Older photos" card per sender, in the order they appear in Photos. */
 export function earlierGroups(posts: FeedPost[]): EarlierGroup[] {
   const out = new Map<string, EarlierGroup>();
   for (const p of posts) {
     if (!isFromEarlier(p)) continue;
-    const g = out.get(p.author_id) ?? { authorId: p.author_id, authorName: p.author_name, photoCount: 0, postIds: [], openAt: p.taken_at! };
+    const g = out.get(p.author_id) ?? { authorId: p.author_id, authorName: p.author_name, photoCount: 0, postIds: [], openAt: p.taken_at!, fromAt: p.taken_at! };
     g.photoCount += p.media.filter((m) => m.status === 'ready').length;
     g.postIds.push(p.post_id);
     if (p.taken_at! > g.openAt) g.openAt = p.taken_at!;
+    if (p.taken_at! < g.fromAt) g.fromAt = p.taken_at!;
     out.set(p.author_id, g);
   }
   return [...out.values()];
@@ -45,6 +48,15 @@ export function earlierGroups(posts: FeedPost[]): EarlierGroup[] {
 export function monthLabel(iso: string): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '' : `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/** "July 2024", "June to July 2024", "December 2023 to July 2024" (full month names). */
+export function monthSpan(fromIso: string, toIso: string): string {
+  const a = new Date(fromIso), b = new Date(toIso);
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return '';
+  if (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth()) return monthLabel(toIso);
+  if (a.getFullYear() === b.getFullYear()) return `${MONTHS[a.getMonth()]} to ${monthLabel(toIso)}`;
+  return `${monthLabel(fromIso)} to ${monthLabel(toIso)}`;
 }
 
 /** The first moment of the month after this one: opening there shows this month first. */

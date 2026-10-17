@@ -47,14 +47,14 @@ describe('BETA-BULK-3 batch review screen', () => {
 
   it('BETA-BULK-5 says plainly that videos were skipped', async () => {
     await openReview({ last: [FIXTURE.circles.dadSide.id] });
-    expect(screen.getByText('3 videos were skipped. Hearth sends photos for now.')).toBeTruthy();
+    expect(screen.getByText("Hearth can't send videos yet, so 3 videos were left out.")).toBeTruthy();
   });
 
-  it('BETA-BULK-3 never a silent Everyone: with no last group, Send waits for a choice', async () => {
+  it('BETA-BULK-3 never a silent Everyone: with no last group, Send waits and the group list is already open', async () => {
     await openReview();
     expect(screen.getByText('Send to: nobody yet. Pick who should see these.')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Send 48 photos' }).props.accessibilityState).toMatchObject({ disabled: true });
-    fireEvent.press(screen.getByRole('button', { name: 'Change who these go to' }));
+    // grandparent-ux: no hidden step; the choices show without tapping Change first
     fireEvent.press(await screen.findByRole('checkbox', { name: new RegExp(`^${EVERYONE.name},`) }));
     expect(screen.getByText(`Send to: ${EVERYONE.name}`)).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Send 48 photos' }).props.accessibilityState).toMatchObject({ disabled: false });
@@ -96,7 +96,7 @@ describe('BETA-BULK-3 batch review screen', () => {
     await renderApp(<ShareScreen />, { user: 'chase', kv, deps: { pickBulk } });
     fireEvent.press(await screen.findByRole('button', { name: 'Pick up to 100 photos at once' }));
     expect(await screen.findByText('100 photos from 2 days')).toBeTruthy();
-    expect(screen.getByText("20 photos weren't added. Hearth sends up to 100 at a time, so pick those next.")).toBeTruthy();
+    expect(screen.getByText('Hearth sends up to 100 photos at a time, so 20 were left out. Pick them next time.')).toBeTruthy();
   });
 
   it('BETA-BULK-3 is grandparent-safe, in plain words', async () => {
@@ -125,7 +125,7 @@ describe('BETA-BULK-3 privacy-security review: Send never goes to a group it has
 });
 
 describe('BETA-BULK-4 batch progress', () => {
-  it('BETA-BULK-4 one line for the whole batch: "Sending N of 48…", not 5 cards', async () => {
+  it('BETA-BULK-4 one line for the whole batch: "Sending N of 48 photos…", not 5 cards', async () => {
     const be = FakeBackend.withFixture();
     const api = be.clientFor(null, { trackAppSession: true });
     jest.spyOn(api, 'createPost').mockImplementation(() => new Promise(() => {})); // stays on the first post
@@ -135,7 +135,7 @@ describe('BETA-BULK-4 batch progress', () => {
     await renderApp(<ShareScreen />, { user: 'chase', kv, be, deps: { pickBulk, api } });
     fireEvent.press(await screen.findByRole('button', { name: 'Pick up to 100 photos at once' }));
     fireEvent.press(await screen.findByRole('button', { name: 'Send 48 photos' }));
-    expect(await screen.findByText('48 photos: Sending 1 of 48…')).toBeTruthy();
+    expect(await screen.findByText('Sending 1 of 48 photos…')).toBeTruthy();
     expect(screen.queryAllByText(/Getting ready/)).toHaveLength(0);
   });
 });

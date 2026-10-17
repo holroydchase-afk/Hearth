@@ -62,10 +62,10 @@ export interface EnqueueInput { space: string; caption: string | null; circleIds
 /** BETA-BULK-4: one bulk pick, already planned into posts (share/bulk.ts planBatch). */
 export interface EnqueueBatchInput { space: string; circleIds: string[]; posts: { takenAt: string | null; items: QueueItem[] }[] }
 
-/** "Sending 12 of 48…" across the whole batch; "Sent 48 photos" when done. */
+/** "Sending 12 of 48 photos…" across the whole batch; "Sent 48 photos" when done. */
 export function batchLabel(p: { done: number; total: number }): string {
   if (p.done >= p.total) return `Sent ${p.total} ${p.total === 1 ? 'photo' : 'photos'}`;
-  return `Sending ${Math.min(p.done + 1, p.total)} of ${p.total}…`;
+  return `Sending ${Math.min(p.done + 1, p.total)} of ${p.total} photos…`;
 }
 
 export interface QueueDeps {
@@ -191,7 +191,7 @@ export class UploadQueue {
     return { done, total };
   }
 
-  /** Batches that still have something to send (for "Sending 12 of 48…"). */
+  /** Batches that still have something to send (for "Sending 12 of 48 photos…"). */
   activeBatches(): { batchId: string; done: number; total: number }[] {
     const ids = [...new Set(this.mine().filter((j) => j.batchId && j.state !== 'published').map((j) => j.batchId!))];
     return ids.map((batchId) => ({ batchId, ...this.batchProgress(batchId) }));

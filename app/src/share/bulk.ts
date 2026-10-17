@@ -87,16 +87,16 @@ export function reviewSummary(plan: BatchPlan): string {
   return plan.dayCount > 0 ? `${photos} from ${plural(plan.dayCount, 'day', 'days')}` : photos;
 }
 
-/** "3 videos were skipped. Hearth sends photos for now." or null when none. */
+/** "Hearth can't send videos yet, so 3 videos were left out." or null when none. */
 export function skippedVideosLine(n: number): string | null {
   if (n <= 0) return null;
-  return n === 1 ? '1 video was skipped. Hearth sends photos for now.' : `${n} videos were skipped. Hearth sends photos for now.`;
+  return n === 1 ? "Hearth can't send videos yet, so 1 video was left out." : `Hearth can't send videos yet, so ${n} videos were left out.`;
 }
 
 /** Said when a pick goes over 100, or null. */
 export function overLimitLine(n: number): string | null {
   if (n <= 0) return null;
   return n === 1
-    ? "1 photo wasn't added. Hearth sends up to 100 at a time, so pick it next."
-    : `${n} photos weren't added. Hearth sends up to 100 at a time, so pick those next.`;
+    ? 'Hearth sends up to 100 photos at a time, so 1 was left out. Pick it next time.'
+    : `Hearth sends up to 100 photos at a time, so ${n} were left out. Pick them next time.`;
 }

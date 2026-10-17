@@ -17,7 +17,8 @@ export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel,
   onCancel: () => void;
   busy: boolean;
 }) {
-  const [changing, setChanging] = useState(false);
+  // grandparent-ux: with nobody picked yet, the choices are already open (no hidden step).
+  const [changing, setChanging] = useState(chosen.length === 0);
   // Everyone first, then the groups (SPEC-GROUPS: 0011 adds a real kind; until then, by name).
   const list = circles ? [...circles].sort((a, b) => Number(b.name === 'Everyone') - Number(a.name === 'Everyone')) : null;
   const names = (list ?? []).filter((g) => chosen.includes(g.circle_id)).map((g) => g.name);

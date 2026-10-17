@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp, useFeed } from '../state/AppContext';
-import { earlierGroups, isFromEarlier, startOfNextMonth, type EarlierGroup } from '../feed/timeline';
+import { earlierGroups, isFromEarlier, monthSpan, startOfNextMonth, type EarlierGroup } from '../feed/timeline';
 import { Button, Card, Loading, Notice, Txt } from '../ui/kit';
 import { andList } from '../ui/format';
 import { useTheme } from '../ui/theme';
@@ -12,12 +12,12 @@ import { QueueStatus } from './QueueStatus';
 import { TimelineScreen } from './TimelineScreen';
 import { YourName } from './YourName';
 
-/** BETA-TIME-1: "Chase added 48 older photos. See them" (opens the timeline at that month). */
+/** BETA-TIME-1: "Older photos. Chase added 48 older photos from July 2024. See them" (opens the timeline at that month). */
 function EarlierCard({ g, onOpen }: { g: EarlierGroup; onOpen: () => void }) {
   return (
     <Card testID={`earlier-card-${g.authorId}`}>
-      <Txt variant="title" role="header">Added from earlier</Txt>
-      <Txt>{`${g.authorName} added ${g.photoCount === 1 ? '1 older photo' : `${g.photoCount} older photos`}.`}</Txt>
+      <Txt variant="title" role="header">Older photos</Txt>
+      <Txt>{`${g.authorName} added ${g.photoCount === 1 ? '1 older photo' : `${g.photoCount} older photos`} from ${monthSpan(g.fromAt, g.openAt)}.`}</Txt>
       <Button label={`See ${g.authorName}'s older photos by date`} text="See them" onPress={onOpen} />
     </Card>
   );

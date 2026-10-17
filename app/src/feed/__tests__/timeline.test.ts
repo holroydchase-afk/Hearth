@@ -3,7 +3,7 @@
 import { FakeBackend, FIXTURE } from '../../api/fake/FakeBackend';
 import { seedPost } from '../../test/seed';
 import {
-  EARLIER_DAYS, earlierGroups, isFromEarlier, monthLabel, startOfNextMonth, startOfNextYear, timelineRows, TimelineStore,
+  EARLIER_DAYS, earlierGroups, isFromEarlier, monthLabel, monthSpan, startOfNextMonth, startOfNextYear, timelineRows, TimelineStore,
 } from '../timeline';
 
 const post = (id: string, taken: string | null, published: string, author = 'Chase', photos = 1) => ({
@@ -30,9 +30,17 @@ describe('BETA-TIME-1 "Added from earlier"', () => {
       post('c', '2023-12-25T12:00:00Z', '2026-10-16T08:00:00Z', 'Alex', 1),
     ]);
     expect(g).toEqual([
-      { authorId: 'u-Chase', authorName: 'Chase', photoCount: 18, postIds: ['a', 'b'], openAt: '2024-07-04T12:00:00Z' },
-      { authorId: 'u-Alex', authorName: 'Alex', photoCount: 1, postIds: ['c'], openAt: '2023-12-25T12:00:00Z' },
+      { authorId: 'u-Chase', authorName: 'Chase', photoCount: 18, postIds: ['a', 'b'], openAt: '2024-07-04T12:00:00Z', fromAt: '2024-06-20T12:00:00Z' },
+      { authorId: 'u-Alex', authorName: 'Alex', photoCount: 1, postIds: ['c'], openAt: '2023-12-25T12:00:00Z', fromAt: '2023-12-25T12:00:00Z' },
     ]);
+  });
+});
+
+describe('BETA-TIME-1 card words (grandparent-ux)', () => {
+  it('BETA-TIME-1 the card names the months in full: "July 2024", "June to July 2024", "December 2023 to July 2024"', () => {
+    expect(monthSpan('2024-07-01T12:00:00Z', '2024-07-30T12:00:00Z')).toBe('July 2024');
+    expect(monthSpan('2024-06-20T12:00:00Z', '2024-07-04T12:00:00Z')).toBe('June to July 2024');
+    expect(monthSpan('2023-12-25T12:00:00Z', '2024-07-04T12:00:00Z')).toBe('December 2023 to July 2024');
   });
 });
 
