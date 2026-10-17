@@ -28,7 +28,7 @@ Sizes: **S** = under half an agent-day · **M** = about 1 agent-day · **L** = 2
 
 **Gate (all must be met; evidence in BETA-SPEC "Milestone gates"):** every M1 `auto` criterion green 3× against the hosted project; M1 `manual` criteria logged as passing on Chase's iPhone; ≥10 posts over ≥2 days from Chase's iPhone to a second test account, 0 lost; 0 crashes; `MEDIA_KEK` written down in 2 places.
 
-"End to end" needs a receiver. Chase uses a second account (a second email) on a second device or the web build to receive, heart and comment, so NOTIFY-3 and REPLY-3 can be exercised alone.
+"End to end" needs a receiver. Chase uses a second account (a second email) on a second device or the web build to receive, heart and comment, so REPLY-3 can be exercised alone. NOTIFY-3 (push tap-to-open) moved to milestone 2 (Chase, Oct 17): M1 runs in Expo Go, which can't receive push.
 
 ### Critical path (in order)
 
@@ -40,8 +40,8 @@ Sizes: **S** = under half an agent-day · **M** = about 1 agent-day · **L** = 2
 | 4 | **Access for deploys:** allow `mcp.supabase.com`, `api.supabase.com`, the project host; add `SUPABASE_ACCESS_TOKEN` | **Chase** | Yes (10 min) | 5 |
 | 5 | **Backblaze B2 account, US East** (region can't change) + bucket keys into Supabase secrets; `MEDIA_KEK` on paper ×2 (CH-5) | **Chase** | Yes (30 min, ~$0 at this size) | 6 |
 | 6 | `bash backend/scripts/deploy.sh` (migrations + cron via the Management API); deploy `sign-media` + `notify`; 1-minute cron; smoke test green on hosted | infra (Claude) | No, after 4–5 | 7, QA-2 |
-| 7 | **App on Chase's iPhone.** First try Expo Go (all current deps are Expo Go SDK 54 modules; push and links need checking). If Expo Go can't do push or tap-to-open, an EAS dev build needs the **Apple Developer account ($99, CH-1)** | app-engineer + **Chase** | Yes (install; maybe $99) | 8 |
-| 8 | Device pass on the iPhone: resize, EXIF scan (M-09), encrypted PUT, Save to phone, OTP code, push tap-to-open cold/warm (AE-3, iPhone half) | app-engineer, qa-tdd | Chase holds the phone | gate |
+| 7 | **App on Chase's iPhone in Expo Go** (Chase, Oct 17). No $99 for M1; the EAS build with push (CH-1) moves to milestone 2 | app-engineer + **Chase** | Yes (install Expo Go) | 8 |
+| 8 | Device pass on the iPhone: resize, EXIF scan (M-09), encrypted PUT, Save to phone, OTP code (AE-3, iPhone half; push tap-to-open moves to M2) | app-engineer, qa-tdd | Chase holds the phone | gate |
 | 9 | QA-2: all M1 auto criteria 3× on hosted; QA-3 sent-vs-received script | qa-tdd | No | gate |
 | 10 | **Chase posts ≥10 times over ≥2 days**; receives on the second account (CH-6) | **Chase** | Yes | M1 gate |
 
