@@ -19,3 +19,12 @@ export async function pickPhotos(limit = 10): Promise<PickResult> {
     items: r.assets.slice(0, limit).map((a) => ({ uri: a.uri, kind: 'photo' as const, width: a.width, height: a.height, durationMs: a.duration ?? null })),
   };
 }
+
+/**
+ * BETA-BULK-1/2: up to 100 photos (and any videos, so we can say they were skipped), with EXIF
+ * so the capture date can be read on the phone. The EXIF stays in memory here; only takenAt leaves.
+ * NOT BUILT YET (overnight plan step 3). Red test: __tests__/pick.test.ts.
+ */
+export async function pickBulk(): Promise<{ assets: import('../share/bulk').PickedAsset[] } | { denied: true }> {
+  throw new Error('not built yet: pickBulk (BETA-BULK-1)');
+}

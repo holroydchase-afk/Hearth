@@ -73,7 +73,32 @@ export interface CreatePostArgs {
   space: string;
   caption: string | null;
   circleIds: string[];
+  /** Capture time read on the phone (BETA-BULK-1). Only this date leaves the phone, never EXIF/GPS. */
   takenAt?: string | null;
+  /** BETA-BULK-6: posts from one bulk pick share a batch id; size = number of posts in the batch (1-100). Both or neither. */
+  batchId?: string | null;
+  batchSize?: number | null;
+}
+
+/** get_timeline (migration 0010, BETA-TIME-2): keyset on (sort_at, post_id). */
+export interface TimelineArgs {
+  space: string;
+  beforeAt?: string | null;
+  beforeId?: string | null;
+  limit?: number;
+}
+
+/** A feed row plus when it was taken. sort_at = coalesce(taken_at, published_at). */
+export interface TimelinePost extends FeedPost {
+  taken_at: string | null;
+  sort_at: string;
+}
+
+/** get_timeline_years (BETA-TIME-4 "Jump to year"): only posts the caller can see are counted. */
+export interface TimelineYear {
+  year: number;
+  post_count: number;
+  photo_count: number;
 }
 
 export interface HeartState {

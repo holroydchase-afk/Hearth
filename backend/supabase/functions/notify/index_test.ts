@@ -191,3 +191,38 @@ Deno.test("privacy: the sender never logs tokens, emails or URLs", async () => {
   assert(!all.includes("@example.com"), "no email in logs");
   assert(!all.includes("http"), "no URL in logs");
 });
+
+// ---------- BETA-BULK-6: one notice per bulk import (migration 0010 adds the claim columns) ----------
+// Cast through unknown: until 0010 the Batch type has no batch fields, and this must stay a red test, not a compile error.
+const bulk = (over: Record<string, unknown>): Batch => pushBatch({
+  post_ids: [P1, P2], post_count: 5, is_batch: true, photo_count: 48,
+  taken_from: "2024-07-04T14:00:00Z", taken_to: "2024-07-06T19:00:00Z", ...over,
+} as unknown as Partial<Batch>);
+
+Deno.test("BETA-BULK-6: a bulk import push reads 'Alex added 48 photos from Jul 2024'", () => {
+  const [m] = buildPush(bulk({}));
+  eq(m.title, "From Alex on Hearth", "title still names the sender");
+  eq(m.body, "Alex added 48 photos from Jul 2024. Tap to see them.", "one line for the whole batch");
+  eq(Object.keys(m).sort(), ["body", "data", "sound", "title", "to"], "no image/attachment fields");
+});
+
+Deno.test("BETA-BULK-6: a batch across months or years names the span; no dates, no month", () => {
+  eq(buildPush(bulk({ taken_from: "2024-06-29T15:00:00Z", taken_to: "2024-07-02T15:00:00Z" }))[0]!.body,
+     "Alex added 48 photos from Jun to Jul 2024. Tap to see them.", "two months");
+  eq(buildPush(bulk({ taken_from: "2023-12-30T15:00:00Z", taken_to: "2024-01-02T15:00:00Z" }))[0]!.body,
+     "Alex added 48 photos from Dec 2023 to Jan 2024. Tap to see them.", "two years");
+  eq(buildPush(bulk({ taken_from: null, taken_to: null }))[0]!.body,
+     "Alex added 48 photos. Tap to see them.", "no capture dates");
+  eq(buildPush(bulk({ photo_count: 1, taken_from: null, taken_to: null }))[0]!.body,
+     "Alex added 1 photo. Tap to see it.", "one photo");
+});
+
+Deno.test("BETA-BULK-6: the month follows Eastern time (a Jul 31, 11 pm photo is July)", () => {
+  eq(buildPush(bulk({ taken_from: "2024-08-01T03:00:00Z", taken_to: "2024-08-01T03:00:00Z" }))[0]!.body,
+     "Alex added 48 photos from Jul 2024. Tap to see them.", "Eastern month");
+});
+
+Deno.test("BETA-BULK-6: an ordinary post batch still says 'shared new photos'", () => {
+  eq(buildPush(pushBatch({ ...({ is_batch: false, photo_count: 3 } as unknown as Partial<Batch>) }))[0]!.body,
+     "Alex shared new photos. Tap to see them.", "not a bulk import");
+});

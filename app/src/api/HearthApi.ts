@@ -6,6 +6,7 @@ import type {
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost,
   FinalizeResult, HeartState, InvitePreview, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
+  TimelineArgs, TimelinePost, TimelineYear,
 } from './types';
 
 export * from './types';
@@ -56,6 +57,10 @@ export interface HearthApi {
   mySpaces(): Promise<Space[]>;
   myCircles(space: string): Promise<Circle[]>;
   getFeed(args: FeedArgs): Promise<FeedPost[]>;
+  /** BETA-TIME-2/3 (migration 0010): by date taken; same visibility as getFeed. */
+  getTimeline(args: TimelineArgs): Promise<TimelinePost[]>;
+  /** BETA-TIME-4 "Jump to year". timeZone = the phone's IANA zone. */
+  getTimelineYears(space: string, timeZone?: string): Promise<TimelineYear[]>;
   createPost(args: CreatePostArgs): Promise<string>;
   publishPost(post: string): Promise<void>;
   deletePost(post: string): Promise<void>;
