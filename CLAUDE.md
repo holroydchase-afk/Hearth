@@ -19,7 +19,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - `docs/eng/API.md`: the app↔backend contract. Change the contract tests before changing it.
 - `docs/product/PERSONAS.md`, `docs/product/CORE-FEATURES.md`, `docs/eng/TESTING.md`.
 - `docs/product/AI-FEATURES.md`: future AI and smart-photo features (people → group suggestions, duplicates), the rules they must meet, and the blocking AI positioning decision.
-- `docs/product/ACCOUNTS.md`: every outside account, its login, and where the name "Hearth" is baked in. Add a row whenever Chase sets up a new account. No secrets.
+- `docs/product/ACCOUNTS.md`: every outside account, its login, and where the name "Hearth" is baked in. Add a row whenever Chase sets up a new account. No secrets. **Before anything that makes the name hard to change (buying the domain, a store build, telling relatives the name), stop and warn Chase**; store builds refuse until it says "Name final: yes".
 - `docs/product/MARKETING.md`: positioning, claims register (what we can truthfully say), marketing ideas log. Owned by the `marketing` agent.
 
 ## Layout
