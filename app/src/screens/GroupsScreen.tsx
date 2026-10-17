@@ -76,6 +76,10 @@ export function GroupsScreen() {
     void app.deps.openUrl(`sms:${sep}body=${encodeURIComponent(body)}`);
   };
 
+  // UX-G4: the server takes an invite only to a household, or (until 0012) a group with nothing under it.
+  const invitable = (g: Circle) =>
+    g.kind === 'household' || ((g.kind ?? 'group') === 'group' && !(circles ?? []).some((o) => o.parent_ids?.includes(g.circle_id)));
+
   return (
     <Screen>
       <Txt variant="display" role="header">Your groups</Txt>
@@ -113,6 +117,7 @@ export function GroupsScreen() {
             </Card>
           ) : asking === g.circle_id ? (
             <>
+              <Txt variant="title" role="header">{`Invite someone to ${g.name}`}</Txt>
               <Field label="Their name, the way your family says it" value={inviteName} onChangeText={setInviteName} placeholder='Like "Grandma June"' maxLength={40} />
               <Txt variant="muted">They'll see this name on Hearth and won't have to type it.</Txt>
               <Txt variant="title" role="header">Should they see photos already shared?</Txt>
@@ -120,7 +125,7 @@ export function GroupsScreen() {
                 kind="radio"
                 label="Share all past photos"
                 title="Share all past photos"
-                detail={`They'll see every photo already shared with ${g.name}.`}
+                detail={`They'll see every photo ${g.name} can already see.`}
                 checked={history === 'all'}
                 onPress={() => { setHistory('all'); setNeedHistory(false); }}
               />
@@ -136,8 +141,10 @@ export function GroupsScreen() {
               <Button label="Make the invite" onPress={() => void makeInvite(g.circle_id)} softDisabled={!history} />
               <Button label="Cancel" variant="secondary" onPress={closeForm} />
             </>
-          ) : (
+          ) : invitable(g) ? (
             <Button label={`Invite someone to ${g.name}`} text="Invite someone" variant="secondary" onPress={() => { closeForm(); setAsking(g.circle_id); }} />
+          ) : (
+            <Txt variant="muted">To invite someone, use their household below.</Txt>
           )}
         </Card>
       ))}

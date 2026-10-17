@@ -47,7 +47,8 @@ export function ShareScreen() {
     let alive = true;
     (async () => {
       try {
-        const list = shareOrder(await app.deps.api.myCircles(spaceId));
+        // BETA-AUD-21 (grandparent-ux UX-G3): only parents send to Everyone, so a relative is never offered it.
+        const list = shareOrder(await app.deps.api.myCircles(spaceId)).filter((x) => isParent || x.kind !== 'everyone');
         const last = await loadLastAudience(app.deps.kv, userId, list.map((x) => x.circle_id));
         if (!alive) return;
         setCircles(list);
@@ -149,6 +150,9 @@ export function ShareScreen() {
         {circles === null ? <Loading words="Loading your groups…" /> : null}
         {(circles ?? []).map((g, i, all) => (
           <React.Fragment key={g.circle_id}>
+          {g.kind !== 'everyone' && g.kind !== 'event' && (i === 0 || all[i - 1]?.kind === 'everyone') ? (
+            <Txt variant="strong" role="header">Groups</Txt>
+          ) : null}
           {g.kind === 'event' && all[i - 1]?.kind !== 'event' ? (
             <>
               <Txt variant="strong" role="header">Events</Txt>
@@ -166,7 +170,9 @@ export function ShareScreen() {
           </React.Fragment>
         ))}
         {chosen.length === 0 ? <Txt variant="strong">Pick who should see it.</Txt> : (
-          <Txt>{`Only ${chosenCircles.map((g) => g.name).join(' and ')} will see these.`}</Txt>
+          <Txt>{chosenCircles.some((g) => g.kind === 'everyone')
+            ? 'Everyone in the family will see these.'
+            : `Only ${chosenCircles.map((g) => g.name).join(' and ')} will see these.`}</Txt>
         )}
       </Card>
 
