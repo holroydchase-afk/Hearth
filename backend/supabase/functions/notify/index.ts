@@ -9,7 +9,7 @@
 // for phones Expo says are gone. Batching windows live in SQL.
 //
 // PRIVACY: messages carry the actor's chosen name ("Grandma June"), counts and a post id only; a bulk
-// import also names the month and year taken ("from Jul 2024"), from posts that person can see
+// import also names the month and year taken ("from July 2024"), from posts that person can see
 // (privacy-security, Oct 17: coarse, no day, place or child). No photo, caption,
 // comment text or child's name, and nothing about them in the logs: never log tokens,
 // email addresses, URLs or message text.
@@ -54,14 +54,14 @@ export function joinNames(names: string[]): string {
   return `${names[0]}, ${names[1]} and ${names.length - 2} others`;
 }
 
-// "Jul 2024" in Eastern time (the POC family is all in WV/NC, like the email windows).
+// "July 2024" in Eastern time (full month names: grandparent-ux; "Jul" reads as a typo or an abbreviation June must decode) (the POC family is all in WV/NC, like the email windows).
 const month = (iso: string) => {
-  const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", month: "short", year: "numeric" })
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", month: "long", year: "numeric" })
     .formatToParts(new Date(iso));
   return { m: parts.find((p) => p.type === "month")!.value, y: parts.find((p) => p.type === "year")!.value };
 };
 
-/** BETA-BULK-6: "from Jul 2024", "from Jun to Jul 2024", "from Dec 2023 to Jan 2024", or "" with no dates. */
+/** BETA-BULK-6: "from July 2024", "from June to July 2024", "from December 2023 to January 2024", or "" with no dates. */
 export function takenSpan(from?: string | null, to?: string | null): string {
   if (!from || !to) return "";
   const a = month(from), b = month(to);

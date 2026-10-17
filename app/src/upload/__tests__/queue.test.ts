@@ -302,9 +302,9 @@ describe('BETA-BULK-4 batch progress and resume after kill', () => {
     };
   }
 
-  it('BETA-BULK-4 batchLabel reads "Sending 12 of 48…" across the batch, then "Sent 48 photos"', () => {
-    expect(batchLabel({ done: 11, total: 48 })).toBe('Sending 12 of 48…');
-    expect(batchLabel({ done: 0, total: 48 })).toBe('Sending 1 of 48…');
+  it('BETA-BULK-4 batchLabel reads "Sending 12 of 48 photos…" across the batch, then "Sent 48 photos"', () => {
+    expect(batchLabel({ done: 11, total: 48 })).toBe('Sending 12 of 48 photos…');
+    expect(batchLabel({ done: 0, total: 48 })).toBe('Sending 1 of 48 photos…');
     expect(batchLabel({ done: 48, total: 48 })).toBe('Sent 48 photos');
     expect(batchLabel({ done: 1, total: 1 })).toBe('Sent 1 photo');
   });
@@ -335,7 +335,7 @@ describe('BETA-BULK-4 batch progress and resume after kill', () => {
     await until(() => (api.calls.createPost ?? 0) >= 2);
     await tick();
     expect(q.batchProgress(batchId)).toEqual({ done: 10, total: 48 });
-    expect(batchLabel(q.batchProgress(batchId))).toBe('Sending 11 of 48…');
+    expect(batchLabel(q.batchProgress(batchId))).toBe('Sending 11 of 48 photos…');
     q.stop();
   });
 

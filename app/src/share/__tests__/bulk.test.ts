@@ -93,8 +93,8 @@ describe('BETA-BULK-2 planBatch: one post per day, at most 10 photos each', () =
     const kept = new Set(plan.posts.flatMap((p) => p.items.map((i) => i.uri)));
     expect(kept).toEqual(new Set(picked.slice(0, 100).map((a) => a.uri)));
     expect(plan.posts.every((p) => p.items.length <= 10)).toBe(true);
-    expect(overLimitLine(20)).toBe("20 photos weren't added. Hearth sends up to 100 at a time, so pick those next.");
-    expect(overLimitLine(1)).toBe("1 photo wasn't added. Hearth sends up to 100 at a time, so pick it next.");
+    expect(overLimitLine(20)).toBe('Hearth sends up to 100 photos at a time, so 20 were left out. Pick them next time.');
+    expect(overLimitLine(1)).toBe('Hearth sends up to 100 photos at a time, so 1 was left out. Pick it next time.');
     expect(overLimitLine(0)).toBeNull();
   });
 
@@ -122,8 +122,8 @@ describe('BETA-BULK-5 videos, Live Photos, HEIC', () => {
     expect(plan.skippedVideos).toBe(3);
     expect(plan.photoCount).toBe(5);
     expect(plan.posts.flatMap((p) => p.items).every((i) => i.kind === 'photo')).toBe(true);
-    expect(skippedVideosLine(3)).toBe('3 videos were skipped. Hearth sends photos for now.');
-    expect(skippedVideosLine(1)).toBe('1 video was skipped. Hearth sends photos for now.');
+    expect(skippedVideosLine(3)).toBe("Hearth can't send videos yet, so 3 videos were left out.");
+    expect(skippedVideosLine(1)).toBe("Hearth can't send videos yet, so 1 video was left out.");
     expect(skippedVideosLine(0)).toBeNull();
   });
 
