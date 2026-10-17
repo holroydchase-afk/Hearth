@@ -13,10 +13,22 @@ These come from the anchors and the "Never build" list, not from taste.
 | R1 | **The photo never leaves the phone for AI.** Any model runs on the device. No cloud vision API, no server-side ML. | Never build #3, A3, CLAUDE.md rule 2 |
 | R2 | **No model learns from family photos.** Use off-the-shelf models as shipped; nothing is trained or fine-tuned on user content, on the phone or anywhere else. | Never build #2, claims register |
 | R3 | **Suggest, never act on audience.** AI may pre-fill a choice; a person confirms it. Sending a photo to the wrong group is a P0 (wrong audience), so no feature silently widens who sees a photo. | A1, BETA-SPEC P0 definition |
-| R4 | **Off unless a parent turns it on**, and the words say plainly what happens: "Hearth looks at faces on this phone only. Nothing is sent anywhere." | A1, grandparent-ux rules |
+| R4 | **Off unless a parent turns it on** for their family space (see Control model), and the words say plainly what happens: "Hearth looks at faces on this phone only. Nothing is sent anywhere." | A1, grandparent-ux rules |
 | R5 | **Nothing that measures people.** No "who's in the most photos", no ranking relatives, no resurfacing old photos uninvited. | A2, Never build #8 |
 | R6 | **No chat, no captions written for you, no filters.** Small, quiet helpers only. | Chase, Oct 17; Never build list |
 | R7 | **Prefer no-ML when it's good enough.** A hash or a date rule beats a model: smaller app, nothing to explain, keeps CF-10 true. | Deep, not wide |
+
+## Control model (Chase, Oct 17, 3:38 am)
+
+"High level of control over AI with like nothing on by default or different user types that don't have AI. Make it optional but still plan to build it. Or like Discord and have your own server."
+
+staff-pm reading, to confirm when we circle back:
+- **Each family space is its own "server"** (it already is: every space has its own groups, roles and settings). AI is a space setting, so one family turning it on never affects another.
+- **Off by default, everywhere.** A new space has every AI item off. Turning one on is a parent's choice, per feature (duplicates on, faces off is fine).
+- **User types.** Owner and parents see the AI settings. Relatives never see them and no AI ever runs on a relative's phone. Any adult can still say "Don't look for my face", which removes them from face grouping in every family they're in.
+- **Kids** follow the parents' choice for their space.
+- **What this does to the promise.** The claim can become "AI is off unless your family turns it on, and then it runs only on your phone". That is easier to keep true than "no face scanning", and makes option B in the session below the natural fit.
+- **"Own server" taken literally** (a family hosting Hearth itself) is a post-milestone-7 question: it would help A3 but costs Chase support time. Logged, not planned.
 
 ## Blocking decision: the AI positioning session
 
