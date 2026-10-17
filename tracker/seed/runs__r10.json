@@ -1,0 +1,9 @@
+{
+ "suite": "app",
+ "at": "2026-10-17T07:30:00-04:00",
+ "label": "Groups + bulk/timeline follow-ups: app tests written first (red)",
+ "passed": 313,
+ "failed": 15,
+ "results": {},
+ "note": "Red on purpose: invite form has no share-history choice (AUD-19, 4); the reply switch and setGroupRepliesShared still exist (REPLY-12, 2); the comment box doesn't call replyReaders (REPLY-11, 2); a relative who can post still gets 'Pick lots of photos' (1); a timeline card can't open its post (2); the phone keeps capture dates more than a day ahead (4). Existing 311 green, 1 skipped; typecheck clean; web smoke test 1/1. Found and fixed T5 (flaky ciphertext regex in bulk.test) on the way; after it, 3 full runs gave identical counts."
+}
