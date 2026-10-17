@@ -182,6 +182,9 @@ If the timeline is cut, the family shape takes 0010 and the timeline the next fr
 
 ## 9. Open questions for Chase (one word each)
 
+**Answered Oct 17, 3:26 am:** 2 Groups, 3 Parents (Chase). 1 left unanswered; going with the recommendation, Event, and Chase can change it.
+
+
 1. **Event replies: Event or Household?** Should everyone in an event read each other's comments on its photos? Recommendation: **Event.** They were in one room; it's what makes an event worth having, and it settles the Charleston case. The event screen will say so.
 2. **A relative's post goes to: Groups or Everyone?** (milestone 4) Recommendation: **Groups**, the groups they're in, with no picker; matches "only parents send to everyone". Their post screen names who will see it.
 3. **Who sends to Everyone and makes events: Parents or Owner?** Parents = you and Danielle; Owner = you only. Recommendation: **Parents.** Danielle posts too (milestone 2), and making her ask you defeats "Sharing in 3 taps".
