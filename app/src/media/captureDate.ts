@@ -3,7 +3,13 @@
 // are stripped by the pipeline as today (pipeline.ts).
 //
 // Order: EXIF DateTimeOriginal (+ OffsetTimeOriginal if present; without an offset it is the
-// phone's local time), then the asset's creation time, then null.
+// phone's local time), then the asset's creation time, then null. A date more than 1 day in the
+// future is wrong (a bad camera clock, an edited EXIF date) and is skipped, so a photo never lands
+// in "2027" on the timeline (grandparent-ux, Oct 17). The server also clamps taken_at to the share date.
+
+/** How far ahead a capture date may be and still count (time zones, slightly-off camera clocks). */
+export const FUTURE_SLACK_MS = 24 * 60 * 60 * 1000;
+const notFuture = (ms: number) => ms <= Date.now() + FUTURE_SLACK_MS;
 
 /** What the picker (exif: true) and the media library give us for one asset. */
 export interface AssetDateSource {
@@ -107,10 +113,10 @@ export function captureInfo(a: AssetDateSource, o: PhoneZone = {}): CaptureInfo 
   if (wall) {
     const off = parseOffset(exifString(a.exif, 'OffsetTimeOriginal'));
     const ms = off !== null ? wallUtc(wall) - off * 60_000 : zonedToUtc(wall, tz);
-    if (Number.isFinite(ms)) return { takenAt: new Date(ms).toISOString(), dayKey: dayOf(wall) };
+    if (Number.isFinite(ms) && notFuture(ms)) return { takenAt: new Date(ms).toISOString(), dayKey: dayOf(wall) };
   }
   const ct = a.creationTime;
-  if (typeof ct === 'number' && Number.isFinite(ct) && ct > 0) {
+  if (typeof ct === 'number' && Number.isFinite(ct) && ct > 0 && notFuture(ct)) {
     return { takenAt: new Date(ct).toISOString(), dayKey: dayOf(wallIn(ct, tz)) };
   }
   return null;
