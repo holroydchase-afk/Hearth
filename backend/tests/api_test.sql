@@ -378,14 +378,14 @@ select tests.throws_code(format('select public.mark_seen(%L)', :p_a_gp), 'mark_s
 -- SEE-6: removal from a circle denies immediately
 -- ======================================================================
 :as_alex
-delete from circle_members where circle_id = :c_a_gp and user_id = :gpa_riv;
+select public.unplace_person(:c_a_gp, :gpa_riv);   -- 0011: memberships change only through the setup RPCs (privacy item 3)
 :as_gpa_riv
 select tests.ok_sql(format($q$select not exists (select 1 from public.get_feed(%L) where post_id = %L)$q$, :space_a, :p_a_gp),
                     'BETA-SEE-6 removed from the circle: post gone from get_feed immediately');
 select tests.ok_sql(format('select not public.can_view_post(%L)', :p_a_gp), 'BETA-SEE-6 ...and can_view_post (the media signer) says no');
 select tests.throws_code(format('select public.toggle_heart(%L)', :p_a_gp), 'BETA-SEE-6 / REPLY-4 ...hearting it is P0002', 'P0002');
 select tests.throws_code(format($q$select public.add_comment(gen_random_uuid(), %L::uuid, 'still here?')$q$, :p_a_gp), 'BETA-SEE-6 / REPLY-4 ...commenting is P0002', 'P0002');
-:as_alex
+:as_admin   -- 0011: app users can't write circle_members; put Grandpa back as the seed had him
 insert into circle_members (circle_id, user_id) values (:c_a_gp, :gpa_riv);
 
 -- ======================================================================
@@ -417,7 +417,7 @@ select tests.throws_code(format('select public.delete_post(%L)', :nopost), 'dele
 -- create_invite returns {code, link}; S9 hashes unreadable (BETA-JOIN-4)
 -- ======================================================================
 :as_alex
-select tests.setv('inv1', format($q$select row_to_json(i)::text from public.create_invite(%L, 'viewer', array[%L]::uuid[], 'email', 'Uncle.Ray@example.com') i$q$, :space_a, :c_a_gp));
+select tests.setv('inv1', format($q$select row_to_json(i)::text from public.create_invite(%L, 'viewer', array[%L]::uuid[], 'email', 'Uncle.Ray@example.com', p_history => 'all') i$q$, :space_a, :c_a_gp));
 select tests.ok_sql($q$select (tests.v('inv1')::jsonb) ?& array['code','link']$q$, 'create_invite: returns code and link');
 select tests.ok_sql($q$select length(tests.v('inv1')::jsonb->>'code') = 10$q$, 'create_invite: the typed code stays short (10 chars)');
 select tests.ok_sql($q$select length(substring(tests.v('inv1')::jsonb->>'link' from '([0-9a-f]+)$')) * 4 >= 128$q$,
@@ -435,7 +435,7 @@ select tests.ok_sql($q$select code_hash <> encode(extensions.digest(tests.v('inv
 :as_alex
 select tests.throws_code('select * from private.secrets', 'BETA-JOIN-4 (S9) clients cannot read the pepper', '42501');
 :as_gma_riv
-select tests.throws_code(format($q$select * from public.create_invite(%L, 'viewer', array[%L]::uuid[])$q$, :space_a, :c_a_all),
+select tests.throws_code(format($q$select * from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_history => 'all')$q$, :space_a, :c_a_all),
                          'create_invite: viewer is 42501', '42501');
 
 -- ======================================================================
@@ -454,11 +454,11 @@ select tests.ok_sql($q$select (tests.rest($s$select public.invite_preview('NOPE2
 -- redeem_invite: BETA-JOIN-3 (every bad invite -> 22023, nothing leaks)
 -- ======================================================================
 :as_alex
-select tests.setv('inv_exp',  format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[])$q$, :space_a, :c_a_gp));
-select tests.setv('inv_rev',  format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[])$q$, :space_a, :c_a_gp));
-select tests.setv('inv_used', format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[])$q$, :space_a, :c_a_gp));
-select tests.setv('inv_ok',   format($q$select row_to_json(i)::text from public.create_invite(%L, 'viewer', array[%L]::uuid[], 'link') i$q$, :space_a, :c_a_gp));
-select tests.setv('inv_ok2',  format($q$select row_to_json(i)::text from public.create_invite(%L, 'viewer', array[%L]::uuid[], 'link') i$q$, :space_a, :c_a_gp));
+select tests.setv('inv_exp',  format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_history => 'all')$q$, :space_a, :c_a_gp));
+select tests.setv('inv_rev',  format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_history => 'all')$q$, :space_a, :c_a_gp));
+select tests.setv('inv_used', format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_history => 'all')$q$, :space_a, :c_a_gp));
+select tests.setv('inv_ok',   format($q$select row_to_json(i)::text from public.create_invite(%L, 'viewer', array[%L]::uuid[], 'link', p_history => 'all') i$q$, :space_a, :c_a_gp));
+select tests.setv('inv_ok2',  format($q$select row_to_json(i)::text from public.create_invite(%L, 'viewer', array[%L]::uuid[], 'link', p_history => 'all') i$q$, :space_a, :c_a_gp));
 :as_admin
 select tests.try($q$update invites set created_at = now() - interval '2 days', expires_at = now() - interval '1 day'
                      where code_hash = private.invite_hash(tests.v('inv_exp'))$q$);
@@ -547,8 +547,8 @@ select tests.throws_code($$select public.set_my_name('')$$, 'names: an empty nam
 select tests.throws_code($$select public.set_my_name('chase@example.com')$$, 'names: an email address is not a name (23514)', '23514');
 select tests.throws_code(format('select public.set_my_name(%L)', repeat('x', 41)), 'names: over 40 characters is 23514', '23514');
 select tests.throws_code($$select public.set_my_name('Chase <x@evil.com>')$$, 'names: angle brackets are refused (23514)', '23514');
-select tests.setv('inv_june', format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'Grandma June') i$q$, :space_a, :c_a_gp));
-select tests.throws_code(format($q$select * from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'june@example.com')$q$, :space_a, :c_a_gp),
+select tests.setv('inv_june', format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'Grandma June', p_history => 'all') i$q$, :space_a, :c_a_gp));
+select tests.throws_code(format($q$select * from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'june@example.com', p_history => 'all')$q$, :space_a, :c_a_gp),
                          'JOIN-1: an invite name that is an email is 23514', '23514');
 reset role; set role authenticated; select set_config('request.jwt.claim.sub', 'f0000000-0000-0000-0000-0000000000f1', false);
 select tests.ok_sql(format($q$select public.invite_preview(%L)->>'inviter_name' = 'Chase'$q$, tests.v('inv_june')),
@@ -557,7 +557,7 @@ select tests.lives(format('select public.redeem_invite(%L)', tests.v('inv_june')
 select tests.ok_sql($$select public.my_profile()->>'display_name' = 'Grandma June' and (public.my_profile()->>'name_set')::boolean$$,
                     'JOIN-1: joining gives her the name Chase typed; she types nothing');
 :as_alex
-select tests.setv('inv_earl', format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'Grandpa Earl') i$q$, :space_a, :c_a_gp));
+select tests.setv('inv_earl', format($q$select code from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'Grandpa Earl', p_history => 'all') i$q$, :space_a, :c_a_gp));
 reset role; set role authenticated; select set_config('request.jwt.claim.sub', 'f0000000-0000-0000-0000-0000000000f2', false);
 select tests.lives($$select public.set_my_name('Earl')$$, 'setup: Earl sets his own name first');
 select tests.lives(format('select public.redeem_invite(%L)', tests.v('inv_earl')), 'setup: Earl joins');
@@ -573,7 +573,7 @@ select tests.throws_code($$update public.profiles set display_name = E'Chase\r\n
 select tests.throws_code($$update public.profiles set display_name = 'A <b>' where id = 'a0000000-0000-0000-0000-00000000000a'$$,
                          'names: the table itself refuses brackets or line breaks in a name (23514)', '23514');
 :as_alex
-select tests.throws_code(format($q$select * from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'chase')$q$, :space_a, :c_a_gp),
+select tests.throws_code(format($q$select * from public.create_invite(%L, 'viewer', array[%L]::uuid[], p_name => 'chase', p_history => 'all')$q$, :space_a, :c_a_gp),
                          'names: an invite can''t reuse a family member''s name (no "Chase" impersonation, 23514)', '23514');
 
 -- ======================================================================

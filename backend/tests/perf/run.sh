@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Scale test for get_feed. Builds a ~1M-post fixture in a separate DB, then runs bench.sql.
+# Scale test for get_feed and get_timeline (0010). Builds a ~1M-post fixture in a separate DB, then runs bench.sql.
 # Usage: tests/perf/run.sh            (needs local Postgres 15+ superuser; ~2-4 min, ~2 GB disk)
 #        KEEP=1 tests/perf/run.sh     (reuse an existing fixture DB, only re-run the benchmark)
-# Fails (exit 1) if any scenario's p95 is 30 ms or more.
+# Fails (exit 1) if a get_feed p95 is 30 ms or more, or a get_timeline p95 is 5 ms or more.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 DB=${PERF_DB:-hearth_perf}
@@ -18,5 +18,6 @@ if [[ "${KEEP:-0}" != 1 ]]; then
   echo "fixture built in $(( $(date +%s) - start )) s"
 fi
 psql -d "$DB" -X -f tests/perf/bench.sql 2>&1 | tee "$OUT"
-awk -F'|' '/ first page| deep page/ && NF>=7 { gsub(/ /,"",$5); if ($5+0 >= 30) bad=1 } END { exit bad }' "$OUT" \
-  && echo "PERF OK: every p95 < 30 ms" || { echo "PERF FAIL: a p95 is >= 30 ms"; exit 1; }
+# get_feed p95 < 30 ms; get_timeline (0010) p95 < 5 ms
+awk -F'|' '/ first page| deep page/ && NF>=7 { gsub(/ /,"",$5); lim = ($1 ~ /timeline/) ? 5 : 30; if ($5+0 >= lim) bad=1 } END { exit bad }' "$OUT" \
+  && echo "PERF OK: every get_feed p95 < 30 ms, every get_timeline p95 < 5 ms" || { echo "PERF FAIL: a p95 is over its target"; exit 1; }

@@ -1,0 +1,9 @@
+{
+ "suite": "backend",
+ "at": "2026-10-17T05:30:00-04:00",
+ "label": "Bulk photos + timeline tests written first (red, no 0010 yet)",
+ "passed": 376,
+ "failed": 39,
+ "results": {},
+ "note": "Red on purpose. New: timeline_test.sql 30 of 31 red (missing get_timeline, get_timeline_years, private.visible_posts, index); notify_test.sql 9 BETA-BULK-6 batch-notice cases red (create_post has no p_batch_id). Existing suites unchanged and green: rls 116, api 169, notify 48, setup 5, reply 37. Timeline tests checked green against a throwaway reference. Deno notify wording tests (4) not run here: no deno binary."
+}

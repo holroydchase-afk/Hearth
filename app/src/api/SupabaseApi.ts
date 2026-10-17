@@ -10,6 +10,7 @@ import type {
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
   HeartState, InvitePreview, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
+  TimelineArgs, TimelinePost, TimelineYear,
 } from './types';
 import { toApiError } from '../errors/messages';
 
@@ -106,8 +107,19 @@ export class SupabaseApi implements HearthApi {
       p_space: a.space, p_before_ts: a.beforeTs ?? null, p_before_id: a.beforeId ?? null,
       p_limit: Math.max(1, Math.min(50, a.limit ?? 20)),
     }).then((d) => d ?? []);
+  getTimeline = (a: TimelineArgs) =>
+    this.rpc<TimelinePost[]>('get_timeline', {
+      p_space: a.space, p_before_at: a.beforeAt ?? null, p_before_id: a.beforeId ?? null,
+      p_limit: Math.max(1, Math.min(50, a.limit ?? 20)),
+    }).then((d) => d ?? []);
+  getTimelineYears = (space: string, tz?: string) =>
+    this.rpc<TimelineYear[]>('get_timeline_years', { p_space: space, p_tz: tz ?? 'UTC' }).then((d) => d ?? []);
+  // Batch args only when set, so an ordinary post still matches a pre-0010 create_post.
   createPost = (a: CreatePostArgs) =>
-    this.rpc<string>('create_post', { p_client_id: a.clientId, p_space: a.space, p_caption: a.caption, p_circle_ids: a.circleIds, p_taken_at: a.takenAt ?? null });
+    this.rpc<string>('create_post', {
+      p_client_id: a.clientId, p_space: a.space, p_caption: a.caption, p_circle_ids: a.circleIds, p_taken_at: a.takenAt ?? null,
+      ...(a.batchId != null || a.batchSize != null ? { p_batch_id: a.batchId ?? null, p_batch_size: a.batchSize ?? null } : {}),
+    });
   publishPost = (p: string) => this.rpc<void>('publish_post', { p_post: p });
   deletePost = (p: string) => this.rpc<void>('delete_post', { p_post: p });
   toggleHeart = (p: string) => this.rpc<unknown>('toggle_heart', { p_post: p }).then((d) => one<HeartState>(d));
@@ -117,7 +129,7 @@ export class SupabaseApi implements HearthApi {
   markSeen = (p: string) => this.rpc<void>('mark_seen', { p_post: p });
   registerPushToken = (token: string, platform: PushPlatform) =>
     this.rpc<void>('register_push_token', { p_token: token, p_platform: platform });
-  setGroupRepliesShared = (circle: string, on: boolean) => this.rpc<void>('set_group_replies_shared', { p_circle: circle, p_on: on });
+  replyReaders = (post: string) => this.rpc<string[] | null>('reply_readers', { p_post: post }).then((d) => d ?? null);
   setReplyAudience = (space: string, choice: ReplyAudience) => this.rpc<void>('set_reply_audience', { p_space: space, p_choice: choice });
   requestAccountDeletion = () => this.rpc<void>('request_account_deletion', {});
   myProfile = () => this.rpc<unknown>('my_profile', {}).then((d) => one<MyProfile>(d));
@@ -127,15 +139,29 @@ export class SupabaseApi implements HearthApi {
   setNotificationPrefs = (space: string, p: NotificationPrefs) =>
     this.rpc<void>('set_notification_prefs', { p_space: space, p_push: p.push, p_email_digest: p.emailDigest });
   redeemInvite = (code: string) => this.rpc<string>('redeem_invite', { p_code: code });
-  invitePreview = (code: string) => this.rpc<unknown>('invite_preview', { p_code: code }).then((d) => {
-    const r = one<InvitePreview>(d);
+  invitePreview = async (code: string): Promise<InvitePreview> => {
+    let res: { data: unknown; error: unknown };
+    try {
+      res = (await this.o.client.rpc('invite_preview', { p_code: code })) as { data: unknown; error: unknown };
+    } catch (e) {
+      throw toApiError(e);
+    }
+    if (res.error) {
+      const e = toApiError(res.error);
+      // UX-G7: a real invite that no longer places anyone names the inviter in details. Only here: details from
+      // any other RPC may hold server text and is never shown.
+      const d = (res.error as { details?: unknown }).details;
+      throw e.code === '22023' && typeof d === 'string' && d.trim() ? new ApiError('22023', e.message, d.trim()) : e;
+    }
+    const r = one<InvitePreview>(res.data);
     return { inviter_name: r.inviter_name, space_name: r.space_name };
-  });
+  };
   createInvite = async (a: CreateInviteArgs) => {
     const d = await this.rpc<unknown>('create_invite', {
       p_space: a.space, p_role: a.role, p_circle_ids: a.circleIds, p_channel: a.channel ?? 'link',
       p_target_email: a.targetEmail ?? null, p_target_phone: a.targetPhone ?? null,
       p_ttl: `${Math.min(30, a.ttlDays ?? 30)} days`, p_max_uses: a.maxUses ?? 1, p_name: a.name ?? null,
+      p_history: a.history ?? null,
     });
     const r = one<{ code: string; link?: string }>(d);
     return { code: r.code, link: r.link ?? JOIN_LINK_BASE + r.code };

@@ -111,6 +111,10 @@ manual = [
  ("M-10", "Removed person loses access on their own phone", "Any", "Remove someone from a circle while they have the post open.", "Gone for them within 10 minutes; they can't reopen it."),
  ("M-11", "Co-parent separation with real accounts", "Any", "Two real households. Co-parent opens every screen.", "They never see the other side's circles, relatives, or posts not shared with them."),
  ("M-12", "Email digest arrives and links work", "Email", "Set a tester to Daily email digest; post 2 photos.", "One email that evening; links open the right photos."),
+ ("M-13", "BETA-BULK-1/7 Bulk pick keeps the date taken (Expo Go)", "iPhone", "In Expo Go, bulk-pick 20 photos from 2 trips: one abroad, one Live Photo, one HEIC, one screenshot with no date. Send to a test group. Open By date.", "Each photo sits under the month and day it was taken (the abroad one on its local day); the screenshot sorts by today. If Expo Go returns no EXIF date, stop and report (plan stop rule)."),
+ ("M-14", "BETA-BULK-4/7 Bulk send survives no network, then network", "iPhone", "Bulk-pick 48 photos. Tap Send, then turn on airplane mode at about 'Sending 12 of 48'. Force-quit. Wait 1 minute, turn airplane mode off, reopen Hearth.", "It finishes on its own: 48 photos in the right posts, none twice. The other phone gets 1 notice. A downloaded copy has no location."),
+ ("M-15", "BETA-AUD-17 Share sheet: Everyone first, then Groups, then Events", "iPhone", "On Chase's iPhone, Chase and then Mom each share one photo to Everyone and one to the Charleston trip. Then ask each: who sees this one?", "Everyone is first and takes 1 tap; Groups then Events follow, each as name plus 'N people'; both answer 'who sees this?' correctly from the screen alone (2 of 2)."),
+ ("M-16", "BETA-AUD-22 Make an event unaided (milestone 4)", "iPhone", "Ask Chase to make 'Thanksgiving 2026' by ticking groups and households. Time it. Don't help.", "Under 60 seconds; it shows under Events in the share sheet as name plus 'N people'; the screen says everyone in it can read each other's comments on its photos."),
 ]
 write("suites", "manual", {"name": "Manual tests (people + real phones)", "kind": "manual",
       "how": "Run on a real phone, then log the result on this page.", "order": 4,
@@ -140,6 +144,9 @@ tickets = [
  ("E8", "enhancement", P, "Medium", "fixed", "Removing someone from a circle says how many posts they lost", ["VIS-06"]),
  ("T1", "test fix", P, "Low", "fixed", "Test selector also matched the Share tab (shared 'post' class). Renamed the tab's class in the app and tightened the test.", ["VIS-01"]),
  ("T2", "test fix", P, "Low", "fixed", "Blocked web fonts were counted as script errors in tests", ["A11Y-04"]),
+ ("T3", "test fix", "app", "Low", "fixed", "pick.test used a dynamic import, which Jest can't run without VM modules; switched to a static import", []),
+ ("T4", "test fix", "app", "Medium", "fixed", "Time-zone tests set process.env.TZ, which Jest's sandbox ignores, so no-offset dates were read as UTC. The phone's zone is now an explicit option (default from Intl)", []),
+ ("T5", "test fix", "app", "Medium", "fixed", "Flaky: bulk.test 'Send makes 5 posts' checked the whole fake backend for /GPS|Apple/ including random base64 ciphertext, which sometimes spells 'GPS' (failed 3 of 4 full runs, 1 of 5 alone). Now checks everything except the encrypted blobs; EXIF in the bytes is checked before encryption by the pipeline tests", []),
  # backend security review (agent, 2026-10-15)
  ("S1", "bug", B, "High", "fixed", "Someone removed from the family space kept access to their own old posts: new comments, photos and keys", []),
  ("S2", "bug", B, "Medium", "fixed", "A view-only member could publish a draft after posting was turned off for viewers", []),
@@ -198,6 +205,18 @@ run("r5", suite="edge", at="2026-10-15T00:55:00-04:00", label="Day 1 baseline", 
 run("r6", suite="edge", at="2026-10-15T08:05:00-04:00", label="After type fixes, type-checking on",
     passed=sum(edge_res.values()), failed=len(edge_res) - sum(edge_res.values()), results={k: ("pass" if v else "fail") for k, v in edge_res.items()})
 
+run("r7", suite="backend", at="2026-10-17T05:30:00-04:00", label="Bulk photos + timeline tests written first (red, no 0010 yet)",
+    passed=376, failed=39, results={},
+    note="Red on purpose. New: timeline_test.sql 30 of 31 red (missing get_timeline, get_timeline_years, private.visible_posts, index); notify_test.sql 9 BETA-BULK-6 batch-notice cases red (create_post has no p_batch_id). Existing suites unchanged and green: rls 116, api 169, notify 48, setup 5, reply 37. Timeline tests checked green against a throwaway reference. Deno notify wording tests (4) not run here: no deno binary.")
+run("r8", suite="app", at="2026-10-17T05:30:00-04:00", label="Bulk photos + timeline app tests written first (red)",
+    passed=247, failed=35, results={},
+    note="Red on purpose: not-built stubs for takenAtFromAsset, planBatch, pickBulk, enqueueBatch/batchProgress/batchLabel and getTimeline/getTimelineYears; FakeApi accepts batchId without batchSize. Existing 245 still green; typecheck clean. 2 test bugs found and fixed before this run: T3 (dynamic import in pick.test) and T4 (process.env.TZ ignored by Jest's sandbox; the phone zone is now an explicit option).")
+run("r9", suite="backend", at="2026-10-17T07:30:00-04:00", label="Groups, households, events, roles, share history: tests written first (red, no 0011 yet)",
+    passed=465, failed=139, results={},
+    note="Red on purpose. New: groups_test.sql 119 of 137 red (no circles.kind, circle_links, circle_people, can, can_send_to, create_level, link_level, place_person, reply_readers, invites.history, sees_from; the 0009 switch still exists). The 18 passing are refusal or 'sees nothing' guards that pass trivially until the fixture can be built. aud16 (BETA-AUD-16 snapshot before/after 0011): 4 of 11 red only because 0011 isn't there; the 7 diff checks pass on a no-op, which shows the diff itself raises no false alarm. setup_v2_test.sh 12 of 14 red (no family-setup-v2.sql). timeline_future_test.sql 4 of 6 red (taken_at after published_at still sorts and counts by taken_at). Existing suites unchanged and green: rls 120, api 169, notify 60, setup 5, reply 44, timeline 38. Same counts on 3 runs. Deno tests not run: no deno binary here.")
+run("r10", suite="app", at="2026-10-17T07:30:00-04:00", label="Groups + bulk/timeline follow-ups: app tests written first (red)",
+    passed=313, failed=15, results={},
+    note="Red on purpose: invite form has no share-history choice (AUD-19, 4); the reply switch and setGroupRepliesShared still exist (REPLY-12, 2); the comment box doesn't call replyReaders (REPLY-11, 2); a relative who can post still gets 'Pick lots of photos' (1); a timeline card can't open its post (2); the phone keeps capture dates more than a day ahead (4). Existing 311 green, 1 skipped; typecheck clean; web smoke test 1/1. Found and fixed T5 (flaky ciphertext regex in bulk.test) on the way; after it, 3 full runs gave identical counts.")
 print("proto", len(proto_cases), "red", sum(v == "fail" for v in red_map.values()), "| sql", len(sql_cases), "| edge", len(edge_cases),
       "| tickets", len(tickets), "| sec-linked", {t[0]: len(t[6]) for t in tickets if t[0].startswith("S")})
 print("areas", sorted({c['area'] for c in sql_cases}))

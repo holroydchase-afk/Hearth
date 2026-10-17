@@ -349,6 +349,134 @@ select tests.throws_code(format($$select public.set_notification_prefs(%L, true,
 select tests.throws_code(format($$select public.set_notification_prefs(%L, true, 'off')$$, :space_b), 'set_notification_prefs: a space you are not in is P0002', 'P0002');
 
 -- ======================================================================
+-- BETA-BULK-6: a bulk import notifies once per batch, not once per post (migration 0010)
+-- ======================================================================
+:as_admin
+delete from public.notification_outbox;
+-- Fixture: both grandparents on push (gma_riv's phone was removed by the "no phone registered" case above).
+insert into public.push_tokens (user_id, expo_token, platform) values (:gma_riv, 'ExponentPushToken[gma_riv]', 'android')
+  on conflict (expo_token) do update set user_id = excluded.user_id;
+-- One post of a batch by Alex to the Dad's-side grandparents: create_post with p_batch_id / p_batch_size,
+-- ready photos, published. Dynamic SQL, so a missing parameter is a failed test, not an abort.
+create function tests.mkbatchpost(p_key text, p_batch uuid, p_size int, p_photos int, p_taken timestamptz) returns void
+language plpgsql as $$
+declare v_post uuid;
+begin
+  perform set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-00000000000a', true);
+  execute 'select public.create_post(p_client_id => gen_random_uuid(), p_space => $1, p_caption => null,
+                                     p_circle_ids => $2, p_taken_at => $3, p_batch_id => $4, p_batch_size => $5)'
+    into v_post using '22222222-0000-0000-0000-00000000000a'::uuid, array['33333333-0000-0000-0000-0000000000a1'::uuid],
+                      p_taken, p_batch, p_size;
+  for i in 0 .. p_photos - 1 loop
+    insert into public.media_items (post_id, space_id, uploader_id, position, kind, mime_type, display_key, thumb_key,
+                                    width, height, byte_size, thumb_byte_size, exif_stripped)
+    values (v_post, '22222222-0000-0000-0000-00000000000a', 'a0000000-0000-0000-0000-00000000000a', i, 'photo', 'image/jpeg',
+            'secret-key-' || i, 'secret-thumb-' || i, 100, 100, 1000, 100, true);
+  end loop;
+  update public.media_items set upload_status = 'ready' where post_id = v_post;
+  update public.posts set status = 'published' where id = v_post;
+  insert into tests.vars values (p_key, v_post::text) on conflict (k) do update set v = excluded.v;
+exception when others then
+  raise warning 'mkbatchpost failed: % %', sqlstate, sqlerrm;
+end $$;
+:as_alex
+select tests.throws_code(format($$select public.create_post(gen_random_uuid(), %L::uuid, null, array[%L]::uuid[], null, '{}'::uuid[],
+                                                           p_batch_id => gen_random_uuid())$$, :space_a, :c_a_gp),
+                         'BETA-BULK-6: create_post with p_batch_id but no p_batch_size is 23514 (both or neither)', '23514');
+select tests.throws_code(format($$select public.create_post(gen_random_uuid(), %L::uuid, null, array[%L]::uuid[], null, '{}'::uuid[],
+                                                           p_batch_id => gen_random_uuid(), p_batch_size => 101)$$, :space_a, :c_a_gp),
+                         'BETA-BULK-6: a batch of more than 100 posts is 23514', '23514');
+:as_admin
+-- 48 photos taken Jul 2024, as 5 posts (10, 10, 10, 10, 8). Only 2 of 5 published so far.
+select tests.setv('batch', 'select gen_random_uuid()::text');
+select tests.mkbatchpost('b1', tests.v('batch')::uuid, 5, 10, '2024-07-04 14:00Z');
+select tests.mkbatchpost('b2', tests.v('batch')::uuid, 5, 10, '2024-07-04 18:00Z');
+select tests.setv('tb', format($$select %L::timestamptz + interval '20 days'$$, tests.v('t0')));
+select tests.queued_at(tests.v('tb')::timestamptz);
+select tests.ok_sql(format($$select tests.v('b1') is not null and tests.v('b2') is not null
+                                    and exists (select 1 from public.notification_outbox where recipient_id = %L and sent_at is null)
+                                    and tests.claim(%L::timestamptz + interval '1 minute') >= 0 and tests.batch_count(%L) = 0$$,
+                           :gma_riv, tests.v('tb'), :gma_riv),
+                    'BETA-BULK-6: mid-batch (2 of 5 posts sent) nobody is notified yet');
+select tests.mkbatchpost('b3', tests.v('batch')::uuid, 5, 10, '2024-07-05 15:00Z');
+select tests.mkbatchpost('b4', tests.v('batch')::uuid, 5, 10, '2024-07-06 15:00Z');
+select tests.mkbatchpost('b5', tests.v('batch')::uuid, 5, 8,  '2024-07-06 19:00Z');
+select tests.queued_at(tests.v('tb')::timestamptz + interval '2 minutes');
+select tests.setv('n', format($$select tests.claim(%L::timestamptz + interval '3 minutes')$$, tests.v('tb')));
+select tests.ok_sql(format($$select tests.batch_count(%L) = 1 and tests.batch_count(%L) = 1$$, :gma_riv, :gpa_riv),
+                    'BETA-BULK-6: when the 5th post is sent, each grandparent gets exactly 1 notice for the whole batch');
+select tests.ok_sql(format($$select post_count = 5 and photo_count = 48 and is_batch and actor_names = array['Alex']
+                                    and taken_from = '2024-07-04 14:00Z' and taken_to = '2024-07-06 19:00Z'
+                             from tests.batches where recipient_id = %L$$, :gma_riv),
+                    'BETA-BULK-6: the notice says 5 posts, 48 photos, taken Jul 4 to Jul 6 2024, from Alex ("Alex added 48 photos from Jul 2024")');
+select tests.ok_sql($$select bool_and(b::text not like '%secret-%' and b::text not like '%http%') from tests.batches b$$,
+                    'BETA-BULK-6: the batch notice carries no media key or URL');
+select tests.ok_sql(format($$select tests.v('b5') is not null and tests.claim(%L::timestamptz + interval '20 minutes') = 0$$, tests.v('tb')),
+                    'BETA-BULK-6: no second notice for the same batch');
+-- a batch the app never finished (killed, never reopened) still tells people, once, after 30 minutes
+:as_admin
+delete from public.notification_outbox;
+select tests.setv('batch2', 'select gen_random_uuid()::text');
+select tests.mkbatchpost('k1', tests.v('batch2')::uuid, 3, 4, '2024-08-01 15:00Z');
+select tests.setv('tk', format($$select %L::timestamptz + interval '25 days'$$, tests.v('t0')));
+select tests.queued_at(tests.v('tk')::timestamptz);
+select tests.ok_sql(format($$select tests.v('k1') is not null
+                                    and exists (select 1 from public.notification_outbox where recipient_id = %L and sent_at is null)
+                                    and tests.claim(%L::timestamptz + interval '20 minutes') >= 0 and tests.batch_count(%L) = 0$$,
+                           :gma_riv, tests.v('tk'), :gma_riv),
+                    'BETA-BULK-6: an unfinished batch waits (1 of 3 posts sent, 20 minutes in)');
+-- claim in its own statement: a subquery on tests.batches in the same statement would read the pre-claim snapshot
+select tests.setv('n', format($$select tests.claim(%L::timestamptz + interval '31 minutes')$$, tests.v('tk')));
+select tests.ok_sql(format($$select tests.batch_count(%L) = 1
+                                    and (select photo_count from tests.batches where recipient_id = %L) = 4$$,
+                           :gma_riv, :gma_riv),
+                    'BETA-BULK-6: ...and goes out as 1 notice (4 photos) 30 minutes after it was queued');
+
+-- privacy-security review (Oct 17): one batch, two audiences. Each person's notice counts and dates
+-- only the posts they may see; nothing about the rest of the batch (threat 1, A1).
+:as_admin
+delete from public.notification_outbox;
+insert into public.push_tokens (user_id, expo_token, platform) values (:gma_chen, 'ExponentPushToken[gma_chen]', 'ios')
+  on conflict (expo_token) do update set user_id = excluded.user_id;
+insert into public.notification_prefs (user_id, space_id, push, email_digest) values (:gma_chen, :space_a, true, 'off')
+  on conflict (user_id, space_id) do update set push = true, email_digest = 'off';
+create function tests.mkbatchpost_to(p_key text, p_circle uuid, p_batch uuid, p_size int, p_photos int, p_taken timestamptz)
+returns void language plpgsql as $$
+declare v_post uuid;
+begin
+  perform set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-00000000000a', true);
+  execute 'select public.create_post(p_client_id => gen_random_uuid(), p_space => $1, p_caption => ''secret caption'',
+                                     p_circle_ids => $2, p_taken_at => $3, p_batch_id => $4, p_batch_size => $5)'
+    into v_post using '22222222-0000-0000-0000-00000000000a'::uuid, array[p_circle], p_taken, p_batch, p_size;
+  for i in 0 .. p_photos - 1 loop
+    insert into public.media_items (post_id, space_id, uploader_id, position, kind, mime_type, display_key, thumb_key,
+                                    width, height, byte_size, thumb_byte_size, exif_stripped)
+    values (v_post, '22222222-0000-0000-0000-00000000000a', 'a0000000-0000-0000-0000-00000000000a', i, 'photo', 'image/jpeg',
+            'secret-key-' || i, 'secret-thumb-' || i, 100, 100, 1000, 100, true);
+  end loop;
+  update public.media_items set upload_status = 'ready' where post_id = v_post;
+  update public.posts set status = 'published' where id = v_post;
+  insert into tests.vars values (p_key, v_post::text) on conflict (k) do update set v = excluded.v;
+exception when others then
+  raise warning 'mkbatchpost_to failed: % %', sqlstate, sqlerrm;
+end $$;
+select tests.setv('batch3', 'select gen_random_uuid()::text');
+select tests.mkbatchpost_to('m1', :c_a_gp,  tests.v('batch3')::uuid, 2, 3, '2022-01-10 15:00Z');
+select tests.mkbatchpost_to('m2', :c_a_all, tests.v('batch3')::uuid, 2, 2, '2023-03-10 15:00Z');
+select tests.setv('tm', format($$select %L::timestamptz + interval '30 days'$$, tests.v('t0')));
+select tests.queued_at(tests.v('tm')::timestamptz);
+select tests.setv('n', format($$select tests.claim(%L::timestamptz + interval '1 minute')$$, tests.v('tm')));
+select tests.ok_sql(format($$select photo_count = 5 and post_count = 2 and taken_from = '2022-01-10 15:00Z' and taken_to = '2023-03-10 15:00Z'
+                             from tests.batches where recipient_id = %L$$, :gma_riv),
+                    'BETA-BULK-6 allowed: Grandma Rivera (both groups) is told about all 5 photos, Jan 2022 to Mar 2023');
+select tests.ok_sql(format($$select photo_count = 2 and post_count = 1 and taken_from = '2023-03-10 15:00Z' and taken_to = '2023-03-10 15:00Z'
+                                    and post_ids = array[%L]::uuid[]
+                             from tests.batches where recipient_id = %L$$, tests.v('m2'), :gma_chen),
+                    'BETA-BULK-6 excluded: Grandma Chen (Everyone only) is told about her 2 photos from Mar 2023, nothing about the grandparents-only post');
+select tests.ok_sql($$select count(*) >= 2 and bool_and(b::text not like '%secret%' and b::text not like '%http%') from tests.batches b$$,
+                    'BETA-BULK-6: the mixed batch''s notices carry no caption, media key or URL');
+
+-- ======================================================================
 -- Summary
 -- ======================================================================
 reset role;

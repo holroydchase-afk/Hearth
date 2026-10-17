@@ -70,7 +70,7 @@ describe('Photos screen', () => {
     fireEvent.changeText(box, 'So cute!');
     fireEvent.press(screen.getByRole('button', { name: 'Send' }));
     expect(await screen.findByText(/So cute!/)).toBeTruthy();
-    expect(await screen.findByText("Sent. Only the kids' parents can read it.")).toBeTruthy();
+    expect(await screen.findByText(/^Sent\. .+ will read it\.$/)).toBeTruthy(); // REPLY-11: names, not a scope
     await waitFor(() => expect(Object.values(be.state.comments)).toHaveLength(1));
   });
 
@@ -78,21 +78,22 @@ describe('Photos screen', () => {
     const be = await twoPosts();
     await renderApp(<PhotosScreen />, { be, user: 'jo' });
     await screen.findAllByLabelText('Write something back to Chase');
-    expect(screen.getAllByText("Only the kids' parents can read this.").length).toBeGreaterThan(0); // AUD-8 default
+    expect((await screen.findAllByText('Alex and Chase will read this.')).length).toBeGreaterThan(0); // AUD-8 default: the parents, by name (REPLY-11)
     expect(screen.queryByText(/everyone/i)).toBeNull();
     const box = screen.getAllByLabelText('Write something back to Chase')[0]!;
     fireEvent.changeText(box, 'Love you all');
     fireEvent.press(screen.getAllByRole('button', { name: 'Send' })[0]!);
-    expect(await screen.findByText("Sent. Only the kids' parents can read it.")).toBeTruthy();
+    expect(await screen.findByText('Sent. Alex and Chase will read it.')).toBeTruthy();
     expect(screen.queryByText(/Chase will see it/)).toBeNull();
   });
 
-  it('BETA-AUD-9: in a group whose members see each other\'s replies, the box says so', async () => {
+  it('BETA-REPLY-11: without a reader list (older server) the box falls back to the scope words', async () => {
     const be = await twoPosts();
-    be.state.circles[FIXTURE.circles.dadSide.id]!.replies_shared = true;
-    await renderApp(<PhotosScreen />, { be, user: 'jo' });
+    const api = be.clientFor(null, { trackAppSession: true }) as unknown as Record<string, unknown>;
+    api.replyReaders = async () => null;
+    await renderApp(<PhotosScreen />, { be, user: 'jo', deps: { api: api as never } });
     await screen.findAllByLabelText('Write something back to Chase');
-    expect(screen.getAllByText("The kids' parents and your part of the family can read this.").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Only the kids' parents can read this.").length).toBeGreaterThan(0);
   });
 
   it('BETA-AUD-10: when the family opens replies to everyone, the box names who', async () => {
@@ -100,7 +101,9 @@ describe('Photos screen', () => {
     be.state.spaces[FIXTURE.space.id]!.reply_audience = 'everyone';
     await renderApp(<PhotosScreen />, { be, user: 'jo' });
     await screen.findAllByLabelText('Write something back to Chase');
-    expect(screen.getAllByText('Chase and the family Chase shared this photo with can read this.').length).toBeGreaterThan(0);
+    const words = (await screen.findAllByText(/ will read this\.$/))[0]!.props.children as string;
+    expect(words).toMatch(/Alex/);
+    expect(words).toMatch(/Earl/); // a relative in the group now reads it too
   });
 
   it('B6: a half-typed comment survives incoming hearts', async () => {

@@ -4,15 +4,26 @@ import { Image, View } from 'react-native';
 import type { Circle } from '../api/HearthApi';
 import { messageFor } from '../errors/messages';
 import { loadLastAudience, saveLastAudience } from '../share/audienceMemory';
+import { planBatch, type BatchPlan } from '../share/bulk';
 import { useApp } from '../state/AppContext';
 import { useNav } from '../state/nav';
 import { Button, Card, Choice, Field, Loading, Notice, Screen, Txt } from '../ui/kit';
 import { people, photos } from '../ui/format';
 import type { QueueItem } from '../upload/queue';
 import { AppGate } from './AppGate';
+import { BatchReview } from './BatchReview';
 import { QueueStatus } from './QueueStatus';
 
 const MAX = 10;
+
+/** BETA-AUD-17 (SPEC-GROUPS): Everyone first (1 tap), then groups and households, then events. */
+const KIND_ORDER: Record<string, number> = { everyone: 0, group: 1, household: 2, event: 3 };
+export function shareOrder(list: Circle[]): Circle[] {
+  return list
+    .map((x, i) => ({ x, i }))
+    .sort((a, b) => (KIND_ORDER[a.x.kind ?? 'group'] ?? 1) - (KIND_ORDER[b.x.kind ?? 'group'] ?? 1) || a.i - b.i)
+    .map((a) => a.x);
+}
 
 export function ShareScreen() {
   const app = useApp();
@@ -23,16 +34,21 @@ export function ShareScreen() {
   const [caption, setCaption] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // BETA-BULK-3: a bulk pick waiting on the review screen (dates only; EXIF already dropped).
+  const [plan, setPlan] = useState<BatchPlan | null>(null);
   const userId = app.session?.userId;
   const spaceId = app.space?.space_id;
   const canPost = !!app.space?.can_post;
+  // Oct 17 decision: "Pick lots of photos" is for parents only, never a relative allowed to post.
+  const isParent = app.space?.role === 'owner' || app.space?.role === 'adult';
 
   useEffect(() => {
     if (!spaceId || !userId || !canPost) return;
     let alive = true;
     (async () => {
       try {
-        const list = await app.deps.api.myCircles(spaceId);
+        // BETA-AUD-21 (grandparent-ux UX-G3): only parents send to Everyone, so a relative is never offered it.
+        const list = shareOrder(await app.deps.api.myCircles(spaceId)).filter((x) => isParent || x.kind !== 'everyone');
         const last = await loadLastAudience(app.deps.kv, userId, list.map((x) => x.circle_id));
         if (!alive) return;
         setCircles(list);
@@ -54,6 +70,32 @@ export function ShareScreen() {
     else setItems((cur) => [...cur, ...r.items].slice(0, MAX));
   };
 
+  const pickMany = async () => {
+    if (!app.deps.pickBulk) return;
+    setNotice(null);
+    const r = await app.deps.pickBulk();
+    if ('denied' in r) setNotice('Hearth needs your OK to see your photos. Tap "Allow" when your phone asks.');
+    else if (r.assets.length) setPlan(planBatch(r.assets));
+  };
+
+  const sendBatch = async () => {
+    if (!plan || !plan.posts.length || !chosen.length || !app.queue || !userId) return;
+    setBusy(true);
+    try {
+      await saveLastAudience(app.deps.kv, userId, chosen);
+      await app.queue.enqueueBatch({
+        space: app.space!.space_id, circleIds: chosen,
+        posts: plan.posts.map((p) => ({ takenAt: p.takenAt, items: p.items })),
+      });
+      setPlan(null);
+      nav.goPhotos();
+    } catch (e) {
+      setNotice(messageFor(e, { inviter: app.helper, action: 'post' }));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const toggle = (id: string) => setChosen((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
 
   const post = async () => {
@@ -71,6 +113,13 @@ export function ShareScreen() {
       setBusy(false);
     }
   };
+
+  if (plan) {
+    return (
+      <BatchReview plan={plan} circles={circles} chosen={chosen} onToggle={toggle} busy={busy}
+        onSend={() => void sendBatch()} onCancel={() => setPlan(null)} />
+    );
+  }
 
   const chosenCircles = (circles ?? []).filter((x) => chosen.includes(x.circle_id));
   const ready = items.length > 0 && chosen.length > 0;
@@ -99,9 +148,18 @@ export function ShareScreen() {
       <Card>
         <Txt variant="title" role="header">Who can see it</Txt>
         {circles === null ? <Loading words="Loading your groups…" /> : null}
-        {(circles ?? []).map((g) => (
+        {(circles ?? []).map((g, i, all) => (
+          <React.Fragment key={g.circle_id}>
+          {g.kind !== 'everyone' && g.kind !== 'event' && (i === 0 || all[i - 1]?.kind === 'everyone') ? (
+            <Txt variant="strong" role="header">Groups</Txt>
+          ) : null}
+          {g.kind === 'event' && all[i - 1]?.kind !== 'event' ? (
+            <>
+              <Txt variant="strong" role="header">Events</Txt>
+              <Txt variant="muted">Everyone in an event reads each other's comments on its photos.</Txt>
+            </>
+          ) : null}
           <Choice
-            key={g.circle_id}
             kind="checkbox"
             label={`${g.name}, ${people(g.member_count)}`}
             title={`${g.name} · ${people(g.member_count)}`}
@@ -109,13 +167,24 @@ export function ShareScreen() {
             checked={chosen.includes(g.circle_id)}
             onPress={() => toggle(g.circle_id)}
           />
+          </React.Fragment>
         ))}
         {chosen.length === 0 ? <Txt variant="strong">Pick who should see it.</Txt> : (
-          <Txt>{`Only ${chosenCircles.map((g) => g.name).join(' and ')} will see these.`}</Txt>
+          <Txt>{chosenCircles.some((g) => g.kind === 'everyone')
+            ? 'Everyone in the family will see these.'
+            : `Only ${chosenCircles.map((g) => g.name).join(' and ')} will see these.`}</Txt>
         )}
       </Card>
 
       <Button label="Post" onPress={() => void post()} disabled={!ready} busy={busy} />
+
+      {app.deps.pickBulk && isParent ? (
+        <Card>
+          <Txt variant="title" role="header">Lots of photos?</Txt>
+          <Txt>Pick up to 100. Hearth puts them in order by the day they were taken.</Txt>
+          <Button label="Pick up to 100 photos at once" text="Pick lots of photos" variant="secondary" onPress={() => void pickMany()} />
+        </Card>
+      ) : null}
     </Screen>
   );
 }
