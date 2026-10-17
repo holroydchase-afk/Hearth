@@ -1,5 +1,15 @@
 # Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
+## Oct 17, evening: milestone 1 runs in Expo Go (Chase's call)
+1. **Decided:** milestone 1 runs fully in Expo Go. NOTIFY-3 (tap a push and the post opens) moves to milestone 2, so the $99 Apple account is off the M1 path; M1 notices come by email. Updated BETA-SPEC (criterion map, M1 and M2 gates), MILESTONE-1 and REMAINING.
+2. **Focus:** milestone 1 only. Nothing new gets built until Chase has signed in and run the demo; the demo shows what to fix.
+3. **Waiting on Chase, in order:**
+   - [ ] Paste the two code email templates in the Supabase dashboard, then sign in once (Claude then runs `family-setup.sh` and sends account B's code).
+   - [ ] Add the Backblaze B2 keys and `MEDIA_KEK` as Hearth environment secrets (photos), plus Resend (email notices). Never in chat.
+   - [ ] Run the 2-day demo in Expo Go, with account B on the web build.
+   - [ ] Later: Mom's email for her poster invite (M2), the "Seen by" call (before M4), the phone survey (Oct 20).
+4. **Stale items below, now closed:** PR #9 merged; 0010 and 0011 deployed to an empty database (Oct 17), so the v2 dry run, the apply step and the re-seed family list aren't needed.
+
 ## Oct 17, afternoon: family setup in one command, no database password (SETUP-API)
 1. **Built, test-first (`backend/tests/setup_api_test.sh`, 34 checks; in `tests/run.sh` and on the real stack in CI):** `bash backend/scripts/family-setup.sh --chase-email <yours> --space-name 'Our kids' [--mom-email <hers>]` sets up your family in the groups shape through the Management API, like `deploy.sh`. It needs only `SUPABASE_ACCESS_TOKEN` (no `SUPABASE_DB_URL`, no `psql`) and runs as you through the app's RPCs and RLS. It makes Everyone, both sides, each grandparent's house, a Test house for account B, the two events, and prints the invite codes. It stops once anyone else has joined (then use `family-setup-v2.sql`'s dry run).
 2. **Why:** hosted now runs 0001–0011 and is empty, so the v1 `family-setup.sql` then v2 would hand account B an invite to a group v2 retires. MILESTONE-1 step 5 and the demo rows now use this script and the Test house.
@@ -25,15 +35,15 @@
 1. **Live on `jqvgjfbhzbvfdhtnvgzr`:** migrations 0001–0009 (the Management API accepts begin/commit, so the migration-transaction question is settled), both edge functions, `NOTIFY_CRON_SECRET`, and the `hearth-notify` and `hearth-purge-client-errors` cron jobs.
 2. **Failed, step 5/5 (sign-in email: 6-digit code):** `PATCH config/auth` returned 403 "Missing required permission(s): project_admin_write". The access token is scoped and can't change project settings. Until this is fixed, sign-in emails send Supabase's default link, not a code.
 3. **Action items for Chase:**
-   - [ ] **Merge PR #9** (bulk upload + timeline, family shape, review fixes).
-   - [ ] **DON'T run `deploy.sh` from main until the v2 dry run is reviewed.** Deploying applies 0010 and 0011; 0011 changes who reads replies and needs the v2 re-seed right after.
-   - [ ] **v2 dry run, on a copy of the database** (a restored backup or a Supabase branch with 0010 and 0011 applied, never the live one): `psql "$SUPABASE_DB_URL" -v chase_email=you@example.com -v space_name='Our kids' -v sister_name='<her name>' -f backend/scripts/family-setup-v2.sql`. Read each person's "gains N posts, loses M posts" line with staff-pm (expected: Mom gains 3 posts as a Parent, since Parents see every post). It needs `SUPABASE_DB_URL` (the database connection string from the Supabase dashboard; `SUPABASE_ACCESS_TOKEN` alone isn't enough, since the script runs through `psql`), `psql` installed, and your account signed in once in the app.
-   - [ ] **Then apply:** take a backup, run `deploy.sh` (applies 0010 and 0011), and right after run the same command on the live database with `-v apply=yes` added.
+   - [x] **Merge PR #9** (bulk upload + timeline, family shape, review fixes).
+   - [x] *(Moot: deployed Oct 17 to an empty database.)* **DON'T run `deploy.sh` from main until the v2 dry run is reviewed.** Deploying applies 0010 and 0011; 0011 changes who reads replies and needs the v2 re-seed right after.
+   - [x] *(Moot, empty database.)* **v2 dry run, on a copy of the database** (a restored backup or a Supabase branch with 0010 and 0011 applied, never the live one): `psql "$SUPABASE_DB_URL" -v chase_email=you@example.com -v space_name='Our kids' -v sister_name='<her name>' -f backend/scripts/family-setup-v2.sql`. Read each person's "gains N posts, loses M posts" line with staff-pm (expected: Mom gains 3 posts as a Parent, since Parents see every post). It needs `SUPABASE_DB_URL` (the database connection string from the Supabase dashboard; `SUPABASE_ACCESS_TOKEN` alone isn't enough, since the script runs through `psql`), `psql` installed, and your account signed in once in the app.
+   - [x] *(Done: 0010 and 0011 deployed Oct 17.)* **Then apply:** take a backup, run `deploy.sh` (applies 0010 and 0011), and right after run the same command on the live database with `-v apply=yes` added.
    - [ ] **Sign-in code email.** Either paste the templates in the Supabase dashboard (Authentication → email templates: Magic Link and Confirm signup, subject `Your Hearth code: {{ .Token }}`, bodies from `backend/supabase/templates/`; code length 6, expiry 3600 s), or make a token with project admin write, replace the `SUPABASE_ACCESS_TOKEN` secret, and rerun `deploy.sh` (applied steps are skipped).
    - [ ] **Function keys.** Fill the values in `backend/supabase/functions/.env.example` (Backblaze B2, `MEDIA_KEK`, `ALLOWED_ORIGINS`, Resend, `APP_LINK_BASE`, Expo). Add them as Hearth environment secrets so a session can write `.env` and rerun the deploy. Until then, photos (sign-media) and notifications (notify) are deployed but can't work.
    - [ ] **Cleanup after the keys are in:** delete the placeholder Supabase secret `HEARTH_KEYS_PENDING`. It was set only because `supabase secrets set --env-file` rejects an empty file.
    - [x] **Groups spec, 3 one-word answers** (Oct 17, 3:26 am: Groups, Parents; event replies default to Event) (`docs/product/SPEC-GROUPS.md` §9): event replies Event or Household (rec. Event); a relative's post goes to Groups or Everyone (rec. Groups); who sends to Everyone and makes events, Parents or Owner (rec. Parents).
-   - [ ] **Family list for the re-seed** (spec §2): Mom's sister's name; put her in both Memaw's and Pawpaw and Granny's houses (rec. yes); who was at Gigi's birthday; any sibling of yours to place in both your parents' houses.
+   - [x] *(Moot: `family-setup.sh` makes a fresh family.)* **Family list for the re-seed** (spec §2): Mom's sister's name; put her in both Memaw's and Pawpaw and Granny's houses (rec. yes); who was at Gigi's birthday; any sibling of yours to place in both your parents' houses.
 
 ## Oct 17: deploy review fixes (DEPLOY-2, DEPLOY-3)
 1. **Built, test-first (`backend/tests/deploy/deploy_test.sh`, now 20 checks):** function deploys pass `--use-api`, so Supabase bundles them and no Docker is needed (DEPLOY-2). A migration the API rejects now prints its file name and the Postgres error, with the cron secret redacted; before, it said only "failed" (DEPLOY-3).
