@@ -16,7 +16,7 @@ Chase uses Hearth end to end in Expo Go on his iPhone, with a test account B on 
 
 | # | Step | Owner | Status |
 |---|---|---|---|
-| 1 | Say "merge" for the two docs PRs: [#15](https://github.com/holroydchase-afk/Hearth/pull/15) (milestone 1 in Expo Go, push moved to milestone 2) and [#14](https://github.com/holroydchase-afk/Hearth/pull/14) (family vault logged), plus the PR that adds this tracker | Chase | ☐ |
+| 1 | Say "merge" for the docs PRs: [#14](https://github.com/holroydchase-afk/Hearth/pull/14) (family vault logged) and the PR that adds this tracker. (#15, milestone 1 in Expo Go, is merged) | Chase | ◐ |
 | 2 | **Sign-in code email.** In Resend: API Keys → Create, name `supabase-smtp`, Sending access. In Supabase → Authentication → Emails → Set up SMTP: sender `onboarding@resend.dev`, name `Hearth`, host `smtp.resend.com`, port `465`, user `resend`, password = that key. Then paste the two templates (`deploy/magic_link.html`, `deploy/confirmation.html` in the project files; subject `Your Hearth code: {{ .Token }}`) and set code length 6, expiry 3600 s. About 10 minutes | Chase | ☐ |
 | 3 | **Get the app to Chase's phone and account B's browser.** Point the app at the hosted project, publish it so Expo Go opens it from a link or QR (no laptop dev server), and give account B a web link. Nothing does this today (see Missing, M1) | Claude | ☐ |
 | 4 | Sign in once in Expo Go with the 6-digit code; tell Claude "signed in" | Chase | ☐ |
@@ -68,6 +68,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 - Milestone 2 build: push on a real iPhone build (NOTIFY-3), Resend domain and SPF/DKIM after the name is final, invite links.
 - Spec the duplicate catcher (first AI add-on, no ML) when milestone 1 is behind us (`AI-FEATURES.md`).
 - grandparent-ux review of the family vault ideas before any vault spec (post-beta).
+- Privacy work offered in the marketing thread: a plain "what Hearth can and can't see" page, and a separate media key per family (deleting a family makes its photos unreadable). Post-milestone 1 unless Chase pulls them forward.
 - 0012 households-only migration (spec'd in `SPEC-GROUPS.md`, needed before milestone 3).
 
 ## Running
@@ -77,6 +78,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 ## Done (latest first)
 
 - Oct 17: tracker created (this file).
+- Oct 17: milestone 1 runs in Expo Go; push moved to milestone 2 (PR #15).
 - Oct 17: Resend connected; a test email reached Chase's Gmail.
 - Oct 17: `ACCOUNTS.md` and the name guard (PR #11, #12): store builds refuse until "Name final: yes".
 - Oct 17: privacy-first marketing path logged (PR #13).
