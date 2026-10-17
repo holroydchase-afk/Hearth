@@ -17,6 +17,11 @@ Every outside account Hearth uses, which login it's under, and where the name "H
 | Domain | Invite links, email sender, app links | Not bought yet (planned `hearth.family`) | Invite links, `app/app.json` link setup, email sender | **Hard once relatives have links** |
 
 ## Decide the name before
+
+**Name final:** no
+
+While this says no, `npm run eas -- build` and `submit` refuse (they would lock the app ID). Only Chase changes it to yes. **Rule for Claude:** before any step below, or anything else that makes the name hard to change, stop and warn Chase first, even if he asked for the step.
+
 1. Buying the domain.
 2. The first Apple or Google build.
 3. Telling relatives the name.
