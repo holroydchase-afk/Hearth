@@ -28,6 +28,10 @@ staff-pm reading, to confirm when we circle back:
 - **User types.** Owner and parents see the AI settings. Relatives never see them and no AI ever runs on a relative's phone. Any adult can still say "Don't look for my face", which removes them from face grouping in every family they're in.
 - **Kids** follow the parents' choice for their space.
 - **What this does to the promise.** The claim can become "AI is off unless your family turns it on, and then it runs only on your phone". That is easier to keep true than "no face scanning", and makes option B in the session below the natural fit.
+- **Shape: add-ons plus role permissions, like Discord (Chase chose "Both", Oct 17, 3:40 am).**
+  - *Add-ons:* each AI item (AI-1 to AI-6) is a named helper a parent adds to the family space from a short list, like adding a bot to a Discord server ("Duplicate catcher: spots photos that look the same. Runs on your phone"). Nothing is added by default; removing one deletes its on-phone data.
+  - *Role permissions:* each add-on has a per-role switch deciding who it runs for and who can change it, using the roles spec's one permission check, `can(space, capability)` (`docs/product/SPEC-GROUPS.md` §4). Default: an add-on runs for parents only; relatives are off and can't see AI settings.
+  - *Cost:* the most flexible shape and the most to build. Build order when we get there: AI-2 as the first add-on (no ML), with the permission row, before any face add-on.
 - **"Own server" taken literally** (a family hosting Hearth itself) is a post-milestone-7 question: it would help A3 but costs Chase support time. Logged, not planned.
 
 ## Blocking decision: the AI positioning session
