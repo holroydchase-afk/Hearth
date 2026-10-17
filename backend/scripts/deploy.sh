@@ -21,11 +21,18 @@ DRY=0; [[ ${1:-} == --dry-run ]] && DRY=1
 run() { if (( DRY )); then echo "+ $*"; else "$@"; fi; }
 die() { echo "deploy: $*" >&2; exit 1; }
 # Run SQL (stdin) through the Management API; prints the JSON rows. The token stays in a header.
+# On an error, prints the API's message (the Postgres error) to stderr, cron secret redacted.
 sql() {
-  python3 -I -c 'import json, sys; sys.stdout.write(json.dumps({"query": sys.stdin.read()}))' |
-    curl -fsS -X POST "$API" \
+  local out
+  if out=$(python3 -I -c 'import json, sys; sys.stdout.write(json.dumps({"query": sys.stdin.read()}))' |
+    curl -sS --fail-with-body -X POST "$API" \
       -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" \
-      --data-binary @-
+      --data-binary @-); then
+    echo "$out"
+  else
+    [[ -n ${CRON_SECRET:-} ]] && out=${out//$CRON_SECRET/<redacted>}
+    echo "deploy: API said: $out" >&2; return 1
+  fi
 }
 
 # ---- preflight (never prints secret values) ----
@@ -57,9 +64,9 @@ CRON_SECRET=$(openssl rand -hex 32)
 if [[ -f $ENV_FILE ]]; then run $CLI secrets set --project-ref "$REF" --env-file "$ENV_FILE"; fi
 run $CLI secrets set --project-ref "$REF" "NOTIFY_CRON_SECRET=${CRON_SECRET}" >/dev/null
 
-echo "== 3/5 edge functions"
-run $CLI functions deploy sign-media --project-ref "$REF"
-run $CLI functions deploy notify --project-ref "$REF" --no-verify-jwt
+echo "== 3/5 edge functions (bundled by Supabase, no Docker)"
+run $CLI functions deploy sign-media --project-ref "$REF" --use-api
+run $CLI functions deploy notify --project-ref "$REF" --no-verify-jwt --use-api
 
 echo "== 4/5 run notify every minute (pg_cron + pg_net, secret in Vault)"
 SQL=$(cat <<SQL
