@@ -32,5 +32,7 @@ check "EXPO-1: no token fails with a clear message and never calls the CLI" "(( 
 
 check "EXPO-1: npm run eas uses the wrapper" "grep -q '\"eas\": \"bash scripts/eas.sh\"' package.json"
 
+check "EXPO-2: app.json links the Expo project (eas init) and adds no permissions" "python3 -I -c \"import json,sys; e=json.load(open('app.json'))['expo']; sys.exit(not (e.get('extra',{}).get('eas',{}).get('projectId')=='676e8cec-57a6-472f-9086-9a9318eaf556' and e.get('owner')=='thefreighttrains-team' and 'permissions' not in e['android']))\""
+
 echo "eas: $PASS passed, $FAIL failed"
 (( FAIL == 0 ))
