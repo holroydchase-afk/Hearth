@@ -1006,6 +1006,20 @@ select tests.ok(exists (select 1 from public.circles where id = tests.c('all') a
                 and exists (select 1 from public.circles where id = tests.c('g_chase') and deleted_at is null),
                 'S-0011-7: Everyone (and everything else) is still live after the refused update');
 
+-- S-0011-8: retiring is one-way for the first build. A parent's direct update can't un-retire a group or
+-- household (that could re-widen a v1 group after the v2 re-seed); there is no un-retire path.
+:as_chase
+-- (A WHERE on a column brings in the select policy, which hides retired rows; a bare update doesn't.)
+select tests.throws_code('update public.circles set deleted_at = null',
+                         'S-0011-8: a parent''s direct update can''t un-retire a retired group or household (23514)', '23514');
+:as_admin
+select tests.ok(exists (select 1 from public.circles where id = tests.c('g_old') and deleted_at is not null)
+                and exists (select 1 from public.circles where id = tests.c('h_ux') and deleted_at is not null),
+                'S-0011-8: both stay retired after the refused updates');
+select tests.q('chase', format($$update public.circles set name = name where id = %L$$, tests.v('g_chase')));
+select tests.ok(exists (select 1 from public.circles where id = tests.c('g_chase') and deleted_at is null),
+                'S-0011-8 allowed: a live group is still updatable and stays live');
+
 -- ======================================================================
 -- Summary
 -- ======================================================================

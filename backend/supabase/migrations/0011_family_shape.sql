@@ -145,12 +145,16 @@ create trigger members_widen before update on public.circle_members
   for each row execute function private.tg_members_widen();
 
 -- S-0011-7: Everyone stays, however it is updated (retire_level says so too; a parent's direct UPDATE of
--- circles.deleted_at must not get round it).
+-- circles.deleted_at must not get round it). S-0011-8: the same trigger keeps retired levels retired.
 create or replace function private.tg_everyone_stays() returns trigger
 language plpgsql set search_path = '' as $$
 begin
   if old.kind = 'everyone' and old.deleted_at is null and new.deleted_at is not null then
     raise exception 'Everyone stays' using errcode = '23514';
+  end if;
+  -- S-0011-8: retiring is one-way (first build has no un-retire path); un-retiring could re-widen a v1 group.
+  if old.deleted_at is not null and new.deleted_at is null then
+    raise exception 'a retired level stays retired' using errcode = '23514';
   end if;
   return new;
 end $$;

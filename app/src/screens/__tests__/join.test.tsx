@@ -85,6 +85,17 @@ describe('Join (BETA-JOIN-1, -3)', () => {
     expect(screen.queryByText(/the person who invited you/)).toBeNull();
   });
 
+  it('UX-G9: already signed in, the refused-invite screen has one verb button, "Go to Photos"', async () => {
+    const be = await fresh();
+    be.state.invites.OTHERMAIL3 = { ...be.state.invites[FIXTURE.invites.jo]!, code: 'OTHERMAIL3', target_email: 'someone.else@example.com' };
+    const { nav } = await renderApp(<JoinScreen code="OTHERMAIL3" />, { be, user: 'jo' });
+    expect(await screen.findByText('This invite is too old or already used. Ask Chase for a new one.')).toBeTruthy();
+    expect(screen.getAllByRole('button').map((b) => b.props.accessibilityLabel)).toEqual(['Go to Photos']);
+    expectGrandparentSafe();
+    fireEvent.press(screen.getByRole('button', { name: 'Go to Photos' }));
+    expect(nav.goPhotos).toHaveBeenCalled();
+  });
+
   it('already signed in and already in the family: straight to the photos', async () => {
     const be = FakeBackend.withFixture({ joIsMember: true });
     const { nav } = await renderApp(<JoinScreen code={FIXTURE.invites.jo} />, { be, user: 'jo' });
