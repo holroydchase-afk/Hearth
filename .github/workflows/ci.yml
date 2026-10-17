@@ -86,5 +86,7 @@ jobs:
           cache: npm
           cache-dependency-path: app/package-lock.json
       - run: npm ci
+      - name: npm run eas works with only EXPO_ACCESS_TOKEN (EXPO-1, stubbed, no network)
+        run: bash scripts/tests/eas_test.sh
       - run: npm test
       - run: npm run typecheck

@@ -12,6 +12,7 @@ on by default for viewers, 48 pt targets, 17 pt+ text, "Love it", "Save to my ph
 | `npm run typecheck` | `tsc --noEmit`, strict + `noUncheckedIndexedAccess`. |
 | `npm run e2e:web` | Exports the web bundle in FakeApi mode (`EXPO_PUBLIC_HEARTH_FAKE=1`) and runs the Playwright core-loop smoke test at 360×740. |
 | `npm run test:contract:real` | Starts `../backend/tests/integration/start.sh` (fresh DB + PostgREST :3001), runs the docs/eng/API.md contract tests through `SupabaseApi`, stops it. |
+| `npm run eas -- <command>` | EAS CLI (`whoami`, `build`, `update`) with the environment's `EXPO_ACCESS_TOKEN` passed as `EXPO_TOKEN`. Tested by `scripts/tests/eas_test.sh` (EXPO-1). Needs `api.expo.dev` on the network allowlist. |
 | `npx expo start` | Dev server (needs the env below, or `EXPO_PUBLIC_HEARTH_FAKE=1`). |
 
 ## Architecture
