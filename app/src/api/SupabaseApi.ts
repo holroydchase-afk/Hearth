@@ -107,11 +107,19 @@ export class SupabaseApi implements HearthApi {
       p_space: a.space, p_before_ts: a.beforeTs ?? null, p_before_id: a.beforeId ?? null,
       p_limit: Math.max(1, Math.min(50, a.limit ?? 20)),
     }).then((d) => d ?? []);
-  // Not built yet (overnight plan step 4): red tests BETA-TIME-2/3/4 cover these.
-  getTimeline = (_a: TimelineArgs): Promise<TimelinePost[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline'));
-  getTimelineYears = (_space: string, _tz?: string): Promise<TimelineYear[]> => Promise.reject(new ApiError('UNKNOWN', 'not built yet: get_timeline_years'));
+  getTimeline = (a: TimelineArgs) =>
+    this.rpc<TimelinePost[]>('get_timeline', {
+      p_space: a.space, p_before_at: a.beforeAt ?? null, p_before_id: a.beforeId ?? null,
+      p_limit: Math.max(1, Math.min(50, a.limit ?? 20)),
+    }).then((d) => d ?? []);
+  getTimelineYears = (space: string, tz?: string) =>
+    this.rpc<TimelineYear[]>('get_timeline_years', { p_space: space, p_tz: tz ?? 'UTC' }).then((d) => d ?? []);
+  // Batch args only when set, so an ordinary post still matches a pre-0010 create_post.
   createPost = (a: CreatePostArgs) =>
-    this.rpc<string>('create_post', { p_client_id: a.clientId, p_space: a.space, p_caption: a.caption, p_circle_ids: a.circleIds, p_taken_at: a.takenAt ?? null });
+    this.rpc<string>('create_post', {
+      p_client_id: a.clientId, p_space: a.space, p_caption: a.caption, p_circle_ids: a.circleIds, p_taken_at: a.takenAt ?? null,
+      ...(a.batchId != null || a.batchSize != null ? { p_batch_id: a.batchId ?? null, p_batch_size: a.batchSize ?? null } : {}),
+    });
   publishPost = (p: string) => this.rpc<void>('publish_post', { p_post: p });
   deletePost = (p: string) => this.rpc<void>('delete_post', { p_post: p });
   toggleHeart = (p: string) => this.rpc<unknown>('toggle_heart', { p_post: p }).then((d) => one<HeartState>(d));

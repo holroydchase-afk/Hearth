@@ -2,9 +2,7 @@
 // Up to 100 photos per pick, grouped by the day taken (phone's time zone) into posts of at
 // most 10 (the BETA-SHARE-1 limit). Videos are skipped with a plain line. Only the date read
 // on the phone (takenAt) goes into a planned item; never EXIF, GPS or other metadata.
-//
-// NOT BUILT YET (overnight plan step 3). Red tests: __tests__/bulk.test.ts.
-import type { PhoneZone } from '../media/captureDate';
+import { captureInfo, type PhoneZone } from '../media/captureDate';
 import type { QueueItem } from '../upload/queue';
 
 export const BULK_PICK_LIMIT = 100;
@@ -40,21 +38,65 @@ export interface BatchPlan {
 }
 
 /** Day = the photo's own local day when its offset is known, else the day in the phone's zone. */
-export function planBatch(_assets: PickedAsset[], _o: PhoneZone = {}): BatchPlan {
-  throw new Error('not built yet: planBatch (BETA-BULK-2)');
+export function planBatch(assets: PickedAsset[], o: PhoneZone = {}): BatchPlan {
+  let skippedVideos = 0;
+  const photos: PickedAsset[] = [];
+  for (const a of assets) {
+    if (a.type === 'pairedVideo') continue; // a Live Photo's motion part: the still is what we send
+    if (a.type === 'video' || (!a.type && typeof a.mimeType === 'string' && a.mimeType.startsWith('video/'))) {
+      skippedVideos += 1;
+      continue;
+    }
+    photos.push(a);
+  }
+  const kept = photos.slice(0, BULK_PICK_LIMIT);
+  const overLimit = photos.length - kept.length;
+
+  // Only the date leaves this function: never EXIF, GPS or maker data.
+  const byDay = new Map<string | null, QueueItem[]>();
+  for (const a of kept) {
+    const info = captureInfo(a, o);
+    const item: QueueItem = { uri: a.uri, kind: 'photo', takenAt: info?.takenAt ?? null };
+    if (typeof a.width === 'number') item.width = a.width;
+    if (typeof a.height === 'number') item.height = a.height;
+    const key = info?.dayKey ?? null;
+    const list = byDay.get(key) ?? [];
+    list.push(item);
+    byDay.set(key, list);
+  }
+  const days = [...byDay.keys()].filter((k): k is string => k !== null).sort();
+  const order: (string | null)[] = byDay.has(null) ? [...days, null] : days;
+
+  const posts: PlannedPost[] = [];
+  for (const dayKey of order) {
+    const items = byDay.get(dayKey)!;
+    if (dayKey !== null) items.sort((x, y) => (x.takenAt! < y.takenAt! ? -1 : x.takenAt! > y.takenAt! ? 1 : 0));
+    for (let i = 0; i < items.length; i += PHOTOS_PER_POST) {
+      const chunk = items.slice(i, i + PHOTOS_PER_POST);
+      posts.push({ dayKey, takenAt: chunk[0]?.takenAt ?? null, items: chunk });
+    }
+  }
+  return { posts, photoCount: kept.length, dayCount: days.length, skippedVideos, overLimit };
 }
 
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
 /** Review screen headline: "48 photos from 3 days". */
-export function reviewSummary(_plan: BatchPlan): string {
-  throw new Error('not built yet: reviewSummary (BETA-BULK-3)');
+export function reviewSummary(plan: BatchPlan): string {
+  const photos = plural(plan.photoCount, 'photo', 'photos');
+  return plan.dayCount > 0 ? `${photos} from ${plural(plan.dayCount, 'day', 'days')}` : photos;
 }
 
 /** "3 videos were skipped. Hearth sends photos for now." or null when none. */
-export function skippedVideosLine(_n: number): string | null {
-  throw new Error('not built yet: skippedVideosLine (BETA-BULK-5)');
+export function skippedVideosLine(n: number): string | null {
+  if (n <= 0) return null;
+  return n === 1 ? '1 video was skipped. Hearth sends photos for now.' : `${n} videos were skipped. Hearth sends photos for now.`;
 }
 
 /** Said when a pick goes over 100, or null. */
-export function overLimitLine(_n: number): string | null {
-  throw new Error('not built yet: overLimitLine (BETA-BULK-2)');
+export function overLimitLine(n: number): string | null {
+  if (n <= 0) return null;
+  return n === 1
+    ? "1 photo wasn't added. Hearth sends up to 100 at a time, so pick it next."
+    : `${n} photos weren't added. Hearth sends up to 100 at a time, so pick those next.`;
 }
