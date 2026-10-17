@@ -65,7 +65,7 @@ The request and response shapes documented at the top of `backend/supabase/funct
 - **Order:** `create_post` (draft) → `sign-media upload` → PUT encrypted bytes → `finalize` → `publish_post`.
 
 ## Scale targets (checked by `backend/tests/perf/`)
-- **`get_timeline` (0010):** p95 under 5 ms in the database at 1M posts (plan target, matches `get_feed`'s measured p95).
+- **`get_timeline` (0010):** p95 under 5 ms in the database at 1M posts (plan target). **Measured Oct 17: 6–14 ms, so not met yet.** The per-post reply rule in the shared row builder costs about 5 ms a page; see `backend/tests/perf/RESULTS.md`.
 - **`get_feed`:** p95 under 30 ms in the database for a viewer in a space with 20,000 posts, on a table of about 1M posts across about 50k spaces.
 - **Per-row work:** RLS helpers are wrapped as `(select auth.uid())` so they run once per statement, not once per row.
 - **Indexes:** every foreign key and every RLS lookup path is indexed.
