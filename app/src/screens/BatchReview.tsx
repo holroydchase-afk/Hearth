@@ -21,6 +21,8 @@ export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel,
   // Everyone first, then the groups (SPEC-GROUPS: 0011 adds a real kind; until then, by name).
   const list = circles ? [...circles].sort((a, b) => Number(b.name === 'Everyone') - Number(a.name === 'Everyone')) : null;
   const names = (list ?? []).filter((g) => chosen.includes(g.circle_id)).map((g) => g.name);
+  // Send only to what the screen names: every chosen id must be a loaded group (never unnamed).
+  const named = list !== null && chosen.length > 0 && chosen.every((id) => list.some((g) => g.circle_id === id));
   const sendTo = names.length ? `Send to: ${names.join(' and ')}` : 'Send to: nobody yet. Pick who should see these.';
   const skipped = skippedVideosLine(plan.skippedVideos);
   const over = overLimitLine(plan.overLimit);
@@ -57,7 +59,7 @@ export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel,
         </Card>
       )}
       {nothing ? null : (
-        <Button label={`Send ${photos(plan.photoCount)}`} onPress={onSend} disabled={chosen.length === 0} busy={busy} />
+        <Button label={`Send ${photos(plan.photoCount)}`} onPress={onSend} disabled={!named} busy={busy} />
       )}
       <Button label="Don't send these photos" text={nothing ? 'Go back' : "Don't send"} variant="secondary" onPress={onCancel} />
     </Screen>

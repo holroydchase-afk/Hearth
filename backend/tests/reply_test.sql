@@ -230,6 +230,98 @@ select tests.ok_sql($$select exists (select 1 from public.profiles where id = 'f
                     'AUD-8 review: ...while the parent still sees who replied');
 
 -- ======================================================================
+-- privacy-security review (Oct 17): 0010 made the reply helpers plpgsql (cached plans), and
+-- the feed/timeline row builder works the reply rule out for the whole page. Both must
+-- give exactly what can_see_reply / reply_scope give, for every member, in every setting.
+-- ======================================================================
+:as_admin
+-- more replies: a second parent (Aunt Jo as 'adult'), the Everyone-only grandma, the cousin, a deleted comment
+update public.space_members set role = 'adult' where space_id = :space_a and user_id = :aunt_jo;
+insert into public.circle_members (circle_id, user_id) values (:c_a_all, 'f0000000-0000-0000-0000-0000000000c9');
+insert into public.comments (post_id, author_id, body) values
+  (:p_a_all, :aunt_jo, 'From Aunt Jo'), (:p_a_all, :gma_chen, 'From Grandma Chen'),
+  (:p_a_all, 'f0000000-0000-0000-0000-0000000000c9', 'From the cousin'), ('55555555-0000-0000-0000-0000000000c9', :gma_riv, 'Grandma on both');
+insert into public.comments (post_id, author_id, body, deleted_at) values (:p_a_all, :gma_riv, 'deleted one', now());
+insert into public.reactions (post_id, user_id, emoji) values
+  (:p_a_all, :aunt_jo, '❤️'), (:p_a_all, :gma_chen, '❤️'), (:p_a_all, :gpa_riv, '❤️'),
+  (:p_a_all, 'f0000000-0000-0000-0000-0000000000c9', '❤️'), ('55555555-0000-0000-0000-0000000000c9', :gpa_riv, '❤️')
+  on conflict do nothing;
+-- Mismatches between the page rows and the per-reply rule, for one member ('' = none; null = error).
+create function tests.reply_rows_mismatch(p_user uuid) returns text language plpgsql as $$
+declare bad text; n int;
+begin
+  perform set_config('request.jwt.claim.sub', p_user::text, true);
+  select count(*), coalesce(string_agg(x.src || ':' || x.post_id || ' h' || x.heart_count || ' c' || x.comment_count || ' ' || coalesce(x.reply_scope, '-'), '; ')
+                        filter (where x.heart_count <> (select count(*) from public.reactions r
+                                                         where r.post_id = x.post_id and public.can_see_reply(x.post_id, r.user_id))
+                                   or x.comment_count <> (select count(*) from public.comments c
+                                                           where c.post_id = x.post_id and c.deleted_at is null
+                                                             and public.can_see_reply(x.post_id, c.author_id))
+                                   or x.reply_scope is distinct from public.reply_scope(x.post_id)), '')
+    into n, bad
+  from (select 'feed' src, f.post_id, f.heart_count, f.comment_count, f.reply_scope
+          from public.get_feed('22222222-0000-0000-0000-00000000000a', null, null, 50) f
+        union all
+        select 'timeline', t.post_id, t.heart_count, t.comment_count, t.reply_scope
+          from public.get_timeline('22222222-0000-0000-0000-00000000000a', null, null, 50) t) x;
+  return case when n = 0 then 'no rows' else bad end;
+exception when others then
+  return 'error ' || sqlstate || ' ' || sqlerrm;
+end $$;
+create function tests.reply_rows_all_match() returns text language sql as $$
+  select coalesce(string_agg(u::text || ' -> ' || m, ' | ') filter (where m <> ''), '')
+  from (select u, tests.reply_rows_mismatch(u) m
+        from unnest(array['a0000000-0000-0000-0000-00000000000a', 'a0000000-0000-0000-0000-0000000000a1',
+                          'a0000000-0000-0000-0000-0000000000a2', 'b0000000-0000-0000-0000-00000000000b',
+                          'b0000000-0000-0000-0000-0000000000b1', 'c0000000-0000-0000-0000-0000000000c1',
+                          'f0000000-0000-0000-0000-0000000000c9']::uuid[]) u) t $$;
+select tests.ok(tests.reply_rows_all_match() = '',
+                'AUD-8 perf: default (parents read replies): every member''s feed and timeline counts and reply_scope equal the per-reply rule');
+update public.circles set replies_shared = true where id in (:c_a_gp, '33333333-0000-0000-0000-0000000000c9');
+select tests.ok(tests.reply_rows_all_match() = '',
+                'AUD-9 perf: with two groups sharing replies (the cousin and Grandma in different ones), counts and reply_scope still equal the per-reply rule');
+update public.circles set replies_shared = false where id in (:c_a_gp, '33333333-0000-0000-0000-0000000000c9');
+update public.spaces set reply_audience = 'everyone' where id = :space_a;
+select tests.ok(tests.reply_rows_all_match() = '',
+                'AUD-10 perf: with replies open to everyone, counts and reply_scope still equal the per-reply rule');
+update public.spaces set reply_audience = 'parents' where id = :space_a;
+select tests.ok(tests.reply_rows_all_match() = '',
+                'AUD-8 perf: back on the safe default, still equal');
+-- the fixture really separates people: Grandma Chen sees fewer hearts on the Everyone post than the parent
+:as_gma_chen
+select tests.setv('chen_h', format($$select heart_count from public.get_feed(%L) where post_id = %L$$, :space_a, :p_a_all));
+:as_alex
+select tests.setv('alex_h', format($$select heart_count from public.get_feed(%L) where post_id = %L$$, :space_a, :p_a_all));
+select tests.ok(tests.v('chen_h')::int < tests.v('alex_h')::int,
+                'AUD-8 perf: the fixture is not trivial (a grandma sees fewer hearts on the Everyone post than the parent)');
+:as_admin
+select tests.ok((select p.prosrc !~* 'can_see_reply|reply_scope\s*\(' from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+                 where n.nspname = 'private' and p.proname = 'feed_rows'),
+                'AUD-8 perf: private.feed_rows works the reply rule out per page, not by calling can_see_reply per heart and comment');
+-- 0010's plan cache must not carry one person's answer to the next request on the same connection
+-- (PostgREST reuses connections). 10 rounds: past the 5 calls after which plpgsql may switch to a generic plan.
+create function tests.plan_cache_flip() returns boolean language plpgsql as $$
+declare ok boolean := true;
+begin
+  for i in 1 .. 10 loop
+    perform set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-0000000000a1', true);  -- Grandma Rivera
+    ok := ok and public.can_view_post('55555555-0000-0000-0000-0000000000a1')
+             and public.reply_scope('55555555-0000-0000-0000-0000000000a1') = 'parents'
+             and not public.can_see_reply('55555555-0000-0000-0000-0000000000a1', 'a0000000-0000-0000-0000-0000000000a2');
+    perform set_config('request.jwt.claim.sub', 'b0000000-0000-0000-0000-0000000000b1', true);  -- Grandma Chen
+    ok := ok and not public.can_view_post('55555555-0000-0000-0000-0000000000a1')
+             and public.reply_scope('55555555-0000-0000-0000-0000000000a1') is null
+             and not public.can_see_reply('55555555-0000-0000-0000-0000000000a1', 'a0000000-0000-0000-0000-0000000000a2');
+    perform set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-00000000000a', true);  -- Alex (parent)
+    ok := ok and public.can_see_reply('55555555-0000-0000-0000-0000000000a1', 'a0000000-0000-0000-0000-0000000000a2')
+             and public.reply_scope('55555555-0000-0000-0000-0000000000a1') = 'everyone';
+  end loop;
+  return ok;
+end $$;
+select tests.ok(tests.plan_cache_flip(),
+                'AUD-8 / 0010 plan cache: switching people on one connection 10 times never carries an answer over (allowed and excluded both ways)');
+
+-- ======================================================================
 -- Summary
 -- ======================================================================
 reset role;
