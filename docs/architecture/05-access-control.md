@@ -60,7 +60,7 @@ RLS limits what each family member's app can read. It does not limit Hearth's se
 ## Limits
 
 - **Gap: parents see everything.** By design, both parents see every post in their family space, including a relative's post to one household.
-- **Gap: legacy direct memberships.** Members from before 0011 keep "direct" rows (`circle_members.derived = false`) so nobody's access changed. Households-only placement becomes strict in migration 0013 (Planned, `docs/product/SPEC-GROUPS.md` §8).
+- **Gap: legacy direct memberships.** Members from before 0011 keep "direct" rows (`circle_members.derived = false`) so nobody's access changed. Households-only placement is cancelled (Oct 18): 0013 lets people be placed in any group and gives each group a comment setting (Planned, `docs/product/SPEC-GROUPS.md` v2 §4).
 - **Gap: "Seen by N of M"** on your own posts shows engagement, which conflicts with anchor A2 Guilt-free (tracker D4).
 - **Planned:** event dates (`starts_on`, `ends_on`) exist in the schema but the app doesn't use them yet.
 
