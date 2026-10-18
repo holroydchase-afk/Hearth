@@ -6,26 +6,20 @@ import { useApp, useFeed } from '../state/AppContext';
 import { useNav } from '../state/nav';
 import { Button, Card, Confirm, Field, Txt } from '../ui/kit';
 import { andList, people, photos, shortDate } from '../ui/format';
+import { sessionPhotos } from '../feed/sessions';
+import { timeLabel } from '../feed/eventTimeline';
 import { MIN_TARGET, useTheme } from '../ui/theme';
 import { MediaImage } from './MediaImage';
-
-const SHOW_INLINE = 4;
+import { PhotoSwipe, cardAspect } from './PhotoSwipe';
 
 export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
-  const { feed, session } = useApp();
+  const { feed } = useApp();
   const nav = useNav();
-  const { c } = useTheme();
-  const mine = post.author_id === session?.userId;
   const ready = post.media.filter((m) => m.status === 'ready');
-  const [confirm, setConfirm] = useState(false);
 
   useEffect(() => {
     feed?.markSeen(post);
   }, [feed, post.post_id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const audience = post.audience
-    ? `Shared with ${post.audience.map((a) => `${a.name} · ${people(a.member_count)}`).join(', ')}`
-    : 'Shared with you';
 
   return (
     <Card testID={`post-${post.post_id}`} style={{ padding: 0, overflow: 'hidden' }}>
@@ -33,22 +27,67 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
         <Txt variant="strong">{post.author_name}</Txt>
         <Txt variant="muted">{shortDate(post.published_at)}</Txt>
       </View>
-      {ready.slice(0, SHOW_INLINE).map((m, i) => (
+      {ready.length > 1 ? (
+        <PhotoSwipe postId={post.post_id} media={ready} />
+      ) : ready.map((m) => (
         <Pressable
           key={m.media_id}
           accessibilityRole="button"
-          accessibilityLabel={`Open photo ${i + 1} of ${ready.length} full screen`}
-          onPress={() => nav.openViewer(post.post_id, i)}
-          style={{ width: '100%', aspectRatio: m.width && m.height ? Math.max(0.6, Math.min(1.8, m.width / m.height)) : 4 / 3, minHeight: MIN_TARGET, minWidth: MIN_TARGET }}
+          accessibilityLabel="Open photo 1 of 1 full screen"
+          onPress={() => nav.openViewer(post.post_id, 0)}
+          style={{ width: '100%', aspectRatio: cardAspect(m), minHeight: MIN_TARGET, minWidth: MIN_TARGET }}
         >
           <MediaImage postId={post.post_id} mediaId={m.media_id} style={{ flex: 1 }} />
         </Pressable>
       ))}
+      <PostBody post={post} />
+    </Card>
+  );
+});
+
+/** SESS-1..3: one entry for a sender's posts within an hour (feed/sessions.ts). One swipe through all their photos;
+ *  the caption, "Seen by", hearts, replies and Delete below are those of the post holding the photo on screen. */
+export const SessionCard = memo(function SessionCard({ posts }: { posts: FeedPost[] }) {
+  const { feed } = useApp();
+  const items = sessionPhotos(posts);
+  const [pos, setPos] = useState(0);
+  const current = posts.find((p) => p.post_id === items[Math.min(pos, items.length - 1)]?.postId) ?? posts[0]!;
+  const first = posts[0]!;
+
+  // "Seen by" counts a post once its photo has been on screen.
+  useEffect(() => {
+    feed?.markSeen(current);
+  }, [feed, current.post_id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <Card testID={`session-${first.post_id}`} style={{ padding: 0, overflow: 'hidden' }}>
+      <View style={styles.head}>
+        <Txt variant="strong">{first.author_name}</Txt>
+        <Txt variant="muted">{shortDate(first.published_at)}</Txt>
+        <Txt variant="muted">{photos(items.length)}</Txt>
+      </View>
+      <PhotoSwipe id={`session-${first.post_id}`} items={items} onPos={setPos} />
+      {/* SESS-3: name which post these belong to: its caption, or when it was shared. */}
+      <PostBody key={current.post_id} post={current} label={current.caption ? null : `Shared at ${timeLabel(current.published_at)}`} />
+    </Card>
+  );
+});
+
+/** A post's words and actions under its photos: caption, who it went to, "Seen by", hearts, replies, Delete. */
+function PostBody({ post, label }: { post: FeedPost; label?: string | null }) {
+  const { feed, session } = useApp();
+  const { c } = useTheme();
+  const mine = post.author_id === session?.userId;
+  const [confirm, setConfirm] = useState(false);
+
+  const audience = post.audience
+    ? `Shared with ${post.audience.map((a) => `${a.name} · ${people(a.member_count)}`).join(', ')}`
+    : 'Shared with you';
+
+  return (
+    <>
       <View style={styles.body}>
-        {ready.length > SHOW_INLINE ? (
-          <Button label={`See all ${photos(ready.length)}`} variant="secondary" onPress={() => nav.openViewer(post.post_id, SHOW_INLINE)} />
-        ) : null}
-        {post.caption ? <Txt>{post.caption}</Txt> : null}
+        {post.caption ? <Txt>{post.caption}</Txt> : label ? <Txt variant="muted">{label}</Txt> : null}
         <Txt variant="muted" style={{ color: post.audience ? c.ink : c.safe }}>{audience}</Txt>
         {mine && post.seen_count !== null && post.reach_count !== null ? (
           <Txt variant="strong">{`Seen by ${post.seen_count} of ${post.reach_count}`}</Txt>
@@ -68,9 +107,9 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
         onNo={() => setConfirm(false)}
         onYes={() => { setConfirm(false); void feed?.deletePost(post.post_id); }}
       />
-    </Card>
+    </>
   );
-});
+}
 
 function Hearts({ post }: { post: FeedPost }) {
   const { feed } = useApp();
