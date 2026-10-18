@@ -21,8 +21,8 @@ Chase uses Hearth end to end in Expo Go on his iPhone, with a test account B on 
 | 3 | **App on the phone and the web.** Expo Go: open `exp://u.expo.dev/676e8cec-57a6-472f-9086-9a9318eaf556/group/<update group>` (latest group on the EAS dashboard, branch `preview`; republish with `npm run eas -- update --branch preview --platform ios`). Web build for account B: https://thefreighttrains-team-hearth.expo.app (EAS Hosting; republish with `expo export --platform web` then `eas deploy --prod`). `app/.env.local` is rebuilt from the Management API anon key | Claude | ☑ |
 | 4 | Sign in once in Expo Go with the 6-digit code; tell Claude "signed in" | Chase | ☐ |
 | 5 | Run `family-setup.sh` (Everyone, both sides, the houses, Test house, two events); send Chase account B's invite code | Claude | ☐ |
-| 6 | **Photo and notice keys.** Make a Backblaze B2 account (US East; the region can't change) and a bucket key. Save the B2 values, a Resend key for notices, and `MEDIA_KEK` (Claude shows how to generate it) as Hearth environment secrets, never in chat. Print `MEDIA_KEK` twice and keep the copies in two places | Chase | ☐ |
-| 7 | Write the function secrets from the environment, rerun `deploy.sh`, delete the placeholder secret `HEARTH_KEYS_PENDING`, and check one photo upload and one email notice on the hosted project | Claude | ☐ |
+| 6 | **Photo and notice keys.** Make a Backblaze B2 account (US East; the region can't change) and a bucket key. Save the B2 values, a Resend key for notices, and `MEDIA_KEK` (Claude shows how to generate it) as Hearth environment secrets, never in chat. Print `MEDIA_KEK` twice and keep the copies in two places | Chase | ☑ |
+| 7 | Write the function secrets from the environment, rerun `deploy.sh`, delete the placeholder secret `HEARTH_KEYS_PENDING`, and check one photo upload and one email notice on the hosted project | Claude | ☑ |
 | 8 | Build the sent-vs-received check (QA-3) and refresh the Test Log so each demo row can be logged | Claude | ☐ |
 | 9 | **The 2-day demo** in `MILESTONE-1.md`: 10+ posts, B comments and hearts, airplane mode, save to phone. Log each row (or tell Claude) | Chase | ☐ |
 | 10 | Fix what the demo found (test first), then staff-pm gate review: pass or fail milestone 1 | Claude | ☐ |
@@ -101,6 +101,8 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 - Weekly deploy dry run, every Monday 15:47 UTC (routine; its thread stays open).
 
 ## Done (latest first)
+
+- Oct 18: keys live. Chase made the B2 account, bucket and key, `MEDIA_KEK` and a Resend notice key; Claude set all 10 function secrets on Supabase, redeployed sign-media and notify, and removed the placeholder secret. Not yet checked end to end (the B2 host is blocked from Claude's environment; the demo checks it). Still to do: a B2 CORS rule for the web build.
 
 - Oct 18 overnight, in draft PR #21 (waits on Chase's "merge"): PRIV-1 (no raw IPs), PRIV-2 (CI check that logs carry no keys, URLs, captions or emails), S11 and S13 fixed in 0012, BULK-1 fallback, QA-3 script, Test Log rewrite, a read-only hosted smoke check, architecture section 05.
 
