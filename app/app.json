@@ -44,6 +44,8 @@
     ],
     "experiments": { "typedRoutes": false },
     "owner": "thefreighttrains-team",
+    "runtimeVersion": { "policy": "sdkVersion" },
+    "updates": { "url": "https://u.expo.dev/676e8cec-57a6-472f-9086-9a9318eaf556" },
     "extra": { "eas": { "projectId": "676e8cec-57a6-472f-9086-9a9318eaf556" } }
   }
 }
