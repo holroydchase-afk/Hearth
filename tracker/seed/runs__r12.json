@@ -1,0 +1,9 @@
+{
+ "suite": "app",
+ "at": "2026-10-18T03:00:00-04:00",
+ "label": "BETA-BULK-1 fallback: creation time for undated photos (red, then green)",
+ "passed": 351,
+ "failed": 0,
+ "results": {},
+ "note": "pickCreationTime.test.ts was red 3 of 8 before the change (no creation time read). After: Jest 351 passed, 1 skipped, the same on 3 runs; typecheck clean."
+}
