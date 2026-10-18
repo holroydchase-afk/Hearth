@@ -14,7 +14,9 @@ export const EVENT_LATER_POSTS_IN_PHOTOS = true;
 export type PhotosRow =
   | { type: 'post'; key: string; post: FeedPost }
   | { type: 'event'; key: string; eventId: string; eventName: string; post: FeedPost }
-  | { type: 'update'; key: string; eventId: string; eventName: string; photoCount: number };
+  | { type: 'update'; key: string; eventId: string; eventName: string; photoCount: number }
+  /** SESS-1 (feed/sessions.ts): posts by one sender within an hour, oldest first. */
+  | { type: 'session'; key: string; posts: FeedPost[] };
 
 export interface EventSummary {
   eventId: string;
