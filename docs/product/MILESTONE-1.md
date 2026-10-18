@@ -38,7 +38,7 @@ Never paste a key, token or password into chat. Secrets go in the environment se
 
 | Path | Expo Go on iPhone | Notes |
 |---|---|---|
-| App bundles for iOS and Android | Yes | Both build (3.6 MB); packages match SDK 54 |
+| App bundles for iOS and Android | Yes | Both build (3.6 MB); packages match SDK 57 (upgraded Oct 18; current Expo Go only opens SDK 57) |
 | Sign-in code, crypto, secure storage | Yes | Pure JS + Expo modules that ship in Expo Go |
 | Pick, resize, strip location, upload | Yes | image-picker, image-manipulator, file-system |
 | Save to phone | Yes | media-library (Android Expo Go is limited; recheck at milestone 5) |

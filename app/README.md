@@ -1,4 +1,4 @@
-# Hearth app (Expo SDK 54, TypeScript strict, expo-router)
+# Hearth app (Expo SDK 57, TypeScript strict, expo-router)
 
 The real Hearth mobile app: a private family photo feed for grandparents. Built test-first against
 `../API.md`; the UX follows `../UX-REVIEW.md` (group not circle, Help tab for viewers, Bigger text
