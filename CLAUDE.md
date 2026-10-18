@@ -2,11 +2,11 @@
 
 Hearth is a private family photo app for split families and for grandparents who avoid social media. Each post has an explicit audience ("groups"; "circles" in code). Data stays in the US. Nothing is used for AI training, and there are no ads or trackers. Founder: Chase (former PM, solo, near Charlotte). Beta target: about 12 West Virginia grandparents by **Nov 22, 2026**.
 
-**Hearth is a proof of concept first** (Chase, Oct 16): a birthday present to himself plus job experience. The milestones in `docs/product/ANCHORS.md` (Chase → wife → most tech-savvy relative → everyone else by savviness → Android → maybe a smart frame → then decide on costs) supersede the startup-style Ring 0–3 plan. Every feature is checked against anchors A1 Anxiety-less, A2 Guilt-free, A3 Stays on US soil.
+**Hearth is a proof of concept first** (Chase, Oct 16): a birthday present to himself plus job experience. The milestones in `docs/product/ANCHORS.md` (Chase → wife → most tech-savvy relative → everyone else by savviness → Android → maybe a smart frame → then decide on costs) supersede the startup-style Ring 0–3 plan. Every feature is checked against anchors A1 Anxiety-less, A2 Guilt-free, A3 Stays on US soil, A4 White-paper ready.
 
 ## Where docs live
 - **Agents read only the repo.** Any doc an agent must act on lives here, and the repo copy wins. Draft in claude.ai docs if you like, then copy it in (or ask Claude to) and edit it here from then on.
-- Root: `CLAUDE.md`, `HANDOFF.md`. Product: `docs/product/`. Engineering: `docs/eng/`. Code READMEs stay beside their code.
+- Root: `CLAUDE.md`, `HANDOFF.md`. Product: `docs/product/`. Engineering: `docs/eng/`. Architecture (white-paper source): `docs/architecture/`. Code READMEs stay beside their code.
 
 ## Read first
 - `docs/product/TRACKER.md`: the one list of what's next, what's missing for milestone 1 and what's pending on Chase or Claude. Work its sequence in order, and update it in the same PR whenever a thread finishes, adds or blocks an item.
@@ -17,6 +17,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - `docs/product/REMAINING.md`: the critical path to the Ring 0 gate (Oct 29) and the beta.
 - `docs/product/BETA-SPEC.md`: 35 acceptance criteria (BETA-*), the scope source of truth.
 - `docs/eng/MERGING.md`: when and how Claude merges PRs (only on Chase's word, CI green, merge commits).
+- `docs/architecture/`: system overview, data flow, encryption and keys, threat model, written for technical privacy-focused readers (anchor A4). Its README has the writing rules.
 - `docs/eng/API.md`: the app↔backend contract. Change the contract tests before changing it.
 - `docs/product/PERSONAS.md`, `docs/product/CORE-FEATURES.md`, `docs/eng/TESTING.md`.
 - `docs/product/AI-FEATURES.md`: future AI and smart-photo features (people → group suggestions, duplicates), the rules they must meet, and the blocking AI positioning decision.
@@ -69,4 +70,5 @@ The main Claude session is Chase's **chief of staff**. It doesn't do specialist 
    - Words: group (not circle), Photos (not feed), Help (not Me) for viewers.
 4. **Deep, not wide.** Nothing outside BETA-SPEC without the staff-pm's call. New ideas go in the `docs/product/ANCHORS.md` ideas log, not straight into code.
 5. **Cost.** Chase is on a $20/mo plan. Run one agent lane at a time and keep reports short.
-6. **PostgREST quirks.** Branch on `error.code`, never on HTTP status (P0002 comes back as 500).
+6. **Docs as we go (A4).** A PR that changes how data is stored, moved, encrypted, logged or shared updates the matching `docs/architecture/` section and its "Last checked" footer in the same PR, or adds a TRACKER row naming the stale section.
+7. **PostgREST quirks.** Branch on `error.code`, never on HTTP status (P0002 comes back as 500).
