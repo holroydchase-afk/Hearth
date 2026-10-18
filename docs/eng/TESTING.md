@@ -16,6 +16,8 @@
 | Prototype | 32 cases (33 tests): visibility, roles, sharing, circles, invites, notifications, accessibility, injection | `cd e2e && npx playwright test` |
 | Backend | 110 privacy rules: grandparent and co-parent separation, revocation, caps, invites, deletion | `cd backend && bash tests/run.sh` |
 | Media signing | 5 tests: signed URLs, denial, metadata check | `cd backend && deno test --allow-env supabase/functions/sign-media/` |
+| Privacy audit | PRIV-1: no raw IP addresses kept (`backend/tests/privacy_audit_test.sql`, in `run.sh`); PRIV-2: no log line carries a key, URL, caption, email or raw error | `bash scripts/tests/check_logs_test.sh` |
+| Hosted checks (read only) | QA-3 sent vs received; D1 smoke check (migrations, RLS, cron, functions, secret names). Tested locally with a stubbed API in `run.sh` | `bash backend/scripts/sent-vs-received.sh ...`, `bash backend/scripts/smoke-check.sh` |
 | Manual | 12 real-phone cases (M-01…M-12), run by family testers | Logged on the Test Log page |
 
 Run everything: `bash test-all.sh`. It saves results to `e2e/results/` and rebuilds the Test Log data in `tracker/seed/`.

@@ -1,0 +1,9 @@
+    ✕ BETA-BULK-1 fallback: a photo with no EXIF date gets the library creation time (8 ms)
+    ✕ BETA-BULK-1 fallback: a photo with an EXIF date never asks the library (2 ms)
+    ✓ BETA-BULK-1 fallback: no asset id means no creation time (null), and the photo is still picked
+    ✓ BETA-BULK-1 fallback: keeps only the number (no location or EXIF from the library) (1 ms)
+    ✓ BETA-BULK-1 fallback: with library access not granted, no new prompt; taken_at is null and the upload still goes (1 ms)
+    ✕ BETA-BULK-1 fallback: limited Photos access (iOS "Selected photos") still reads the picked photo
+    ✓ BETA-BULK-1 fallback: a library error leaves the date null and the pick goes through (4 ms)
+    ✓ BETA-BULK-1 fallback: the library being unavailable (web) leaves dates null (1 ms)
+Tests:       3 failed, 5 passed, 8 total

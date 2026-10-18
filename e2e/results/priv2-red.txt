@@ -1,0 +1,13 @@
+ok      PRIV-2 flags a bad log call (key)
+ok      PRIV-2 flags a bad log call (url)
+ok      PRIV-2 flags a bad log call (caption)
+ok      PRIV-2 flags a bad log call (message)
+ok      PRIV-2 flags a bad log call (object)
+ok      PRIV-2 flags a bad log call (stringify)
+ok      PRIV-2 flags a bad log call (multiline)
+ok      PRIV-2 passes safe log calls (fixed words, e.name, URL-cut message)
+NOT OK  PRIV-2 app/src and the edge functions log no keys, URLs, captions or raw errors  [backend/supabase/functions/sign-media/index.ts:288 logs an error .message without cutting URLs (use .message.replace(/https?:\S+/g, ""))
+backend/supabase/functions/sign-media/index.ts:288 logs a whole error object (log e.name or a fixed word)
+PRIV-2 log check: 2 problem(s)]
+
+LOG CHECK RESULT: 8 passed, 1 failed
