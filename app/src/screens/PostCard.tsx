@@ -5,11 +5,10 @@ import type { CommentView } from '../feed/store';
 import { useApp, useFeed } from '../state/AppContext';
 import { useNav } from '../state/nav';
 import { Button, Card, Confirm, Field, Txt } from '../ui/kit';
-import { andList, people, photos, shortDate } from '../ui/format';
+import { andList, people, shortDate } from '../ui/format';
 import { MIN_TARGET, useTheme } from '../ui/theme';
 import { MediaImage } from './MediaImage';
-
-const SHOW_INLINE = 4;
+import { PhotoSwipe, cardAspect } from './PhotoSwipe';
 
 export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
   const { feed, session } = useApp();
@@ -33,21 +32,20 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
         <Txt variant="strong">{post.author_name}</Txt>
         <Txt variant="muted">{shortDate(post.published_at)}</Txt>
       </View>
-      {ready.slice(0, SHOW_INLINE).map((m, i) => (
+      {ready.length > 1 ? (
+        <PhotoSwipe postId={post.post_id} media={ready} />
+      ) : ready.map((m) => (
         <Pressable
           key={m.media_id}
           accessibilityRole="button"
-          accessibilityLabel={`Open photo ${i + 1} of ${ready.length} full screen`}
-          onPress={() => nav.openViewer(post.post_id, i)}
-          style={{ width: '100%', aspectRatio: m.width && m.height ? Math.max(0.6, Math.min(1.8, m.width / m.height)) : 4 / 3, minHeight: MIN_TARGET, minWidth: MIN_TARGET }}
+          accessibilityLabel="Open photo 1 of 1 full screen"
+          onPress={() => nav.openViewer(post.post_id, 0)}
+          style={{ width: '100%', aspectRatio: cardAspect(m), minHeight: MIN_TARGET, minWidth: MIN_TARGET }}
         >
           <MediaImage postId={post.post_id} mediaId={m.media_id} style={{ flex: 1 }} />
         </Pressable>
       ))}
       <View style={styles.body}>
-        {ready.length > SHOW_INLINE ? (
-          <Button label={`See all ${photos(ready.length)}`} variant="secondary" onPress={() => nav.openViewer(post.post_id, SHOW_INLINE)} />
-        ) : null}
         {post.caption ? <Txt>{post.caption}</Txt> : null}
         <Txt variant="muted" style={{ color: post.audience ? c.ink : c.safe }}>{audience}</Txt>
         {mine && post.seen_count !== null && post.reach_count !== null ? (
