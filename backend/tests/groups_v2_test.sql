@@ -614,7 +614,7 @@ begin
   end loop;
 end $$;
 select tests.fill_cmatrix();
-select tests.ok((select count(*) from tests.cmatrix) >= 10 * 8
+select tests.ok((select count(*) from tests.cmatrix) = 10 * 7   -- 10 people x the 7 comments the fixture writes
                 and not exists (select 1 from tests.cmatrix where via_rpc is distinct from via_rls or via_rls is distinct from via_ok),
                 format('GRP-14 every person x every comment: get_comments = table RLS = reply_ok (%s disagree)',
                        (select count(*) from tests.cmatrix where via_rpc is distinct from via_rls or via_rls is distinct from via_ok)));
