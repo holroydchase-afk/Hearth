@@ -83,6 +83,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 - 0012 households-only migration (spec'd in `SPEC-GROUPS.md`, needed before milestone 3).
 
 - **Real data starts at milestone 2** (Chase, Oct 18): milestone 1 is Chase's own UAT playground, so the hosted project and the bucket (`family-photos-testing-…` is fine) hold test data and can be wiped. Before Danielle joins, decide: wipe and keep them, or make a fresh bucket (and project) for real photos. No sandbox structure until then.
+- **QA environment before milestone 3** (Chase, Oct 18): once anyone beyond Danielle is on, every release is tried in QA first (its own Supabase project and bucket, plus the `preview` update channel), so grandparents never get a wonky build. Ties to IN-9 (update discipline) in REMAINING.md.
 
 ## Running
 
