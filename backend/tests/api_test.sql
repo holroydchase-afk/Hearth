@@ -452,6 +452,22 @@ select tests.ok_sql($q$select (tests.rest($s$select public.invite_preview('NOPE2
                     'invite_preview over PostgREST: 400 with code 22023');
 
 -- ======================================================================
+-- ONB-3 / ONB-4: invite links open the hosted web build's join screen, never a domain we don't own
+-- ======================================================================
+:as_admin
+select tests.ok_sql($q$select value = 'https://thefreighttrains-team-hearth.expo.app/join/' from private.secrets where name = 'invite_link_base'$q$,
+                    'ONB-3 invite_link_base is the hosted web build''s /join/ address');
+select tests.ok_sql($q$select starts_with(tests.v('inv1')::jsonb->>'link', (select value from private.secrets where name = 'invite_link_base'))$q$,
+                    'ONB-3 create_invite: the link starts with the configured invite_link_base');
+select tests.ok_sql($q$select tests.v('inv1')::jsonb->>'link' not like 'https://hearth.family%'$q$,
+                    'ONB-3 create_invite: the link never points at hearth.family (not bought, ACCOUNTS.md)');
+select tests.ok_sql($q$select tests.v('inv1')::jsonb->>'link' ~ '^https://[^/]+/join/[0-9a-f]{40}$'$q$,
+                    'ONB-4 create_invite: the link path is /join/<token>, the route the app opens (app/src/app/join/[code].tsx)');
+:as_anon
+select tests.ok_sql($q$select public.invite_preview(substring(tests.v('inv1')::jsonb->>'link' from '/join/([^/]+)$'))::jsonb->>'inviter_name' = 'Alex'$q$,
+                    'ONB-4 invite_preview: the /join/ path segment of the link previews the invite');
+
+-- ======================================================================
 -- redeem_invite: BETA-JOIN-3 (every bad invite -> 22023, nothing leaks)
 -- ======================================================================
 :as_alex

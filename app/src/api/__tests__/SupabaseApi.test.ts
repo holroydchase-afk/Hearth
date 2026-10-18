@@ -46,7 +46,14 @@ describe('SupabaseApi RPC wiring (API.md names and args)', () => {
     const c = mockClient({ data: [{ invite_id: 'i', code: 'ABCDEFGHJK', expires_at: 'x' }], error: null });
     const r = await make(c).createInvite({ space: 'S', role: 'viewer', circleIds: ['a'], channel: 'email', targetEmail: 'g@x.com' });
     expect(c.rpc).toHaveBeenCalledWith('create_invite', expect.objectContaining({ p_space: 'S', p_role: 'viewer', p_circle_ids: ['a'], p_channel: 'email', p_target_email: 'g@x.com' }));
-    expect(r).toEqual({ code: 'ABCDEFGHJK', link: 'https://hearth.family/join/ABCDEFGHJK' });
+    expect(r).toEqual({ code: 'ABCDEFGHJK', link: 'https://thefreighttrains-team-hearth.expo.app/join/ABCDEFGHJK' }); // ONB-3 fallback
+  });
+
+  it('ONB-3 create_invite: the server\'s link (invite_link_base + token) is passed through unchanged', async () => {
+    const link = 'https://thefreighttrains-team-hearth.expo.app/join/0123456789abcdef0123456789abcdef01234567';
+    const c = mockClient({ data: [{ invite_id: 'i', code: 'ABCDEFGHJK', link, expires_at: 'x' }], error: null });
+    const r = await make(c).createInvite({ space: 'S', role: 'viewer', circleIds: ['a'] });
+    expect(r).toEqual({ code: 'ABCDEFGHJK', link });
   });
 
   it('keeps PostgREST error codes', async () => {
