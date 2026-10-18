@@ -82,7 +82,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 - Schedule the nightly hard purge (`purge_soft_deleted`) on the hosted project; `deploy.sh` doesn't today. Found while writing `docs/architecture/02-data-flow.md`.
 - 0012 households-only migration (spec'd in `SPEC-GROUPS.md`, needed before milestone 3).
 
-- **QA environment** (Chase, Oct 18): a second Supabase project and B2 bucket (e.g. `family-photos-qa-xxxx`) for test runs, so the hosted suites and demos never touch real family photos. Today there is one hosted project and one bucket, and they hold real data from milestone 1 on. Ties to D1. Before milestone 2.
+- **Real data starts at milestone 2** (Chase, Oct 18): milestone 1 is Chase's own UAT playground, so the hosted project and the bucket (`family-photos-testing-…` is fine) hold test data and can be wiped. Before Mom joins, decide: wipe and keep them, or make a fresh bucket (and project) for real photos. No sandbox structure until then.
 
 ## Running
 
