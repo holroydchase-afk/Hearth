@@ -79,7 +79,15 @@ export async function supabaseHarness(): Promise<ContractHarness> {
         p_post: postId,
         p_items: [{ kind: 'photo', mime_type: 'image/jpeg', width: 4, height: 3, duration_ms: null, byte_size: 92, thumb_byte_size: 44, exif_stripped: true }],
       });
-      for (const r of rows as { media_id: string }[]) await rpcRaw(service, 'mark_media_upload_result', { p_media: r.media_id, p_ok: true });
+      for (const r of rows as { media_id: string }[]) {
+        // sign-media saves the wrapped key at upload; ready needs it (S15, migration 0012)
+        const k = await rewrite(`${url}/rest/v1/media_keys`, {
+          method: 'POST', body: JSON.stringify({ media_id: r.media_id, wrapped_dek: '\\x00' }),
+          headers: { apikey: anonKey, authorization: `Bearer ${service}`, 'content-type': 'application/json', prefer: 'return=minimal' },
+        });
+        if (!k.ok) throw new Error(`media_keys: HTTP ${k.status}`);
+        await rpcRaw(service, 'mark_media_upload_result', { p_media: r.media_id, p_ok: true });
+      }
     },
   };
 }

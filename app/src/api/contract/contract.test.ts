@@ -519,14 +519,16 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
     it('BETA-TIME-4 years, newest first, with post and photo counts; the year follows the phone time zone', async () => {
       await datedPost('2021-05-01T12:00:00.000Z');
       await datedPost('2021-06-01T12:00:00.000Z');
-      await datedPost('2019-01-01T03:30:00.000Z'); // 10:30 pm Dec 31 2018 in New York
+      // T7: years no other test uses, since the real-API harness keeps one database for the whole run
+      // (BETA-TIME-2 above makes a 2019 post).
+      await datedPost('2017-01-01T03:30:00.000Z'); // 10:30 pm Dec 31 2016 in New York
       const ny = await viewerIn.getTimelineYears(h.spaceId, 'America/New_York');
       expect(ny.map((y) => y.year)).toEqual([...ny.map((y) => y.year)].sort((a, b) => b - a));
       expect(ny.find((y) => y.year === 2021)).toMatchObject({ post_count: 2, photo_count: 2 });
-      expect(ny.find((y) => y.year === 2018)).toMatchObject({ post_count: 1 });
-      expect(ny.find((y) => y.year === 2019)).toBeUndefined();
+      expect(ny.find((y) => y.year === 2016)).toMatchObject({ post_count: 1 });
+      expect(ny.find((y) => y.year === 2017)).toBeUndefined();
       const utc = await viewerIn.getTimelineYears(h.spaceId, 'UTC');
-      expect(utc.find((y) => y.year === 2019)).toMatchObject({ post_count: 1 });
+      expect(utc.find((y) => y.year === 2017)).toMatchObject({ post_count: 1 });
     });
 
     it('BETA-TIME-4 an unknown time zone is 22023', async () => {

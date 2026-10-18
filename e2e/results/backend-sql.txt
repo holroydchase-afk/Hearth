@@ -504,10 +504,10 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 TIMELINE RESULT: 38 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
-psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('bf7b0975-4b50-495b-84c7-e8b8cb6d5a75'))
-psql:tests/groups_test.sql:886: WARNING:  as mom: P0002 not found (select public.retire_level('06dcbc51-c2f9-46a9-8726-77b14eabe462'))
-psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('f29afd5d-d727-4f70-a734-6b2fc5b3f653'))
-psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = '9b386a06-3395-4b16-aaec-5b71d4f7149b')
+psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('1df981fc-5cc8-4e2e-b18c-bdd42a708d4d'))
+psql:tests/groups_test.sql:886: WARNING:  as mom: P0002 not found (select public.retire_level('438a2393-3438-4de7-8bff-c5934a67e691'))
+psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('11f4ef27-bfd7-4549-be09-e3d2eb63d9e8'))
+psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = 'dcc92284-4c21-4075-aa24-a6e11caf1a65')
   n  | result |                                                                                  description                                                                                   
 -----+--------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    1 | ok     | BETA-AUD-11 shape: circles.kind exists (everyone | group | household | event)
@@ -694,8 +694,8 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 TIMELINE-FUTURE RESULT: 6 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
- n  | result |                                                 description                                                  
-----+--------+--------------------------------------------------------------------------------------------------------------
+ n  | result |                                                         description                                                         
+----+--------+-----------------------------------------------------------------------------------------------------------------------------
   1 | ok     | PRIV-1 no table in public or private has an inet/cidr column or an ip/user_agent column
   2 | ok     | PRIV-1 setup: the failed attempts were counted per client (rate limit still keyed by IP)
   3 | ok     | PRIV-1 rate limit rows never hold the raw client IP (only a keyed hash)
@@ -708,17 +708,20 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
  10 | ok     | S11 the owner of a family space can still unlink a child from their own space
  11 | ok     | S13 setup: two relatives in the same group see each other's profile
  12 | ok     | S13 once their only shared group is deleted, they no longer see each other's profile
+ 13 | ok     | S15 a photo whose key was never saved is marked failed, not ready, even when its upload checked out
+ 14 | ok     | S15 a photo with its key saved is marked ready as before
+ 15 | ok     | S15 ...so the post can't be published half-broken (all photos must be ready)  [23514 all media must finish uploading first]
 
 
-PRIVACY-AUDIT RESULT: 12 passed, 0 failed
+PRIVACY-AUDIT RESULT: 15 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
 
 Narrowing for Chase (readable before 0011 only through "members see each other's replies"):
      reader     |  kind   |                                 reply_id                                  
 ----------------+---------+---------------------------------------------------------------------------
- Grandma Rivera | comment | 32d774b6-1ccb-4040-bca8-72bd97a7a638
+ Grandma Rivera | comment | d9f67835-3145-4a9d-91f5-87da29096bf5
  Grandma Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a2
- Grandpa Rivera | comment | 0a5d812e-0b5c-4214-9814-d74fe2f9c853
+ Grandpa Rivera | comment | eeece3d1-4707-4d7f-832d-aa0e1eae3b8a
  Grandpa Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a1
 
  n  | result |                                                     description                                                      
@@ -761,8 +764,8 @@ ok      SETUP-API: before Chase has an account it says "sign in once in the app"
 ok      SETUP-API: ... and changes nothing
 ok      SETUP-API: fresh setup runs without error
         | Family "Chase's kids" is ready: Everyone, Chase's side, Mom's side, 7 houses, 2 events.
-        | Test viewer invite (account B): code ZWJ338SBTN, works once until Oct 25, link https://hearth.family/i/cd7a8cf9c6b3d04d7f4a30e58950de81aa9dcd30
-        | Mom's poster invite: code H2W84DEPS9, works once until Oct 25, only for mom@example.com, link https://hearth.family/i/a89e2c39caaf2d4557afb4fd8f6dcfe458a9994f
+        | Test viewer invite (account B): code TCYRPDFZZD, works once until Oct 25, link https://hearth.family/i/064a7f96a34847042d5738ced0c541b813406564
+        | Mom's poster invite: code ZCA8H8MP4G, works once until Oct 25, only for mom@example.com, link https://hearth.family/i/731dd32a6fe780c1521b8160c10338996b4642bc
 ok      SETUP-API: Chase owns one family, named as given (an apostrophe in the name is kept, not a SQL error)
 ok      SETUP-API: one Everyone
 ok      SETUP-API: the set groups are Chase's side and Mom's side (no v1 groups to retire later)
@@ -825,10 +828,11 @@ ok      D1 smoke: without SUPABASE_ACCESS_TOKEN it stops and names the secret
         | ok    RLS is on for every public table
         | ok    cron job hearth-notify
         | ok    cron job hearth-purge-client-errors
+        | ok    no IP addresses in Supabase Auth's audit log
         | ok    edge function sign-media is active
         | ok    edge function notify is active
         | ok    all 10 function secrets are set
-        | SMOKE RESULT: 7 ok, 0 failed
+        | SMOKE RESULT: 8 ok, 0 failed
 ok      D1 smoke: a healthy project passes (exit 0)
 ok      D1 smoke: ends with "SMOKE RESULT: N ok, 0 failed"
 ok      D1 smoke: says all 12 local migrations are applied
@@ -847,5 +851,8 @@ ok      D1 smoke: an edge function that isn't ACTIVE fails
 ok      D1 smoke: a missing function secret fails and names it (MEDIA_KEK)
 ok      D1 smoke: ... and still prints no secret value
 ok      D1 smoke: the leftover placeholder secret is a warning to clean up, not a failure
+ok      PRIV-1 smoke: no auth audit table (or no IPs in it) reads as ok
+ok      PRIV-1 smoke: IP addresses in Supabase Auth's audit log are a warning with a count
+ok      PRIV-1 smoke: ... and the address itself is never printed
 
-SMOKE CHECK TEST RESULT: 20 passed, 0 failed
+SMOKE CHECK TEST RESULT: 23 passed, 0 failed
