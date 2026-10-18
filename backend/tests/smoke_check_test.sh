@@ -98,6 +98,7 @@ echo "$out" | grep -q "^ok  *all $n migrations applied"; ok $? "D1 smoke: says a
 grep -q "Authorization: Bearer $TOKEN" "$T/log/requests"; ok $? "D1 smoke: the token goes in the Authorization header"
 [ ! -f "$T/log/psql" ] && [ ! -f "$T/log/unexpected" ]; ok $? "D1 smoke: no psql, no unexpected endpoint"
 [ "$before" = "$(fingerprint)" ]; ok $? "D1 smoke: changes nothing"
+echo "$out" | grep -q "^ok  *invite links open the web build's /join/ screen"; ok $? "ONB-3 smoke: hosted invite_link_base is checked and reads as ok"
 
 # ---- each kind of problem fails and names what's wrong ----
 q "delete from supabase_migrations.schema_migrations where version = (select max(version) from supabase_migrations.schema_migrations)" >/dev/null
@@ -132,6 +133,19 @@ out=$(run); rc=$?
 write_secrets "${ALL_SECRETS[@]}" HEARTH_KEYS_PENDING
 out=$(run); rc=$?
 [ $rc = 0 ] && echo "$out" | grep -q "^warn.*HEARTH_KEYS_PENDING"; ok $? "D1 smoke: the leftover placeholder secret is a warning to clean up, not a failure"
+
+# ONB-3: invite links must not point at a domain we don't own (hearth.family, not bought) and must use /join/
+q "update private.secrets set value = 'https://hearth.family/i/' where name = 'invite_link_base'" >/dev/null
+out=$(run); rc=$?
+[ $rc != 0 ] && echo "$out" | grep -q "^FAIL.*invite links point at hearth.family"; ok $? "ONB-3 smoke: an invite_link_base on hearth.family fails"
+! echo "$out" | grep -q "hearth.family/i/"; ok $? "ONB-3 smoke: ... and the stored value is never printed"
+q "update private.secrets set value = 'https://thefreighttrains-team-hearth.expo.app/i/' where name = 'invite_link_base'" >/dev/null
+out=$(run); rc=$?
+[ $rc != 0 ] && echo "$out" | grep -q "^FAIL.*invite links don't end in /join/"; ok $? "ONB-4 smoke: an invite_link_base whose path the app doesn't open fails"
+q "delete from private.secrets where name = 'invite_link_base'" >/dev/null
+out=$(run); rc=$?
+[ $rc != 0 ] && echo "$out" | grep -q "^FAIL.*invite_link_base is not set"; ok $? "ONB-3 smoke: a missing invite_link_base fails"
+q "insert into private.secrets (name, value) values ('invite_link_base', 'https://thefreighttrains-team-hearth.expo.app/join/')" >/dev/null
 
 # Supabase Auth's own audit log (auth.audit_log_entries) can hold IP addresses inside our database (PRIV-1 gap)
 out=$(run); echo "$out" | grep -q "^ok .*no IP addresses in Supabase Auth's audit log"; ok $? "PRIV-1 smoke: no auth audit table (or no IPs in it) reads as ok"

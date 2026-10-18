@@ -1,6 +1,7 @@
 // API.md contract tests. They run against every HearthApi implementation we can reach:
 // FakeApi always; SupabaseApi when HEARTH_API_URL/HEARTH_ANON_KEY/HEARTH_USERS_JSON are set.
 import { ApiError, type HearthApi } from '../HearthApi';
+import { JOIN_LINK_BASE } from '../links';
 import { decryptMedia, encryptMedia, encryptedSize } from '../../crypto/media';
 import { uuid } from '../../crypto/random';
 import { fakeHarness } from './fakeHarness';
@@ -216,6 +217,14 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       const prev = await h.anon().invitePreview(c);
       expect(Object.keys(prev).sort()).toEqual(['inviter_name', 'space_name']);
       expect(await code(h.anon().invitePreview('NOPE-NOPE-1'))).toBe('22023');
+    });
+
+    it('ONB-3/ONB-4 the link is the web build\'s /join/ address, and its last segment previews signed out', async () => {
+      const { link } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all' });
+      expect(link.startsWith(JOIN_LINK_BASE)).toBe(true);
+      const segment = link.slice(JOIN_LINK_BASE.length); // the code (Fake) or the 160-bit link token (server)
+      expect(segment).toMatch(/^[A-Za-z0-9]+$/);
+      expect((await h.anon().invitePreview(segment)).inviter_name).toBeTruthy();
     });
 
     itJoiner('a bad code is 22023 with no space data', async () => {

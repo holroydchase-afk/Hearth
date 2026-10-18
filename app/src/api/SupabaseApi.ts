@@ -14,8 +14,9 @@ import type {
   TimelineArgs, TimelinePost, TimelineYear,
 } from './types';
 import { toApiError } from '../errors/messages';
+import { JOIN_LINK_BASE } from './links';
 
-export const JOIN_LINK_BASE = 'https://hearth.family/join/';
+export { JOIN_LINK_BASE };
 
 export interface SupabaseApiOptions {
   url: string;
