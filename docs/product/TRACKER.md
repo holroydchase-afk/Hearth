@@ -27,6 +27,17 @@ Chase uses Hearth end to end in Expo Go on his iPhone, with a test account B on 
 | 9 | **The 2-day demo** in `MILESTONE-1.md`: 10+ posts, B comments and hearts, airplane mode, save to phone. Log each row (or tell Claude) | Chase | ☐ |
 | 10 | Fix what the demo found (test first), then staff-pm gate review: pass or fail milestone 1 | Claude | ☐ |
 
+## High priority: QA resources (Chase, Oct 18)
+
+What lets the qa-tdd agent check milestone 1 for real instead of only on local copies. Chase marked all four high priority.
+
+| # | Item | Why it matters | Owner | Status |
+|---|---|---|---|---|
+| QA-R1 | Test account B made by `family-setup.sh`, with its invite code sent to Chase | QA can run the demo path on hosted (sign in, post, B sees it, B comments) and build QA-3, the sent-vs-received check | Claude | ☐ (step 5, then step 8) |
+| QA-R2 | Photo and notice keys (B2 and `MEDIA_KEK` first, then Resend) as Hearth environment secrets | QA can't test photos or email notices without them | Chase | ◐ (B2 account, bucket and key done Oct 18; `MEDIA_KEK` and Resend next; steps 6, 7) |
+| QA-R3 | `SUPABASE_DB_URL` as a Hearth environment secret, never in chat | QA can query the hosted DB directly and re-measure `get_timeline` speed. Milestone 1 data is test data, so the full SQL suites may wipe it (D1) | Chase | ☐ |
+| QA-R4 | Browser tests in CI: add `npm run e2e:web` (Playwright) to `.github/workflows/ci.yml` | Every PR checked in a real browser | Claude | ☐ after milestone 1 (build freeze), unless Chase pulls it forward |
+
 ## Missing for MVP
 
 What stops milestone 1 from being testable today. Each line names its sequence step.
@@ -48,7 +59,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 
 | # | Question | Claude's pick | Blocks |
 |---|---|---|---|
-| D1 | How to meet "auto criteria green 3× on hosted": wipe and run the full suites on hosted before you sign in (needs `SUPABASE_DB_URL`), or count CI's 3 green runs on a real Supabase stack plus a read-only smoke check on hosted | CI runs plus hosted smoke check; no extra secret, nothing wiped | M1 gate wording (before step 4) |
+| D1 | How to meet "auto criteria green 3× on hosted" | Milestone 1 data is test data (Chase, Oct 18), so run the full SQL suites on hosted and let them wipe it; needs `SUPABASE_DB_URL` (QA-R3). Re-run family setup after | Settled by Chase's Oct 18 call; waits on QA-R3 |
 | D2 | Refresh the staff-pm agent (milestones, "groups" wording, a not-doing list, files it owns), as a PR you review | Yes, after milestone 1 | Nothing today |
 | D3 | Is the name final? Must be answered before buying the domain or the $99 Apple build (`ACCOUNTS.md`) | Decide at the start of milestone 2 | Milestone 2 |
 | D4 | "Seen by" conflicts with A2 Guilt-free: keep, change or drop | Decide before milestone 4 | Milestone 4 |
