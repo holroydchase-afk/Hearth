@@ -193,6 +193,9 @@ reset role;
 -- ======================================================================
 -- 6. Uploads: EXIF flag + free-tier video cap (10/month)
 -- ======================================================================
+-- 0013 (FLAG-1/4): video posting is off by default; these cap tests need it on for space A (global + family).
+insert into private.feature_flags (feature, enabled) values ('video_posting', true);
+insert into public.space_features (space_id, feature, enabled) values (:space_a, 'video_posting', true);
 set role authenticated;
 select set_config('request.jwt.claim.sub', :alex, false);
 select tests.throws(format($q$select * from public.prepare_media_upload(%L, '[{"kind":"photo","mime_type":"image/jpeg","width":10,"height":10,"byte_size":100,"thumb_byte_size":10,"exif_stripped":false}]')$q$, :p_a_all),
