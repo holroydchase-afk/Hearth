@@ -1,6 +1,6 @@
 # Hearth tracker: what's next, what's missing, what's pending
 
-The one list of everything open between Chase and Claude. Updated Oct 17, 2026.
+The one list of everything open between Chase and Claude. Updated Oct 18, 2026.
 
 **How it works**
 - Work the **Sequence** top to bottom. One step at a time; nothing new gets built until milestone 1 passes (Chase, Oct 17).
@@ -78,6 +78,8 @@ What stops milestone 1 from being testable today. Each line names its sequence s
   - A "what Hearth can see" page listing every vendor and what it can read; grandparent-ux reviews the wording.
   - Audit that our code never keeps IP addresses, and write down Supabase's log retention.
   - Later: encrypt captions and replies (this blocks caption search).
+- **Architecture docs (A4, white-paper source).** Write the access-control section (groups, households, events, roles, RLS from 0011) next; then retention and deletion once the purge worker exists. Keep every footer current (CLAUDE.md rule 6).
+- Schedule the nightly hard purge (`purge_soft_deleted`) on the hosted project; `deploy.sh` doesn't today. Found while writing `docs/architecture/02-data-flow.md`.
 - 0012 households-only migration (spec'd in `SPEC-GROUPS.md`, needed before milestone 3).
 
 ## Running
@@ -86,6 +88,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 
 ## Done (latest first)
 
+- Oct 18: anchor A4 White-paper ready; `docs/architecture/` started (overview, data flow, encryption and keys, threat model).
 - Oct 18: sign-in code email set up in Supabase (Resend SMTP, both templates, 6-digit code, 1 hour); PR #14 and #16 merged.
 - Oct 17: tracker created (this file).
 - Oct 17: milestone 1 runs in Expo Go; push moved to milestone 2 (PR #15).

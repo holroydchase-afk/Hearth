@@ -1,5 +1,11 @@
 # Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
+## Oct 18: anchor A4 White-paper ready, architecture docs started (Chase's ask)
+- Chase: build documentation as we go so it turns into white papers easily, for intelligent, privacy-focused tech readers. Logged as anchor A4 and an ideas-log row in `docs/product/ANCHORS.md`.
+- New `docs/architecture/`: README (reader, writing rules, keep-current rule), system overview, data flow, encryption and keys, threat model. Each claim is labeled Built, Planned or Gap and cites code.
+- CLAUDE.md rule 6: PRs that change how data is stored, moved, encrypted, logged or shared update the matching section in the same PR.
+- Found while writing: `deploy.sh` doesn't schedule `purge_soft_deleted` on hosted (tracker row added).
+
 ## Oct 17, evening: milestone 1 runs in Expo Go (Chase's call)
 1. **Decided:** milestone 1 runs fully in Expo Go. NOTIFY-3 (tap a push and the post opens) moves to milestone 2, so the $99 Apple account is off the M1 path; M1 notices come by email. Updated BETA-SPEC (criterion map, M1 and M2 gates), MILESTONE-1 and REMAINING.
 2. **Focus:** milestone 1 only. Nothing new gets built until Chase has signed in and run the demo; the demo shows what to fix.
