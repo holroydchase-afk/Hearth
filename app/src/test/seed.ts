@@ -10,7 +10,7 @@ export const fakeJpegBytes = (seed: number, n = 600) => {
   return b;
 };
 
-export async function seedPost(be: FakeBackend, opts: { author?: string; caption?: string; circles?: string[]; photos?: number; takenAt?: string | null } = {}) {
+export async function seedPost(be: FakeBackend, opts: { author?: string; caption?: string; circles?: string[]; photos?: number; takenAt?: string | null; sizes?: Array<[number, number]> } = {}) {
   const api = be.clientFor(opts.author ?? FIXTURE.users.chase.id);
   const id = await api.createPost({ clientId: uuid(), space: FIXTURE.space.id, caption: opts.caption ?? 'Mia at the park', circleIds: opts.circles ?? [FIXTURE.circles.dadSide.id], takenAt: opts.takenAt ?? null });
   const n = opts.photos ?? 1;
@@ -19,7 +19,7 @@ export async function seedPost(be: FakeBackend, opts: { author?: string; caption
     const items = Array.from({ length: n }, (_, i) => {
       const d = fakeJpegBytes(i + 3);
       plains.push(d);
-      return { kind: 'photo' as const, mime_type: 'image/jpeg', width: 2048, height: 1536, duration_ms: null, byte_size: encryptedSize(d.length), thumb_byte_size: encryptedSize(100), exif_stripped: true };
+      return { kind: 'photo' as const, mime_type: 'image/jpeg', width: opts.sizes?.[i]?.[0] ?? 2048, height: opts.sizes?.[i]?.[1] ?? 1536, duration_ms: null, byte_size: encryptedSize(d.length), thumb_byte_size: encryptedSize(100), exif_stripped: true };
     });
     const g = await api.signUpload(id, items);
     for (const it of g.items) {

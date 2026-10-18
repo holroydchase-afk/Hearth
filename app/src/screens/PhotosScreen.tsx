@@ -3,13 +3,14 @@ import { FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp, useFeed } from '../state/AppContext';
 import { eventList, photosRows, type PhotosRow } from '../feed/events';
+import { withSessions } from '../feed/sessions';
 import { earlierGroups, isFromEarlier, monthSpan, startOfNextMonth, type EarlierGroup } from '../feed/timeline';
 import { Button, Card, Loading, Notice, Txt } from '../ui/kit';
 import { andList } from '../ui/format';
 import { useTheme } from '../ui/theme';
 import { AppGate } from './AppGate';
 import { EventCard, EventsScreen, EventUpdate, type EventsView } from './EventsScreen';
-import { PostCard } from './PostCard';
+import { PostCard, SessionCard } from './PostCard';
 import { QueueStatus } from './QueueStatus';
 import { TimelineScreen } from './TimelineScreen';
 import { YourName } from './YourName';
@@ -54,11 +55,13 @@ export function PhotosScreen() {
   const earlier = earlierGroups(state.posts);
   const recent = state.posts.filter((p) => !isFromEarlier(p));
   // EVT-2/3: an event's first post is a bigger card; its later posts are ordinary cards (EVENT_LATER_POSTS_IN_PHOTOS).
-  const rows = photosRows(recent);
+  // SESS-1/2: a sender's posts to the same groups within an hour are one entry (display only).
+  const rows = withSessions(photosRows(recent));
   const hasEvents = eventList(state.posts).length > 0;
   const openEvent = (eventId: string) => setEvents({ eventId, fromList: false });
   const renderRow = ({ item }: { item: PhotosRow }) =>
     item.type === 'post' ? <PostCard post={item.post} />
+      : item.type === 'session' ? <SessionCard posts={item.posts} />
       : item.type === 'event' ? <EventCard eventId={item.eventId} eventName={item.eventName} post={item.post} onOpen={() => openEvent(item.eventId)} />
         : <EventUpdate eventId={item.eventId} eventName={item.eventName} photoCount={item.photoCount} onOpen={() => openEvent(item.eventId)} />;
 
