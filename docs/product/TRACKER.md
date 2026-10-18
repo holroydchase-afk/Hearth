@@ -16,8 +16,8 @@ Chase uses Hearth end to end in Expo Go on his iPhone, with a test account B on 
 
 | # | Step | Owner | Status |
 |---|---|---|---|
-| 1 | Say "merge" for the docs PRs: [#14](https://github.com/holroydchase-afk/Hearth/pull/14) (family vault logged) and the PR that adds this tracker. (#15, milestone 1 in Expo Go, is merged) | Chase | ◐ |
-| 2 | **Sign-in code email.** In Resend: API Keys → Create, name `supabase-smtp`, Sending access. In Supabase → Authentication → Emails → Set up SMTP: sender `onboarding@resend.dev`, name `Hearth`, host `smtp.resend.com`, port `465`, user `resend`, password = that key. Then paste the two templates (`deploy/magic_link.html`, `deploy/confirmation.html` in the project files; subject `Your Hearth code: {{ .Token }}`) and set code length 6, expiry 3600 s. About 10 minutes | Chase | ☐ |
+| 1 | Say "merge" for the docs PRs: [#14](https://github.com/holroydchase-afk/Hearth/pull/14) (family vault logged) and the PR that adds this tracker. (#15, milestone 1 in Expo Go, is merged) | Chase | ☑ |
+| 2 | **Sign-in code email.** In Resend: API Keys → Create, name `supabase-smtp`, Sending access. In Supabase → Authentication → Emails → Set up SMTP: sender `onboarding@resend.dev`, name `Hearth`, host `smtp.resend.com`, port `465`, user `resend`, password = that key. Then paste the two templates (`deploy/magic_link.html`, `deploy/confirmation.html` in the project files; subject `Your Hearth code: {{ .Token }}`) and set code length 6, expiry 3600 s. About 10 minutes | Chase | ☑ |
 | 3 | **Get the app to Chase's phone and account B's browser.** Point the app at the hosted project, publish it so Expo Go opens it from a link or QR (no laptop dev server), and give account B a web link. Nothing does this today (see Missing, M1) | Claude | ☐ |
 | 4 | Sign in once in Expo Go with the 6-digit code; tell Claude "signed in" | Chase | ☐ |
 | 5 | Run `family-setup.sh` (Everyone, both sides, the houses, Test house, two events); send Chase account B's invite code | Claude | ☐ |
@@ -58,6 +58,8 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 | D8 | Start per-family media keys now, before the first real photos (step 7), or after milestone 1 (then old photos need re-keying) | Before step 7, if staff-pm approves; it's small | Nothing today; cheaper before step 7 |
 | D9 | Push and email notices name the sender ("From Chase on Hearth", BETA-NOTIFY-7) or say nothing about who | Keep names for the beta; add a "hide names" setting later | Milestone 2 |
 | D10 | Open-source the repo? Prep would be a secrets scan and a license; a paid outside review waits for milestone 7 | Decide after milestone 1 | Nothing today |
+| D11 | Text message codes as the primary, default way to get a sign-in code (email as fallback). Needs an SMS provider and US carrier registration, which can take weeks | Keep email for milestones 1 and 2; staff-pm specs texts, and you start carrier registration early so it's ready for the grandparents (milestone 3+) | Grandparent milestones |
+| D12 | Other sign-in options, including Sign in with Apple | Explore after milestone 1; Apple needs the $99 account and a final name | Nothing today |
 
 ## Waiting on Chase, later (not milestone 1)
 
@@ -84,6 +86,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 
 ## Done (latest first)
 
+- Oct 18: sign-in code email set up in Supabase (Resend SMTP, both templates, 6-digit code, 1 hour); PR #14 and #16 merged.
 - Oct 17: tracker created (this file).
 - Oct 17: milestone 1 runs in Expo Go; push moved to milestone 2 (PR #15).
 - Oct 17: Resend connected; a test email reached Chase's Gmail.
