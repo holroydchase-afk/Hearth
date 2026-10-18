@@ -303,10 +303,10 @@
    "status": "fixed",
    "title": "Someone removed from the family space kept access to their own old posts: new comments, photos and keys",
    "tests": [
-    "SQL-105",
-    "SQL-108",
     "SQL-109",
-    "SQL-111"
+    "SQL-112",
+    "SQL-113",
+    "SQL-115"
    ],
    "found": "2026-10-15",
    "fixed": "2026-10-15"
@@ -319,8 +319,8 @@
    "status": "fixed",
    "title": "A view-only member could publish a draft after posting was turned off for viewers",
    "tests": [
-    "SQL-104",
-    "SQL-109"
+    "SQL-108",
+    "SQL-113"
    ],
    "found": "2026-10-15",
    "fixed": "2026-10-15"
@@ -395,7 +395,7 @@
    "status": "fixed",
    "title": "Could edit your comment on a post you can no longer see",
    "tests": [
-    "SQL-110"
+    "SQL-114"
    ],
    "found": "2026-10-15",
    "fixed": "2026-10-15"
@@ -422,22 +422,40 @@
    "kind": "bug",
    "layer": "backend",
    "severity": "Medium",
-   "status": "open",
+   "status": "fixed",
    "title": "Space managers can read invite code hashes; 8-character codes are crackable offline in about a day. Salt or lengthen codes.",
-   "tests": [],
+   "tests": [
+    "API-097",
+    "API-098",
+    "API-099",
+    "API-101",
+    "API-102"
+   ],
    "found": "2026-10-15",
-   "fixed": null
+   "fixed": "2026-10-16"
   },
   {
    "id": "S10",
    "kind": "bug",
    "layer": "backend",
    "severity": "Medium",
-   "status": "open",
+   "status": "fixed",
    "title": "No rate limit on redeeming invite codes",
-   "tests": [],
+   "tests": [
+    "API-117",
+    "API-118",
+    "API-119",
+    "API-120",
+    "API-121",
+    "API-122",
+    "API-123",
+    "API-124",
+    "API-125",
+    "API-126",
+    "PRIVACY-AUDIT-005"
+   ],
    "found": "2026-10-15",
-   "fixed": null
+   "fixed": "2026-10-16"
   },
   {
    "id": "S11",
@@ -455,11 +473,13 @@
    "kind": "bug",
    "layer": "backend",
    "severity": "Low",
-   "status": "open",
+   "status": "fixed",
    "title": "Removed members can still edit captions on their old posts",
-   "tests": [],
+   "tests": [
+    "SQL-115"
+   ],
    "found": "2026-10-15",
-   "fixed": null
+   "fixed": "2026-10-16"
   },
   {
    "id": "S13",
@@ -499,11 +519,11 @@
    "kind": "task",
    "layer": "backend",
    "severity": "High",
-   "status": "open",
+   "status": "fixed",
    "title": "Rerun the backend suite on a real Supabase stack before launch (today's runs use a stand-in)",
    "tests": [],
    "found": "2026-10-15",
-   "fixed": null
+   "fixed": "2026-10-17"
   },
   {
    "id": "E9",
@@ -519,13 +539,13 @@
   {
    "id": "E10",
    "kind": "enhancement",
-   "layer": "prototype",
+   "layer": "app",
    "severity": "High",
-   "status": "open",
+   "status": "fixed",
    "title": "Save a photo to your phone (grandparents print them)",
    "tests": [],
    "found": "2026-10-15",
-   "fixed": null
+   "fixed": "2026-10-16"
   },
   {
    "id": "E11",
@@ -563,13 +583,13 @@
   {
    "id": "E14",
    "kind": "enhancement",
-   "layer": "prototype",
+   "layer": "app",
    "severity": "Medium",
-   "status": "open",
+   "status": "fixed",
    "title": "Upload progress and automatic retry on bad cell signal",
    "tests": [],
    "found": "2026-10-15",
-   "fixed": null
+   "fixed": "2026-10-16"
   },
   {
    "id": "E15",
@@ -592,6 +612,179 @@
    "tests": [],
    "found": "2026-10-15",
    "fixed": null
+  },
+  {
+   "id": "AE-2",
+   "kind": "enhancement",
+   "layer": "backend",
+   "severity": "High",
+   "status": "fixed",
+   "title": "Notification sender: outbox (0003) plus the notify function (Expo Push + Resend), 1-minute cron",
+   "tests": [],
+   "found": "2026-10-16",
+   "fixed": "2026-10-16"
+  },
+  {
+   "id": "AE-3",
+   "kind": "task",
+   "layer": "app",
+   "severity": "High",
+   "status": "open",
+   "title": "First real-device pass on Chase's iPhone: resize, EXIF scan (M-09), encrypted upload, save to phone, code sign-in",
+   "tests": [],
+   "found": "2026-10-16",
+   "fixed": null
+  },
+  {
+   "id": "AE-4",
+   "kind": "task",
+   "layer": "app",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Publish to Expo Go as an EAS Update (branch preview) and the web build",
+   "tests": [],
+   "found": "2026-10-16",
+   "fixed": "2026-10-18"
+  },
+  {
+   "id": "AE-5",
+   "kind": "enhancement",
+   "layer": "app",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "'Take me off Hearth' for non-owners (BETA-JOIN-7)",
+   "tests": [],
+   "found": "2026-10-16",
+   "fixed": "2026-10-16"
+  },
+  {
+   "id": "AE-6",
+   "kind": "task",
+   "layer": "app",
+   "severity": "Medium",
+   "status": "open",
+   "title": "TestFlight external submission (milestone 3, after the name is final)",
+   "tests": [],
+   "found": "2026-10-16",
+   "fixed": null
+  },
+  {
+   "id": "AE-7",
+   "kind": "enhancement",
+   "layer": "backend",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Our own error reports, fixed fields only, 30 days (0006, BETA-OPS-1)",
+   "tests": [],
+   "found": "2026-10-16",
+   "fixed": "2026-10-16"
+  },
+  {
+   "id": "AE-8",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "S12: removed members can't edit their old captions (0005, BETA-REPLY-4)",
+   "tests": [],
+   "found": "2026-10-16",
+   "fixed": "2026-10-16"
+  },
+  {
+   "id": "V1",
+   "kind": "enhancement",
+   "layer": "app",
+   "severity": "Medium",
+   "status": "deferred",
+   "title": "Video posting: off until location can be stripped from video too (BETA-SPEC)",
+   "tests": [],
+   "found": "2026-10-16",
+   "fixed": null
+  },
+  {
+   "id": "REPLY-1",
+   "kind": "enhancement",
+   "layer": "app",
+   "severity": "Low",
+   "status": "deferred",
+   "title": "BETA-REPLY-1, deferred in BETA-SPEC",
+   "tests": [],
+   "found": "2026-10-16",
+   "fixed": null
+  },
+  {
+   "id": "PRIV-1",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "The invite rate limit kept raw IP addresses, and the last ones could stay forever. Now a keyed hash, purged daily, pepper replaced daily (0012)",
+   "tests": [
+    "PRIVACY-AUDIT-001",
+    "PRIVACY-AUDIT-002",
+    "PRIVACY-AUDIT-003",
+    "PRIVACY-AUDIT-004",
+    "PRIVACY-AUDIT-005",
+    "PRIVACY-AUDIT-006",
+    "PRIVACY-AUDIT-007"
+   ],
+   "found": "2026-10-18",
+   "fixed": "2026-10-18"
+  },
+  {
+   "id": "PRIV-2",
+   "kind": "bug",
+   "layer": "ops",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Nothing stopped a log line from printing a key, URL or caption; sign-media logged raw error messages. CI log check added",
+   "tests": [],
+   "found": "2026-10-18",
+   "fixed": "2026-10-18"
+  },
+  {
+   "id": "QA-3",
+   "kind": "task",
+   "layer": "ops",
+   "severity": "High",
+   "status": "fixed",
+   "title": "Sent-vs-received check for the milestone 1 gate's '0 lost' (backend/scripts/sent-vs-received.sh)",
+   "tests": [],
+   "found": "2026-10-18",
+   "fixed": "2026-10-18"
+  },
+  {
+   "id": "QA-2",
+   "kind": "task",
+   "layer": "ops",
+   "severity": "High",
+   "status": "fixed",
+   "title": "Read-only smoke check of the hosted project (D1; backend/scripts/smoke-check.sh)",
+   "tests": [],
+   "found": "2026-10-18",
+   "fixed": "2026-10-18"
+  },
+  {
+   "id": "BULK-1F",
+   "kind": "enhancement",
+   "layer": "app",
+   "severity": "High",
+   "status": "fixed",
+   "title": "Photos with no EXIF date take the photo library's creation time, with no new permission prompt",
+   "tests": [],
+   "found": "2026-10-18",
+   "fixed": "2026-10-18"
+  },
+  {
+   "id": "T6",
+   "kind": "test fix",
+   "layer": "ops",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "Test Log builder gave every backend suite's case 1 the same id (SQL-001), so later suites overwrote earlier ones. Ids are now per suite",
+   "tests": [],
+   "found": "2026-10-18",
+   "fixed": "2026-10-18"
   }
  ]
 }
