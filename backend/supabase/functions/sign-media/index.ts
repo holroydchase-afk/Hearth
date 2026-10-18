@@ -285,7 +285,8 @@ export async function handler(req: Request): Promise<Response> {
     return json(req, 405, { error: "method_not_allowed" });
   } catch (e) {
     if (e instanceof DbError && (e.status === 401 || e.code === "PGRST301")) return json(req, 401, { error: "unauthorized" });
-    console.error(`sign-media error (${e instanceof Error ? e.name + ": " + e.message.replace(/https?:\S+/g, "") : "error"})`); // never log keys/URLs
+    // Name and code only: database and storage messages can carry row values or object paths (PRIV-2).
+    console.error(`sign-media error (${e instanceof DbError ? `DbError ${e.status} ${e.code ?? ""}` : e instanceof Error ? e.name : "unknown"})`);
     return json(req, 500, { error: "internal" });
   }
 }

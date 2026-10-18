@@ -75,7 +75,9 @@ for (const root of ROOTS) {
       const name = c.match(SECRETISH);
       if (name) problems.push(`${where} logs "${name[0]}" (keys, URLs, captions, emails and bodies are never logged)`);
       if (/\.message\b(?!\.replace\(\/https\?:\\S\+\/g)/.test(raw)) problems.push(`${where} logs an error .message without cutting URLs (use .message.replace(/https?:\\S+/g, ""))`);
-      if (/(^|[,(?:]\s*)(e|err|error)\s*($|[,)])/.test(c.trim())) problems.push(`${where} logs a whole error object (log e.name or a fixed word)`);
+      if (/(^|[,(?:]\s*)(e|err|error)\s*($|[,)])/.test(c.trim()) || /\$\{\s*(e|err|error)\s*\}/.test(raw))
+        problems.push(`${where} logs a whole error object (log e.name or a fixed word)`);
+      if (/\b(e|err|error)\.(stack|cause)\b/.test(c)) problems.push(`${where} logs an error's stack or cause`);
       if (/JSON\.stringify/.test(c)) problems.push(`${where} logs JSON.stringify(...) (could dump anything)`);
     }
   }

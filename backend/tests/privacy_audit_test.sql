@@ -41,7 +41,11 @@ select tests.ok_sql($q$select exists (select 1 from private.rate_limit_events wh
 
 -- 4. Old rows go away on the regular purge, even if no new failure ever arrives.
 insert into private.rate_limit_events (key, action, at) values ('ip:stale', 'redeem', now() - interval '2 hours');
+select tests.setv('pepper_before', $q$select value from private.secrets where name = 'ip_pepper'$q$);
 select public.purge_client_errors();
+select tests.ok_sql($q$select value is distinct from tests.v('pepper_before') and length(value) = 64
+                       from private.secrets where name = 'ip_pepper'$q$,
+  'PRIV-1 the daily purge replaces the IP pepper (a dump or backup can''t reverse older hashes)');
 select tests.ok_sql($q$select not exists (select 1 from private.rate_limit_events where at < now() - interval '1 hour')$q$,
   'PRIV-1 the scheduled purge (hearth-purge-client-errors) clears rate limit rows older than 1 hour');
 

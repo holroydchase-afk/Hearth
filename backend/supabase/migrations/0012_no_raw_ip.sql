@@ -4,7 +4,9 @@
 -- Now the key is 'ip:' + HMAC-SHA256(addr, ip_pepper): the same address still maps to the same key, so
 -- the limit works, but the address can't be read back or brute-forced without the server-side pepper.
 -- The daily purge (hearth-purge-client-errors, 04:17 UTC) also clears rows older than an hour, so a hashed
--- key lives about a day at most even if no new failure ever comes in.
+-- key lives about a day at most even if no new failure ever comes in. The same purge replaces ip_pepper, so a
+-- database dump or backup never holds a pepper that can reverse older hashes (the limit looks back only 10
+-- minutes, so the cost is one reset a day at 04:17 UTC).
 -- Test: backend/tests/privacy_audit_test.sql. Doc: docs/architecture/04-threat-model.md.
 
 insert into private.secrets (name, value)
@@ -35,6 +37,7 @@ create or replace function public.purge_client_errors() returns void
 language sql security definer set search_path = '' as $$
   delete from public.client_errors where at < now() - interval '30 days';
   delete from private.rate_limit_events where at < now() - interval '1 hour';
+  update private.secrets set value = encode(extensions.gen_random_bytes(32), 'hex'), created_at = now() where name = 'ip_pepper';
 $$;
 revoke execute on function public.purge_client_errors() from public, anon, authenticated;
 grant execute on function public.purge_client_errors() to service_role;
