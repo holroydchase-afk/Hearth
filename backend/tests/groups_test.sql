@@ -12,7 +12,8 @@
 --   Charleston trip    (event): Pawpaw and Granny's house + the sister's house.
 --   Birthday at Gigi's (event): Grandaddy and Grandmomma's house, Gigi and Bebar's house, Pawpaw and Granny's house.
 --   Everyone: every relative who joined by invite, plus the parents.
--- Relatives join the way the app does it: create_invite (naming one household, p_history required) + redeem_invite.
+-- Relatives join the way the app does it: create_invite (naming one household and Everyone, which the app ticks by
+-- default since 0013 / GRP-18; p_history required) + redeem_invite.
 -- Gigi joins with "Only new photos" (p_history 'new'); everyone else with "Share all past photos".
 --
 -- Decisions this suite encodes (staff-pm / Chase can change them; then change the test first):
@@ -95,13 +96,14 @@ begin
   execute 'select public.place_person(p_group => $1, p_user => $2, p_history => $3)' using tests.c(p_house), tests.u(p_who), p_history;
 exception when others then raise warning 'place_person % in % failed: % %', p_who, p_house, sqlstate, sqlerrm;
 end $$;
--- Chase invites p_who to one household with a share-history choice; p_who redeems it.
+-- Chase invites p_who to one household and Everyone (what the app sends since 0013: a new invite puts the person in
+-- Everyone only if Everyone is named, PRIV-G2) with a share-history choice; p_who redeems it.
 create function tests.join(p_who text, p_house text, p_history text) returns void language plpgsql as $$
 declare v_code text; v_inv uuid; v_name text := (select name from tests.people where k = p_who);
 begin
   perform tests.act('chase');
   execute 'select invite_id, code from public.create_invite(p_space => $1, p_role => ''viewer'', p_circle_ids => $2, p_name => $3, p_history => $4)'
-    into v_inv, v_code using '22222222-0000-0000-0000-0000000000f0'::uuid, array[tests.c(p_house)], v_name, p_history;
+    into v_inv, v_code using '22222222-0000-0000-0000-0000000000f0'::uuid, array[tests.c(p_house), tests.c('all')], v_name, p_history;
   insert into tests.vars values ('invite_' || p_who, v_inv::text) on conflict (k) do update set v = excluded.v;
   perform tests.act(p_who);
   execute 'select public.redeem_invite($1)' using v_code;

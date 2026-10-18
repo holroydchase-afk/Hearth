@@ -508,11 +508,9 @@ select tests.invite('eve', array['all', 'g_porch'], 'Cousin Eve');
 select tests.redeem('eve');
 select tests.ok(tests.in_everyone('eve') and tests.member('all', 'eve') and tests.placed('g_porch', 'eve'),
                 'GRP-12 an invite naming Everyone and Porch puts Cousin Eve in Everyone and in Porch');
-select tests.level('h_hal', 'household', 'Hal''s house');
-select tests.invite('hal', array['h_hal'], 'Uncle Hal');
-select tests.redeem('hal');
-select tests.ok(tests.in_everyone('hal') and tests.placed('h_hal', 'hal'),
-                'GRP-12 an old-style invite naming a household still puts the person in Everyone too');
+-- GRP-12's old-style invite (made before 0013, naming a household, still puts the person in Everyone) is tested
+-- with a genuinely pre-0013 invite in tests/grp1/: made on migrations 0001-0012 (before.sql), redeemed after 0013
+-- (after.sql). A new household-only invite does NOT imply Everyone: PRIV-G2 below.
 -- a named group retired before the invite is used
 select tests.level('g_old', 'group', 'Old porch');
 select tests.invite('fay', array['g_old', 'g_meemaw'], 'Cousin Fay');
@@ -727,6 +725,82 @@ select tests.flag_global(true);
 :as_chase
 select tests.lives(format('select * from public.prepare_media_upload(%L, %L::jsonb)', 'e5000000-0000-0000-0000-0000000000f4', :video_item),
                    'FLAG-4 with all three switches on, a parent can prepare a video upload');
+
+-- ======================================================================
+-- PRIV-G: privacy-security review of 0013 (Oct 18). Runs last: it changes Porch's setting and adds people.
+-- ======================================================================
+:as_admin
+-- PRIV-G1 (SPEC-GROUPS section 2: "turning it up never opens old comments"). c7b was written while Porch was
+-- Always shared; GRP-7 then switched Porch to Private, hiding c7b from Linda. Switching back to Always shared is a
+-- "turn up" and must not reopen c7b: the effective setting is the least open one between write time and now.
+select tests.set_mode('g_porch', 'always');
+select tests.ok(not tests.reads('linda', 'c7b') and not tests.reads_rls('linda', tests.c('c7b')),
+                'PRIV-G1 Always -> Private -> Always: a comment hidden by the switch to Private stays hidden when the group is turned back up');
+select tests.set_mode('g_porch', 'private');
+
+-- PRIV-G2 (GRP-12: "Everyone only if Everyone is named, or, for OLD invites, a household is named"). An invite
+-- made after 0013 that names only a household (the parent unticked Everyone, GRP-18) must not put the person in
+-- Everyone, where they would see every Everyone post.
+insert into tests.joiners values ('gus', 'e2000000-0000-0000-0000-000000000045', 'Cousin Gus');
+insert into auth.users (id, email, raw_user_meta_data)
+values ('e2000000-0000-0000-0000-000000000045', 'gus@v2.hearth.test', '{"display_name": "Cousin Gus"}');
+select tests.level('h_gus', 'household', 'Gus''s house');
+select tests.invite('gus', array['h_gus'], 'Cousin Gus');
+select tests.redeem('gus');
+select tests.ok(tests.placed('h_gus', 'gus') and tests.in_everyone('gus') = false and not tests.member('all', 'gus'),
+                'PRIV-G2 a new invite naming only a household places the person there and NOT in Everyone');
+select tests.ok(tests.row('gus', 'p_all') is null,
+                'PRIV-G2 ...so Cousin Gus does not get Dad''s Everyone post in his feed');
+
+
+:as_admin
+-- PRIV-G4 (FLAG-4 at the table): with video_posting off, a parent's DIRECT insert of a video row into media_items
+-- is refused (42501 video_posting_off), not only the prepare_media_upload RPC. A photo row still goes in.
+select tests.flag_global(false);
+:as_chase
+select tests.throws_code($q$insert into public.media_items (post_id, position, kind, mime_type, width, height, duration_ms,
+                              byte_size, thumb_byte_size, exif_stripped, display_key, thumb_key, space_id, uploader_id)
+                            values ('e5000000-0000-0000-0000-0000000000f4', 90, 'video', 'video/mp4', 1280, 720, 5000, 1000, 10,
+                                    true, 'x', 'y', '22222222-0000-0000-0000-0000000000e0', 'e2000000-0000-0000-0000-000000000001')$q$,
+                         'PRIV-G4 video_posting off: a direct table insert of a video row is refused (42501)', '42501');
+select tests.lives($q$insert into public.media_items (post_id, position, kind, mime_type, width, height,
+                        byte_size, thumb_byte_size, exif_stripped, display_key, thumb_key, space_id, uploader_id)
+                      values ('e5000000-0000-0000-0000-0000000000f4', 91, 'photo', 'image/jpeg', 10, 10, 100, 10,
+                              true, 'x', 'y', '22222222-0000-0000-0000-0000000000e0', 'e2000000-0000-0000-0000-000000000001')$q$,
+                   'PRIV-G4 ...the same direct insert of a photo row is allowed (the refusal is the video switch, not RLS)');
+:as_admin
+select tests.ok(not exists (select 1 from public.media_items where post_id = 'e5000000-0000-0000-0000-0000000000f4' and position = 90),
+                'PRIV-G4 ...and no video row was created');
+create function tests.video_insert_msg() returns text language plpgsql as $$
+begin
+  perform tests.act('chase');
+  execute 'set local role authenticated';
+  insert into public.media_items (post_id, position, kind, mime_type, width, height, duration_ms, byte_size, thumb_byte_size, exif_stripped)
+  values ('e5000000-0000-0000-0000-0000000000f4', 92, 'video', 'video/mp4', 1280, 720, 5000, 1000, 10, true);
+  return 'inserted';
+exception when others then return sqlerrm;
+end $$;
+select tests.ok(tests.video_insert_msg() = 'video_posting_off', 'PRIV-G4 ...the refusal says video_posting_off');
+select tests.flag_global(true);
+
+-- PRIV-G5 (SPEC-GROUPS section 5: family add-ons are family settings, owner only): an adult parent can't write
+-- space_features, neither a new row nor switching an existing one.
+select tests.flag_family(false);
+:as_mom
+select tests.throws_code(format('insert into %s (space_id, feature, enabled) values (%L, ''photo_books'', true)',
+                                tests.tbl('space_features'), tests.space()),
+                         'PRIV-G5 an adult parent can''t add a family add-on row (owner only)', '42501');
+select tests.try(format('update %s set enabled = true where space_id = %L and feature = ''video_posting''', tests.tbl('space_features'), tests.space()));
+:as_admin
+select tests.ok_sql(format('select count(*) = 1 and not bool_or(enabled) from %s where space_id = %L and feature = ''video_posting''',
+                           tests.tbl('space_features'), tests.space()),
+                    'PRIV-G5 ...nor switch video posting on with an UPDATE (still off)');
+:as_chase
+select tests.lives(format('update %s set enabled = true where space_id = %L and feature = ''video_posting''', tests.tbl('space_features'), tests.space()),
+                   'PRIV-G5 the owner still can');
+:as_admin
+select tests.ok_sql(format('select bool_and(enabled) from %s where space_id = %L and feature = ''video_posting''', tests.tbl('space_features'), tests.space()),
+                    'PRIV-G5 ...and the owner''s switch took effect');
 
 reset role;
 \o

@@ -61,6 +61,20 @@ select tests.ok_sql(format($q$select count(*) = (select count(*) from grp1.circl
                               where c.relname = 'comment_mode_log' and n.nspname in ('public', 'private') limit 1), 'public.comment_mode_log')),
                     'GRP-2 comment_mode_log backfill: one row per circle, set_at = circles.created_at' || tests.tag());
 
+-- GRP-12 / PRIV-G2: a genuinely pre-0013 invite (made by before.sql on 0001-0012) naming only the household
+-- "May and Lee" keeps 0011's meaning when redeemed after 0013: the household AND Everyone.
+select tests.ok_sql($q$select household_means_everyone from public.invites where id = (select invite_id from grp1.old_invite)$q$,
+                    'PRIV-G2 0013 marked the invite made before it as "a household means Everyone too"' || tests.tag());
+select set_config('request.jwt.claim.sub', 'd1000000-0000-0000-0000-000000000017', false);
+select public.redeem_invite((select code from grp1.old_invite));
+select set_config('request.jwt.claim.sub', '', false);
+select tests.ok(exists (select 1 from public.space_members where user_id = 'd1000000-0000-0000-0000-000000000017' and in_everyone)
+                and exists (select 1 from public.circle_people where user_id = 'd1000000-0000-0000-0000-000000000017'
+                            and circle_id = '33333333-0000-0000-0000-0000000000d2')
+                and exists (select 1 from public.circle_members where user_id = 'd1000000-0000-0000-0000-000000000017'
+                            and circle_id = '33333333-0000-0000-0000-0000000000d0'),
+                'GRP-12 an old-style invite made before 0013 naming a household still puts the person in Everyone too' || tests.tag());
+
 reset role;
 \o
 \echo

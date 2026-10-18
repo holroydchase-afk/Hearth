@@ -22,6 +22,8 @@ export function GroupsScreen() {
   // BETA-AUD-19: "Share all past photos" or "Only new photos"; neither is picked until the parent picks one.
   const [history, setHistory] = useState<ShareHistory | null>(null);
   const [needHistory, setNeedHistory] = useState(false);
+  // PRIV-G2 / GRP-18: a new invite adds Everyone only if it names Everyone; ticked first, can be unticked.
+  const [alsoEveryone, setAlsoEveryone] = useState(true);
   const [myName, setMyName] = useState<string | null>(null);
   useEffect(() => { app.deps.api.myProfile().then((p) => setMyName(p.display_name)).catch(() => {}); }, [app.deps.api]);
   const spaceId = app.space?.space_id;
@@ -52,14 +54,16 @@ export function GroupsScreen() {
     }
   };
 
-  const closeForm = () => { setAsking(null); setInviteName(''); setHistory(null); setNeedHistory(false); };
+  const closeForm = () => { setAsking(null); setInviteName(''); setHistory(null); setNeedHistory(false); setAlsoEveryone(true); };
+  const everyone = (circles ?? []).find((g) => g.kind === 'everyone');
 
   const makeInvite = async (id: string) => {
     if (!history) { setNeedHistory(true); return; }
     try {
       // JOIN-1: the name the family uses becomes theirs when they join, so they type nothing.
       const r = await app.deps.api.createInvite({
-        space: app.space!.space_id, role: 'viewer', circleIds: [id], ttlDays: 30, name: inviteName.trim() || null, history,
+        space: app.space!.space_id, role: 'viewer', ttlDays: 30, name: inviteName.trim() || null, history,
+        circleIds: everyone && alsoEveryone && everyone.circle_id !== id ? [id, everyone.circle_id] : [id],
       });
       setInvite({ circle: id, link: r.link, code: r.code });
       closeForm();
@@ -138,6 +142,16 @@ export function GroupsScreen() {
                 onPress={() => { setHistory('new'); setNeedHistory(false); }}
               />
               {needHistory ? <Txt variant="strong">Pick one above first.</Txt> : null}
+              {everyone && everyone.circle_id !== g.circle_id ? (
+                <Choice
+                  kind="checkbox"
+                  label="Also see photos sent to Everyone"
+                  title="Also see photos sent to Everyone"
+                  detail={`Untick this if they should see only ${g.name}.`}
+                  checked={alsoEveryone}
+                  onPress={() => setAlsoEveryone((v) => !v)}
+                />
+              ) : null}
               <Button label="Make the invite" onPress={() => void makeInvite(g.circle_id)} softDisabled={!history} />
               <Button label="Cancel" variant="secondary" onPress={closeForm} />
             </>

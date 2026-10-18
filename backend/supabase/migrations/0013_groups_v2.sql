@@ -7,17 +7,21 @@
 -- * circles.comment_mode: 'private' | 'on_group_posts' | 'always'. Decides who reads a member's replies, never
 --   who sees a post. Backfill: household -> always, event -> on_group_posts, group and Everyone -> private. That
 --   is exactly what 0011's household and event rules did, so nobody's access changes (GRP-1). New circles get
---   the same default by kind; set_comment_mode (parents only) changes it; Everyone's can't change (AUD-10's
---   owner switch is the one way to open Everyone). App users can't read the column (GRP-13): parents get it
+--   the same default by kind (a household is by definition a reply circle; the v2 app makes only groups and
+--   events); set_comment_mode (parents only) changes it; Everyone's can't change (AUD-10's owner switch is the one way to
+--   open Everyone). App users can't read the column (GRP-13): parents get it
 --   from my_circles.
--- * comment_mode_log: every setting with the moment it took effect (trigger-written). A reply is judged by the
---   LESS OPEN of the setting when it was written and the setting now (GRP-7): turning a group down narrows at
---   once, turning it up never opens older replies.
+-- * comment_mode_log: every setting with the moment it took effect (trigger-written, clock_timestamp()). A reply is
+--   judged by the LEAST OPEN setting the group had at any point from when it was written until now (GRP-7,
+--   PRIV-G1): turning a group down narrows at once, turning it up (even back up) never opens older replies.
 -- * ONE group rule, private.group_reply_ok, called by reply_ok (RLS, get_comments, can_see_reply,
 --   reply_readers), reply_scope and feed_rows (GRP-14). Readers stay fixed when the reply is written.
--- * Feature flags: private.feature_flags (global; no app grant), public.space_features (family add-on; parents
---   write it), can(space, 'use_video'). private.feature_on = all three; my_features for the app. Default off.
---   prepare_media_upload refuses a video with 42501 'video_posting_off' unless video_posting is on (FLAG-4).
+-- * Feature flags: private.feature_flags (global; no app grant), public.space_features (family add-on; only the
+--   owner writes it: can(space, 'family_settings')), can(space, 'use_video'). private.feature_on = all three;
+--   my_features for the app. Default off. prepare_media_upload and the media_items insert trigger refuse a video
+--   from an app user with 42501 'video_posting_off' unless video_posting is on (FLAG-4, PRIV-G4).
+-- * Invites: a person goes in Everyone only if the invite names Everyone. Invites made before 0013 are marked
+--   (invites.household_means_everyone = true) and keep 0011's "a household implies Everyone" (PRIV-G2).
 -- * Feed and timeline rows carry event_id / event_name only for the event's members and the parents (EVT-1).
 -- NO CONTENT IS USED FOR AI/ML TRAINING, ADVERTISING OR PROFILING (see 0001 header).
 
@@ -34,19 +38,31 @@ create table public.comment_mode_log (
   circle_id  uuid not null references public.circles(id) on delete cascade,
   mode       text not null check (mode in ('private', 'on_group_posts', 'always')),
   set_by     uuid references public.profiles(id) on delete set null,
-  set_at     timestamptz not null default now()
+  set_at     timestamptz not null default clock_timestamp()   -- the moment the row is written, not the txn start
 );
 create index on public.comment_mode_log (circle_id, set_at);
 create index on public.comment_mode_log (set_by);
 insert into public.comment_mode_log (circle_id, mode, set_by, set_at)
 select id, comment_mode, created_by, created_at from public.circles;
 
+-- PRIV-G1: the LEAST open setting circle p_circle had at any point from p_at until now: the setting in effect at
+-- p_at (none logged yet = private), every setting logged since, and p_current (the setting now).
 -- Order of openness: private < on_group_posts < always.
-create or replace function private.less_open(a text, b text) returns text
-language sql immutable set search_path = '' as $$
-  select case when a = 'private' or b = 'private' or a is null or b is null then 'private'
-              when a = 'on_group_posts' or b = 'on_group_posts' then 'on_group_posts'
-              else 'always' end
+create or replace function private.least_open_since(p_circle uuid, p_current text, p_at timestamptz) returns text
+language sql stable security definer set search_path = '' as $$
+  select (array['private', 'on_group_posts', 'always'])[min(r)]
+  from (
+    select array_position(array['private', 'on_group_posts', 'always'], x.mode) as r
+    from (
+      select p_current as mode
+      union all
+      select coalesce((select l.mode from public.comment_mode_log l
+                        where l.circle_id = p_circle and l.set_at <= p_at
+                        order by l.set_at desc, l.id desc limit 1), 'private')
+      union all
+      select l.mode from public.comment_mode_log l where l.circle_id = p_circle and l.set_at > p_at
+    ) x
+  ) y
 $$;
 
 -- A new circle starts with the default for its kind, whatever the insert says (only set_comment_mode changes it).
@@ -62,7 +78,11 @@ create trigger comment_mode_default before insert on public.circles
 create or replace function private.tg_comment_mode_log() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin
-  if tg_op = 'INSERT' or new.comment_mode is distinct from old.comment_mode then
+  -- a new circle's first setting takes effect when the circle was made (created_at, as the backfill); a change takes
+  -- effect when it is logged (clock_timestamp(), not the transaction start: PRIV-G6 narrows the commit race)
+  if tg_op = 'INSERT' then
+    insert into public.comment_mode_log (circle_id, mode, set_by, set_at) values (new.id, new.comment_mode, auth.uid(), new.created_at);
+  elsif new.comment_mode is distinct from old.comment_mode then
     insert into public.comment_mode_log (circle_id, mode, set_by) values (new.id, new.comment_mode, auth.uid());
   end if;
   return null;
@@ -131,8 +151,9 @@ end $$;
 -- THE group reply rule (SPEC-GROUPS v2 section 2; GRP-3..8, GRP-14)
 -- ---------------------------------------------------------------------------
 -- Does a group let p_reader read what p_writer wrote on p_post at p_at? True when some live group G of the post's
--- family had both of them as members by p_at, and G's effective setting (the less open of the setting in effect at
--- p_at and the setting now) is 'always', or is 'on_group_posts' and G was on the post's audience by p_at.
+-- family had both of them as members by p_at, and G's effective setting (the least open setting G had at any point
+-- from p_at until now: private.least_open_since) is 'always', or is 'on_group_posts' and G was on the post's
+-- audience by p_at.
 -- Says nothing about seeing the post: callers check that (reply_ok, reply_scope, feed_rows).
 create or replace function private.group_reply_ok(p_reader uuid, p_post uuid, p_writer uuid, p_at timestamptz) returns boolean
 language sql stable security definer set search_path = '' as $$
@@ -143,11 +164,7 @@ language sql stable security definer set search_path = '' as $$
     join public.circles g on g.id = r.circle_id and g.space_id = p.space_id and g.deleted_at is null
                          and g.comment_mode <> 'private'
     join public.circle_members w on w.circle_id = g.id and w.user_id = p_writer and w.added_at <= p_at
-    cross join lateral (
-      select private.less_open(g.comment_mode,
-               (select l.mode from public.comment_mode_log l
-                 where l.circle_id = g.id and l.set_at <= p_at
-                 order by l.set_at desc, l.id desc limit 1)) as mode) m
+    cross join lateral (select private.least_open_since(g.id, g.comment_mode, p_at) as mode) m
     where p.id = p_post
       and (m.mode = 'always'
            or (m.mode = 'on_group_posts'
@@ -406,6 +423,11 @@ end $$;
 -- ---------------------------------------------------------------------------
 -- Invites to any groups (GRP-12)
 -- ---------------------------------------------------------------------------
+-- PRIV-G2: set once, when the invite is made. Every invite that exists when 0013 runs gets true (0011's rule: a
+-- household implies Everyone); every invite made after gets false (Everyone only when named). Not granted to app users.
+alter table public.invites add column household_means_everyone boolean not null default true;
+alter table public.invites alter column household_means_everyone set default false;
+
 create or replace function public.create_invite(
   p_space uuid, p_role public.member_role, p_circle_ids uuid[],
   p_channel public.invite_channel default 'link', p_target_email text default null,
@@ -505,10 +527,11 @@ begin
 
   -- "Only new photos" starts when the invite was made ("from today on")
   v_from := case when v_inv.role = 'viewer' and v_inv.history = 'new' then v_inv.created_at end;
-  -- Everyone when the invite names it, or (an invite made before 0013) names a household
+  -- Everyone when the invite names it, or (an invite made before 0013, PRIV-G2) names a household
   select exists (select 1 from public.invite_circles ic
-                 join public.circles c on c.id = ic.circle_id and c.deleted_at is null and c.kind in ('everyone', 'household')
-                 where ic.invite_id = v_inv.id) into v_all;
+                 join public.circles c on c.id = ic.circle_id and c.deleted_at is null
+                 where ic.invite_id = v_inv.id
+                   and (c.kind = 'everyone' or (v_inv.household_means_everyone and c.kind = 'household'))) into v_all;
   insert into public.space_members (space_id, user_id, role, invited_by, sees_from, in_everyone)
   values (v_inv.space_id, auth.uid(), v_inv.role, v_inv.created_by, v_from, v_all)
   on conflict (space_id, user_id) do nothing;          -- never silently changes an existing role or choice
@@ -582,11 +605,12 @@ create trigger space_features_stamp before insert or update on public.space_feat
 alter table public.space_features enable row level security;
 create policy space_features_select on public.space_features for select to authenticated
   using (space_id = any ((select private.my_managed_space_ids())::uuid[]));
+-- writes: the owner only (can(space, 'family_settings'); PRIV-G5). Both parents can read.
 create policy space_features_insert on public.space_features for insert to authenticated
-  with check (space_id = any ((select private.my_managed_space_ids())::uuid[]));
+  with check (public.can(space_id, 'family_settings'));
 create policy space_features_update on public.space_features for update to authenticated
-  using (space_id = any ((select private.my_managed_space_ids())::uuid[]))
-  with check (space_id = any ((select private.my_managed_space_ids())::uuid[]));
+  using (public.can(space_id, 'family_settings'))
+  with check (public.can(space_id, 'family_settings'));
 
 -- capabilities: + use_video (parents only to start)
 create or replace function public.can(p_space uuid, p_capability text) returns boolean
@@ -626,6 +650,44 @@ create or replace function public.my_features(p_space uuid) returns table (featu
 language sql stable security definer set search_path = '' as $$
   select f.feature from private.feature_flags f where private.feature_on(p_space, f.feature) order by f.feature
 $$;
+
+-- PRIV-G4: the media insert trigger (0001) refuses a video from an app user (auth.uid() set) while video_posting
+-- is off for them, so a direct table insert gets the same 42501 'video_posting_off' as prepare_media_upload.
+-- Server-side writes (service role, seed: no auth.uid()) are not app uploads and are not checked.
+create or replace function public.tg_media_before_insert() returns trigger
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_space   uuid;
+  v_plan    public.plan_tier;
+  v_month   date;
+  v_count   integer;
+  v_now_m   date := (date_trunc('month', now() at time zone 'utc'))::date;
+begin
+  select p.space_id into v_space from public.posts p where p.id = new.post_id;
+  new.space_id    := v_space;
+  new.uploader_id := coalesce(auth.uid(), (select author_id from public.posts where id = new.post_id));
+  new.id          := coalesce(new.id, gen_random_uuid());
+  new.display_key := format('s/%s/p/%s/m/%s/display', v_space, new.post_id, new.id);
+  new.thumb_key   := format('s/%s/p/%s/m/%s/thumb',   v_space, new.post_id, new.id);
+  new.upload_status := 'pending';
+
+  if new.kind = 'video' then
+    if auth.uid() is not null and not private.feature_on(v_space, 'video_posting') then
+      raise exception 'video_posting_off' using errcode = '42501';
+    end if;
+    select plan, videos_month, videos_this_month into v_plan, v_month, v_count
+      from public.spaces where id = v_space for update;      -- serializes concurrent uploads
+    if v_month <> v_now_m then v_count := 0; end if;
+    if public.plan_video_cap(v_plan) is not null and v_count >= public.plan_video_cap(v_plan) then
+      raise exception 'free_video_cap_reached'
+        using errcode = 'P0001',
+              hint = format('Free spaces can upload %s videos per month.', public.plan_video_cap(v_plan));
+    end if;
+    -- Counts attempts, not survivors: deleting a video does not refund the month.
+    update public.spaces set videos_month = v_now_m, videos_this_month = v_count + 1 where id = v_space;
+  end if;
+  return new;
+end $$;
 
 -- FLAG-4: the upload RPC sign-media calls refuses a video while video_posting is off for the caller's family.
 create or replace function public.prepare_media_upload(p_post uuid, p_items jsonb)
@@ -692,7 +754,7 @@ revoke all on public.space_features from anon, authenticated;
 grant select, insert (space_id, feature, enabled), update (enabled) on public.space_features to authenticated;
 grant all on public.space_features to service_role;
 
-revoke execute on function private.less_open(text, text), private.tg_comment_mode_default(), private.tg_comment_mode_log(),
+revoke execute on function private.least_open_since(uuid, text, timestamptz), private.tg_comment_mode_default(), private.tg_comment_mode_log(),
   private.group_reply_ok(uuid, uuid, uuid, timestamptz), private.post_event(uuid, uuid), private.feed_rows(uuid[]),
   private.feature_capability(text), private.feature_on(uuid, text), private.tg_space_features_stamp(),
   private.tg_people_check(), private.rebuild_members(uuid), private.reply_ok(uuid, uuid, uuid, timestamptz),
