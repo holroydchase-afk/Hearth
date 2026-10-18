@@ -50,14 +50,20 @@ call() {  # method path [json body]; prints the body, the token stays in a heade
   printf '%s' "$out"
 }
 
-DBJSON=$(call POST /database/query "$SQL") || die "the database check didn't run"
-FNJSON=$(call GET /functions) || die "couldn't list edge functions"
-SECJSON=$(call GET /secrets) || die "couldn't list function secret names"
+T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
+call POST /database/query "$SQL" > "$T/db.json" || die "the database check didn't run"
+call GET /functions > "$T/functions.json" || die "couldn't list edge functions"
+# Keep secret NAMES only, straight away; the rest of the reply is never stored or passed on.
+call GET /secrets | python3 -I -c 'import json, sys; print("\n".join(s.get("name", "") for s in json.load(sys.stdin)))' > "$T/secret-names" ||
+  die "couldn't list function secret names"
 
-python3 -I - "$DBJSON" "$FNJSON" "$SECJSON" "${REQUIRED[@]}" <<'PY'
-import json, sys
-db, fns, secs = (json.loads(x) for x in sys.argv[1:4])
-required = sys.argv[4:]
+python3 -I - "$T" "${REQUIRED[@]}" <<'PY'
+import json, sys, pathlib
+t = pathlib.Path(sys.argv[1])
+db = json.loads((t / "db.json").read_text())
+fns = json.loads((t / "functions.json").read_text())
+names = set((t / "secret-names").read_text().split())
+required = sys.argv[2:]
 lines, failed = [], 0
 def report(ok, text, warn=False):
     global failed
@@ -69,7 +75,6 @@ status = {f.get("slug"): f.get("status") for f in fns}
 for slug in ("sign-media", "notify"):
     s = status.get(slug)
     report(s == "ACTIVE", f"edge function {slug} " + ("is active" if s == "ACTIVE" else f"is {s.lower() if s else 'not deployed'}"))
-names = {s.get("name") for s in secs}          # names only; values are never read into the report
 missing = [n for n in required if n not in names]
 report(not missing, "all %d function secrets are set" % len(required) if not missing else "function secrets not set: " + ", ".join(missing))
 if "HEARTH_KEYS_PENDING" in names:
