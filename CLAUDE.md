@@ -11,6 +11,7 @@ Hearth is a private family photo app for split families and for grandparents who
 ## Read first
 - `docs/product/TRACKER.md`: the one list of what's next, what's missing for milestone 1 and what's pending on Chase or Claude. Work its sequence in order, and update it in the same PR whenever a thread finishes, adds or blocks an item.
 - `docs/product/STORY.md`: why Hearth exists, the 8 problems and Hearth's answers, family stories, WV vs Charlotte. Read before any UX or positioning call.
+- `docs/product/GOALS.md`: 6 product goals (blow them away in the first three sessions, no help on old phones, set up from far away, deep not wide), each with its signal.
 - `docs/product/ANCHORS.md`: milestones, anchors (A1–A3), ideas log. Add new anchors and ideas there as Chase names them; never delete built features to satisfy one.
 - `HANDOFF.md`: current state and what's next. Start here every session.
 - `docs/product/MILESTONE-1.md`: Chase's setup steps and the 2-day demo for milestone 1 (incl. the $99 Apple answer).
