@@ -24,6 +24,7 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 | **Push and email providers** | Learn content | Notices carry display names, counts and a link only | Built. **Planned:** names-off setting (D9) |
 | **Account takeover** | Sign in as a relative | One-time email codes, 1-hour expiry; no passwords to reuse | Built. **Gap:** an inbox compromise is an account compromise; SIM-swap risk if text codes ship (D11) |
 | **Hearth's operator, or whoever compromises Hearth's server** | Read everything | Least-privilege grants, keys only in function secrets, no keys or captions in logs | **Gap:** the server can unwrap every photo key and read all captions and comments. Fixed only by the family vault |
+| **Anyone who reads Hearth's database or function logs** (operator, breach, legal demand) | Learn where relatives are, or match accounts to addresses | Hearth's own tables keep no IP address: the invite rate limit (S10) stores a keyed HMAC of the address, cleared daily (migration 0012, `backend/tests/privacy_audit_test.sql`). No `console.*` call in the app or the edge functions logs a key, URL, caption, email or raw error; CI enforces it (`scripts/check-logs.mjs`) | Built. **Gap:** Supabase's own gateway and Auth logs record IP addresses outside our code; their retention is set by Supabase's plan, not by us |
 | **Legal demand to Hearth or Supabase** | Obtain family data | Data minimization; US storage | **Gap:** what's readable by the server can be produced. Supabase contracts through a Singapore entity |
 
 ## Out of scope (today)
@@ -42,4 +43,4 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 5. No outside security review yet; open-sourcing is undecided (D10).
 
 ---
-Last checked against code: 2026-10-18, 3031b37
+Last checked against code: 2026-10-18, 0fb7ad1 (plus migration 0012 and the PRIV-2 log check)

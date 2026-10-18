@@ -172,7 +172,7 @@ Numbering is fixed across this spec and `/mnt/project-files/plans/overnight-bulk
 1. **0010: timeline** (`get_timeline`, `get_timeline_years`, index, batched notice). Overnight plan, milestone 1, waiting on Chase's go.
 2. **0011: family shape** (kinds, links, placements, events, share history, `can()`, send-to-Everyone check, 0009 switch removed). Access-neutral for everything that exists (AUD-16). Adds the cutoff to the shared predicate that 0010's `get_timeline` uses. After privacy-security review; before milestone 3.
 3. **`family-setup.sql` v2 re-seed** on hosted: section 2's setup, legacy placements removed.
-4. **0012: households-only placement becomes hard.**
+4. **0013 (was 0012; 0012 is now PRIV-1, no raw IPs): households-only placement becomes hard.**
 
 If the timeline is cut, the family shape takes 0010 and the timeline the next free number; whoever renumbers updates both documents.
 
