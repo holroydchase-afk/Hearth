@@ -105,7 +105,7 @@ export interface HearthApi {
   renameCircle(circle: string, name: string): Promise<void>;
 
   // --- groups v2 (SPEC-GROUPS v2, migration 0013; parents only, relatives get P0002) ---
-  /** create_level: a group starts Private, an event Shared on this group's posts. Returns the new id. */
+  /** create_level: a group starts Private, an event Shared on this group's photos. Returns the new id. */
   createLevel(space: string, kind: Exclude<CircleKind, 'everyone'>, name: string): Promise<string>;
   /** set_comment_mode (GRP-9/17). Everyone or an unknown value: 23514. */
   setCommentMode(circle: string, mode: CommentMode): Promise<void>;

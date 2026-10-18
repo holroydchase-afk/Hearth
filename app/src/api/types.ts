@@ -20,7 +20,7 @@ export type ReplyScope = 'parents' | 'group' | 'everyone';
 export type CircleKind = 'everyone' | 'group' | 'household' | 'event';
 
 /** SPEC-GROUPS v2 (0013): who reads a member's comments, besides the writer, the parents and the poster.
- *  App words: Private / Shared on this group's posts / Always shared. Parents only; relatives never get it. */
+ *  App words: Private / Shared on this group's photos / Always shared. Parents only; relatives never get it. */
 export type CommentMode = 'private' | 'on_group_posts' | 'always';
 
 /** A person in the family (space_members + profiles, parents read it through RLS). */

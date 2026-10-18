@@ -13,7 +13,7 @@ import { AppGate } from './AppGate';
 /** SPEC-GROUPS v2 section 2, in the app's words (grandparent-ux owns the final wording). */
 const MODES: { mode: CommentMode; title: string; detail: string }[] = [
   { mode: 'private', title: 'Private', detail: 'Only the parents and whoever posted the photo read them.' },
-  { mode: 'on_group_posts', title: "Shared on this group's posts", detail: "People in this group read each other's comments on photos sent to this group." },
+  { mode: 'on_group_posts', title: "Shared on this group's photos", detail: "People in this group read each other's comments on photos sent to this group." },
   { mode: 'always', title: 'Always shared', detail: "People in this group read each other's comments on every photo they can both see." },
 ];
 
@@ -186,8 +186,8 @@ export function GroupsScreen() {
           {draft.need === 'name' ? <Txt variant="strong">Type a name for the group first.</Txt> : null}
           <Choice
             kind="checkbox"
-            label="This is for an occasion (event)"
-            title="This is for an occasion (event)"
+            label="This group is for an event"
+            title="This group is for an event"
             detail="Like a birthday or a trip. People in it read each other's comments on its photos."
             checked={draft.event}
             onPress={() => edit({ event: !draft.event, mode: draft.event ? 'private' : 'on_group_posts' })}
@@ -196,7 +196,7 @@ export function GroupsScreen() {
           {groups.filter((g) => relativesIn(g).length > 0).map((g) => (
             <Button key={g.circle_id} label={`Add everyone from ${g.name}`} variant="secondary" onPress={() => copyFrom(g)} />
           ))}
-          {draft.copied.map((n) => <Txt key={n} variant="muted">{`People added to ${n} later won't be added here.`}</Txt>)}
+          {draft.copied.map((n) => <Txt key={n} variant="muted">{`People you add to ${n} later won't be added here.`}</Txt>)}
           {relatives.map((p) => (
             <Choice key={p.user_id} kind="checkbox" label={p.name} title={p.name} checked={draft.ticked.includes(p.user_id)} onPress={() => tick(p.user_id)} />
           ))}
@@ -260,7 +260,7 @@ export function GroupsScreen() {
               {confirming === g.circle_id ? (
                 <Card>
                   <Txt variant="strong">{alwaysWords(relativesIn(g), g.name)}</Txt>
-                  <Txt>The parents and whoever posted the photo read every comment, as now.</Txt>
+                  <Txt>As now, the parents and whoever posted a photo read every comment on it.</Txt>
                   <Button label="Turn on Always shared" onPress={() => void setMode(g, 'always')} />
                   <Button label="Cancel" variant="secondary" onPress={() => setConfirming(null)} />
                 </Card>
@@ -294,9 +294,9 @@ export function GroupsScreen() {
               {everyone && everyone.circle_id !== g.circle_id ? (
                 <Choice
                   kind="checkbox"
-                  label="Also see photos sent to Everyone"
-                  title="Also see photos sent to Everyone"
-                  detail={`Untick this if they should see only ${g.name}.`}
+                  label="Also add them to Everyone"
+                  title="Also add them to Everyone"
+                  detail={`They'll see photos sent to Everyone. Untick this if they should see only ${g.name}.`}
                   checked={alsoEveryone}
                   onPress={() => setAlsoEveryone((v) => !v)}
                 />
