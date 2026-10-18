@@ -42,4 +42,6 @@ bash tests/setup_v2_test.sh || STATUS=1
 bash tests/setup_api_test.sh || STATUS=1
 # QA-3 sent vs received, read only, through the Management API (curl stubbed, SQL real)
 bash tests/sent_received_test.sh || STATUS=1
+# D1 read-only hosted smoke check (curl stubbed, SQL real and read-only)
+bash tests/smoke_check_test.sh || STATUS=1
 exit $STATUS
