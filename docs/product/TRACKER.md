@@ -55,6 +55,9 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 | D5 | Is Thanksgiving (Nov 26) still the target for milestones 3–4 | Yes, soft target | Planning only |
 | D6 | AI positioning session (on-device, opt-in); blocks face features only | After the beta | Face features |
 | D7 | Earlier "personal server" question: did you mean a separate locked store per family, run in the US? Your yes to the family vault may already answer it | Treat the vault as the answer | Nothing today |
+| D8 | Start per-family media keys now, before the first real photos (step 7), or after milestone 1 (then old photos need re-keying) | Before step 7, if staff-pm approves; it's small | Nothing today; cheaper before step 7 |
+| D9 | Push and email notices name the sender ("From Chase on Hearth", BETA-NOTIFY-7) or say nothing about who | Keep names for the beta; add a "hide names" setting later | Milestone 2 |
+| D10 | Open-source the repo? Prep would be a secrets scan and a license; a paid outside review waits for milestone 7 | Decide after milestone 1 | Nothing today |
 
 ## Waiting on Chase, later (not milestone 1)
 
@@ -68,7 +71,11 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 - Milestone 2 build: push on a real iPhone build (NOTIFY-3), Resend domain and SPF/DKIM after the name is final, invite links.
 - Spec the duplicate catcher (first AI add-on, no ML) when milestone 1 is behind us (`AI-FEATURES.md`).
 - grandparent-ux review of the family vault ideas before any vault spec (post-beta).
-- Privacy work offered in the marketing thread: a plain "what Hearth can and can't see" page, and a separate media key per family (deleting a family makes its photos unreadable). Post-milestone 1 unless Chase pulls them forward.
+- **Privacy path** (marketing thread, Oct 17). Chase's stance: the family vault is a later, higher tier, rolled out slowly; the steps below come first. Post-milestone 1 unless Chase pulls them forward.
+  - Per-family media keys: deleting a family makes its photos unreadable. A small test-first change in media signing; easiest while the hosted database has no photos. Outside BETA-SPEC, so staff-pm approves first. See D8.
+  - A "what Hearth can see" page listing every vendor and what it can read; grandparent-ux reviews the wording.
+  - Audit that our code never keeps IP addresses, and write down Supabase's log retention.
+  - Later: encrypt captions and replies (this blocks caption search).
 - 0012 households-only migration (spec'd in `SPEC-GROUPS.md`, needed before milestone 3).
 
 ## Running
