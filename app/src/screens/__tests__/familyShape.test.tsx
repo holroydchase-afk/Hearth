@@ -59,7 +59,7 @@ describe('BETA-AUD-19 invite form: share history, no default', () => {
     expect(make.props.accessibilityState?.disabled ?? false).toBe(false);
     fireEvent.press(make);
     expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
-    expect(createInvite).toHaveBeenCalledWith(expect.objectContaining({ history: 'new', circleIds: [FIXTURE.circles.dadSide.id] }));
+    expect(createInvite).toHaveBeenCalledWith(expect.objectContaining({ history: 'new', circleIds: [FIXTURE.circles.dadSide.id, FIXTURE.circles.everyone.id] }));
   });
 
   it('BETA-AUD-19 picking "Share all past photos" sends history "all"', async () => {
@@ -68,6 +68,36 @@ describe('BETA-AUD-19 invite form: share history, no default', () => {
     fireEvent.press(screen.getByRole('button', { name: 'Make the invite' }));
     expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
     expect(createInvite).toHaveBeenCalledWith(expect.objectContaining({ history: 'all' }));
+  });
+});
+
+describe('PRIV-G2 / GRP-18 invite form: Everyone is ticked first and can be unticked', () => {
+  async function openForm() {
+    const be = FakeBackend.withFixture();
+    const { api, createInvite } = spiedApi(be);
+    await renderApp(<GroupsScreen />, { be, user: 'chase', deps: { api } });
+    fireEvent.press(await screen.findByRole('button', { name: `Invite someone to ${DAD}` }));
+    fireEvent.press(await screen.findByRole('radio', { name: 'Share all past photos' }));
+    return { be, createInvite };
+  }
+
+  it('PRIV-G2 / GRP-18 "Also see photos sent to Everyone" starts ticked, and the invite names the group and Everyone', async () => {
+    const { createInvite } = await openForm();
+    const box = screen.getByRole('checkbox', { name: 'Also see photos sent to Everyone' });
+    expect(box.props.accessibilityState).toMatchObject({ checked: true });
+    expectGrandparentSafe();
+    fireEvent.press(screen.getByRole('button', { name: 'Make the invite' }));
+    expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
+    expect(createInvite).toHaveBeenCalledWith(expect.objectContaining({ circleIds: [FIXTURE.circles.dadSide.id, FIXTURE.circles.everyone.id] }));
+  });
+
+  it('PRIV-G2 / GRP-18 unticking it sends only the group (a new invite adds Everyone only if named)', async () => {
+    const { createInvite } = await openForm();
+    fireEvent.press(screen.getByRole('checkbox', { name: 'Also see photos sent to Everyone' }));
+    expect(screen.getByRole('checkbox', { name: 'Also see photos sent to Everyone' }).props.accessibilityState).toMatchObject({ checked: false });
+    fireEvent.press(screen.getByRole('button', { name: 'Make the invite' }));
+    expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
+    expect(createInvite).toHaveBeenCalledWith(expect.objectContaining({ circleIds: [FIXTURE.circles.dadSide.id] }));
   });
 });
 

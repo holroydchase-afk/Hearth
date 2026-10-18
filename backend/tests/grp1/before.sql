@@ -103,6 +103,17 @@ insert into public.comments (post_id, author_id, body) values ('55555555-0000-00
 insert into public.comments (post_id, author_id, body) values ('55555555-0000-0000-0000-0000000000a3', 'a0000000-0000-0000-0000-0000000000a1', 'So proud');
 insert into public.reactions (post_id, user_id, emoji) values ('55555555-0000-0000-0000-0000000000a3', 'c0000000-0000-0000-0000-0000000000c1', '❤️');
 
+-- GRP-12 / PRIV-G2: an invite made BEFORE 0013 that names only a household (0011's way to invite). Cousin Ivy
+-- redeems it after 0013 (after.sql) and must still land in Everyone too. Not redeemed here, so the snapshot is unchanged.
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('d1000000-0000-0000-0000-000000000017', 'ivy@grp1.test', '{"display_name":"Cousin Ivy"}');
+select set_config('request.jwt.claim.sub', 'd1000000-0000-0000-0000-000000000001', false);
+create table grp1.old_invite as
+  select invite_id, code from public.create_invite(p_space => '22222222-0000-0000-0000-0000000000d0', p_role => 'viewer',
+                                                   p_circle_ids => array['33333333-0000-0000-0000-0000000000d2']::uuid[],
+                                                   p_name => 'Cousin Ivy', p_history => 'all');
+select set_config('request.jwt.claim.sub', '', false);
+
 -- ---------- the snapshot ----------
 create table grp1.circles as select id, kind, created_at from public.circles;
 create table grp1.members as select space_id, user_id from public.space_members;

@@ -231,6 +231,17 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(joiner.redeemInvite(c))).toBe('22023'); // already used
     });
 
+    itJoiner('GRP-12 / PRIV-G2: one invite can name two groups; the joiner gets both', async () => {
+      const inId = await publishedPost('to the in group');
+      const outId = await publishedPost('to the out group', [h.circleOut]);
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn, h.circleOut], history: 'all', channel: 'email', targetEmail: h.joinerEmail });
+      const joiner = h.as('joiner');
+      expect(await joiner.redeemInvite(c)).toBe(h.spaceId);
+      const ids = await feedIds(joiner);
+      expect(ids).toContain(inId);
+      expect(ids).toContain(outId);
+    });
+
     itJoiner('an invite addressed to someone else is refused (22023)', async () => {
       const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', channel: 'email', targetEmail: 'someone.else@example.com' });
       expect(await code(h.as('joiner').redeemInvite(c))).toBe('22023');

@@ -44,6 +44,8 @@ interface CommentRec { id: string; post: string; author: string; body: string; c
 interface InviteRow {
   code: string; space: string; role: Role; circles: string[]; created_by: string; target_email: string | null;
   expires_at: string; max_uses: number; uses: number; revoked: boolean; name?: string | null; history?: ShareHistory | null;
+  /** Server invites.household_means_everyone: only invites made before 0013 (PRIV-G2). */
+  householdMeansEveryone?: boolean;
 }
 
 export interface FakeState {
@@ -516,7 +518,11 @@ export class FakeBackend {
     this.state.members.push({ space: inv.space, user: me, role: inv.role, invited_by: inv.created_by });
     const u = this.state.users[me];
     if (u && inv.name && u.nameSet === false) { u.name = inv.name; u.nameSet = true; } // JOIN-1
-    for (const c of inv.circles) if (!this.inCircle(c, me)) this.state.circleMembers.push({ circle: c, user: me });
+    // PRIV-G2 / GRP-12: Everyone only if named, or (an invite made before 0013) a household is named
+    const places = [...inv.circles];
+    const everyone = Object.values(this.state.circles).find((c) => c.space === inv.space && c.kind === 'everyone' && !c.deleted);
+    if (everyone && inv.householdMeansEveryone && inv.circles.some((c) => this.state.circles[c]?.kind === 'household')) places.push(everyone.id);
+    for (const c of places) if (!this.inCircle(c, me)) this.state.circleMembers.push({ circle: c, user: me });
     this.changed();
     return inv.space;
   }
@@ -527,9 +533,8 @@ export class FakeBackend {
     if (a.role !== 'viewer' && this.member(a.space, me)?.role !== 'owner') throw new ApiError('42501', 'only owners invite adults');
     if (!a.circleIds.length) throw new ApiError('23514', 'at least one circle');
     if (a.circleIds.some((c) => this.state.circles[c]?.space !== a.space)) throw new ApiError('23514', 'circle not in space');
-    // BETA-AUD-19 (0011): a relative's invite names one group and says whether they see past photos
+    // BETA-AUD-19: a relative's invite says whether they see past photos. GRP-12 (0013): it may name several groups.
     if (a.role === 'viewer' && (a.history !== 'all' && a.history !== 'new')) throw new ApiError('23514', 'choose all or new for past photos');
-    if (a.role === 'viewer' && a.circleIds.length !== 1) throw new ApiError('23514', 'an invite names one household');
     if (a.name != null && !validName(a.name)) throw new ApiError('23514', 'a name is 1-40 characters, not an email address');
     if (a.name != null && this.state.members.some((m) => m.space === a.space && this.state.users[m.user]?.name.toLowerCase() === a.name!.trim().toLowerCase())) {
       throw new ApiError('23514', 'someone in this family already has that name'); // no impersonation, like the SQL
@@ -540,7 +545,7 @@ export class FakeBackend {
     this.state.invites[code] = {
       code, space: a.space, role: a.role, circles: [...a.circleIds], created_by: me, target_email: a.targetEmail?.toLowerCase() ?? null,
       expires_at: new Date(Date.now() + days * 864e5).toISOString(), max_uses: a.maxUses ?? 1, uses: 0, revoked: false,
-      name: a.name?.trim() || null, history: a.role === 'viewer' ? a.history ?? null : null,
+      name: a.name?.trim() || null, history: a.role === 'viewer' ? a.history ?? null : null, householdMeansEveryone: false,
     };
     this.changed();
     return { code, link: `https://hearth.family/join/${code}` };
