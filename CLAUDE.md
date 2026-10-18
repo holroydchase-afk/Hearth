@@ -9,6 +9,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - Root: `CLAUDE.md`, `HANDOFF.md`. Product: `docs/product/`. Engineering: `docs/eng/`. Code READMEs stay beside their code.
 
 ## Read first
+- `docs/product/TRACKER.md`: the one list of what's next, what's missing for milestone 1 and what's pending on Chase or Claude. Work its sequence in order, and update it in the same PR whenever a thread finishes, adds or blocks an item.
 - `docs/product/STORY.md`: why Hearth exists, the 8 problems and Hearth's answers, family stories, WV vs Charlotte. Read before any UX or positioning call.
 - `docs/product/ANCHORS.md`: milestones, anchors (A1–A3), ideas log. Add new anchors and ideas there as Chase names them; never delete built features to satisfy one.
 - `HANDOFF.md`: current state and what's next. Start here every session.
