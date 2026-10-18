@@ -40,4 +40,6 @@ psql -d "$DB" -X -q -f tests/aud16/after.sql || STATUS=1
 bash tests/setup_v2_test.sh || STATUS=1
 # one-command family setup through the Management API (SETUP-API; curl stubbed, SQL real)
 bash tests/setup_api_test.sh || STATUS=1
+# QA-3 sent vs received, read only, through the Management API (curl stubbed, SQL real)
+bash tests/sent_received_test.sh || STATUS=1
 exit $STATUS
