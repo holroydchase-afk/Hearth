@@ -6,6 +6,8 @@
 import { ApiError, type HearthApi } from '../HearthApi';
 import type {
   CircleKind,
+  CommentMode,
+  Person,
   ReplyAudience,
   ReplyScope,
   ShareHistory,
@@ -28,7 +30,7 @@ const INVITE_ALPHABET = 'ABCDEFGHJKMNPQRSTVWXYZ23456789';
 
 interface UserRow { id: string; email: string; name: string; nameSet?: boolean } // nameSet undefined = set
 interface MemberRow { space: string; user: string; role: Role; invited_by: string | null }
-interface CircleRow { id: string; space: string; name: string; created_by: string; deleted: boolean; kind?: CircleKind }
+interface CircleRow { id: string; space: string; name: string; created_by: string; deleted: boolean; kind?: CircleKind; comment_mode?: CommentMode }
 interface PostRow {
   id: string; space: string; author: string; caption: string | null; status: 'draft' | 'published';
   deleted: boolean; circles: string[]; client_id: string; created_at: string; published_at: string | null;
@@ -67,7 +69,16 @@ export interface FakeState {
   failures: Record<string, number[]>;
   appSession: string | null;
   lastTs: number;
+  /** FLAG (0013): global switch per feature (Hearth only) and the family add-on, keyed `${space}:${feature}`. */
+  featureFlags?: Record<string, boolean>;
+  spaceFeatures?: Record<string, boolean>;
 }
+
+/** 0013: a new circle's comment setting by kind (households stay 'always'). */
+const defaultMode = (k: CircleKind | undefined): CommentMode => (k === 'household' ? 'always' : k === 'event' ? 'on_group_posts' : 'private');
+const MODES: CommentMode[] = ['private', 'on_group_posts', 'always'];
+/** private.feature_capability: who may use each feature (parents only to start). */
+const FEATURE_CAPABILITY: Record<string, 'use_video'> = { video_posting: 'use_video' };
 
 const U = (n: number) => `00000000-0000-4000-8000-${n.toString(16).padStart(12, '0')}`;
 export const FIXTURE = {
@@ -272,7 +283,10 @@ export class FakeBackend {
       .filter((c) => c.space === space && !c.deleted && (c.created_by === me || this.inCircle(c.id, me)))
       .map((c) => {
         const ids = this.circleMemberIds(c.id);
-        return { circle_id: c.id, name: c.name, member_count: ids.length, member_names: ids.map((i) => this.state.users[i]?.name ?? '?'), kind: c.kind ?? 'group', parent_ids: [] };
+        return {
+          circle_id: c.id, name: c.name, member_count: ids.length, member_names: ids.map((i) => this.state.users[i]?.name ?? '?').sort(),
+          kind: c.kind ?? 'group', parent_ids: [], comment_mode: c.comment_mode ?? defaultMode(c.kind),
+        };
       });
   }
 
@@ -562,6 +576,78 @@ export class FakeBackend {
     this.changed();
   }
 
+  // ---------------- groups v2 (0013) ----------------
+  /** private.managed_circle: live, and in a family the caller is a parent of; else "not found". */
+  managedCircle(user: string | null, circle: string): CircleRow {
+    const me = this.requireUser(user);
+    const c = this.state.circles[circle];
+    if (!c || c.deleted || !this.isPoster(c.space, me)) throw new ApiError('P0002', 'not found');
+    return c;
+  }
+  historyChoice(h: unknown): void {
+    if (h !== 'all' && h !== 'new') throw new ApiError('23514', 'choose "all" or "new" for past photos');
+  }
+
+  createLevel(user: string | null, space: string, kind: string, name: string): string {
+    const me = this.requireUser(user);
+    if (!this.isPoster(space, me)) throw new ApiError('P0002', 'not found');
+    if (kind !== 'group' && kind !== 'household' && kind !== 'event') throw new ApiError('23514', 'kind');
+    const n = (name ?? '').trim();
+    if (n.length < 1 || n.length > 60) throw new ApiError('23514', 'name length');
+    if (Object.values(this.state.circles).some((o) => o.space === space && o.name === n)) throw new ApiError('23514', 'name taken');
+    const id = uuid();
+    this.state.circles[id] = { id, space, name: n, created_by: me, deleted: false, kind, comment_mode: defaultMode(kind) };
+    this.changed();
+    return id;
+  }
+
+  setCommentMode(user: string | null, circle: string, mode: CommentMode): void {
+    const c = this.managedCircle(user, circle);
+    if (c.kind === 'everyone') throw new ApiError('23514', "Everyone's setting stays Private");
+    if (!MODES.includes(mode)) throw new ApiError('23514', 'comment setting');
+    c.comment_mode = mode;
+    this.changed();
+  }
+
+  /** The fake keeps one membership list, so placing a person is adding them (history is checked, not modelled). */
+  placePerson(user: string | null, group: string, person: string, history: ShareHistory): void {
+    const c = this.managedCircle(user, group);
+    this.historyChoice(history);
+    if (c.kind === 'everyone') throw new ApiError('23514', 'people join Everyone through an invite');
+    if (!this.member(c.space, person)) throw new ApiError('23514', 'not a member of this family');
+    if (!this.inCircle(group, person)) this.state.circleMembers.push({ circle: group, user: person });
+    this.changed();
+  }
+
+  addPeopleFrom(user: string | null, target: string, source: string, history: ShareHistory): void {
+    const t = this.managedCircle(user, target);
+    const s = this.managedCircle(user, source);
+    this.historyChoice(history);
+    if (t.space !== s.space) throw new ApiError('23514', 'both must be in the same family');
+    if (t.kind === 'everyone') throw new ApiError('23514', 'people join Everyone through an invite');
+    for (const u of this.circleMemberIds(source)) {
+      if (this.member(t.space, u)?.role === 'viewer' && !this.inCircle(target, u)) this.state.circleMembers.push({ circle: target, user: u });
+    }
+    this.changed();
+  }
+
+  /** space_members + profiles under RLS: parents see everyone; others themselves and the parents. */
+  familyPeople(user: string | null, space: string): Person[] {
+    const me = this.requireUser(user);
+    const parent = this.isPoster(space, me);
+    return this.state.members
+      .filter((m) => m.space === space && (parent || m.user === me || m.role === 'owner' || m.role === 'adult'))
+      .filter(() => !!this.member(space, me))
+      .map((m) => ({ user_id: m.user, name: this.state.users[m.user]?.name ?? '?', role: m.role }));
+  }
+
+  /** private.feature_on for each known feature: global switch AND family add-on AND can(capability). */
+  myFeatures(user: string | null, space: string): string[] {
+    const me = this.requireUser(user);
+    return Object.keys(FEATURE_CAPABILITY).filter((f) =>
+      !!this.state.featureFlags?.[f] && !!this.state.spaceFeatures?.[`${space}:${f}`] && this.isPoster(space, me)).sort();
+  }
+
   // ---------------- sign-media ----------------
   signUpload(user: string | null, post: string, items: UploadItemSpec[]): UploadGrant {
     const me = this.requireUser(user);
@@ -738,4 +824,10 @@ export class FakeApi implements HearthApi {
     return this.be.getObject(url).slice();
   };
   renameCircle = (c: string, name: string) => this.run(() => this.be.renameCircle(this.userId, c, name));
+  createLevel = (space: string, kind: Exclude<CircleKind, 'everyone'>, name: string) => this.run(() => this.be.createLevel(this.userId, space, kind, name));
+  setCommentMode = (c: string, mode: CommentMode) => this.run(() => this.be.setCommentMode(this.userId, c, mode));
+  placePerson = (g: string, u: string, h: ShareHistory) => this.run(() => this.be.placePerson(this.userId, g, u, h));
+  addPeopleFrom = (t: string, f: string, h: ShareHistory) => this.run(() => this.be.addPeopleFrom(this.userId, t, f, h));
+  familyPeople = (space: string) => this.run(() => this.be.familyPeople(this.userId, space));
+  myFeatures = (space: string) => this.run(() => this.be.myFeatures(this.userId, space));
 }
