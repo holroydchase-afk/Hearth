@@ -18,7 +18,7 @@ Chase uses Hearth end to end in Expo Go on his iPhone, with a test account B on 
 |---|---|---|---|
 | 1 | Say "merge" for the docs PRs: [#14](https://github.com/holroydchase-afk/Hearth/pull/14) (family vault logged) and the PR that adds this tracker. (#15, milestone 1 in Expo Go, is merged) | Chase | ☑ |
 | 2 | **Sign-in code email.** In Resend: API Keys → Create, name `supabase-smtp`, Sending access. In Supabase → Authentication → Emails → Set up SMTP: sender `onboarding@resend.dev`, name `Hearth`, host `smtp.resend.com`, port `465`, user `resend`, password = that key. Then paste the two templates (`deploy/magic_link.html`, `deploy/confirmation.html` in the project files; subject `Your Hearth code: {{ .Token }}`) and set code length 6, expiry 3600 s. About 10 minutes | Chase | ☑ |
-| 3 | **Get the app to Chase's phone and account B's browser.** Point the app at the hosted project, publish it so Expo Go opens it from a link or QR (no laptop dev server), and give account B a web link. Nothing does this today (see Missing, M1) | Claude | ☐ |
+| 3 | **App on the phone and the web.** Expo Go: open `exp://u.expo.dev/676e8cec-57a6-472f-9086-9a9318eaf556/group/<update group>` (latest group on the EAS dashboard, branch `preview`; republish with `npm run eas -- update --branch preview --platform ios`). Web build for account B: https://thefreighttrains-team-hearth.expo.app (EAS Hosting; republish with `expo export --platform web` then `eas deploy --prod`). `app/.env.local` is rebuilt from the Management API anon key | Claude | ☑ |
 | 4 | Sign in once in Expo Go with the 6-digit code; tell Claude "signed in" | Chase | ☐ |
 | 5 | Run `family-setup.sh` (Everyone, both sides, the houses, Test house, two events); send Chase account B's invite code | Claude | ☐ |
 | 6 | **Photo and notice keys.** Make a Backblaze B2 account (US East; the region can't change) and a bucket key. Save the B2 values, a Resend key for notices, and `MEDIA_KEK` (Claude shows how to generate it) as Hearth environment secrets, never in chat. Print `MEDIA_KEK` twice and keep the copies in two places | Chase | ☐ |
@@ -89,6 +89,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 ## Done (latest first)
 
 - Oct 18: anchor A4 White-paper ready; `docs/architecture/` started (overview, data flow, encryption and keys, threat model).
+- Oct 18: app published to Expo Go (EAS Update, branch preview) and the web (thefreighttrains-team-hearth.expo.app); PR #18.
 - Oct 18: sign-in code email set up in Supabase (Resend SMTP, both templates, 6-digit code, 1 hour); PR #14 and #16 merged.
 - Oct 17: tracker created (this file).
 - Oct 17: milestone 1 runs in Expo Go; push moved to milestone 2 (PR #15).
