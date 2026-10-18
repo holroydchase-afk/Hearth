@@ -4383,6 +4383,41 @@
    "where": "backend/tests/privacy_audit_test.sql"
   },
   {
+   "id": "PRIVACY-AUDIT-008",
+   "title": "S11 a co-parent (guardian, viewer in the other household's space) can't unlink the child from it",
+   "area": "Privacy audit (no raw IPs)",
+   "tickets": [],
+   "where": "backend/tests/privacy_audit_test.sql"
+  },
+  {
+   "id": "PRIVACY-AUDIT-009",
+   "title": "S11 setup: Blair can still unlink Sam from Blair's own space",
+   "area": "Privacy audit (no raw IPs)",
+   "tickets": [],
+   "where": "backend/tests/privacy_audit_test.sql"
+  },
+  {
+   "id": "PRIVACY-AUDIT-010",
+   "title": "S11 the owner of a family space can still unlink a child from their own space",
+   "area": "Privacy audit (no raw IPs)",
+   "tickets": [],
+   "where": "backend/tests/privacy_audit_test.sql"
+  },
+  {
+   "id": "PRIVACY-AUDIT-011",
+   "title": "S13 setup: two relatives in the same group see each other's profile",
+   "area": "Privacy audit (no raw IPs)",
+   "tickets": [],
+   "where": "backend/tests/privacy_audit_test.sql"
+  },
+  {
+   "id": "PRIVACY-AUDIT-012",
+   "title": "S13 once their only shared group is deleted, they no longer see each other's profile",
+   "area": "Privacy audit (no raw IPs)",
+   "tickets": [],
+   "where": "backend/tests/privacy_audit_test.sql"
+  },
+  {
    "id": "AUD-16-001",
    "title": "BETA-AUD-16: migration 0011 was applied (circles.kind exists), so the diffs below compare before/after 0011",
    "area": "Groups, households, events",

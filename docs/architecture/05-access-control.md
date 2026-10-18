@@ -42,11 +42,15 @@ One permission check, `public.can(space, capability)`, decides `post`, `send_to_
 
 A comment or heart is read by the parents, the post's author, the writer, people in the writer's own household, people in an event on the post's audience they share with the writer, or everyone if the owner turned that on. Readers are **fixed when the reply is written**: a house added to a post later sees the photo, not the replies written before it joined. Times that decide this (a heart's time, an audience row's time) can't be set by the app. The comment box shows the names of who will read it (`public.reply_readers`).
 
+## Who sees a name (Built)
+
+A relative's profile (display name) is visible to the people they share a family space with as a parent, to people in a live group with them (`public.can_see_profile`; a deleted group, or a deleted family space, no longer counts, migration 0012, S13), and to whoever can read one of their replies. Only a family space's parents can unlink a child from that space; a co-parent who is a viewer there can't (migration 0012, S11).
+
 ## How it's tested (Built)
 
 - `backend/tests/rls_test.sql` (120 checks) and `backend/tests/groups_test.sql` (168): each rule in both directions, the allowed person sees it and the excluded person doesn't, including grandparent and co-parent separation.
 - `backend/tests/aud16/` (BETA-AUD-16): a who-sees-what snapshot before 0011 and after; 0011 changed nobody's access.
-- `backend/tests/privacy_audit_test.sql` (PRIV-1): the invite rate limit keeps no raw IP address.
+- `backend/tests/privacy_audit_test.sql`: the invite rate limit keeps no raw IP address (PRIV-1); S11 and S13 above.
 - CI runs the SQL suites on a real local Supabase stack (`backend/tests/run_supabase.sh`), not only on a stand-in.
 
 ## What Hearth's server can see

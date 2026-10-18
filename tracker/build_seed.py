@@ -185,9 +185,9 @@ tickets = [
  # open backlog
  ("S9", "bug", B, "Medium", "fixed", "Space managers can read invite code hashes; 8-character codes are crackable offline in about a day. Salt or lengthen codes.", []),
  ("S10", "bug", B, "Medium", "fixed", "No rate limit on redeeming invite codes", []),
- ("S11", "bug", B, "Medium", "open", "A guardian can unlink their child from the other household's space", []),
+ ("S11", "bug", B, "Medium", "fixed", "A guardian can unlink their child from the other household's space", []),
  ("S12", "bug", B, "Low", "fixed", "Removed members can still edit captions on their old posts", []),
- ("S13", "bug", B, "Low", "open", "Members of a deleted circle can still see each other's profiles", []),
+ ("S13", "bug", B, "Low", "fixed", "Members of a deleted circle can still see each other's profiles", []),
  ("S14", "bug", B, "Low", "open", "Free-tier video cap is per space; someone can make extra spaces", []),
  ("S15", "bug", E_, "Low", "open", "Media can be marked ready without its key saved, which breaks that post (fails closed)", []),
  ("S16", "task", B, "High", "fixed", "Rerun the backend suite on a real Supabase stack before launch (today's runs use a stand-in)", []),
@@ -219,7 +219,7 @@ tickets = [
 ]
 # When each ticket was found and fixed, where it isn't Oct 15.
 DATES = {"S9": ("2026-10-15", "2026-10-16"), "S10": ("2026-10-15", "2026-10-16"), "S12": ("2026-10-15", "2026-10-16"),
-         "S16": ("2026-10-15", "2026-10-17"), "E10": ("2026-10-15", "2026-10-16"), "E14": ("2026-10-15", "2026-10-16"),
+         "S16": ("2026-10-15", "2026-10-17"), "S11": ("2026-10-15", "2026-10-18"), "S13": ("2026-10-15", "2026-10-18"), "E10": ("2026-10-15", "2026-10-16"), "E14": ("2026-10-15", "2026-10-16"),
          "AE-2": ("2026-10-16", "2026-10-16"), "AE-3": ("2026-10-16", None), "AE-4": ("2026-10-16", "2026-10-18"),
          "AE-5": ("2026-10-16", "2026-10-16"), "AE-6": ("2026-10-16", None), "AE-7": ("2026-10-16", "2026-10-16"),
          "AE-8": ("2026-10-16", "2026-10-16"), "V1": ("2026-10-16", None), "REPLY-1": ("2026-10-16", None),
@@ -277,7 +277,7 @@ run("r10", suite="app", at="2026-10-17T07:30:00-04:00", label="Groups + bulk/tim
     note="Red on purpose: invite form has no share-history choice (AUD-19, 4); the reply switch and setGroupRepliesShared still exist (REPLY-12, 2); the comment box doesn't call replyReaders (REPLY-11, 2); a relative who can post still gets 'Pick lots of photos' (1); a timeline card can't open its post (2); the phone keeps capture dates more than a day ahead (4). Existing 311 green, 1 skipped; typecheck clean; web smoke test 1/1. Found and fixed T5 (flaky ciphertext regex in bulk.test) on the way; after it, 3 full runs gave identical counts.")
 run("r11", suite="backend", at="2026-10-18T03:30:00-04:00", label="Overnight privacy audit: PRIV-1 written first (red), then migration 0012",
     passed=sum(sql_res.values()), failed=len(sql_res) - sum(sql_res.values()), results={k: ("pass" if v else "fail") for k, v in sql_res.items()},
-    note="PRIV-1 was red 2 of 6 before 0012 (raw IP stored; stale rows never purged); the pepper-rotation check was added after privacy-security's review. "
+    note="PRIV-1 was red 2 of 6 before 0012, and S11 and S13 1 each before their fixes (raw IP stored; stale rows never purged); the pepper-rotation check was added after privacy-security's review. "
          "Green 3 runs in a row with every other suite unchanged. Also green 3x, not in this table: QA-3 sent-vs-received 20/20, D1 smoke check 20/20, "
          "SETUP-API 34, SETUP V2 15, deploy 20, PRIV-2 log check 11/11 (red first on sign-media). Deno not run here (CI only).")
 run("r12", suite="app", at="2026-10-18T03:00:00-04:00", label="BETA-BULK-1 fallback: creation time for undated photos (red, then green)",
