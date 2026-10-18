@@ -5,10 +5,9 @@ import type { Prepared, QueueItem } from '../upload/queue';
 import { expoManipulator } from './expoManipulator';
 import { buildUploadSpec, checkVideo, processPhoto } from './pipeline';
 
-/** Video posting stays off until video metadata (iOS location atoms) can be stripped on device. */
-export const VIDEO_POSTING_ENABLED = false;
-
 export async function prepareItem(item: QueueItem): Promise<Prepared> {
+  // FLAG-5: whether video is offered is the server's video_posting feature (my_features); sign-media refuses
+  // video while it is off (FLAG-4). Until on-phone transcode strips location (FLAG-7), a video still stops here.
   if (item.kind === 'video') {
     checkVideo({ durationMs: item.durationMs ?? null });
     throw new ApiError('EXIF', 'video metadata stripping not available');

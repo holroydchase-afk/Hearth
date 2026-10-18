@@ -18,7 +18,8 @@ export interface AppDeps {
   /** Phone number behind "Call Chase" (EXPO_PUBLIC_HELP_PHONE). */
   helpPhone?: string | null;
   prepare: (item: QueueItem) => Promise<Prepared>;
-  pickPhotos: () => Promise<{ items: QueueItem[] } | { denied: true }>;
+  /** videos: offer videos too (only when the server says video_posting is on: FLAG-5). */
+  pickPhotos: (opts: { videos: boolean }) => Promise<{ items: QueueItem[] } | { denied: true }>;
   /** BETA-BULK-1: up to 100 photos with EXIF, read on the phone only (media/pick.ts pickBulk). */
   pickBulk?: () => Promise<{ assets: PickedAsset[] } | { denied: true }>;
   saveToPhone: (bytes: Uint8Array, name: string) => Promise<'saved' | 'denied'>;
@@ -38,6 +39,8 @@ export interface AppValue {
   queue: UploadQueue | null;
   media: MediaCache | null;
   prefs: Prefs;
+  /** FLAG-5: features the server has on for me in this family (my_features). Empty until read, or if the read fails. */
+  features: string[];
   setPrefs: (p: Partial<Prefs>) => void;
   /** Re-read session + spaces (after sign-in or joining). */
   reload: () => Promise<void>;
@@ -89,9 +92,11 @@ interface Loaded {
   queue: UploadQueue | null;
   media: MediaCache | null;
   prefs: Prefs;
+  features: string[];
 }
 
-const SIGNED_OUT: Loaded = { status: 'signedOut', session: null, space: null, feed: null, queue: null, media: null, prefs: defaultPrefs('owner') };
+const NO_FEATURES: string[] = [];
+const SIGNED_OUT: Loaded = { status: 'signedOut', session: null, space: null, feed: null, queue: null, media: null, prefs: defaultPrefs('owner'), features: NO_FEATURES };
 
 export function AppProvider({ deps, children }: { deps: AppDeps; children: ReactNode }) {
   const [s, setS] = useState<Loaded>({ ...SIGNED_OUT, status: 'loading' });
@@ -127,7 +132,11 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
         onPublished: (job) => { void feed.refresh().then(() => queue?.remove(job.id)); },
       });
     }
-    setS({ status: 'ready', session, space, feed, queue, media, prefs });
+    setS({ status: 'ready', session, space, feed, queue, media, prefs, features: NO_FEATURES });
+    // FLAG-5: the server decides features (default off). A failed read leaves them off; the next launch retries.
+    void deps.api.myFeatures(space.space_id).then((features) => {
+      setS((cur) => (cur.space?.space_id === space.space_id ? { ...cur, features } : cur));
+    }).catch(() => {});
     await feed.hydrate();
     void feed.refresh();
     // AE-10: note when each notice reaches this phone (kept on the phone only).

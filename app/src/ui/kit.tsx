@@ -55,7 +55,8 @@ export function Button({ label, text, onPress, variant = 'primary', disabled, so
       accessibilityRole={role}
       accessibilityLabel={label}
       accessibilityState={{ disabled: !!disabled || !!softDisabled, selected: !!selected, busy: !!busy }}
-      disabled={disabled || busy}
+      // undefined, not false: Pressable copies a boolean `disabled` over accessibilityState and would undo softDisabled
+      disabled={disabled || busy || undefined}
       onPress={onPress}
       testID={testID}
       style={({ pressed }) => [

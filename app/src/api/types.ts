@@ -19,6 +19,17 @@ export type ReplyScope = 'parents' | 'group' | 'everyone';
 /** 0011 (SPEC-GROUPS): every container is a "group" in the app's words; kind says which part of the family shape. */
 export type CircleKind = 'everyone' | 'group' | 'household' | 'event';
 
+/** SPEC-GROUPS v2 (0013): who reads a member's comments, besides the writer, the parents and the poster.
+ *  App words: Private / Shared on this group's posts / Always shared. Parents only; relatives never get it. */
+export type CommentMode = 'private' | 'on_group_posts' | 'always';
+
+/** A person in the family (space_members + profiles, parents read it through RLS). */
+export interface Person {
+  user_id: string;
+  name: string;
+  role: Role;
+}
+
 /** BETA-AUD-19: when someone is added, do they see photos already shared? No default. */
 export type ShareHistory = 'all' | 'new';
 
@@ -31,6 +42,8 @@ export interface Circle {
   kind?: CircleKind;
   /** 0011: the groups and events this one sits under. */
   parent_ids?: string[];
+  /** 0013 (GRP-13): parents only; older servers omit it. */
+  comment_mode?: CommentMode;
 }
 
 export type MediaKind = 'photo' | 'video';

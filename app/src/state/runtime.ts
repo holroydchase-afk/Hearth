@@ -30,7 +30,7 @@ export function createRuntime(): AppDeps | { error: string } {
   const common = {
     kv: asyncStorageKV,
     prepare: prepareItem,
-    pickPhotos: () => pickPhotos(),
+    pickPhotos: (opts: { videos: boolean }) => pickPhotos(10, opts),
     pickBulk: () => pickBulk(),
     saveToPhone,
     openUrl: (u: string) => Linking.openURL(u),
