@@ -6,12 +6,15 @@ import { BULK_PICK_LIMIT, type PickedAsset } from '../share/bulk';
 
 export type PickResult = { items: QueueItem[] } | { denied: true };
 
-/** Up to 10 photos, picked in one go (BETA-SHARE-1). No editing step, no extra taps. */
-export async function pickPhotos(limit = 10): Promise<PickResult> {
+/**
+ * Up to 10 photos, picked in one go (BETA-SHARE-1). No editing step, no extra taps.
+ * Videos are offered only when the server has video_posting on for this person (FLAG-5).
+ */
+export async function pickPhotos(limit = 10, opts: { videos: boolean } = { videos: false }): Promise<PickResult> {
   const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (!perm.granted && perm.accessPrivileges !== 'limited') return { denied: true };
   const r = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ['images'],
+    mediaTypes: opts.videos ? ['images', 'videos'] : ['images'],
     allowsMultipleSelection: true,
     selectionLimit: limit,
     exif: false,
@@ -19,7 +22,7 @@ export async function pickPhotos(limit = 10): Promise<PickResult> {
   });
   if (r.canceled) return { items: [] };
   return {
-    items: r.assets.slice(0, limit).map((a) => ({ uri: a.uri, kind: 'photo' as const, width: a.width, height: a.height, durationMs: a.duration ?? null })),
+    items: r.assets.slice(0, limit).map((a) => ({ uri: a.uri, kind: opts.videos && a.type === 'video' ? 'video' as const : 'photo' as const, width: a.width, height: a.height, durationMs: a.duration ?? null })),
   };
 }
 

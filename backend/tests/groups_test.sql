@@ -12,7 +12,8 @@
 --   Charleston trip    (event): Pawpaw and Granny's house + the sister's house.
 --   Birthday at Gigi's (event): Grandaddy and Grandmomma's house, Gigi and Bebar's house, Pawpaw and Granny's house.
 --   Everyone: every relative who joined by invite, plus the parents.
--- Relatives join the way the app does it: create_invite (naming one household, p_history required) + redeem_invite.
+-- Relatives join the way the app does it: create_invite (naming one household and Everyone, which the app ticks by
+-- default since 0013 / GRP-18; p_history required) + redeem_invite.
 -- Gigi joins with "Only new photos" (p_history 'new'); everyone else with "Share all past photos".
 --
 -- Decisions this suite encodes (staff-pm / Chase can change them; then change the test first):
@@ -92,16 +93,17 @@ end $$;
 create function tests.place(p_house text, p_who text, p_history text default 'all') returns void language plpgsql as $$
 begin
   perform tests.act('chase');
-  execute 'select public.place_person(p_household => $1, p_user => $2, p_history => $3)' using tests.c(p_house), tests.u(p_who), p_history;
+  execute 'select public.place_person(p_group => $1, p_user => $2, p_history => $3)' using tests.c(p_house), tests.u(p_who), p_history;
 exception when others then raise warning 'place_person % in % failed: % %', p_who, p_house, sqlstate, sqlerrm;
 end $$;
--- Chase invites p_who to one household with a share-history choice; p_who redeems it.
+-- Chase invites p_who to one household and Everyone (what the app sends since 0013: a new invite puts the person in
+-- Everyone only if Everyone is named, PRIV-G2) with a share-history choice; p_who redeems it.
 create function tests.join(p_who text, p_house text, p_history text) returns void language plpgsql as $$
 declare v_code text; v_inv uuid; v_name text := (select name from tests.people where k = p_who);
 begin
   perform tests.act('chase');
   execute 'select invite_id, code from public.create_invite(p_space => $1, p_role => ''viewer'', p_circle_ids => $2, p_name => $3, p_history => $4)'
-    into v_inv, v_code using '22222222-0000-0000-0000-0000000000f0'::uuid, array[tests.c(p_house)], v_name, p_history;
+    into v_inv, v_code using '22222222-0000-0000-0000-0000000000f0'::uuid, array[tests.c(p_house), tests.c('all')], v_name, p_history;
   insert into tests.vars values ('invite_' || p_who, v_inv::text) on conflict (k) do update set v = excluded.v;
   perform tests.act(p_who);
   execute 'select public.redeem_invite($1)' using v_code;
@@ -690,10 +692,9 @@ select tests.chase_throws(format('select public.link_level(%L, %L, ''all'')', te
                           'BETA-AUD-13: an event under an event is 23514', '23514');
 select tests.chase_throws(format('select public.link_level(%L, %L, ''all'')', tests.v('all'), tests.v('g_chase')),
                           'BETA-AUD-13: linking anything under Everyone is 23514', '23514');
-select tests.chase_throws(format('select public.place_person(%L, %L, ''all'')', tests.v('g_chase'), tests.u('gammy')),
-                          'BETA-AUD-13: placing a person in a group is 23514 (people go only in households)', '23514');
-select tests.chase_throws(format('select public.place_person(%L, %L, ''all'')', tests.v('e_chs'), tests.u('gammy')),
-                          'BETA-AUD-13: placing a person in an event is 23514', '23514');
+-- 0013 (SPEC-GROUPS v2, GRP-10): people may be placed in any live group or event; only Everyone is refused.
+select tests.chase_throws(format('select public.place_person(%L, %L, ''all'')', tests.v('all'), tests.u('gammy')),
+                          'BETA-AUD-13 / GRP-10: placing a person in Everyone is 23514 (Everyone comes from the invite)', '23514');
 select tests.chase_throws(format('select public.link_level(%L, %L, ''all'')', tests.v('g_dan'), tests.v('h_other')),
                           'BETA-AUD-13: linking across two families (spaces) is 23514, even for a parent of both', '23514');
 select tests.chase_throws(format('select public.link_level(%L, %L, ''all'')', tests.v('h_test'), tests.v('h_test')),
@@ -707,8 +708,8 @@ select tests.throws_code(format('insert into public.circle_links (parent_id, chi
                          'privacy item 3: a direct cross-space circle_links insert (even as admin) is refused by trigger (23514)', '23514');
 select tests.throws_code(format('insert into public.circle_links (parent_id, child_id) values (%L, %L)', tests.v('g_chase'), tests.v('g_dan')),
                          'privacy item 3: a direct group-under-group insert is refused by link_allowed in a trigger (23514)', '23514');
-select tests.throws_code(format('insert into public.circle_people (circle_id, user_id) values (%L, %L)', tests.v('g_chase'), tests.u('gammy')),
-                         'privacy item 3: a direct circle_people insert into a group is refused (23514)', '23514');
+select tests.throws_code(format('insert into public.circle_people (circle_id, user_id) values (%L, %L)', tests.v('all'), tests.u('gammy')),
+                         'privacy item 3 / GRP-10: a direct circle_people insert into Everyone is refused (23514)', '23514');
 -- non-parents: P0002 on every setup RPC
 create function tests.gammy_p0002(p_sql text, p_desc text) returns void language plpgsql as $$
 begin perform tests.act('gammy'); perform tests.throws_code(p_sql, p_desc, 'P0002'); end $$;
@@ -739,9 +740,10 @@ select tests.chase_throws(format($$select public.create_invite(p_space => %L, p_
 select tests.chase_throws(format($$select public.create_invite(p_space => %L, p_role => 'viewer', p_circle_ids => array[%L]::uuid[], p_name => 'Grandma June', p_history => 'everything')$$,
                                  :space_h, tests.v('h_test')),
                           'BETA-AUD-19: create_invite with a made-up p_history is 23514', '23514');
-select tests.chase_throws(format($$select public.create_invite(p_space => %L, p_role => 'viewer', p_circle_ids => array[%L]::uuid[], p_name => 'Grandma June', p_history => 'all')$$,
-                                 :space_h, tests.v('g_dan')),
-                          'BETA-AUD-19: an invite names one household, not a group (23514)', '23514');
+-- 0013 (GRP-12): an invite may name any live groups; naming none is still refused
+select tests.chase_throws(format($$select public.create_invite(p_space => %L, p_role => 'viewer', p_circle_ids => '{}'::uuid[], p_name => 'Grandma June', p_history => 'all')$$,
+                                 :space_h),
+                          'BETA-AUD-19 / GRP-12: an invite that names no group is 23514', '23514');
 
 -- ======================================================================
 -- BETA-REPLY-12: the 0009 switch is gone
@@ -928,9 +930,13 @@ select tests.redeem_as('f0000000-0000-0000-0000-000000000031', tests.v('inv_old1
 select tests.ok(exists (select 1 from public.space_members where space_id = :space_h and user_id = 'f0000000-0000-0000-0000-000000000031'),
                 'S-0011-3 allowed: an invite to an old group with nothing under it still works until 0012 (Aunt Bea joins)');
 select tests.link('g_old', 'h_gammy', 'all');
-select tests.ok(tests.redeem_as('f0000000-0000-0000-0000-000000000032', tests.v('inv_old2')) like '%22023%'
-                and not exists (select 1 from public.space_members where space_id = :space_h and user_id = 'f0000000-0000-0000-0000-000000000032'),
-                'S-0011-3 excluded: once the old group has a household under it, its open invite is refused (Uncle Ray isn''t placed straight into the group)');
+-- 0013 (SPEC-GROUPS v2 section 4 item 7): the "nothing linked under it" check is gone; being in a group never meant
+-- more than that group's posts. Uncle Ray joins and is placed in the old group (not in Everyone).
+select tests.setv('ray_redeem', format('select tests.redeem_as(%L, %L)', 'f0000000-0000-0000-0000-000000000032', tests.v('inv_old2')));
+select tests.ok(tests.v('ray_redeem') not like 'error%'
+                and exists (select 1 from public.circle_people where circle_id = tests.v('g_old')::uuid and user_id = 'f0000000-0000-0000-0000-000000000032')
+                and not (select in_everyone from public.space_members where space_id = :space_h and user_id = 'f0000000-0000-0000-0000-000000000032'),
+                'S-0011-3 / GRP-12: an invite to a live group that now has a household under it still works (Uncle Ray is placed in it, not in Everyone)');
 select tests.q('chase', format('select public.retire_level(%L)', tests.v('g_old')));
 select tests.ok(tests.redeem_as('f0000000-0000-0000-0000-000000000033', tests.v('inv_old3')) like '%22023%'
                 and not exists (select 1 from public.space_members where space_id = :space_h and user_id = 'f0000000-0000-0000-0000-000000000033'),
@@ -952,7 +958,7 @@ set role anon;
 select tests.throws_code(format('select public.invite_preview(%L)', tests.v('inv_old3')),
                          'UX-G7: invite_preview refuses an invite to a retired group (22023), as redeem does', '22023');
 select tests.throws_code(format('select public.invite_preview(%L)', tests.v('inv_old2')),
-                         'UX-G7: invite_preview refuses an invite to an old group that now has households under it (22023)', '22023');
+                         'UX-G7: invite_preview refuses an invite that was already used (22023)', '22023');
 select tests.throws_code(format('select public.invite_preview(%L)', tests.v('inv_ux_house')),
                          'UX-G7: invite_preview refuses an invite whose household was retired (22023)', '22023');
 select tests.ok_sql(format($q$select tests.rest(format('select public.invite_preview(%%L)', %L)) @> '{"status":"400","body":{"code":"22023","details":"Chase"}}'$q$, tests.v('inv_old3')),

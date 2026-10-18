@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { ApiError, type ApiErrorCode, type HearthApi } from './HearthApi';
 import type {
   ReplyAudience,
+  CircleKind, CommentMode, Person, Role, ShareHistory,
   ClientErrorReport,
   MyProfile,
   NotificationPrefs,
@@ -167,6 +168,38 @@ export class SupabaseApi implements HearthApi {
     return { code: r.code, link: r.link ?? JOIN_LINK_BASE + r.code };
   };
   renameCircle = (circle: string, name: string) => this.rpc<void>('rename_circle', { p_circle: circle, p_name: name });
+  // ---- groups v2 (0013) ----
+  createLevel = (space: string, kind: Exclude<CircleKind, 'everyone'>, name: string) =>
+    this.rpc<unknown>('create_level', { p_space: space, p_kind: kind, p_name: name }).then((d) => one<string>(d));
+  setCommentMode = (circle: string, mode: CommentMode) => this.rpc<void>('set_comment_mode', { p_circle: circle, p_mode: mode });
+  placePerson = (group: string, user: string, history: ShareHistory) =>
+    this.rpc<void>('place_person', { p_group: group, p_user: user, p_history: history });
+  addPeopleFrom = (target: string, source: string, history: ShareHistory) =>
+    this.rpc<void>('add_people_from', { p_target: target, p_source: source, p_history: history });
+  myFeatures = (space: string) =>
+    this.rpc<{ feature: string }[] | null>('my_features', { p_space: space }).then((d) => (d ?? []).map((r) => r.feature));
+  /** Two plain reads under RLS (space_members: parents see the whole family; profiles: can_see_profile). Only names
+   *  and roles are selected: never an email. */
+  familyPeople = async (space: string): Promise<Person[]> => {
+    let members: { data: unknown; error: unknown };
+    try {
+      members = (await this.o.client.from('space_members').select('user_id, role').eq('space_id', space)) as { data: unknown; error: unknown };
+    } catch (e) {
+      throw toApiError(e);
+    }
+    if (members.error) throw toApiError(members.error);
+    const rows = (members.data ?? []) as { user_id: string; role: Role }[];
+    if (!rows.length) return [];
+    let profiles: { data: unknown; error: unknown };
+    try {
+      profiles = (await this.o.client.from('profiles').select('id, display_name').in('id', rows.map((r) => r.user_id))) as { data: unknown; error: unknown };
+    } catch (e) {
+      throw toApiError(e);
+    }
+    if (profiles.error) throw toApiError(profiles.error);
+    const names = new Map(((profiles.data ?? []) as { id: string; display_name: string }[]).map((p) => [p.id, p.display_name]));
+    return rows.filter((r) => names.has(r.user_id)).map((r) => ({ user_id: r.user_id, name: names.get(r.user_id)!, role: r.role }));
+  };
 
   // ---- sign-media ----
   signUpload = (post: string, items: UploadItemSpec[]) => this.fnCall<UploadGrant>('POST', '', { action: 'upload', post_id: post, items });

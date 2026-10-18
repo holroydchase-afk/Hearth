@@ -18,7 +18,9 @@ Who can see a post, who can send to whom, and who reads a reply. The short versi
 | group → event | Yes | A whole side invited to a birthday |
 | anything else | No | Refused by one check, `private.link_allowed`, in a trigger, so a direct insert can't bypass it |
 
-People are placed in households (`circle_people`); containers are linked to containers (`circle_links`). Who is in each container (`circle_members`) is **derived by trigger in the same transaction**, never written by the app, so membership can't drift from the shape. Everyone holds the parents and every relative who joined through a household invite.
+People are placed in containers (`circle_people`); containers are linked to containers (`circle_links`). Who is in each container (`circle_members`) is **derived by trigger in the same transaction**, never written by the app, so membership can't drift from the shape. Everyone holds the parents and every relative whose invite named Everyone (or, for an invite made before migration 0013, a household).
+
+**Plain groups (Built, migration 0013).** Since `0013_groups_v2.sql` a person can be placed in any live group, household or event, not only a household, and anyone can be in several. Only Everyone refuses a placement (its members come from the invite). Links are kept and still work but are no longer needed: `add_people_from(target, source, history)` copies the relatives currently in one group into another in one transaction, so someone added to the source later is not added to the copy. An invite can name one or more live groups; redeeming places the person in each and in Everyone only if Everyone is named. An invite that names a group retired since is refused (`22023`).
 
 ## Who sees a post (Built)
 
@@ -36,11 +38,29 @@ The same function is behind RLS on posts, photos (`media_items`), comments and h
 
 ## Who can send (Built)
 
-One permission check, `public.can(space, capability)`, decides `post`, `send_to_everyone`, `make_events`, `invite`, `set_up_family` and `family_settings`. Only parents send to Everyone, make events or invite; only the owner changes family settings. Relatives post only when the family allows it (`viewers_can_post`, off by default) and only to containers they are in. `can_send_to(circle)` applies this in `create_post`, `publish_post` and the RLS policy on `post_audiences`, so the API and a direct table insert give the same answer.
+One permission check, `public.can(space, capability)`, decides `post`, `send_to_everyone`, `make_events`, `invite`, `set_up_family`, `family_settings` and (0013) `use_video`. Only parents send to Everyone, make events or invite; only the owner changes family settings. Relatives post only when the family allows it (`viewers_can_post`, off by default) and only to containers they are in. `can_send_to(circle)` applies this in `create_post`, `publish_post` and the RLS policy on `post_audiences`, so the API and a direct table insert give the same answer.
 
-## Who reads a reply (Built)
+## Who reads a reply (Built, migration 0013)
 
-A comment or heart is read by the parents, the post's author, the writer, people in the writer's own household, people in an event on the post's audience they share with the writer, or everyone if the owner turned that on. Readers are **fixed when the reply is written**: a house added to a post later sees the photo, not the replies written before it joined. Times that decide this (a heart's time, an audience row's time) can't be set by the app. The comment box shows the names of who will read it (`public.reply_readers`).
+A comment or heart is read only by people who can see the post, and among them by the parents, the post's author, the writer, everyone if the owner turned that on, or people a **group's comment setting** lets read it. Each group has one setting (`circles.comment_mode`), chosen by a parent with `set_comment_mode`:
+
+| Setting | Who else reads a member's reply |
+|---|---|
+| Private (`private`) | Nobody. Default for Everyone and new groups |
+| Shared on this group's posts (`on_group_posts`) | Every member of the group, only on posts sent to that group. Default for new events |
+| Always shared (`always`) | Every member of the group, on any post both can see. What households did before 0013 |
+
+The settings decide who reads replies, never who sees a post. Everyone's setting can't be changed; the owner's family-wide switch is the only way to open it. One function, `private.group_reply_ok`, holds the group rule, and every reader of replies uses it: `private.reply_ok` (behind RLS on comments and hearts, `get_comments`, `can_see_reply` and `reply_readers`), `reply_scope`, and the feed and timeline counts (`private.feed_rows`).
+
+Readers are **fixed when the reply is written**. Both people must have been in the group by then, the post must already have been sent to the group (for "Shared on this group's posts"), and the reader must already have been able to see the post. A trigger logs every setting with the moment it took effect (`comment_mode_log`); a reply is judged by the **least open** setting the group had at any point from when the reply was written until now (`private.least_open_since`), so turning a group down hides earlier replies at once and turning it up, even back up, never opens them. A change is timed when it is logged (`clock_timestamp()`), not when its transaction began. Times that decide this (a heart's time, an audience row's time, a setting's time) can't be set by the app. The comment box shows the names of who will read it (`public.reply_readers`).
+
+Relatives can't read any group's setting: the column isn't granted to signed-in users and the log is visible only to parents, who get the setting from `my_circles`. Migration 0013 set households to Always shared and events to Shared on this group's posts, which is exactly the household and event rule it replaced; `backend/tests/grp1/` checks that it changed nobody's access.
+
+## Feature switches (Built, migration 0013)
+
+A feature such as video posting is on for someone only when three switches are all on (`private.feature_on`): a global switch per feature (`private.feature_flags`, which no app user can read or write), the family's add-on (`space_features`, which only the family's owner can write: `can(space, 'family_settings')`), and `can(space, capability)` for the person (video posting: `use_video`, parents only). Every switch defaults to off. The app reads its list from `my_features(space)`. The server enforces it: `prepare_media_upload` and the `media_items` insert trigger (so a direct table insert too) refuse an app user's video with `42501 video_posting_off`, and `sign-media` then signs nothing.
+
+**Event names.** A feed or timeline row carries the event a post was sent to (`event_id`, `event_name`) only for that event's members and the parents; anyone who sees the post through another group gets nulls and never learns the event exists.
 
 ## Who sees a name (Built)
 
@@ -48,8 +68,8 @@ A relative's profile (display name) is visible to the people they share a family
 
 ## How it's tested (Built)
 
-- `backend/tests/rls_test.sql` (120 checks) and `backend/tests/groups_test.sql` (168): each rule in both directions, the allowed person sees it and the excluded person doesn't, including grandparent and co-parent separation.
-- `backend/tests/aud16/` (BETA-AUD-16): a who-sees-what snapshot before 0011 and after; 0011 changed nobody's access.
+- `backend/tests/rls_test.sql` (120 checks), `backend/tests/groups_test.sql` (167) and `backend/tests/groups_v2_test.sql` (108): each rule in both directions, the allowed person sees it and the excluded person doesn't, including grandparent and co-parent separation. The v2 suite also checks that `get_comments`, table RLS, `reply_ok`, the feed counts and `reply_scope` agree for every person and every reply.
+- `backend/tests/aud16/` (BETA-AUD-16): a who-sees-what snapshot before 0011 and after; 0011 changed nobody's access. `backend/tests/grp1/` (GRP-1) does the same for 0013, including who reads every reply.
 - `backend/tests/privacy_audit_test.sql`: the invite rate limit keeps no raw IP address (PRIV-1); S11 and S13 above.
 - CI runs the SQL suites on a real local Supabase stack (`backend/tests/run_supabase.sh`), not only on a stand-in.
 
@@ -60,9 +80,10 @@ RLS limits what each family member's app can read. It does not limit Hearth's se
 ## Limits
 
 - **Gap: parents see everything.** By design, both parents see every post in their family space, including a relative's post to one household.
-- **Gap: legacy direct memberships.** Members from before 0011 keep "direct" rows (`circle_members.derived = false`) so nobody's access changed. Households-only placement becomes strict in migration 0013 (Planned, `docs/product/SPEC-GROUPS.md` §8).
+- **Gap: legacy direct memberships.** Members from before 0011 keep "direct" rows (`circle_members.derived = false`) so nobody's access changed. Since 0013 no new direct rows are written; invites place people through `circle_people`.
+- **Gap: "Always shared" crosses posts.** A member of an Always-shared group reads the other members' replies on any post both can see, including posts sent to other groups. That is the setting's purpose, but a parent should choose it knowingly (the app's confirmation is Planned, GRP-17).
 - **Gap: "Seen by N of M"** on your own posts shows engagement, which conflicts with anchor A2 Guilt-free (tracker D4).
 - **Planned:** event dates (`starts_on`, `ends_on`) exist in the schema but the app doesn't use them yet.
 
 ---
-Last checked against code: 2026-10-18, 0fb7ad1 (plus migration 0012)
+Last checked against code: 2026-10-18, b0d1d2b (plus migration 0013)

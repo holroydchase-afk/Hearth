@@ -41,6 +41,8 @@ export function ShareScreen() {
   const canPost = !!app.space?.can_post;
   // Oct 17 decision: "Pick lots of photos" is for parents only, never a relative allowed to post.
   const isParent = app.space?.role === 'owner' || app.space?.role === 'adult';
+  // FLAG-5: video is offered only when the server has video_posting on for me.
+  const videos = app.features.includes('video_posting');
 
   useEffect(() => {
     if (!spaceId || !userId || !canPost) return;
@@ -65,7 +67,7 @@ export function ShareScreen() {
 
   const pick = async () => {
     setNotice(null);
-    const r = await app.deps.pickPhotos();
+    const r = await app.deps.pickPhotos({ videos });
     if ('denied' in r) setNotice('Hearth needs your OK to see your photos. Tap "Allow" when your phone asks.');
     else setItems((cur) => [...cur, ...r.items].slice(0, MAX));
   };
@@ -131,7 +133,9 @@ export function ShareScreen() {
       {notice ? <Notice text={notice} onClose={() => setNotice(null)} /> : null}
 
       <Card>
-        <Button label="Pick photos from your phone" text={items.length ? 'Pick more photos' : 'Pick photos'} onPress={() => void pick()} disabled={items.length >= MAX} />
+        <Button
+          label={videos ? 'Pick photos or videos from your phone' : 'Pick photos from your phone'}
+          text={videos ? (items.length ? 'Pick more photos or videos' : 'Pick photos or videos') : (items.length ? 'Pick more photos' : 'Pick photos')} onPress={() => void pick()} disabled={items.length >= MAX} />
         {items.length ? <Txt variant="strong">{`${photos(items.length)} picked`}</Txt> : null}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           {items.map((it, i) => (
