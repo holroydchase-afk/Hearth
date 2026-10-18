@@ -83,7 +83,7 @@ describe('PRIV-G2 / GRP-18 invite form: Everyone is ticked first and can be unti
 
   it('PRIV-G2 / GRP-18 "Also see photos sent to Everyone" starts ticked, and the invite names the group and Everyone', async () => {
     const { createInvite } = await openForm();
-    const box = screen.getByRole('checkbox', { name: 'Also see photos sent to Everyone' });
+    const box = screen.getByRole('checkbox', { name: 'Also add them to Everyone' });
     expect(box.props.accessibilityState).toMatchObject({ checked: true });
     expectGrandparentSafe();
     fireEvent.press(screen.getByRole('button', { name: 'Make the invite' }));
@@ -93,8 +93,8 @@ describe('PRIV-G2 / GRP-18 invite form: Everyone is ticked first and can be unti
 
   it('PRIV-G2 / GRP-18 unticking it sends only the group (a new invite adds Everyone only if named)', async () => {
     const { createInvite } = await openForm();
-    fireEvent.press(screen.getByRole('checkbox', { name: 'Also see photos sent to Everyone' }));
-    expect(screen.getByRole('checkbox', { name: 'Also see photos sent to Everyone' }).props.accessibilityState).toMatchObject({ checked: false });
+    fireEvent.press(screen.getByRole('checkbox', { name: 'Also add them to Everyone' }));
+    expect(screen.getByRole('checkbox', { name: 'Also add them to Everyone' }).props.accessibilityState).toMatchObject({ checked: false });
     fireEvent.press(screen.getByRole('button', { name: 'Make the invite' }));
     expect(await screen.findByText('Works for 30 days.')).toBeTruthy();
     expect(createInvite).toHaveBeenCalledWith(expect.objectContaining({ circleIds: [FIXTURE.circles.dadSide.id] }));
