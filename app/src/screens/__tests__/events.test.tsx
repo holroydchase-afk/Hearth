@@ -51,13 +51,14 @@ describe('EVT-3 later event posts in Photos', () => {
   it('EVT-3 Chase (Oct 18): later posts show as ordinary cards in Photos, no update line; the event card still opens all of them', async () => {
     const { be } = await family();
     await renderApp(<PhotosScreen />, { be, user: 'jo' });
+    // SESS-1 (Oct 18): Candles and Presents (same sender, same groups, minutes apart) are one entry of 3 photos.
     expect(await screen.findByText('Candles')).toBeTruthy();
-    expect(screen.getByText('Presents')).toBeTruthy();
+    expect(screen.getByText('3 photos')).toBeTruthy();
     expect(screen.queryByText(`3 new photos in ${BDAY}`)).toBeNull();
     fireEvent.press(screen.getByRole('button', { name: `Open ${BDAY}` }));
     expect(await screen.findByRole('header', { name: BDAY })).toBeTruthy();
-    expect(screen.getByText('Candles')).toBeTruthy();
-    expect(screen.getByText('Presents')).toBeTruthy();
+    // EVT-6..9 (Oct 18): inside, one timeline; these have no capture time, so all 4 are under "Added later".
+    expect(screen.getByText('4 photos from Chase')).toBeTruthy();
     expect(screen.getByText('Cake')).toBeTruthy();
     expect(screen.queryByText('Park day')).toBeNull();
     expectGrandparentSafe();
@@ -68,9 +69,10 @@ describe('EVT-3 later event posts in Photos', () => {
   it('EVT-3 / EVT-4 a relative who sees the posts only through another group gets ordinary cards and never the event\'s name', async () => {
     const { be } = await family();
     await renderApp(<PhotosScreen />, { be, user: 'ruth' });
-    expect(await screen.findByText('Presents')).toBeTruthy();
-    expect(screen.getByText('Candles')).toBeTruthy();
+    // SESS-1 (Oct 18): to her all four are ordinary posts from Chase minutes apart: one entry of 5 photos.
+    expect(await screen.findByText('5 photos')).toBeTruthy();
     expect(screen.getByText('Cake')).toBeTruthy();
+    expect(screen.queryByTestId(/^event-card-/)).toBeNull();
     expect(screenWords()).not.toContain('birthday');
     expect(screen.queryByRole('button', { name: 'See events' })).toBeNull();
   });
@@ -95,7 +97,7 @@ describe('EVT-4 Events section (a button at the top of Photos)', () => {
     expect(screen.queryByText('Cake')).toBeNull();
     fireEvent.press(screen.getByRole('button', { name: 'Back to events' }));
     fireEvent.press(await screen.findByRole('button', { name: `Open ${BDAY}` }));
-    expect(await screen.findByText('Presents')).toBeTruthy();
+    expect(await screen.findByText('4 photos from Chase')).toBeTruthy(); // EVT-9: no capture times, "Added later"
     expect(screen.getByText('Cake')).toBeTruthy();
     expect(screen.queryByText('Sandcastle')).toBeNull();
     fireEvent.press(screen.getByRole('button', { name: 'Back to events' }));
