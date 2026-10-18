@@ -3,6 +3,7 @@
 import { FIXTURE, FakeBackend } from '../fake/FakeBackend';
 import { ApiError } from '../HearthApi';
 import { SupabaseApi } from '../SupabaseApi';
+import { seedPost } from '../../test/seed';
 
 function mockClient(data: unknown = null) {
   const rpc = jest.fn(async () => ({ data, error: null }));
@@ -101,5 +102,31 @@ describe('GRP-15..17 / FLAG-5 FakeBackend rules', () => {
     be.state.spaceFeatures = { [`${FIXTURE.space.id}:video_posting`]: true };
     expect(await chaseApi.myFeatures(FIXTURE.space.id)).toEqual(['video_posting']);
     expect(await be.clientFor(FIXTURE.users.jo.id).myFeatures(FIXTURE.space.id)).toEqual([]);
+  });
+});
+
+describe('EVT-1 / EVT-4 FakeBackend: event rows only for the event\'s members and the parents', () => {
+  it('EVT-4 a relative in the event gets its id and name; one who sees the post only through another group gets nulls; parents get it', async () => {
+    const be = FakeBackend.withFixture();
+    const chaseApi = be.clientFor(FIXTURE.users.chase.id);
+    const e = await chaseApi.createLevel(FIXTURE.space.id, 'event', "Chase's birthday");
+    await chaseApi.placePerson(e, FIXTURE.users.jo.id, 'all');
+    const { id } = await seedPost(be, { caption: 'Cake', circles: [e, FIXTURE.circles.momSide.id] });
+    const row = async (who: string) => (await be.clientFor(who).getFeed({ space: FIXTURE.space.id })).find((p) => p.post_id === id);
+    expect(await row(FIXTURE.users.jo.id)).toMatchObject({ event_id: e, event_name: "Chase's birthday" });
+    expect(await row(FIXTURE.users.chase.id)).toMatchObject({ event_id: e, event_name: "Chase's birthday" });
+    expect(await row(FIXTURE.users.alex.id)).toMatchObject({ event_id: e, event_name: "Chase's birthday" });
+    const ruth = await row(FIXTURE.users.ruth.id);
+    expect(ruth).toMatchObject({ event_id: null, event_name: null });
+    expect(JSON.stringify(ruth)).not.toContain('birthday');
+    const tl = (await be.clientFor(FIXTURE.users.jo.id).getTimeline({ space: FIXTURE.space.id })).find((p) => p.post_id === id);
+    expect(tl).toMatchObject({ event_id: e, event_name: "Chase's birthday" });
+  });
+
+  it('EVT-1 a post to no event carries null event fields', async () => {
+    const be = FakeBackend.withFixture();
+    const { id } = await seedPost(be, { circles: [FIXTURE.circles.dadSide.id] });
+    expect((await be.clientFor(FIXTURE.users.jo.id).getFeed({ space: FIXTURE.space.id })).find((p) => p.post_id === id))
+      .toMatchObject({ event_id: null, event_name: null });
   });
 });

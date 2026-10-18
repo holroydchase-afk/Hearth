@@ -82,6 +82,10 @@ export interface FeedPost {
   reply_scope?: ReplyScope;
   /** 0010 (BETA-TIME-1): when it was taken, read on the phone; null if unknown. Older servers omit it. */
   taken_at?: string | null;
+  /** 0013 (EVT-1): the event the post was sent to, only for that event's members and the parents; else null.
+   *  Older servers omit it. */
+  event_id?: string | null;
+  event_name?: string | null;
 }
 
 export interface FeedArgs {

@@ -359,7 +359,16 @@ export class FakeBackend {
         reach_count: mine ? reach.size : null,
         reply_scope: this.replyScope(me, p),
         taken_at: p.taken_at ?? null,
+        ...this.postEvent(me, p),
       };
+  }
+
+  /** private.post_event (0013, EVT-1): the first live event on the post's audience, only for a parent or a member
+   *  of that event; anyone else gets nulls (they never learn it exists). The fake doesn't model share-history cutoffs. */
+  private postEvent(me: string, p: PostRow): { event_id: string | null; event_name: string | null } {
+    const e = Object.values(this.state.circles).find((c) => c.kind === 'event' && !c.deleted && p.circles.includes(c.id)
+      && (this.isPoster(p.space, me) || this.inCircle(c.id, me)));
+    return { event_id: e?.id ?? null, event_name: e?.name ?? null };
   }
 
   createPost(user: string | null, a: CreatePostArgs): string {
