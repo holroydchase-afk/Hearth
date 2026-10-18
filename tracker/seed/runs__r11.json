@@ -2,7 +2,7 @@
  "suite": "backend",
  "at": "2026-10-18T03:30:00-04:00",
  "label": "Overnight privacy audit: PRIV-1 written first (red), then migration 0012",
- "passed": 631,
+ "passed": 636,
  "failed": 0,
  "results": {
   "SQL-001": "pass",
@@ -625,6 +625,11 @@
   "PRIVACY-AUDIT-005": "pass",
   "PRIVACY-AUDIT-006": "pass",
   "PRIVACY-AUDIT-007": "pass",
+  "PRIVACY-AUDIT-008": "pass",
+  "PRIVACY-AUDIT-009": "pass",
+  "PRIVACY-AUDIT-010": "pass",
+  "PRIVACY-AUDIT-011": "pass",
+  "PRIVACY-AUDIT-012": "pass",
   "AUD-16-001": "pass",
   "AUD-16-002": "pass",
   "AUD-16-003": "pass",
@@ -637,5 +642,5 @@
   "AUD-16-010": "pass",
   "AUD-16-011": "pass"
  },
- "note": "PRIV-1 was red 2 of 6 before 0012 (raw IP stored; stale rows never purged); the pepper-rotation check was added after privacy-security's review. Green 3 runs in a row with every other suite unchanged. Also green 3x, not in this table: QA-3 sent-vs-received 20/20, D1 smoke check 20/20, SETUP-API 34, SETUP V2 15, deploy 20, PRIV-2 log check 11/11 (red first on sign-media). Deno not run here (CI only)."
+ "note": "PRIV-1 was red 2 of 6 before 0012, and S11 and S13 1 each before their fixes (raw IP stored; stale rows never purged); the pepper-rotation check was added after privacy-security's review. Green 3 runs in a row with every other suite unchanged. Also green 3x, not in this table: QA-3 sent-vs-received 20/20, D1 smoke check 20/20, SETUP-API 34, SETUP V2 15, deploy 20, PRIV-2 log check 11/11 (red first on sign-media). Deno not run here (CI only)."
 }

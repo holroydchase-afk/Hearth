@@ -462,11 +462,15 @@
    "kind": "bug",
    "layer": "backend",
    "severity": "Medium",
-   "status": "open",
+   "status": "fixed",
    "title": "A guardian can unlink their child from the other household's space",
-   "tests": [],
+   "tests": [
+    "PRIVACY-AUDIT-008",
+    "PRIVACY-AUDIT-009",
+    "PRIVACY-AUDIT-010"
+   ],
    "found": "2026-10-15",
-   "fixed": null
+   "fixed": "2026-10-18"
   },
   {
    "id": "S12",
@@ -486,11 +490,14 @@
    "kind": "bug",
    "layer": "backend",
    "severity": "Low",
-   "status": "open",
+   "status": "fixed",
    "title": "Members of a deleted circle can still see each other's profiles",
-   "tests": [],
+   "tests": [
+    "PRIVACY-AUDIT-011",
+    "PRIVACY-AUDIT-012"
+   ],
    "found": "2026-10-15",
-   "fixed": null
+   "fixed": "2026-10-18"
   },
   {
    "id": "S14",

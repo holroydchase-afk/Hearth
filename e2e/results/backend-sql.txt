@@ -504,10 +504,10 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 TIMELINE RESULT: 38 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
-psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('9be7dd0d-69a6-49bc-850e-1840062dc149'))
-psql:tests/groups_test.sql:886: WARNING:  as danielle: P0002 not found (select public.retire_level('63d248b5-2704-4e6f-8e30-f4727d42dcc6'))
-psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('5b945df7-c93f-4391-af2b-3527c94a02af'))
-psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = 'd16299d8-d541-4a10-979c-90f038d22591')
+psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('bf7b0975-4b50-495b-84c7-e8b8cb6d5a75'))
+psql:tests/groups_test.sql:886: WARNING:  as danielle: P0002 not found (select public.retire_level('06dcbc51-c2f9-46a9-8726-77b14eabe462'))
+psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('f29afd5d-d727-4f70-a734-6b2fc5b3f653'))
+psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = '9b386a06-3395-4b16-aaec-5b71d4f7149b')
   n  | result |                                                                                  description                                                                                   
 -----+--------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    1 | ok     | BETA-AUD-11 shape: circles.kind exists (everyone | group | household | event)
@@ -694,26 +694,31 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 TIMELINE-FUTURE RESULT: 6 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
- n | result |                                                 description                                                  
----+--------+--------------------------------------------------------------------------------------------------------------
- 1 | ok     | PRIV-1 no table in public or private has an inet/cidr column or an ip/user_agent column
- 2 | ok     | PRIV-1 setup: the failed attempts were counted per client (rate limit still keyed by IP)
- 3 | ok     | PRIV-1 rate limit rows never hold the raw client IP (only a keyed hash)
- 4 | ok     | PRIV-1 the IP hash is keyed (a plain sha256 of the IP would be reversible by trying all 4 billion addresses)
- 5 | ok     | PRIV-1 two failures from one IP share one key (S10 per-IP limit still counts them together)
- 6 | ok     | PRIV-1 the daily purge replaces the IP pepper (a dump or backup can't reverse older hashes)
- 7 | ok     | PRIV-1 the scheduled purge (hearth-purge-client-errors) clears rate limit rows older than 1 hour
+ n  | result |                                                 description                                                  
+----+--------+--------------------------------------------------------------------------------------------------------------
+  1 | ok     | PRIV-1 no table in public or private has an inet/cidr column or an ip/user_agent column
+  2 | ok     | PRIV-1 setup: the failed attempts were counted per client (rate limit still keyed by IP)
+  3 | ok     | PRIV-1 rate limit rows never hold the raw client IP (only a keyed hash)
+  4 | ok     | PRIV-1 the IP hash is keyed (a plain sha256 of the IP would be reversible by trying all 4 billion addresses)
+  5 | ok     | PRIV-1 two failures from one IP share one key (S10 per-IP limit still counts them together)
+  6 | ok     | PRIV-1 the daily purge replaces the IP pepper (a dump or backup can't reverse older hashes)
+  7 | ok     | PRIV-1 the scheduled purge (hearth-purge-client-errors) clears rate limit rows older than 1 hour
+  8 | ok     | S11 a co-parent (guardian, viewer in the other household's space) can't unlink the child from it
+  9 | ok     | S11 setup: Blair can still unlink Sam from Blair's own space
+ 10 | ok     | S11 the owner of a family space can still unlink a child from their own space
+ 11 | ok     | S13 setup: two relatives in the same group see each other's profile
+ 12 | ok     | S13 once their only shared group is deleted, they no longer see each other's profile
 
 
-PRIVACY-AUDIT RESULT: 7 passed, 0 failed
+PRIVACY-AUDIT RESULT: 12 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
 
 Narrowing for Chase (readable before 0011 only through "members see each other's replies"):
      reader     |  kind   |                                 reply_id                                  
 ----------------+---------+---------------------------------------------------------------------------
- Grandma Rivera | comment | 85d1f820-2ea6-4986-9802-9834a5784f85
+ Grandma Rivera | comment | 32d774b6-1ccb-4040-bca8-72bd97a7a638
  Grandma Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a2
- Grandpa Rivera | comment | 8d137004-23cf-4911-aeee-2e3af7e8860d
+ Grandpa Rivera | comment | 0a5d812e-0b5c-4214-9814-d74fe2f9c853
  Grandpa Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a1
 
  n  | result |                                                     description                                                      
@@ -756,8 +761,8 @@ ok      SETUP-API: before Chase has an account it says "sign in once in the app"
 ok      SETUP-API: ... and changes nothing
 ok      SETUP-API: fresh setup runs without error
         | Family "Chase's kids" is ready: Everyone, Chase's side, Danielle's side, 7 houses, 2 events.
-        | Test viewer invite (account B): code 4W3NNKR5YT, works once until Oct 25, link https://hearth.family/i/ce3bd955a3160d3be989e8eaae0342276270dd31
-        | Danielle's poster invite: code 85MGY5PHZ6, works once until Oct 25, only for danielle@example.com, link https://hearth.family/i/707badee8a2fa3a93f8d089fe636b1b676806a6e
+        | Test viewer invite (account B): code ZWJ338SBTN, works once until Oct 25, link https://hearth.family/i/cd7a8cf9c6b3d04d7f4a30e58950de81aa9dcd30
+        | Danielle's poster invite: code H2W84DEPS9, works once until Oct 25, only for danielle@example.com, link https://hearth.family/i/a89e2c39caaf2d4557afb4fd8f6dcfe458a9994f
 ok      SETUP-API: Chase owns one family, named as given (an apostrophe in the name is kept, not a SQL error)
 ok      SETUP-API: one Everyone
 ok      SETUP-API: the set groups are Chase's side and Danielle's side (no v1 groups to retire later)

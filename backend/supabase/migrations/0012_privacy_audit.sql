@@ -1,4 +1,4 @@
--- 0012: PRIV-1. Hearth's own tables never keep a raw IP address.
+-- 0012: overnight privacy audit (Oct 18). PRIV-1: Hearth's own tables never keep a raw IP address. Also S11 and S13 below.
 -- The invite rate limit (S10, 0002) counted failures under 'ip:<addr>' and only pruned old rows when a
 -- new failure came in, so the last failing addresses could sit in private.rate_limit_events forever.
 -- Now the key is 'ip:' + HMAC-SHA256(addr, ip_pepper): the same address still maps to the same key, so
@@ -41,3 +41,36 @@ language sql security definer set search_path = '' as $$
 $$;
 revoke execute on function public.purge_client_errors() from public, anon, authenticated;
 grant execute on function public.purge_client_errors() to service_role;
+
+-- ---------------------------------------------------------------------------
+-- S11 (Oct 15 security review): a guardian could unlink their child from the OTHER household's family space,
+-- where the co-parent is only a viewer. Now only that space's parents (owner, adult) can unlink a child from it.
+-- ---------------------------------------------------------------------------
+drop policy space_children_delete on public.space_children;
+create policy space_children_delete on public.space_children for delete to authenticated
+  using (space_id = any ((select private.my_managed_space_ids())::uuid[]));
+
+-- ---------------------------------------------------------------------------
+-- S13: sharing a group made two relatives' profiles visible to each other, even after the group was deleted
+-- or its family space was. Now the shared group must be live, in a live space. Otherwise as in 0009.
+-- ---------------------------------------------------------------------------
+create or replace function public.can_see_profile(p_user uuid) returns boolean
+language sql stable security definer set search_path = '' as $fn$
+  select p_user = auth.uid()
+  or exists (
+    select 1 from public.space_members me
+    join public.space_members them on them.space_id = me.space_id
+    join public.spaces s on s.id = me.space_id and s.deleted_at is null
+    where me.user_id = auth.uid() and them.user_id = p_user
+      and (me.role in ('owner','adult') or them.role in ('owner','adult')))
+  or exists (
+    select 1 from public.circle_members a
+    join public.circle_members b on b.circle_id = a.circle_id
+    join public.circles c on c.id = a.circle_id and c.deleted_at is null
+    join public.spaces s on s.id = c.space_id and s.deleted_at is null
+    where a.user_id = auth.uid() and b.user_id = p_user)
+  or exists (select 1 from public.comments c
+             where c.author_id = p_user and c.deleted_at is null and public.can_see_reply(c.post_id, p_user))
+  or exists (select 1 from public.reactions r
+             where r.user_id = p_user and public.can_see_reply(r.post_id, p_user))
+$fn$;
