@@ -133,6 +133,14 @@ write_secrets "${ALL_SECRETS[@]}" HEARTH_KEYS_PENDING
 out=$(run); rc=$?
 [ $rc = 0 ] && echo "$out" | grep -q "^warn.*HEARTH_KEYS_PENDING"; ok $? "D1 smoke: the leftover placeholder secret is a warning to clean up, not a failure"
 
+# Supabase Auth's own audit log (auth.audit_log_entries) can hold IP addresses inside our database (PRIV-1 gap)
+out=$(run); echo "$out" | grep -q "^ok .*no IP addresses in Supabase Auth's audit log"; ok $? "PRIV-1 smoke: no auth audit table (or no IPs in it) reads as ok"
+q "create table if not exists auth.audit_log_entries (instance_id uuid, id uuid, payload json, created_at timestamptz, ip_address varchar(64) not null default '');
+   insert into auth.audit_log_entries (id, ip_address, created_at) values (gen_random_uuid(), '203.0.113.5', now()), (gen_random_uuid(), '', now())" >/dev/null
+out=$(run); rc=$?
+[ $rc = 0 ] && echo "$out" | grep -q "^warn .*1 row.* IP address"; ok $? "PRIV-1 smoke: IP addresses in Supabase Auth's audit log are a warning with a count"
+! echo "$out" | grep -q "203.0.113.5"; ok $? "PRIV-1 smoke: ... and the address itself is never printed"
+
 dropdb --if-exists "$DB" 2>/dev/null
 echo
 echo "SMOKE CHECK TEST RESULT: $PASS passed, $FAIL failed"

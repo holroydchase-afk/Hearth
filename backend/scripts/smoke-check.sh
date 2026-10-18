@@ -5,7 +5,8 @@
 # Needs only SUPABASE_ACCESS_TOKEN (an environment secret, never in chat or git). Through the Management API:
 # every local migration is applied, RLS is on for every public table, both cron jobs exist, both edge
 # functions are active, and every function secret in supabase/functions/.env.example is set. It reads
-# secret NAMES only and never prints a value. One SELECT, two GETs; it changes nothing.
+# secret NAMES only and never prints a value. It also counts (never prints) IP addresses in Supabase Auth's
+# audit log, as a warning. One SELECT, two GETs; it changes nothing.
 # Exit 0 when every check passes (warnings allowed), 1 when any fails.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -35,7 +36,15 @@ union all
 select 'rls', n = 0, case when n = 0 then 'RLS is on for every public table' else 'RLS is off on: ' || s end from norls
 union all
 select 'cron', exists (select 1 from cron.job j where j.jobname = w.name and j.active),
-       'cron job ' || w.name from (values ('hearth-notify'), ('hearth-purge-client-errors')) w(name);"
+       'cron job ' || w.name from (values ('hearth-notify'), ('hearth-purge-client-errors')) w(name)
+union all
+select 'auth_ips', n = 0,
+       case when n = 0 then 'no IP addresses in Supabase Auth''s audit log'
+            else 'Supabase Auth''s audit log (auth.audit_log_entries) holds ' || n || ' row(s) with an IP address' end
+from (select case when to_regclass('auth.audit_log_entries') is null then 0
+             else (xpath('/row/n/text()', query_to_xml(
+               'select count(*) as n from auth.audit_log_entries where coalesce(ip_address, '''') <> ''''',
+               false, true, '')))[1]::text::int end as n) x;"
 
 call() {  # method path [json body]; prints the body, the token stays in a header
   local out
@@ -69,8 +78,9 @@ def report(ok, text, warn=False):
     global failed
     if not ok and not warn: failed += 1
     lines.append(("ok  " if ok else ("warn" if warn else "FAIL")) + "  " + text)
-for r in db:
-    report(bool(r["ok"]), r["detail"] + ("" if r["ok"] or r["check"] != "cron" else " is missing or paused"))
+for r in db:   # IPs in Supabase Auth's own log are theirs to keep: a warning to act on (PRIV-1), not a failure
+    report(bool(r["ok"]), r["detail"] + ("" if r["ok"] or r["check"] != "cron" else " is missing or paused"),
+           warn=r["check"] == "auth_ips")
 status = {f.get("slug"): f.get("status") for f in fns}
 for slug in ("sign-media", "notify"):
     s = status.get(slug)
