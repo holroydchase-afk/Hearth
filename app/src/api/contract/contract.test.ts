@@ -292,7 +292,9 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       const v = view.items[0]!;
       expect(v.id).toBe(g.media_id);
       const bytes = await viewerIn.getObject(v.display_url);
-      expect(bytes[0]).not.toBe(0); // stored bytes are ciphertext
+      // Stored bytes are ciphertext: no run of the plaintext appears in them. (Was `bytes[0] !== 0`, which
+      // failed 1 run in 256 because byte 0 is the random nonce prefix.)
+      expect(Buffer.from(bytes).includes(Buffer.from(display.subarray(0, 64)))).toBe(false);
       expect(Buffer.from(decryptMedia(bytes, v.dek))).toEqual(Buffer.from(display));
       expect(await code(viewerOut.signView(id))).toBe('P0002');
       const fp = (await viewerIn.getFeed({ space: h.spaceId })).find((p) => p.post_id === id)!;
