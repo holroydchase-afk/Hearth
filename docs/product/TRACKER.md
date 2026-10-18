@@ -49,8 +49,8 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 | No family in the hosted database (0 users, 0 groups) | Nothing to post to | 5 |
 | Backblaze B2 keys and `MEDIA_KEK` missing | Photos can't upload or show | 6, 7 |
 | Resend key for notices missing | No email notices (REPLY-3, NOTIFY-4) | 6, 7 |
-| BULK-1 fallback: a photo with no EXIF date should use the photo's creation time; needs `expo-media-library`, not wired | An M1 P0 criterion is only partly met; old screenshots land undated | 10 (or earlier if the demo hits it) |
-| QA-3 sent-vs-received script doesn't exist; Test Log data stops at day 2 | The gate's "0 lost" can't be shown | 8 |
+| BULK-1 fallback: a photo with no EXIF date should use the photo's creation time | Built in draft PR #21 (no new permission prompt); still needs a real-phone check in the demo (bulk-pick a screenshot) | 9 |
+| QA-3 sent-vs-received check and the Test Log | Built in draft PR #21 (`backend/scripts/sent-vs-received.sh`, Test Log cases rewritten for the real app); its hosted run waits for the demo, and the seed still needs pushing to the Test Log page | 8 |
 | Gate says "M1 auto criteria green 3× against the hosted project", but the hosted SQL suites wipe the database and need `SUPABASE_DB_URL` | Can't be met as written once Chase's family exists (see Decisions, D1) | before 4 |
 | Never run on a real phone: resize, location strip (M-09), save to phone, code email | Only the demo proves these | 9 |
 | `get_timeline` speed measured only on a 2-CPU test box (2–5.5 ms vs a 5 ms target) | Re-measure on hosted; low risk at family size | 10 |
@@ -87,11 +87,11 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 - **Privacy path** (marketing thread, Oct 17). Chase's stance: the family vault is a later, higher tier, rolled out slowly; the steps below come first. Post-milestone 1 unless Chase pulls them forward.
   - Per-family media keys: deleting a family makes its photos unreadable. A small test-first change in media signing; easiest while the hosted database has no photos. Outside BETA-SPEC, so staff-pm approves first. See D8.
   - A "what Hearth can see" page listing every vendor and what it can read; grandparent-ux reviews the wording.
-  - Audit that our code never keeps IP addresses, and write down Supabase's log retention.
+  - IP addresses and log retention: built in draft PR #21 (migration 0012: invite rate limit keeps a keyed hash, not raw IPs; Supabase log retention written in `docs/architecture/04-threat-model.md`). New: Supabase Auth can store IPs in `auth.audit_log_entries`; decide whether to clear it on a schedule.
   - Later: encrypt captions and replies (this blocks caption search).
-- **Architecture docs (A4, white-paper source).** Write the access-control section (groups, households, events, roles, RLS from 0011) next; then retention and deletion once the purge worker exists. Keep every footer current (CLAUDE.md rule 6).
+- **Architecture docs (A4, white-paper source).** Access-control section written in draft PR #21 (`05-access-control.md`). Previously: write the access-control section (groups, households, events, roles, RLS from 0011) next; then retention and deletion once the purge worker exists. Keep every footer current (CLAUDE.md rule 6).
 - Schedule the nightly hard purge (`purge_soft_deleted`) on the hosted project; `deploy.sh` doesn't today. Found while writing `docs/architecture/02-data-flow.md`.
-- 0012 households-only migration (spec'd in `SPEC-GROUPS.md`, needed before milestone 3).
+- 0013 households-only migration (spec'd in `SPEC-GROUPS.md`, needed before milestone 3; renumbered because 0012 is the privacy audit in PR #21).
 
 - **Real data starts at milestone 2** (Chase, Oct 18): milestone 1 is Chase's own UAT playground, so the hosted project and the bucket (`family-photos-testing-…` is fine) hold test data and can be wiped. Before Mom joins, decide: wipe and keep them, or make a fresh bucket (and project) for real photos. No sandbox structure until then.
 - **QA environment before milestone 3** (Chase, Oct 18): once anyone beyond Mom is on, every release is tried in QA first (its own Supabase project and bucket, plus the `preview` update channel), so grandparents never get a wonky build. Ties to IN-9 (update discipline) in REMAINING.md.
@@ -101,6 +101,8 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 - Weekly deploy dry run, every Monday 15:47 UTC (routine; its thread stays open).
 
 ## Done (latest first)
+
+- Oct 18 overnight, in draft PR #21 (waits on Chase's "merge"): PRIV-1 (no raw IPs), PRIV-2 (CI check that logs carry no keys, URLs, captions or emails), S11 and S13 fixed in 0012, BULK-1 fallback, QA-3 script, Test Log rewrite, a read-only hosted smoke check, architecture section 05.
 
 - Oct 18: anchor A4 White-paper ready; `docs/architecture/` started (overview, data flow, encryption and keys, threat model).
 - Oct 18: app published to Expo Go (EAS Update, branch preview) and the web (thefreighttrains-team-hearth.expo.app); PR #18.
