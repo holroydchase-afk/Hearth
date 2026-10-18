@@ -47,14 +47,14 @@ describe('EVT-2 event card in Photos', () => {
   });
 });
 
-describe('EVT-3 update line in Photos', () => {
-  it('EVT-3 later posts show as one update line ("3 new photos in Chase\'s birthday"), not as cards; it opens the event', async () => {
+describe('EVT-3 later event posts in Photos', () => {
+  it('EVT-3 Chase (Oct 18): later posts show as ordinary cards in Photos, no update line; the event card still opens all of them', async () => {
     const { be } = await family();
     await renderApp(<PhotosScreen />, { be, user: 'jo' });
-    expect(await screen.findByText(`3 new photos in ${BDAY}`)).toBeTruthy();
-    expect(screen.queryByText('Candles')).toBeNull();
-    expect(screen.queryByText('Presents')).toBeNull();
-    fireEvent.press(screen.getByRole('button', { name: `Open ${BDAY} to see the new photos` }));
+    expect(await screen.findByText('Candles')).toBeTruthy();
+    expect(screen.getByText('Presents')).toBeTruthy();
+    expect(screen.queryByText(`3 new photos in ${BDAY}`)).toBeNull();
+    fireEvent.press(screen.getByRole('button', { name: `Open ${BDAY}` }));
     expect(await screen.findByRole('header', { name: BDAY })).toBeTruthy();
     expect(screen.getByText('Candles')).toBeTruthy();
     expect(screen.getByText('Presents')).toBeTruthy();
@@ -62,7 +62,7 @@ describe('EVT-3 update line in Photos', () => {
     expect(screen.queryByText('Park day')).toBeNull();
     expectGrandparentSafe();
     fireEvent.press(screen.getByRole('button', { name: 'Back to Photos' }));
-    expect(await screen.findByText(`3 new photos in ${BDAY}`)).toBeTruthy();
+    expect(await screen.findByText('Candles')).toBeTruthy();
   });
 
   it('EVT-3 / EVT-4 a relative who sees the posts only through another group gets ordinary cards and never the event\'s name', async () => {

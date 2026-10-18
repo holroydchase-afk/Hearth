@@ -53,7 +53,7 @@ export function PhotosScreen() {
   // BETA-TIME-1: old photos added today don't take over the top; they go in a card.
   const earlier = earlierGroups(state.posts);
   const recent = state.posts.filter((p) => !isFromEarlier(p));
-  // EVT-2/3: an event's first post is a bigger card; its later posts are one update line (see EVENT_LATER_POSTS_IN_PHOTOS).
+  // EVT-2/3: an event's first post is a bigger card; its later posts are ordinary cards (EVENT_LATER_POSTS_IN_PHOTOS).
   const rows = photosRows(recent);
   const hasEvents = eventList(state.posts).length > 0;
   const openEvent = (eventId: string) => setEvents({ eventId, fromList: false });

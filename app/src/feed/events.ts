@@ -5,11 +5,11 @@ import type { FeedPost } from '../api/HearthApi';
 import { photos } from '../ui/format';
 
 /**
- * EVT-3, open for Chase. false (the recommendation): an event's later posts live only inside the event, and Photos
- * shows one update line ("3 new photos in Chase's birthday") that opens it. true: they also show as ordinary cards
- * in Photos, and there is no update line. The first post is always the event card (EVT-2).
+ * EVT-3. true (Chase, Oct 18: relatives add a handful of photos a few days later): an event's later posts also show
+ * as ordinary cards in Photos, and there is no update line. false: they live only inside the event, and Photos shows
+ * one update line ("3 new photos in Chase's birthday") that opens it. The first post is always the event card (EVT-2).
  */
-export const EVENT_LATER_POSTS_IN_PHOTOS = false;
+export const EVENT_LATER_POSTS_IN_PHOTOS = true;
 
 export type PhotosRow =
   | { type: 'post'; key: string; post: FeedPost }
