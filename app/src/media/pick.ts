@@ -1,4 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
+import * as MediaLibrary from 'expo-media-library';
+import { captureInfo } from './captureDate';
 import type { QueueItem } from '../upload/queue';
 import { BULK_PICK_LIMIT, type PickedAsset } from '../share/bulk';
 
@@ -37,10 +39,36 @@ export async function pickBulk(): Promise<{ assets: PickedAsset[] } | { denied: 
     quality: 1,
   });
   if (r.canceled) return { assets: [] };
-  return {
-    assets: r.assets.map((a) => ({
-      uri: a.uri, type: a.type ?? null, mimeType: a.mimeType ?? null, width: a.width, height: a.height,
-      duration: a.duration ?? null, exif: (a.exif as Record<string, unknown> | null | undefined) ?? null,
-    })),
-  };
+  const assets: PickedAsset[] = r.assets.map((a) => ({
+    uri: a.uri, type: a.type ?? null, mimeType: a.mimeType ?? null, width: a.width, height: a.height,
+    duration: a.duration ?? null, exif: (a.exif as Record<string, unknown> | null | undefined) ?? null,
+  }));
+  await addCreationTimes(assets, r.assets.map((a) => a.assetId ?? null));
+  return { assets };
+}
+
+/**
+ * BETA-BULK-1 fallback: a photo with no usable EXIF date (screenshots, saved or forwarded photos) takes the
+ * photo library's creation time. Read only for those photos, and only when the Photos access the picker
+ * already asked for is there: never a new prompt. Only the number is kept; the library's location and
+ * EXIF are dropped here. Any failure (web, no access, a missing asset) leaves the date null.
+ */
+async function addCreationTimes(assets: PickedAsset[], ids: (string | null)[]): Promise<void> {
+  const undated = assets.map((a, i) => i).filter((i) => ids[i] && !captureInfo({ exif: assets[i]!.exif }));
+  if (!undated.length) return;
+  try {
+    const perm = await MediaLibrary.getPermissionsAsync();
+    if (!perm.granted && perm.accessPrivileges !== 'limited') return;
+  } catch {
+    return;
+  }
+  for (const i of undated) {
+    try {
+      const info = await MediaLibrary.getAssetInfoAsync(ids[i]!, { shouldDownloadFromNetwork: false });
+      const ct = info.creationTime;
+      if (typeof ct === 'number' && Number.isFinite(ct) && ct > 0) assets[i]!.creationTime = ct;
+    } catch {
+      /* leave it undated */
+    }
+  }
 }

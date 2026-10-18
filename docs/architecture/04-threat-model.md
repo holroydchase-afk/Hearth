@@ -24,6 +24,7 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 | **Push and email providers** | Learn content | Notices carry display names, counts and a link only | Built. **Planned:** names-off setting (D9) |
 | **Account takeover** | Sign in as a relative | One-time email codes, 1-hour expiry; no passwords to reuse | Built. **Gap:** an inbox compromise is an account compromise; SIM-swap risk if text codes ship (D11) |
 | **Hearth's operator, or whoever compromises Hearth's server** | Read everything | Least-privilege grants, keys only in function secrets, no keys or captions in logs | **Gap:** the server can unwrap every photo key and read all captions and comments. Fixed only by the family vault |
+| **Anyone who reads Hearth's database or function logs** (operator, breach, legal demand) | Learn where relatives are, or match accounts to addresses | Hearth's own tables keep no IP address: the invite rate limit (S10) stores a keyed HMAC of the address, cleared daily, and the key (pepper) is replaced daily so a dump or backup can't reverse older hashes (migration 0012, `backend/tests/privacy_audit_test.sql`). No `console.*` call in the app or the edge functions logs a key, URL, caption, email or raw error; CI enforces it (`scripts/check-logs.mjs`) | Built. **Gap:** Supabase's own logs sit outside our code and can hold IP addresses. On the Free plan Supabase lists 1 day of API and database log retention and 1 hour of Auth audit logs (supabase.com/pricing and docs/guides/auth/audit-logs, checked Oct 18, 2026); paid plans keep them longer. Supabase Auth can also write its audit log, with an IP address field, into `auth.audit_log_entries` in our own database; `backend/scripts/smoke-check.sh` counts those rows (never printing them) and warns. Supabase backups and point-in-time restore keep database rows (including hashed rate-limit keys) for their own retention window, not yet written down |
 | **Legal demand to Hearth or Supabase** | Obtain family data | Data minimization; US storage | **Gap:** what's readable by the server can be produced. Supabase contracts through a Singapore entity |
 
 ## Out of scope (today)
@@ -42,4 +43,4 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 5. No outside security review yet; open-sourcing is undecided (D10).
 
 ---
-Last checked against code: 2026-10-18, 3031b37
+Last checked against code: 2026-10-18, 0fb7ad1 (plus migration 0012 and the PRIV-2 log check)

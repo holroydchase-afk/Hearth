@@ -45,14 +45,6 @@
    "tickets": []
   },
   {
-   "id": "M-06",
-   "title": "Android, no app: invite link opens web viewer",
-   "area": "Android",
-   "steps": "Text an invite link to an Android phone without the app. Open it.",
-   "expected": "Photos show in the browser; no app or password needed.",
-   "tickets": []
-  },
-  {
    "id": "M-07",
    "title": "iPhone to Android photo arrives full quality",
    "area": "iPhone + Android",
@@ -130,6 +122,102 @@
    "area": "iPhone",
    "steps": "Ask Chase to make 'Thanksgiving 2026' by ticking groups and households. Time it. Don't help.",
    "expected": "Under 60 seconds; it shows under Events in the share sheet as name plus 'N people'; the screen says everyone in it can read each other's comments on its photos.",
+   "tickets": []
+  },
+  {
+   "id": "M-17",
+   "title": "BETA-JOIN-5 Still signed in after 7 days",
+   "area": "iPhone",
+   "steps": "Sign in, then don't open Hearth for 7 days. Open it.",
+   "expected": "Photos open straight away; no new code asked for.",
+   "tickets": []
+  },
+  {
+   "id": "M-18",
+   "title": "BETA-NOTIFY-1 Notices arrive within a minute",
+   "area": "iPhone + account B",
+   "steps": "As B, comment on 10 posts over 2 days. Note when each notice arrives (the Help screen's timing log, AE-10).",
+   "expected": "9 of 10 arrive within 1 minute.",
+   "tickets": []
+  },
+  {
+   "id": "M1-01",
+   "title": "BETA-JOIN-2 Sign in with the 6-digit email code",
+   "area": "iPhone (Expo Go)",
+   "steps": "Sign in with your email; type the 6-digit code from the email.",
+   "expected": "In within a minute; no password.",
+   "tickets": []
+  },
+  {
+   "id": "M1-02",
+   "title": "BETA-JOIN-1 Account B joins with the Test house code",
+   "area": "Web build",
+   "steps": "As account B, tap 'I have an invite code' and type the Test house code.",
+   "expected": "B joins and sees only Everyone and Test house posts.",
+   "tickets": []
+  },
+  {
+   "id": "M1-03",
+   "title": "BETA-SHARE-1 Post 3 photos to Test house in 3 taps or fewer",
+   "area": "iPhone (Expo Go)",
+   "steps": "Post 3 photos to 'Test house'.",
+   "expected": "At the top of your Photos right away; B sees all 3 within a minute.",
+   "tickets": []
+  },
+  {
+   "id": "M1-04",
+   "title": "BETA-SEE-3 Full screen with buttons",
+   "area": "Web build",
+   "steps": "As B: tap a photo, use Next/Back, then Close.",
+   "expected": "Full screen; buttons work, not just swipes.",
+   "tickets": []
+  },
+  {
+   "id": "M1-05",
+   "title": "BETA-AUD-1 A post to Gammy's house never reaches B",
+   "area": "iPhone (Expo Go)",
+   "steps": "Post 1 photo to 'Gammy's house' only.",
+   "expected": "B never sees it.",
+   "tickets": []
+  },
+  {
+   "id": "M1-06",
+   "title": "BETA-SHARE-4 Airplane mode, then network",
+   "area": "iPhone (Expo Go)",
+   "steps": "Turn on airplane mode, post, turn it off.",
+   "expected": "It sends on its own.",
+   "tickets": []
+  },
+  {
+   "id": "M1-07",
+   "title": "BETA-REPLY-3 / NOTIFY-4 Comment and heart send one email notice",
+   "area": "Web build + email",
+   "steps": "As B: comment and heart.",
+   "expected": "You get one email notice.",
+   "tickets": []
+  },
+  {
+   "id": "M1-08",
+   "title": "M-09 / BETA-SEE-5 Save to phone, no location",
+   "area": "iPhone (Expo Go)",
+   "steps": "Save a photo to your phone; check its info in Photos.",
+   "expected": "It's there at 2048 px with no location.",
+   "tickets": []
+  },
+  {
+   "id": "M1-09",
+   "title": "Gate: 10+ posts over 2 days, 0 lost (QA-3)",
+   "area": "iPhone + web build",
+   "steps": "Keep posting until 10+ posts over 2 days, then run backend/scripts/sent-vs-received.sh (MILESTONE-1.md).",
+   "expected": "RESULT: sent N, received N, lost 0; 0 crash reports.",
+   "tickets": []
+  },
+  {
+   "id": "M1-10",
+   "title": "BETA-BULK-1 fallback: a screenshot gets its date",
+   "area": "iPhone (Expo Go)",
+   "steps": "Bulk-pick a screenshot (no EXIF date) with 2 normal photos.",
+   "expected": "The screenshot sits under the day it was taken, not undated.",
    "tickets": []
   }
  ]

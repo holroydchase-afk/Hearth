@@ -287,6 +287,7 @@ select tests.throws_code(format($q$select public.create_post(gen_random_uuid(), 
 select tests.throws_code(format('select public.publish_post(%L)', tests.v('cp1')), 'publish_post: media not ready is 23514', '23514');
 select tests.setv('cp1_media', format($q$select media_id from public.prepare_media_upload(%L, '[{"kind":"photo","mime_type":"image/jpeg","width":10,"height":10,"byte_size":100,"thumb_byte_size":10,"exif_stripped":true}]')$q$, tests.v('cp1')));
 :as_admin
+insert into public.media_keys (media_id, wrapped_dek) values (tests.v('cp1_media')::uuid, '\x00');   -- saved at upload (S15)
 select public.mark_media_upload_result(tests.v('cp1_media')::uuid, true);
 :as_gma_chen
 select tests.throws_code(format('select public.publish_post(%L)', tests.v('cp1')), 'publish_post: someone who cannot see the draft gets P0002', 'P0002');

@@ -63,3 +63,11 @@ Phone A = your iPhone (you). Account B = your test email, signed in on the web b
 | Milestone 2 | Real build ($99): lock the phone, have B post, tap the notice | Opens that post (cold and warm start) | NOTIFY-3 (not in the M1 gate) |
 
 Log each line in the Test Log as you go, or tell Claude and it will.
+
+**Checking "0 lost" (QA-3).** At the end of day 2, Claude (or you) runs this read-only check. It counts what you shared to Everyone and the Test house, then checks as account B, through the same access rules the app uses, that each post shows with every photo ready. It prints post ids and counts only, never captions or links. The "Gammy's house" post is left out on purpose, since B should never see it.
+
+```
+bash backend/scripts/sent-vs-received.sh --sender-email YOUR_EMAIL --receiver-email ACCOUNT_B_EMAIL --since 2026-10-19 --audience Everyone --audience 'Test house'
+```
+
+It ends with `RESULT: sent N, received N, lost 0` when nothing was lost, and lists each missing post otherwise.

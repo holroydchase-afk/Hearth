@@ -4,6 +4,7 @@ set -u
 cd "$(dirname "$0")"
 mkdir -p e2e/results
 bash scripts/check-agents.sh
+bash scripts/tests/check_logs_test.sh > e2e/results/priv2-logs.txt 2>&1 ; tail -1 e2e/results/priv2-logs.txt
 bash app/scripts/tests/eas_test.sh > e2e/results/app-eas.txt 2>&1 ; tail -1 e2e/results/app-eas.txt
 (cd e2e && npx playwright test) ; P=$?
 (cd backend && bash tests/deploy/deploy_test.sh) > e2e/results/backend-deploy.txt 2>&1 ; tail -1 e2e/results/backend-deploy.txt

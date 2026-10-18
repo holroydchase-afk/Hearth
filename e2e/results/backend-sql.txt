@@ -504,10 +504,10 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 TIMELINE RESULT: 38 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
-psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('05c0d1a8-2055-4531-aabb-beb8576dcf88'))
-psql:tests/groups_test.sql:886: WARNING:  as danielle: P0002 not found (select public.retire_level('70073e8a-de44-43dc-98dd-784a30a0759f'))
-psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('ad57b78a-cec7-404c-9cda-52e450401918'))
-psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = '103f69e4-62f9-4905-9952-65f5a0a42ede')
+psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('1df981fc-5cc8-4e2e-b18c-bdd42a708d4d'))
+psql:tests/groups_test.sql:886: WARNING:  as danielle: P0002 not found (select public.retire_level('438a2393-3438-4de7-8bff-c5934a67e691'))
+psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('11f4ef27-bfd7-4549-be09-e3d2eb63d9e8'))
+psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = 'dcc92284-4c21-4075-aa24-a6e11caf1a65')
   n  | result |                                                                                  description                                                                                   
 -----+--------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    1 | ok     | BETA-AUD-11 shape: circles.kind exists (everyone | group | household | event)
@@ -694,13 +694,34 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 TIMELINE-FUTURE RESULT: 6 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+ n  | result |                                                         description                                                         
+----+--------+-----------------------------------------------------------------------------------------------------------------------------
+  1 | ok     | PRIV-1 no table in public or private has an inet/cidr column or an ip/user_agent column
+  2 | ok     | PRIV-1 setup: the failed attempts were counted per client (rate limit still keyed by IP)
+  3 | ok     | PRIV-1 rate limit rows never hold the raw client IP (only a keyed hash)
+  4 | ok     | PRIV-1 the IP hash is keyed (a plain sha256 of the IP would be reversible by trying all 4 billion addresses)
+  5 | ok     | PRIV-1 two failures from one IP share one key (S10 per-IP limit still counts them together)
+  6 | ok     | PRIV-1 the daily purge replaces the IP pepper (a dump or backup can't reverse older hashes)
+  7 | ok     | PRIV-1 the scheduled purge (hearth-purge-client-errors) clears rate limit rows older than 1 hour
+  8 | ok     | S11 a co-parent (guardian, viewer in the other household's space) can't unlink the child from it
+  9 | ok     | S11 setup: Blair can still unlink Sam from Blair's own space
+ 10 | ok     | S11 the owner of a family space can still unlink a child from their own space
+ 11 | ok     | S13 setup: two relatives in the same group see each other's profile
+ 12 | ok     | S13 once their only shared group is deleted, they no longer see each other's profile
+ 13 | ok     | S15 a photo whose key was never saved is marked failed, not ready, even when its upload checked out
+ 14 | ok     | S15 a photo with its key saved is marked ready as before
+ 15 | ok     | S15 ...so the post can't be published half-broken (all photos must be ready)  [23514 all media must finish uploading first]
+
+
+PRIVACY-AUDIT RESULT: 15 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
 
 Narrowing for Chase (readable before 0011 only through "members see each other's replies"):
      reader     |  kind   |                                 reply_id                                  
 ----------------+---------+---------------------------------------------------------------------------
- Grandma Rivera | comment | 3ca61ecf-340d-49e4-943e-1be8ac14a52f
+ Grandma Rivera | comment | d9f67835-3145-4a9d-91f5-87da29096bf5
  Grandma Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a2
- Grandpa Rivera | comment | 125143c5-881f-424b-afac-61f2d2d445e7
+ Grandpa Rivera | comment | eeece3d1-4707-4d7f-832d-aa0e1eae3b8a
  Grandpa Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a1
 
  n  | result |                                                     description                                                      
@@ -736,3 +757,102 @@ ok      setup v2: a person it can't place by name (Test viewer) is reported as n
 ok      setup v2: applying twice adds nothing (safe to re-run)
 
 SETUP V2 RESULT: 15 passed, 0 failed
+ok      SETUP-API: backend/scripts/family-setup.sh exists
+ok      SETUP-API: without SUPABASE_ACCESS_TOKEN it stops and names the secret
+ok      SETUP-API: without --chase-email it stops and says what's missing
+ok      SETUP-API: before Chase has an account it says "sign in once in the app" and fails
+ok      SETUP-API: ... and changes nothing
+ok      SETUP-API: fresh setup runs without error
+        | Family "Chase's kids" is ready: Everyone, Chase's side, Danielle's side, 7 houses, 2 events.
+        | Test viewer invite (account B): code TCYRPDFZZD, works once until Oct 25, link https://hearth.family/i/064a7f96a34847042d5738ced0c541b813406564
+        | Danielle's poster invite: code ZCA8H8MP4G, works once until Oct 25, only for danielle@example.com, link https://hearth.family/i/731dd32a6fe780c1521b8160c10338996b4642bc
+ok      SETUP-API: Chase owns one family, named as given (an apostrophe in the name is kept, not a SQL error)
+ok      SETUP-API: one Everyone
+ok      SETUP-API: the set groups are Chase's side and Danielle's side (no v1 groups to retire later)
+ok      SETUP-API: the family's houses (SPEC-GROUPS section 2) plus a Test house for account B
+ok      SETUP-API: the Charleston trip and Birthday at Gigi's events
+ok      SETUP-API: Chase's parents' houses sit under Chase's side
+ok      SETUP-API: the Test house is under no group or event (account B sees only Everyone and Test house posts)
+ok      SETUP-API: everything is made as Chase (through the app's RPCs, not as the database owner)
+ok      SETUP-API: prints the test viewer's 10-letter invite code
+ok      SETUP-API: prints Danielle's poster invite code when --danielle-email is given
+ok      SETUP-API: Danielle's invite is a poster (adult) invite for her email
+ok      SETUP-API: the test viewer's invite names the Test house and says "all past photos"
+ok      SETUP-API: says the family is ready
+ok      SETUP-API: one Management API request (got 1)
+ok      SETUP-API: the token goes in the Authorization header
+ok      SETUP-API: the token is never printed
+ok      SETUP-API: psql is never called
+ok      SETUP-API: re-running runs without error
+ok      SETUP-API: re-running adds no family, group, house or event
+ok      SETUP-API: re-running prints a fresh test viewer code
+ok      SETUP-API: no Danielle invite unless --danielle-email is given
+ok      SETUP-API: account B's code places it in the Test house
+ok      SETUP-API: account B sees a Test house post and not a Gammy's house post
+ok      SETUP-API: once someone else has joined, it stops and points to family-setup-v2.sql's dry run
+ok      SETUP-API: ... and changes nothing (no new invite either)
+ok      SETUP-API: --print-sql works without the token
+ok      SETUP-API: --print-sql sends nothing
+ok      SETUP-API: values are SQL-quoted (a quote in an email can't end the string)
+
+SETUP API RESULT: 34 passed, 0 failed
+ok      QA-3 setup: 12 published posts and 1 draft seeded
+ok      QA-3: backend/scripts/sent-vs-received.sh exists
+ok      QA-3: without SUPABASE_ACCESS_TOKEN it stops and names the secret
+ok      QA-3: without --receiver-email it stops and says what's missing
+ok      QA-3: an unknown email stops with "no account"
+        | Sent since 2026-10-19 00:00 UTC: 12 published posts
+        | Not finished sending: 1 post(s) still drafts (tapped Share but never published; check the sender's upload queue)
+        | Missing: f0000000-0000-0000-0000-000000000007 (shared 2026-10-19 19:00 UTC, 1 photo): the receiver can't see this post
+        | RESULT: sent 12, received 11, lost 1
+ok      QA-3: exits non-zero when anything is lost
+ok      QA-3: reports "sent 12, received 11, lost 1"
+ok      QA-3: names the missing post's id
+ok      QA-3: lists only the missing post
+ok      QA-3: counts the stuck draft separately (tapped Share, never published)
+ok      QA-3: prints no caption, email, URL or storage key
+ok      QA-3: the token is never printed
+ok      QA-3: one Management API request (got 1)
+ok      QA-3: the token goes in the Authorization header
+ok      QA-3: psql is never called
+ok      QA-3: changes nothing (read only)
+ok      QA-3: the received side runs as the authenticated role (RLS applies)
+ok      QA-3: exits 0 when nothing is lost
+ok      QA-3: --audience Everyone counts only posts shared to Everyone (sent 11, received 11, lost 0)
+ok      QA-3: a visible post with a photo not ready counts as missing, and says so
+
+SENT-RECEIVED RESULT: 20 passed, 0 failed
+ok      D1 smoke: backend/scripts/smoke-check.sh exists
+ok      D1 smoke: without SUPABASE_ACCESS_TOKEN it stops and names the secret
+        | ok    all 12 migrations applied
+        | ok    RLS is on for every public table
+        | ok    cron job hearth-notify
+        | ok    cron job hearth-purge-client-errors
+        | ok    no IP addresses in Supabase Auth's audit log
+        | ok    edge function sign-media is active
+        | ok    edge function notify is active
+        | ok    all 10 function secrets are set
+        | SMOKE RESULT: 8 ok, 0 failed
+ok      D1 smoke: a healthy project passes (exit 0)
+ok      D1 smoke: ends with "SMOKE RESULT: N ok, 0 failed"
+ok      D1 smoke: says all 12 local migrations are applied
+ok      D1 smoke: never prints a secret value
+ok      D1 smoke: never prints the token
+ok      D1 smoke: its SQL runs inside a read-only transaction (no write attempted)
+ok      D1 smoke: only GETs and the read-only query call
+ok      D1 smoke: the token goes in the Authorization header
+ok      D1 smoke: no psql, no unexpected endpoint
+ok      D1 smoke: changes nothing
+ok      D1 smoke: a migration not applied on hosted fails and names it (0012)
+ok      D1 smoke: a public table without RLS fails and names it
+ok      D1 smoke: a missing cron job fails and names it
+ok      D1 smoke: a missing edge function fails and names it
+ok      D1 smoke: an edge function that isn't ACTIVE fails
+ok      D1 smoke: a missing function secret fails and names it (MEDIA_KEK)
+ok      D1 smoke: ... and still prints no secret value
+ok      D1 smoke: the leftover placeholder secret is a warning to clean up, not a failure
+ok      PRIV-1 smoke: no auth audit table (or no IPs in it) reads as ok
+ok      PRIV-1 smoke: IP addresses in Supabase Auth's audit log are a warning with a count
+ok      PRIV-1 smoke: ... and the address itself is never printed
+
+SMOKE CHECK TEST RESULT: 23 passed, 0 failed
