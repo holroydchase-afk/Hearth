@@ -1,0 +1,1104 @@
+# groups v2 red run (qa-tdd, 2026-10-18T15:12:49Z): cd backend && bash tests/run.sh, migration 0013 not written yet
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+  n  | result |                                                                               description                                                                                
+-----+--------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1 | ok     | Mom-side grandma cannot see post shared only with Dad-side grandparents
+   2 | ok     | can_view_post() is false for Mom-side grandma on Dad-side post
+   3 | ok     | ...nor its media rows
+   4 | ok     | ...nor its comments
+   5 | ok     | ...nor its reactions
+   6 | ok     | Mom-side grandma cannot see Dad's co-parent-only post
+   7 | ok     | Mom-side grandma CAN see Dad's "Everyone" post (she is in that circle)
+   8 | ok     | Mom-side grandma sees Mom-side grandparents post
+   9 | ok     | Mom-side grandma cannot see Mom's co-parent post
+  10 | ok     | Mom-side grandma sees only 1 circle in Dad's space (Everyone)
+  11 | ok     | Mom-side grandma cannot comment on a post she cannot see  [new row violates row-level security policy for table "comments"]
+  12 | ok     | Mom-side grandma cannot react to a post she cannot see  [new row violates row-level security policy for table "reactions"]
+  13 | ok     | Dad-side grandma sees Dad-side grandparents post
+  14 | ok     | Dad-side grandma sees both media items
+  15 | ok     | Dad-side grandma cannot see Mom-side grandparents post
+  16 | ok     | Dad-side grandma cannot see co-parent post
+  17 | ok     | Dad-side grandma sees no circles in Mom's space
+  18 | ok     | Dad-side grandma cannot see the Co-parent circle exists
+  19 | ok     | Viewer can comment on a visible post
+  20 | ok     | Viewer can change own reaction
+  21 | ok     | One reaction per person per post  [duplicate key value violates unique constraint "reactions_pkey"]
+  22 | ok     | Viewer cannot post when viewers_can_post = false  [new row violates row-level security policy for table "posts"]
+  23 | ok     | Viewer cannot post via create_post() either  [you cannot post in this space]
+  24 | ok     | Clients can never read wrapped media keys  [permission denied for table media_keys]
+  25 | ok     | Clients cannot read the purge queue  [permission denied for table storage_purge_queue]
+  26 | ok     | Viewer sees only own seen-receipts
+  27 | ok     | Viewer cannot change billing plan  [permission denied for table spaces]
+  28 | ok     | Co-parent sees exactly the co-parent post in the other household's space
+  29 | ok     | Co-parent sees only the Co-parent circle (cannot see Dad's family circles)
+  30 | ok     | Co-parent cannot list other members of Dad's circles
+  31 | ok     | Co-parent sees no other audience circles on the post
+  32 | ok     | Co-parent cannot enumerate Dad's viewers (grandparents)
+  33 | ok     | Co-parent cannot see Dad-side grandma's profile
+  34 | ok     | Blair sees all her own posts in her space
+  35 | ok     | Family-plan author sees "seen by" receipts
+  36 | ok     | Non-author cannot change a post's audience  [only the author can change the audience]
+  37 | ok     | Non-author delete on post_audiences affects 0 rows
+  38 | ok     | Non-author cannot edit post
+  39 | ok     | Co-parent (viewer) cannot create invites in the other space  [only space owners/adults can invite]
+  40 | ok     | Author sees all own posts
+  41 | ok     | Alex sees Blair's co-parent post
+  42 | ok     | Alex cannot see Blair's Mom-side grandparents post
+  43 | ok     | Alex sees only the Co-parent circle in Blair's space
+  44 | ok     | Free-plan author cannot read "seen by" receipts (paid feature)
+  45 | ok     | Owner cannot self-upgrade plan from client  [permission denied for table spaces]
+  46 | ok     | author_id not updatable  [permission denied for table posts]
+  47 | ok     | After widening to Everyone, Mom-side grandma sees the post
+  48 | ok     | ...and its media
+  49 | ok     | After narrowing back, Mom-side grandma loses access immediately
+  50 | ok     | ...and can_view_post() (used by sign-media) is false
+  51 | ok     | ...and media rows are gone from her view
+  52 | ok     | Moving co-parent post to grandparents revokes co-parent access
+  53 | ok     | ...and grants Dad-side grandpa access
+  54 | ok     | Removing grandpa from the circle revokes his access
+  55 | ok     | Cannot set an empty audience  [choose at least one circle]
+  56 | ok     | Deleting the last audience row of a published post is refused  [a published post needs at least one audience circle]
+  57 | ok     | Audience circle from another space is refused  [audience circle must belong to the post's space]
+  58 | ok     | Upload without exif_stripped=true is refused  [new row for relation "media_items" violates check constraint "media_items_exif_stripped_check"]
+  59 | ok     | Stripped photo upload is accepted
+  60 | ok     | Object key is derived server-side
+  61 | ok     | Free space can upload videos up to 10 this month
+  62 | ok     | Quota shows 10/10 used
+  63 | ok     | 11th video on free plan is refused  [free_video_cap_reached]
+  64 | ok     | Photos are not capped
+  65 | ok     | Other viewers never see pending (not yet finalized) media
+  66 | ok     | Non-author cannot upload to someone else's post  [cannot upload to this post]
+  67 | ok     | Clients cannot mark uploads ready (service-role only)  [permission denied for function mark_media_upload_result]
+  68 | ok     | Cannot publish before media finish uploading  [all media must finish uploading first]
+  69 | ok     | Drafts are invisible to the audience
+  70 | ok     | Author publishes once media is ready
+  71 | ok     | Published post is visible to its audience
+  72 | ok     | Family plan is not video-capped
+  73 | ok     | Invite code stored hashed, not plaintext
+  74 | ok     | Invite targeted at an email cannot be redeemed by someone else  [invite is invalid or expired]
+  75 | ok     | Before redeeming, new user sees nothing
+  76 | ok     | Invitee redeems code (case-insensitive)
+  77 | ok     | Invitee lands in the invited circle and sees its posts
+  78 | ok     | Invitee does not see posts for circles they were not invited to
+  79 | ok     | Viewer defaults to weekly email digest
+  80 | ok     | Single-use invite cannot be reused  [invite is invalid or expired]
+  81 | ok     | Cannot set notification prefs for a space you are not in  [new row violates row-level security policy for table "notification_prefs"]
+  82 | ok     | Expired invite is refused  [invite is invalid or expired]
+  83 | ok     | Soft-deleted post disappears for viewers
+  84 | ok     | ...and cannot be signed
+  85 | ok     | Account export returns the caller's own posts
+  86 | ok     | Export contains no one else's private posts
+  87 | ok     | Purge job hard-deletes soft-deleted posts
+  88 | ok     | Purge enqueues B2 objects for deletion
+  89 | ok     | anon has no table access  [permission denied for table posts]
+  90 | ok     | anon cannot call RPCs  [permission denied for function can_view_post]
+  91 | ok     | Co-parent cannot read the other household's monthly video counter  [permission denied for table spaces]
+  92 | ok     | Co-parent cannot read the other household's billing customer ref  [permission denied for table spaces]
+  93 | ok     | space_upload_quota() hides the upload count from members who cannot post
+  94 | ok     | Members can still read the space's name and plan
+  95 | ok     | Owner still sees the upload count
+  96 | ok     | A video declared as kind=photo is refused (free-tier cap bypass)  [new row for relation "media_items" violates check constraint "media_items_check1"]
+  97 | ok     | Co-parent cannot see a child the other household linked to its space but never shared
+  98 | ok     | ...nor the space_children link row
+  99 | ok     | Viewer still sees a child tagged in a post they can see
+ 100 | ok     | Non-guardian cannot read a child's birth date  [permission denied for table children]
+ 101 | ok     | ...nor via child_birth_date()
+ 102 | ok     | Space manager sees the linked child
+ 103 | ok     | Guardian reads the birth date via child_birth_date()
+ 104 | ok     | BETA-AUD-4 review: a viewer-author cannot add a group she is not in to her post (direct insert)  [new row violates row-level security policy for table "post_audiences"]
+ 105 | ok     | BETA-AUD-4 review: ...nor through set_post_audience  [new row violates row-level security policy for table "post_audiences"]
+ 106 | ok     | BETA-AUD-4 review: the grandparents group never joined her post's audience
+ 107 | ok     | BETA-AUD-4 review allowed: she can still set her post to a group she is in
+ 108 | ok     | Viewer cannot publish a draft after viewers_can_post is turned off  [you cannot post in this space]
+ 109 | ok     | Removed member sees nothing in the space, including their own old posts
+ 110 | ok     | ...can_view_post() is false, so sign-media will not sign them
+ 111 | ok     | ...and new comments on them stay hidden
+ 112 | ok     | Removed member cannot re-target an old post's audience  [only the author can change the audience]
+ 113 | ok     | Removed member cannot publish an old draft into the space  [post not found]
+ 114 | ok     | Commenter who lost access to a post cannot edit their comment on it
+ 115 | ok     | S12 / BETA-REPLY-4: an author removed from the space cannot edit captions on their old posts
+ 116 | ok     | BETA-AUD-7: no app-readable column holds last-seen, login, online or device details
+ 117 | ok     | BETA-AUD-7: the family-plan author still sees who has seen the post (Seen by unchanged)
+ 118 | ok     | BETA-AUD-7: ...but not when each person last looked  [permission denied for table post_views]
+ 119 | ok     | BETA-AUD-7: nobody sees another member's phones
+ 120 | ok     | BETA-AUD-7: app users cannot read sign-in records (auth.users)  [permission denied for table users]
+
+
+RESULT: 120 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+  n  | result |                                                                                description                                                                                 
+-----+--------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1 | ok     | my_spaces: Alex is in 2 spaces
+   2 | ok     | my_spaces: owner row has role owner, can_post, no inviter
+   3 | ok     | my_spaces: co-parent row shows viewer, cannot post, inviter Blair
+   4 | ok     | my_spaces: grandparent sees one space, invited by Alex
+   5 | ok     | my_spaces: a user with no spaces gets []
+   6 | ok     | my_spaces: anon is refused  [42501 permission denied for function my_spaces]
+   7 | ok     | my_circles: owner sees all 3 circles
+   8 | ok     | my_circles: member_count and member_names for Everyone
+   9 | ok     | my_circles: Co-parent circle has exactly Blair
+  10 | ok     | my_circles: Alex is a viewer in Blair's space, gets []
+  11 | ok     | my_circles: viewer gets []
+  12 | ok     | BETA-AUD-4 my_circles: co-parent gets [] in the other household (no circle names leak)
+  13 | ok     | my_circles: non-member gets []
+  14 | ok     | BETA-AUD-3 get_feed: user only in circle Everyone sees only the Everyone post, not the circle-A post
+  15 | ok     | get_feed: Dad-side grandma sees the grandparents post and the Everyone post
+  16 | ok     | get_feed: audience, seen_count, reach_count are null for non-authors
+  17 | ok     | get_feed: author_name, caption, heart_count, i_hearted, comment_count
+  18 | ok     | get_feed: media array in position order with the contract fields
+  19 | ok     | get_feed: i_hearted is per caller
+  20 | ok     | BETA-AUD-4 get_feed: co-parent sees only the co-parent post in the other space
+  21 | ok     | get_feed: author sees all own published posts
+  22 | ok     | get_feed: author gets audience [{circle_id,name,member_count}], reach_count, seen_count
+  23 | ok     | get_feed: reach_count excludes the author
+  24 | ok     | get_feed: non-member gets []
+  25 | ok     | get_feed: anon is refused  [42501 permission denied for function get_feed]
+  26 | ok     | get_feed matches can_view_post() for every user x space (seed)
+  27 | ok     | get_feed: keyset pages (limit 7, with timestamp ties) return every visible post once, newest first
+  28 | ok     | get_feed: p_limit is capped at 50
+  29 | ok     | get_feed: default page is 20
+  30 | ok     | get_feed: a cursor before everything returns []
+  31 | ok     | get_feed: author keyset pages cover every own post once
+  32 | ok     | create_post: retry with the same p_client_id returns the original post_id
+  33 | ok     | create_post: ...creates no duplicate, keeps the original, and makes a draft
+  34 | ok     | create_post: drafts are not in the author's feed
+  35 | ok     | create_post: no audience is 23514  [23514 choose at least one circle]
+  36 | ok     | create_post: a circle from another space is 23514  [23514 circle not found in this space]
+  37 | ok     | create_post: p_client_id is required (23514)  [23514 p_client_id is required]
+  38 | ok     | create_post: viewer who cannot post gets 42501  [42501 you cannot post in this space]
+  39 | ok     | create_post: non-member gets 42501  [42501 you cannot post in this space]
+  40 | ok     | create_post: a viewer-poster cannot target a circle they cannot see (23514)  [23514 circle not found in this space]
+  41 | ok     | create_post: a viewer-poster can target their own circle
+  42 | ok     | create_post: anon is refused  [42501 permission denied for function create_post]
+  43 | ok     | publish_post: media not ready is 23514  [23514 all media must finish uploading first]
+  44 | ok     | publish_post: someone who cannot see the draft gets P0002  [P0002 post not found]
+  45 | ok     | publish_post: unknown post gets P0002  [P0002 post not found]
+  46 | ok     | publish_post: author publishes once media is ready
+  47 | ok     | publish_post: publishing again is a no-op (idempotent)
+  48 | ok     | publish_post: ...and does not move published_at
+  49 | ok     | publish_post: the audience now sees it in get_feed
+  50 | ok     | publish_post: a visible post by someone else is 42501  [42501 only the author can publish]
+  51 | ok     | BETA-REPLY-1 toggle_heart: one call hearts it
+  52 | ok     | BETA-REPLY-1 the audience sees who hearted it
+  53 | ok     | BETA-REPLY-1 toggle_heart: a second call un-hearts it
+  54 | ok     | BETA-AUD-3 toggle_heart: invisible post is P0002 (not 42501)  [P0002 post not found]
+  55 | ok     | toggle_heart: unknown post is P0002  [P0002 post not found]
+  56 | ok     | BETA-REPLY-1 people outside the audience do not see who hearted
+  57 | ok     | toggle_heart: viewer when viewers_can_comment = false is 42501  [42501 reactions are turned off here]
+  58 | ok     | BETA-REPLY-2 add_comment: retry with the same p_client_id returns the original comment
+  59 | ok     | add_comment: no duplicate, body stored trimmed
+  60 | ok     | add_comment: 500 characters is allowed and returns created_at
+  61 | ok     | add_comment: 501 characters is 23514  [23514 a comment must be 1 to 500 characters]
+  62 | ok     | add_comment: blank after trim is 23514  [23514 a comment must be 1 to 500 characters]
+  63 | ok     | get_comments: oldest first
+  64 | ok     | get_comments: author_name
+  65 | ok     | get_comments: p_limit
+  66 | ok     | BETA-REPLY-2 the post's audience sees the comment
+  67 | ok     | BETA-REPLY-2 outside the audience: get_comments is P0002  [P0002 post not found]
+  68 | ok     | get_comments: unknown post is P0002  [P0002 post not found]
+  69 | ok     | BETA-REPLY-2 add_comment on an invisible post is P0002  [P0002 post not found]
+  70 | ok     | BETA-REPLY-2 ...and the comments table shows nothing
+  71 | ok     | add_comment: viewers_can_comment = false is 42501  [42501 comments are turned off here]
+  72 | ok     | mark_seen: audience member marks seen
+  73 | ok     | mark_seen: again is fine (idempotent)
+  74 | ok     | mark_seen: one receipt row
+  75 | ok     | mark_seen: feeds the author's seen_count
+  76 | ok     | mark_seen: author viewing own post is a no-op
+  77 | ok     | mark_seen: ...and the author never counts as a viewer
+  78 | ok     | mark_seen: invisible post is P0002  [P0002 post not found]
+  79 | ok     | BETA-SEE-6 removed from the circle: post gone from get_feed immediately
+  80 | ok     | BETA-SEE-6 ...and can_view_post (the media signer) says no
+  81 | ok     | BETA-SEE-6 / REPLY-4 ...hearting it is P0002  [P0002 post not found]
+  82 | ok     | BETA-SEE-6 / REPLY-4 ...commenting is P0002  [P0002 post not found]
+  83 | ok     | BETA-AUD-5 delete_post: a visible post by someone else is 42501  [42501 only the author can delete this post]
+  84 | ok     | BETA-AUD-5 delete_post: an invisible post is P0002  [P0002 post not found]
+  85 | ok     | BETA-AUD-5 delete_post: author deletes
+  86 | ok     | BETA-AUD-5 delete_post: deleting again is a no-op (idempotent)
+  87 | ok     | BETA-AUD-5 gone from the author's feed
+  88 | ok     | BETA-AUD-5 gone from a viewer's feed
+  89 | ok     | BETA-AUD-5 can_view_post is false, so sign-media refuses new URLs
+  90 | ok     | BETA-AUD-5 hearting a deleted post is P0002  [P0002 post not found]
+  91 | ok     | BETA-AUD-5 the deleted post's wrapped keys are destroyed (crypto-shred)
+  92 | ok     | BETA-AUD-5 its media blobs are queued for purge
+  93 | ok     | delete_post: unknown post is P0002  [P0002 post not found]
+  94 | ok     | create_invite: returns code and link
+  95 | ok     | create_invite: the typed code stays short (10 chars)
+  96 | ok     | BETA-JOIN-4 create_invite: the link carries >= 128 random bits
+  97 | ok     | BETA-JOIN-4 (S9) a manager cannot read invite code hashes  [42501 permission denied for table invites]
+  98 | ok     | BETA-JOIN-4 (S9) a manager cannot read invite link hashes  [42501 permission denied for table invites]
+  99 | ok     | BETA-JOIN-4 (S9) select * on invites is refused (name the columns)  [42501 permission denied for table invites]
+ 100 | ok     | create_invite: managers still list invites without the hashes
+ 101 | ok     | BETA-JOIN-4 (S9) stored hash is keyed (HMAC with a server pepper), not sha256(code)
+ 102 | ok     | BETA-JOIN-4 (S9) clients cannot read the pepper  [42501 permission denied for table secrets]
+ 103 | ok     | create_invite: viewer is 42501  [42501 only space owners/adults can invite]
+ 104 | ok     | invite_preview: anon sees exactly {inviter_name, space_name}
+ 105 | ok     | invite_preview: the link token works too
+ 106 | ok     | invite_preview: unknown code is 22023  [22023 invite is invalid or expired]
+ 107 | ok     | invite_preview over PostgREST: 400 with code 22023
+ 108 | ok     | BETA-JOIN-3 expired invite is 22023  [22023 invite is invalid or expired]
+ 109 | ok     | BETA-JOIN-3 revoked invite is 22023  [22023 invite is invalid or expired]
+ 110 | ok     | BETA-JOIN-3 used-up invite is 22023  [22023 invite is invalid or expired]
+ 111 | ok     | BETA-JOIN-3 unknown code is 22023  [22023 invite is invalid or expired]
+ 112 | ok     | BETA-JOIN-3 invite addressed to a different email is 22023  [22023 invite is invalid or expired]
+ 113 | ok     | BETA-JOIN-3 wrong-email and unknown-code responses are byte-identical (no space data, no hint the code is real)
+ 114 | ok     | redeem_invite: the addressed person redeems (case-insensitive) and gets space_id
+ 115 | ok     | redeem_invite: ...and lands in the invited circle
+ 116 | ok     | redeem_invite: the long link token redeems
+ 117 | ok     | BETA-JOIN-4 (S10) 10th failure is still 22023 (failures persist across requests)
+ 118 | ok     | BETA-JOIN-4 (S10) 11th attempt by the same account is 54000, even with a valid code
+ 119 | ok     | BETA-JOIN-4 (S10) ...and did not join
+ 120 | ok     | BETA-JOIN-4 (S10) also 54000 outside PostgREST  [54000 Too many tries. Wait 10 minutes.]
+ 121 | ok     | BETA-JOIN-4 (S10) the same IP is limited across accounts (last X-Forwarded-For hop)
+ 122 | ok     | BETA-JOIN-4 (S10) a different account on a different IP is not limited
+ 123 | ok     | BETA-JOIN-4 (S10) Prefer: tx=rollback (which would erase the failure log) is refused
+ 124 | ok     | BETA-JOIN-4 (S10) the window is 10 minutes
+ 125 | ok     | BETA-JOIN-4 (S10) invite_preview: 11th anon attempt from one IP is 54000
+ 126 | ok     | BETA-JOIN-4 (S10) invite_preview: another IP still works
+ 127 | ok     | names: a new account starts with a placeholder name, marked not set
+ 128 | ok     | names: my_profile returns the caller's name and whether it is set
+ 129 | ok     | BETA-NOTIFY-7: a poster sets the name the family knows him by
+ 130 | ok     | BETA-NOTIFY-7: ...trimmed and saved
+ 131 | ok     | names: an empty name is 23514  [23514 a name is 1-40 characters, not an email address]
+ 132 | ok     | names: an email address is not a name (23514)  [23514 a name is 1-40 characters, not an email address]
+ 133 | ok     | names: over 40 characters is 23514  [23514 a name is 1-40 characters, not an email address]
+ 134 | ok     | names: angle brackets are refused (23514)  [23514 a name is 1-40 characters, not an email address]
+ 135 | ok     | JOIN-1: an invite name that is an email is 23514  [23514 a name is 1-40 characters, not an email address]
+ 136 | ok     | BETA-NOTIFY-7: the invite preview names the real sender ("Chase invited you")
+ 137 | ok     | setup: June joins
+ 138 | ok     | JOIN-1: joining gives her the name Chase typed; she types nothing
+ 139 | ok     | setup: Earl sets his own name first
+ 140 | ok     | setup: Earl joins
+ 141 | ok     | names: an invite never overwrites a name the person chose
+ 142 | ok     | names: anon cannot set a name (42501)  [42501 permission denied for function set_my_name]
+ 143 | ok     | names: a direct profile update cannot bypass set_my_name (42501)  [42501 permission denied for table profiles]
+ 144 | ok     | names: the table itself refuses brackets or line breaks in a name (23514)  [23514 new row for relation "profiles" violates check constraint "profiles_display_name_clean"]
+ 145 | ok     | names: an invite can't reuse a family member's name (no "Chase" impersonation, 23514)  [23514 someone in this family already has that name]
+ 146 | ok     | rename_circle: the owner renames a group
+ 147 | ok     | rename_circle: ...trimmed and saved
+ 148 | ok     | rename_circle: a name another group already has is 23514 (not 23505)  [23514 another group already has that name]
+ 149 | ok     | rename_circle: an empty name is 23514  [23514 a group name is 1-60 characters]
+ 150 | ok     | rename_circle: over 60 characters is 23514  [23514 a group name is 1-60 characters]
+ 151 | ok     | rename_circle: a viewer gets not found (P0002), even for her own group  [P0002 not found]
+ 152 | ok     | rename_circle: a poster in another space gets not found (P0002)  [P0002 not found]
+ 153 | ok     | rename_circle: unknown group is P0002  [P0002 not found]
+ 154 | ok     | setup: rename back
+ 155 | ok     | BETA-OPS-1: a signed-in member reports an error
+ 156 | ok     | BETA-OPS-1: exactly 1 row with app version, OS, screen and error type
+ 157 | ok     | BETA-OPS-1: errors before sign-in can be reported too
+ 158 | ok     | BETA-OPS-1: free text (a caption) is refused, not stored  [23514 error reports take fixed fields only]
+ 159 | ok     | BETA-OPS-1: a URL is refused, not stored  [23514 error reports take fixed fields only]
+ 160 | ok     | BETA-OPS-1: an email address is refused, not stored  [23514 error reports take fixed fields only]
+ 161 | ok     | BETA-OPS-1: app users cannot read error reports  [42501 permission denied for table client_errors]
+ 162 | ok     | setup: 30 reports in an hour
+ 163 | ok     | BETA-OPS-1: more than 30 reports an hour from one person is 54000  [54000 too many error reports]
+ 164 | ok     | BETA-OPS-1: reports older than 30 days are purged; newer ones stay
+ 165 | ok     | BETA-OPS-1: only the server can purge  [42501 permission denied for function purge_client_errors]
+ 166 | ok     | RLS: every policy uses (select auth.uid()), never a per-row auth.uid()
+ 167 | ok     | RLS: membership helpers are wrapped as once-per-statement (select ...) arrays, not per-row calls
+ 168 | ok     | Indexes: every foreign key has an index on its columns
+ 169 | ok     | RLS: rewritten posts policy returns exactly the rows can_view_post() allows, for every user
+
+
+API RESULT: 169 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+ n  | result |                                                              description                                                              
+----+--------+---------------------------------------------------------------------------------------------------------------------------------------
+  1 | ok     | BETA-NOTIFY-2: publishing to the Dad's-side grandparents group queues exactly those two members
+  2 | ok     | BETA-NOTIFY-2: the author, the co-parent, Aunt Jo and Grandma Chen get nothing
+  3 | ok     | BETA-NOTIFY-2: the sender claims one notice per audience member
+  4 | ok     | BETA-NOTIFY-2: the notice carries the poster's name, the post id and only that member's token
+  5 | ok     | BETA-NOTIFY-2: the claimed payload has no caption, no child's name and no media key or URL
+  6 | ok     | BETA-NOTIFY-2: a claimed notice is never sent twice
+  7 | ok     | BETA-NOTIFY-2: someone removed from the group before sending gets no notice
+  8 | ok     | BETA-NOTIFY-4: a post with 5 photos gives each recipient 1 notice, not 5
+  9 | ok     | BETA-NOTIFY-4: posts within 10 minutes of the last notice wait (no second buzz)
+ 10 | ok     | BETA-NOTIFY-4: after the 10-minute window, 3 posts arrive as 1 notice per recipient
+ 11 | ok     | BETA-NOTIFY-4: 3 posts queued together go out as 1 notice per recipient
+ 12 | ok     | setup: Grandma Rivera comments
+ 13 | ok     | setup: Grandpa Rivera hearts
+ 14 | ok     | BETA-REPLY-3: a comment and a heart on Alex's post reach Alex as 1 notice
+ 15 | ok     | BETA-REPLY-3: the people who reacted get nothing about their own reaction
+ 16 | ok     | BETA-REPLY-3: the comment text is not in the notice
+ 17 | ok     | setup: Alex hearts the post they made
+ 18 | ok     | BETA-REPLY-3: hearting your own post queues nothing
+ 19 | ok     | setup: Grandpa un-hearts
+ 20 | ok     | setup: Grandpa hearts again
+ 21 | ok     | setup: Grandpa un-hearts again
+ 22 | ok     | setup: Grandpa hearts a third time
+ 23 | ok     | BETA-NOTIFY-4: hearting on and off repeatedly queues 1 notice, not one per tap
+ 24 | ok     | BETA-NOTIFY-5: a daily email waits for the evening (nothing at noon)
+ 25 | ok     | prefs: push off and email off -> nothing sent, and the notice is closed out (no pile-up)
+ 26 | ok     | BETA-NOTIFY-5: push off + daily email -> one email at 6 pm, no push tokens
+ 27 | ok     | BETA-NOTIFY-5: one evening email per day; later photos wait for the next evening
+ 28 | ok     | BETA-NOTIFY-5: the Sunday email waits for Sunday 8 am
+ 29 | ok     | prefs: push wanted but no phone registered -> falls back to the evening email
+ 30 | ok     | security: a signed-in user cannot claim notices  [42501 permission denied for function claim_notification_batches]
+ 31 | ok     | security: a signed-in user cannot release notices  [42501 permission denied for function release_notifications]
+ 32 | ok     | security: a signed-in user cannot read the outbox  [42501 permission denied for table notification_outbox]
+ 33 | ok     | security: anon cannot claim notices  [42501 permission denied for function claim_notification_batches]
+ 34 | ok     | sender: forget_push_tokens drops a token Expo reports as no longer registered
+ 35 | ok     | security: a signed-in user cannot delete tokens  [42501 permission denied for function forget_push_tokens]
+ 36 | ok     | sender: release_notifications puts a failed send back, and it goes out on the next run
+ 37 | ok     | register_push_token: a member saves her phone's token
+ 38 | ok     | register_push_token: saving it again is a no-op (idempotent)
+ 39 | ok     | register_push_token: unknown platform is 23514  [23514 platform must be ios, android or web]
+ 40 | ok     | register_push_token: a malformed token is 23514  [23514 not an Expo push token]
+ 41 | ok     | register_push_token: the same phone signed in by someone else
+ 42 | ok     | register_push_token: the token moves to whoever signed in last (shared phone gets one person's notices)
+ 43 | ok     | register_push_token: anon is 42501  [42501 permission denied for function register_push_token]
+ 44 | ok     | set_notification_prefs: a member turns push off and picks a daily email
+ 45 | ok     | set_notification_prefs: the choice is saved on the server
+ 46 | ok     | set_notification_prefs: changing it again overwrites
+ 47 | ok     | set_notification_prefs: unknown email choice is 23514  [23514 email choice must be off, daily or weekly]
+ 48 | ok     | set_notification_prefs: a space you are not in is P0002  [P0002 not found]
+ 49 | ok     | BETA-BULK-6: create_post with p_batch_id but no p_batch_size is 23514 (both or neither)  [23514 batch id and batch size go together]
+ 50 | ok     | BETA-BULK-6: a batch of more than 100 posts is 23514  [23514 a batch is 1 to 100 posts]
+ 51 | ok     | BETA-BULK-6: mid-batch (2 of 5 posts sent) nobody is notified yet
+ 52 | ok     | BETA-BULK-6: when the 5th post is sent, each grandparent gets exactly 1 notice for the whole batch
+ 53 | ok     | BETA-BULK-6: the notice says 5 posts, 48 photos, taken Jul 4 to Jul 6 2024, from Alex ("Alex added 48 photos from Jul 2024")
+ 54 | ok     | BETA-BULK-6: the batch notice carries no media key or URL
+ 55 | ok     | BETA-BULK-6: no second notice for the same batch
+ 56 | ok     | BETA-BULK-6: an unfinished batch waits (1 of 3 posts sent, 20 minutes in)
+ 57 | ok     | BETA-BULK-6: ...and goes out as 1 notice (4 photos) 30 minutes after it was queued
+ 58 | ok     | BETA-BULK-6 allowed: Grandma Rivera (both groups) is told about all 5 photos, Jan 2022 to Mar 2023
+ 59 | ok     | BETA-BULK-6 excluded: Grandma Chen (Everyone only) is told about her 2 photos from Mar 2023, nothing about the grandparents-only post
+ 60 | ok     | BETA-BULK-6: the mixed batch's notices carry no caption, media key or URL
+
+
+NOTIFY RESULT: 60 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+Test viewer invite (milestone 1, account B):
+Mom's poster invite (milestone 2; she can post to every group):
+ ok 
+----
+ 
+(1 row)
+
+ ok 
+----
+ 
+(1 row)
+
+ ok 
+----
+ 
+(1 row)
+
+ ok 
+----
+ 
+(1 row)
+
+Test viewer invite (milestone 1, account B):
+Mom's poster invite (milestone 2; she can post to every group):
+ ok 
+----
+ 
+(1 row)
+
+ n | result |                              description                              
+---+--------+-----------------------------------------------------------------------
+ 1 | ok     | M1 setup: Chase owns one space
+ 2 | ok     | M1 setup: the starter groups exist (Chase can rename them in the app)
+ 3 | ok     | M1 setup: one viewer invite for the test account
+ 4 | ok     | M2 setup: one poster (adult) invite for Mom
+ 5 | ok     | setup: running it again reuses the space and groups (no duplicates)
+(5 rows)
+
+
+SETUP RESULT: 5 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+ n  | result |                                                                         description                                                                          
+----+--------+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+  1 | ok     | AUD-8: by default Grandma can't read Grandpa's comment, even in the same group
+  2 | ok     | AUD-8: ...not through the table either
+  3 | ok     | AUD-8: the comment count she sees doesn't give it away
+  4 | ok     | AUD-8: Grandpa sees his own comment
+  5 | ok     | AUD-8: Grandpa can't tell Grandma hearted it (heart count shows only what he may see)
+  6 | ok     | AUD-8: the app is told his replies reach only the parents
+  7 | ok     | AUD-8: the parent (owner) reads every reply
+  8 | ok     | AUD-8: ...and sees every heart
+  9 | ok     | setup: Alex answers
+ 10 | ok     | AUD-8: a parent's own replies reach everyone the post went to
+ 11 | ok     | AUD-8: so Grandma sees the parent's answer, but still not Grandpa's comment
+ 12 | ok     | AUD-8: toggling her heart off reports only what she may see
+ 13 | ok     | setup: Grandma hearts again
+ 14 | ok     | REPLY-12 (was AUD-9): set_group_replies_shared no longer exists  [42883 function public.set_group_replies_shared(unknown, boolean) does not exist]
+ 15 | ok     | REPLY-12 (was AUD-9): my_circles shows the kind, not a switch
+ 16 | ok     | setup: the parent puts Grandma and Grandpa Rivera in one household
+ 17 | ok     | REPLY-7 / privacy item 5: Grandpa's earlier comment stays with the parents (written before they shared a house); she sees the parent's
+ 18 | ok     | REPLY-7: the app is told her replies now reach her household too
+ 19 | ok     | setup: Grandpa comments on the Everyone post
+ 20 | ok     | REPLY-7: on the Everyone post, Grandma reads her household's new comment
+ 21 | ok     | REPLY-7: ...and Grandma Chen (not in their house) doesn't
+ 22 | ok     | setup: the household is undone
+ 23 | ok     | REPLY-7 narrowing is read-time: out of the house, she stops reading Grandpa's comment at once
+ 24 | ok     | AUD-10: a viewer can't change it (42501)  [42501 only the owner can change this]
+ 25 | ok     | AUD-10: an adult who isn't the owner can't either (42501)  [42501 only the owner can change this]
+ 26 | ok     | AUD-10: unknown choice is 23514  [23514 choose parents or everyone]
+ 27 | ok     | AUD-10: the owner opens replies to everyone the post went to
+ 28 | ok     | AUD-10: my_spaces shows the family's choice
+ 29 | ok     | AUD-10: then Grandma reads Grandpa's reply on the Everyone post
+ 30 | ok     | AUD-10: and the app says so
+ 31 | ok     | AUD-10: not in the family -> not found (P0002)  [P0002 not found]
+ 32 | ok     | setup: back to the safe default
+ 33 | ok     | AUD-10: back to parents-only immediately
+ 34 | ok     | AUD-8 review: the raw heart counter on posts is not readable (42501)  [42501 permission denied for table posts]
+ 35 | ok     | AUD-8 review: the raw comment counter on posts is not readable (42501)  [42501 permission denied for table posts]
+ 36 | ok     | AUD-8 review: ...while the post itself still reads fine
+ 37 | ok     | AUD-8 review: reply_scope on a post you can't see says nothing ("not found")
+ 38 | ok     | AUD-8 review: a relative in another group who replied stays invisible (no profile leak)
+ 39 | ok     | AUD-8 review: ...while the parent still sees who replied
+ 40 | ok     | AUD-8 perf: default (parents read replies): every member's feed and timeline counts and reply_scope equal the per-reply rule
+ 41 | ok     | REPLY-7/8 perf (was AUD-9): with two households and an event, replies before and after the placements, counts and reply_scope still equal the per-reply rule
+ 42 | ok     | REPLY-8 / privacy item 5: Grandma Rivera reads her event-mate's new comment, not the cousin's from before the event
+ 43 | ok     | AUD-10 perf: with replies open to everyone, counts and reply_scope still equal the per-reply rule
+ 44 | ok     | AUD-8 perf: back on the safe default, still equal
+ 45 | ok     | AUD-8 perf: the fixture is not trivial (a grandma sees fewer hearts on the Everyone post than the parent)
+ 46 | ok     | AUD-8 perf: private.feed_rows works the reply rule out per page, not by calling can_see_reply per heart and comment
+ 47 | ok     | AUD-8 / 0010 plan cache: switching people on one connection 10 times never carries an answer over (allowed and excluded both ways)
+
+
+REPLY RESULT: 47 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+ n  | result |                                                                                description                                                                                
+----+--------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  1 | ok     | BETA-TIME-2: public.get_timeline exists (migration 0010)
+  2 | ok     | BETA-TIME-4: public.get_timeline_years exists (migration 0010)
+  3 | ok     | BETA-TIME-3: one visibility function, private.visible_posts, exists
+  4 | ok     | BETA-TIME-3: get_feed, get_timeline and get_timeline_years all read private.visible_posts (no copies)
+  5 | ok     | BETA-TIME-3: get_timeline has no visibility logic of its own (no circle_members / post_audiences joins)
+  6 | ok     | BETA-TIME-2: posts has an index on (space_id, coalesce(taken_at, published_at) desc, ...)
+  7 | ok     | BETA-TIME-3: anon cannot call get_timeline or get_timeline_years (same as get_feed)
+  8 | ok     | BETA-TIME-2 perf: private.feed_rows and visible_posts are plpgsql, so their plans are cached per connection (a SQL security-definer function is re-planned on every call)
+  9 | ok     | BETA-TIME-2: Grandma Rivera's timeline orders by date taken (shared date if none): t_new, t_mid, t_old2, t_old, t_nye
+ 10 | ok     | BETA-TIME-2: first page of 3 is t_new (Oct 16), Soccer (Oct 12), Bike ride (Oct 10): an undated post sorts by its shared date
+ 11 | ok     | BETA-TIME-2: every row has sort_at = coalesce(taken_at, published_at), never increasing
+ 12 | ok     | BETA-TIME-2: a timeline row is a feed row plus taken_at (3 photos, no audience for a viewer)
+ 13 | ok     | BETA-TIME-2: a post with no taken_at comes back with taken_at null and sorts by its shared date
+ 14 | ok     | BETA-TIME-2: keyset pages of 2 (p_before_at, p_before_id) match the full timeline with no gaps or duplicates
+ 15 | ok     | BETA-TIME-2: limit is capped at 50
+ 16 | ok     | BETA-TIME-3 allowed: Grandma Rivera (Dad's-side grandparents) sees the grandparents-only posts
+ 17 | ok     | BETA-TIME-3 excluded: Grandma Rivera never gets the co-parent-only posts
+ 18 | ok     | BETA-TIME-3: drafts and deleted posts never appear
+ 19 | ok     | BETA-TIME-3: a space she is not in returns nothing (not an error that confirms it exists)
+ 20 | ok     | BETA-TIME-3 excluded: Grandma Chen (Everyone only) gets just the Everyone posts, in date-taken order
+ 21 | ok     | BETA-TIME-3 excluded: Grandma Chen never gets the Dad's-side-grandparents posts, on any page
+ 22 | ok     | BETA-TIME-3: Blair (co-parent) sees the co-parent posts and nothing from Dad's family groups
+ 23 | ok     | BETA-TIME-3: the author sees all his published posts, but not his draft or deleted post
+ 24 | ok     | BETA-TIME-2: like get_feed, the author gets the audience on his own posts
+ 25 | ok     | BETA-TIME-3: private.visible_posts matches can_view_post (published) for the author, both grandmas and the co-parent
+ 26 | ok     | BETA-TIME-4: Grandma Rivera's years, newest first: 2026 (3 posts, 3 photos), 2025 (1, 4), 2024 (2, 5), 2023 (1, 1); videos not counted
+ 27 | ok     | BETA-TIME-4: in UTC the 10:30 pm New Year's Eve photo counts in 2024: the year follows the phone's time zone
+ 28 | ok     | BETA-TIME-3: years for a space she is not in: nothing
+ 29 | ok     | BETA-TIME-4: an unknown time zone is 22023  [22023 unknown time zone]
+ 30 | ok     | BETA-TIME-3 excluded: Grandma Chen's years leave out the grandparents-only posts (no 2024 at all)
+ 31 | ok     | BETA-TIME-3: Blair's years count only the 2 co-parent posts
+ 32 | ok     | BETA-TIME-1: get_feed still orders by shared date, so old photos imported today don't reorder by date taken
+ 33 | ok     | BETA-TIME-1: get_feed rows carry taken_at, so Photos can put old photos in an "Added from earlier" card
+ 34 | ok     | BETA-TIME-3 removed from a group: Grandma Rivera loses its posts from the timeline (keeps Everyone)
+ 35 | ok     | BETA-TIME-4 removed from a group: her years list no longer counts its posts (only the 4 Everyone posts)
+ 36 | ok     | BETA-TIME-3 allowed: Grandpa Rivera, still in the group, keeps those posts
+ 37 | ok     | BETA-TIME-3 removed from the family: her timeline is empty
+ 38 | ok     | BETA-TIME-4 removed from the family: her years list is empty (no counts survive)
+
+
+TIMELINE RESULT: 38 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('4f1beb20-2d3e-4a27-aa75-da8650e8dc94'))
+psql:tests/groups_test.sql:886: WARNING:  as mom: P0002 not found (select public.retire_level('e3428062-e8fc-45bc-ad43-2784b827e69e'))
+psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('d47f0ffc-2f3a-4401-a14f-d0fd4b6ef331'))
+psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = '26c05589-80b5-47cf-aed0-6bb11c64b8be')
+  n  | result |                                                                                  description                                                                                   
+-----+--------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1 | ok     | BETA-AUD-11 shape: circles.kind exists (everyone | group | household | event)
+   2 | ok     | BETA-AUD-11 shape: circle_links and circle_people exist
+   3 | ok     | BETA-AUD-20 shape: space_members.sees_from, invites.history and circle_members.sees_from exist
+   4 | ok     | BETA-AUD-13/21 shape: can, can_send_to, link_allowed, create_level, link_level, unlink_level, place_person, unplace_person, reply_readers exist
+   5 | ok     | BETA-REPLY-11 shape: anon cannot call reply_readers
+   6 | ok     | BETA-AUD-11 allowed: Memaw, Pawpaw, Granny, Great-Grandma and Mom's sister see the Mom's side post
+   7 | ok     | BETA-AUD-11 allowed: both parents see it
+   8 | ok     | BETA-AUD-11 excluded: nobody placed only under Chase's side can open it by ID (can_view_post)
+   9 | ok     | BETA-AUD-11 feed: Memaw gets it once; Gammy and Grandaddy never do
+  10 | ok     | BETA-AUD-11 timeline: Great-Grandma gets it; Bebar never does
+  11 | ok     | BETA-AUD-11 media signer: Gammy can read no media row (no key, no URL) of the Mom's side post
+  12 | ok     | BETA-AUD-11 push and email: the post notice is queued for Mom, Memaw, Pawpaw, Granny, Great-Grandma and the sister only (once each)
+  13 | ok     | BETA-AUD-11 both directions: the Chase's side post reaches Gammy and Gigi, never Memaw or the sister
+  14 | ok     | BETA-AUD-12 feed: the sister gets the Mom's side, Pawpaw and Granny's house, Memaw's house and Everyone posts once each
+  15 | ok     | BETA-AUD-12 timeline: the same four posts once each
+  16 | ok     | BETA-AUD-12 excluded: the sister never gets a Chase's side post
+  17 | ok     | BETA-AUD-12 a person in two households does not bridge them: Pawpaw can't see the Memaw's house post, Memaw can't see Pawpaw and Granny's
+  18 | ok     | BETA-AUD-18 allowed: Pawpaw, Granny, the sister and both parents see the Charleston trip post
+  19 | ok     | BETA-AUD-18 excluded: Memaw, Gammy and Great-Grandma don't
+  20 | ok     | BETA-AUD-18: the same people still get Mom's side and Everyone posts
+  21 | ok     | BETA-AUD-18 Birthday at Gigi's: Grandaddy, Gigi and Granny see it; Gammy and Memaw never do
+  22 | ok     | BETA-AUD-20: Gigi's invite records history = new
+  23 | ok     | BETA-AUD-20: redeeming copies the choice: Gigi's sees_from = her invite's creation time, Bebar's is null (all)
+  24 | ok     | BETA-AUD-20 excluded: Gigi can't open posts shared before T by ID (Everyone or her own house)
+  25 | ok     | BETA-AUD-20 excluded: neither is in her feed or timeline
+  26 | ok     | BETA-AUD-20 allowed: posts shared at or after T show for Gigi
+  27 | ok     | BETA-AUD-20 / privacy item 8: an old photo (taken 2024) bulk-imported after T counts as new: Gigi sees it (cutoff uses published_at, never taken_at)
+  28 | ok     | BETA-AUD-20 allowed: Bebar ("Share all past photos") sees both old posts
+  29 | ok     | BETA-AUD-20 replies: get_comments and toggle_heart on a pre-T post answer "not found" (P0002) for Gigi
+  30 | ok     | BETA-AUD-20 replies: Bebar's comment on the pre-T post is not readable by Gigi (same household, but she can't see the post)
+  31 | ok     | BETA-AUD-20 media signer: Gigi reads no media row of a pre-T post
+  32 | ok     | BETA-AUD-20 years list: Gigi's year counts add up to exactly the posts she may open (pre-T posts not counted)
+  33 | ok     | BETA-AUD-20 parity: for all 12 people x every post, can_view_post = get_feed = get_timeline = get_comments = media rows (sign-media)
+  34 | ok     | BETA-AUD-20 / privacy item 9: claim_notification_batches no longer copies the visibility rule (it calls the one shared predicate)
+  35 | ok     | BETA-AUD-20 push and email: no claimed notice names a post its recipient can't open (Gigi's pre-T post included)
+  36 | ok     | BETA-REPLY-7 allowed: Chase (author, parent), Mom (parent) and Gammy's household (Gammy) read her comment
+  37 | ok     | BETA-REPLY-7 excluded: Grandaddy, Grandmomma (and Memaw) don't read Gammy's comment
+  38 | ok     | BETA-REPLY-7 hearts: the parents see Gammy's heart; Grandaddy and Grandmomma don't
+  39 | ok     | BETA-REPLY-7 counts leave hidden replies out: Grandaddy 1 heart 1 comment (Mom's), Gammy 2:2, Chase 3:5
+  40 | ok     | BETA-REPLY-8 allowed: Granny's comment on the Charleston trip reaches Pawpaw, the sister (event rule), the parents and the author
+  41 | ok     | BETA-REPLY-8 excluded: Memaw (can't see the post at all) doesn't read it
+  42 | ok     | BETA-REPLY-8 Birthday at Gigi's: Grandaddy's comment reaches Grandmomma, Gigi, Bebar, Pawpaw and Granny (everyone in the event)
+  43 | ok     | BETA-REPLY-8 Birthday at Gigi's: Gammy and Memaw never read it
+  44 | ok     | BETA-REPLY-8 mixed audience (Everyone + Charleston trip): Granny's comment reaches the event (Pawpaw, the sister) and the parents
+  45 | ok     | BETA-REPLY-8 mixed audience: Memaw sees the photo but not Granny's comment; nor does Gammy
+  46 | ok     | BETA-REPLY-9: the sister's comment reaches Memaw, Pawpaw, Granny, Chase and Mom
+  47 | ok     | BETA-REPLY-9: ... and not Gammy, Grandaddy or Great-Grandma
+  48 | ok     | BETA-REPLY-9: Memaw's comment reaches the sister, Chase and Mom
+  49 | ok     | BETA-REPLY-9 no relay: Memaw's comment does NOT reach Pawpaw or Granny (the sister doesn't bridge the houses)
+  50 | ok     | BETA-REPLY-9 no relay: Pawpaw's comment reaches Granny and the sister, but not Memaw
+  51 | ok     | BETA-REPLY-9 hearts: Pawpaw's heart reaches Granny and the sister, not Memaw
+  52 | ok     | privacy item 4: on a Mom's side post, Memaw's comment does not reach Great-Grandma or Pawpaw (a group never passes replies along)
+  53 | ok     | BETA-REPLY-10: Mom's comment and heart on an Everyone post reach everyone who can see it
+  54 | ok     | BETA-REPLY-10 / rule 4: on Mom's post, Gammy's comment reaches Mom (author) and Chase, not Memaw
+  55 | ok     | BETA-REPLY-10: a parent reads every reply on every post they can see (Chase and Mom)
+  56 | ok     | BETA-REPLY-11 sibling: reply_readers for the sister on an Everyone post = Memaw, Pawpaw, Granny, Chase, Mom
+  57 | ok     | BETA-REPLY-11 household of one: Gammy's readers on an Everyone post = Chase, Mom
+  58 | ok     | BETA-REPLY-11 event: Granny's readers on the Charleston trip = Pawpaw, the sister, Chase, Mom
+  59 | ok     | BETA-REPLY-11 household: Pawpaw's readers on an Everyone post = Granny, the sister, Chase, Mom
+  60 | ok     | BETA-REPLY-11 parent: Mom's readers on an Everyone post = all 11 others; on a pre-T post, not Gigi (privacy item 7)
+  61 | ok     | BETA-REPLY-11 / privacy item 7: reply_readers on a post Memaw can't see is null ("not found")
+  62 | ok     | BETA-REPLY-11 parity: for every person and post, reply_readers = exactly the members for whom can_see_reply(post, caller) is true
+  63 | ok     | privacy item 7 parity: feed heart and comment counts equal can_see_reply for every person (household and event rules)
+  64 | ok     | BETA-REPLY-13: Gammy (relative, posting on) can post to her own group, Chase's side
+  65 | ok     | BETA-AUD-21: can(space, send_to_everyone) is true for Chase (owner)
+  66 | ok     | BETA-AUD-21: ... and for Mom (parent)
+  67 | ok     | BETA-AUD-21: Gammy (relative) can post (family switch on) but can't send to Everyone
+  68 | ok     | privacy item 2: create_post and publish_post both call can_send_to (publish re-checks)
+  69 | ok     | privacy item 2: the post_audiences insert policy calls can_send_to
+  70 | ok     | BETA-AUD-21: can_send_to goes through can(space, capability)
+  71 | ok     | BETA-AUD-21 allowed: Mom (parent) sends to Everyone through create_post
+  72 | ok     | BETA-AUD-21 allowed: Chase (owner) sends to Everyone through create_post
+  73 | ok     | BETA-AUD-21 excluded: Gammy to Everyone by create_post is 42501  [42501 you can't send there]
+  74 | ok     | privacy item 2: Gammy to Mom's side (not hers) is refused  [23514 circle not found in this space]
+  75 | ok     | privacy item 2: Gammy to Birthday at Gigi's (an event she isn't in) is refused  [23514 circle not found in this space]
+  76 | ok     | privacy item 2: Gammy to Memaw's house is refused  [23514 circle not found in this space]
+  77 | ok     | privacy item 2 allowed: Gammy may send to her own household
+  78 | ok     | BETA-AUD-21 excluded: Gammy's direct post_audiences insert of Everyone is 42501 (insert policy)  [42501 new row violates row-level security policy for table "post_audiences"]
+  79 | ok     | BETA-AUD-21 excluded: set_post_audience adding Everyone is 42501 for Gammy  [42501 new row violates row-level security policy for table "post_audiences"]
+  80 | ok     | BETA-AUD-21 excluded: publish_post of a draft naming Everyone is 42501 for a relative  [42501 you can't send there]
+  81 | ok     | privacy item 2: Mom, demoted to relative after drafting to Everyone, can't publish it (42501)  [42501 you can't send there]
+  82 | ok     | privacy item 2: with posting off, Gammy can't send even to her own house (can(space, post) is false)  [42501 you cannot post in this space]
+  83 | ok     | BETA-AUD-14: my_circles gives Gammy no other household, group or event, and no other household's member names
+  84 | ok     | BETA-AUD-14: reading circles directly, Gammy sees no other container's name or kind
+  85 | ok     | BETA-AUD-14: Gammy can read no circle_links row (no links between containers)
+  86 | ok     | BETA-AUD-14: circle_people shows Gammy only her own placement
+  87 | ok     | BETA-AUD-14: circle_members shows Gammy no one else (no member counts, no other household's members)
+  88 | ok     | BETA-AUD-14: Gammy's feed shows posts and their authors only: no audience, seen or reach on anyone else's post
+  89 | ok     | BETA-AUD-13: a group under a group is 23514  [23514 a group can't go under a group]
+  90 | ok     | BETA-AUD-13: a household under a household is 23514  [23514 a household can't go under a household]
+  91 | ok     | BETA-AUD-13: anything under a household (a group) is 23514  [23514 a group can't go under a household]
+  92 | ok     | BETA-AUD-13: an event under a group is 23514  [23514 a event can't go under a group]
+  93 | ok     | BETA-AUD-13: an event under an event is 23514  [23514 a event can't go under a event]
+  94 | ok     | BETA-AUD-13: linking anything under Everyone is 23514  [23514 a group can't go under a everyone]
+  95 | ok     | BETA-AUD-13: placing a person in a group is 23514 (people go only in households)  [23514 people go only in households]
+  96 | ok     | BETA-AUD-13: placing a person in an event is 23514  [23514 people go only in households]
+  97 | ok     | BETA-AUD-13: linking across two families (spaces) is 23514, even for a parent of both  [23514 both must be in the same family]
+  98 | ok     | BETA-AUD-13: a loop (a container under itself) is 23514  [23514 a household can't go under a household]
+  99 | ok     | BETA-AUD-13: a second Everyone is 23514  [23514 kind must be group, household or event (there is one Everyone)]
+ 100 | ok     | BETA-AUD-13: an unknown kind is 23514  [23514 kind must be group, household or event (there is one Everyone)]
+ 101 | ok     | privacy item 3: a direct cross-space circle_links insert (even as admin) is refused by trigger (23514)  [23514 both must be in the same family]
+ 102 | ok     | privacy item 3: a direct group-under-group insert is refused by link_allowed in a trigger (23514)  [23514 a group can't go under a group]
+ 103 | ok     | privacy item 3: a direct circle_people insert into a group is refused (23514)  [23514 people go only in households]
+ 104 | ok     | BETA-AUD-13: Gammy calling create_level is P0002  [P0002 not found]
+ 105 | ok     | BETA-AUD-13: Gammy calling link_level is P0002  [P0002 not found]
+ 106 | ok     | BETA-AUD-13: Gammy calling unlink_level is P0002  [P0002 not found]
+ 107 | ok     | BETA-AUD-13: Gammy calling place_person is P0002  [P0002 not found]
+ 108 | ok     | BETA-AUD-13: Gammy calling unplace_person is P0002  [P0002 not found]
+ 109 | ok     | BETA-AUD-13: after every refused call, links, placements, containers and derived members are unchanged
+ 110 | ok     | BETA-AUD-19: link_level with no history is 23514  [23514 choose "all" or "new" for past photos]
+ 111 | ok     | BETA-AUD-19: link_level with a made-up history is 23514  [23514 choose "all" or "new" for past photos]
+ 112 | ok     | BETA-AUD-19: place_person with no history is 23514  [23514 choose "all" or "new" for past photos]
+ 113 | ok     | BETA-AUD-19: create_invite for a relative with no p_history is 23514  [23514 choose "all" or "new" for past photos]
+ 114 | ok     | BETA-AUD-19: create_invite with a made-up p_history is 23514  [23514 choose "all" or "new" for past photos]
+ 115 | ok     | BETA-AUD-19: an invite names one household, not a group (23514)  [23514 an invite names one household]
+ 116 | ok     | BETA-REPLY-12: set_group_replies_shared is dropped
+ 117 | ok     | BETA-REPLY-12: circles.replies_shared is dropped
+ 118 | ok     | BETA-REPLY-12 / API: my_circles returns kind and parent_ids, and no replies_shared
+ 119 | ok     | privacy item 3: app users can't insert, update or delete circle_members (derived by trigger only)
+ 120 | ok     | privacy item 3: app users can't write circle_links or circle_people directly (only through the RPCs)
+ 121 | ok     | privacy item 5: after Memaw joins Pawpaw and Granny's house, they still don't read the comment she wrote before
+ 122 | ok     | privacy item 5: ... and Memaw doesn't read Pawpaw's earlier comment or heart (written for Granny, the sister and the parents)
+ 123 | ok     | privacy item 5: a comment Memaw writes after the move reaches Pawpaw and Granny
+ 124 | ok     | privacy item 5 / REPLY-11: Memaw's comment box now names the sister, Pawpaw, Granny, Chase and Mom
+ 125 | ok     | BETA-AUD-20: Memaw's house added to the Charleston trip with "Share all past photos": Memaw sees the trip's earlier post
+ 126 | ok     | privacy item 5: ... but not the trip comments written before her house was added (Granny's, and even the sister's, whose box never named Memaw)
+ 127 | ok     | privacy item 5: Granny's next comment on the trip reaches Memaw (event rule, now that she's in it)
+ 128 | ok     | BETA-AUD-20: Great-Grandma's house added to the trip with "Only new photos": she can't open its earlier post
+ 129 | ok     | BETA-AUD-20: ... and does see the next trip post
+ 130 | ok     | privacy item 5 narrowing: once the sister leaves Pawpaw and Granny's house, they stop reading her old comment; Memaw (still her house) keeps it
+ 131 | ok     | BETA-AUD-15: Great-Grandma removed from her house loses the Mom's side post in the same transaction
+ 132 | ok     | BETA-AUD-15: Gammy's house unlinked from Chase's side: Gammy loses its posts in the same transaction
+ 133 | ok     | BETA-AUD-15: Pawpaw and Granny's house unlinked from the birthday event: Granny loses the event post at once
+ 134 | ok     | BETA-AUD-15 allowed: everyone else keeps theirs (Grandaddy keeps Chase's side and the birthday; Gammy keeps Everyone)
+ 135 | ok     | BETA-AUD-15: Gammy can no longer read the media rows (sign-media refuses new URLs)
+ 136 | ok     | privacy item 10: removing Gigi from the family removes her placements and derived memberships
+ 137 | ok     | privacy item 10: re-invited with "Share all past photos", Gigi now sees the posts from before her first invite
+ 138 | ok     | S-0011-1 setup: the sister's comment box names only Chase and Mom
+ 139 | ok     | S-0011-1 allowed: Memaw's house added to the post: Memaw sees the photo
+ 140 | ok     | S-0011-1 excluded: ... but not the sister's comment or heart written before her house was added
+ 141 | ok     | S-0011-1 counts: Memaw's feed counts leave them out too (0 hearts, 0 comments)
+ 142 | ok     | S-0011-1 allowed: the sister's next comment reaches Memaw; Chase still reads both
+ 143 | ok     | S-0011-1: app users can't choose post_audiences.added_at (the time that fixes who reads replies)
+ 144 | ok     | S-0011-2 excluded: a relative (Memaw, her own house) and a parent of another family can't retire a container
+ 145 | ok     | S-0011-2: Everyone can't be retired
+ 146 | ok     | S-0011-2 allowed: Mom (parent) retires Pawpaw and Granny's house: they lose its posts at once
+ 147 | ok     | S-0011-2: the house's posts stay with the parents and the author only (no one else picks them up)
+ 148 | ok     | S-0011-2: retiring widens nobody: no (person, post) pair is visible after that wasn't before
+ 149 | ok     | S-0011-3 allowed: an invite to an old group with nothing under it still works until 0012 (Aunt Bea joins)
+ 150 | ok     | S-0011-3 excluded: once the old group has a household under it, its open invite is refused (Uncle Ray isn't placed straight into the group)
+ 151 | ok     | S-0011-3 excluded: an invite whose group was retired is refused (no member who is placed nowhere)
+ 152 | ok     | UX-G7: invite_preview refuses an invite to a retired group (22023), as redeem does  [22023 invite is invalid or expired]
+ 153 | ok     | UX-G7: invite_preview refuses an invite to an old group that now has households under it (22023)  [22023 invite is invalid or expired]
+ 154 | ok     | UX-G7: invite_preview refuses an invite whose household was retired (22023)  [22023 invite is invalid or expired]
+ 155 | ok     | UX-G7: over PostgREST the refusal names the inviter in details ("Ask Chase for a new one.")
+ 156 | ok     | UX-G7 excluded: an unknown code still names no one (BETA-JOIN-3)
+ 157 | ok     | UX-G7 allowed: an invite to a live household still previews ("Chase invited you")
+ 158 | ok     | UX-G7: redeem refuses the same retired-household invite (preview and redeem agree)
+ 159 | ok     | S-0011-6 setup: Lu ("Only new photos") can't see the older post; Jo (all past photos) can
+ 160 | ok     | S-0011-6 allowed: placed again with "Share all past photos", Lu now sees the older post
+ 161 | ok     | S-0011-6 excluded: ... but not Jo's comment or heart written while she couldn't see it
+ 162 | ok     | S-0011-6 counts: Lu's feed counts leave them out too (0 hearts, 0 comments)
+ 163 | ok     | S-0011-6 allowed: Jo's next comment reaches Lu; Chase still reads both
+ 164 | ok     | S-0011-7: a parent's direct update can't soft-delete Everyone (23514)  [23514 Everyone stays]
+ 165 | ok     | S-0011-7: Everyone (and everything else) is still live after the refused update
+ 166 | ok     | S-0011-8: a parent's direct update can't un-retire a retired group or household (23514)  [23514 a retired level stays retired]
+ 167 | ok     | S-0011-8: both stay retired after the refused updates
+ 168 | ok     | S-0011-8 allowed: a live group is still updatable and stays live
+
+
+GROUPS RESULT: 168 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+ n | result |                                                       description                                                       
+---+--------+-------------------------------------------------------------------------------------------------------------------------
+ 1 | ok     | BETA-TIME-2 future date: a post "taken" after it was shared sorts by its shared date (sort_at = published_at)
+ 2 | ok     | BETA-TIME-2 future date: it does not jump above a photo taken (and shared) after it was shared
+ 3 | ok     | BETA-TIME-2 guard: a normal post still sorts by when it was taken
+ 4 | ok     | BETA-TIME-4 future date: "Pick a year" shows no 2027 (the post counts in the year it was shared)
+ 5 | ok     | BETA-TIME-4 future date: 2026 counts it, with the 3 other posts Grandma Rivera can see from 2026 (seed a1, a3, f_today)
+ 6 | ok     | BETA-TIME-2 future date: pages of 1 cover the timeline with no gaps or duplicates
+
+
+TIMELINE-FUTURE RESULT: 6 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+ n  | result |                                                         description                                                         
+----+--------+-----------------------------------------------------------------------------------------------------------------------------
+  1 | ok     | PRIV-1 no table in public or private has an inet/cidr column or an ip/user_agent column
+  2 | ok     | PRIV-1 setup: the failed attempts were counted per client (rate limit still keyed by IP)
+  3 | ok     | PRIV-1 rate limit rows never hold the raw client IP (only a keyed hash)
+  4 | ok     | PRIV-1 the IP hash is keyed (a plain sha256 of the IP would be reversible by trying all 4 billion addresses)
+  5 | ok     | PRIV-1 two failures from one IP share one key (S10 per-IP limit still counts them together)
+  6 | ok     | PRIV-1 the daily purge replaces the IP pepper (a dump or backup can't reverse older hashes)
+  7 | ok     | PRIV-1 the scheduled purge (hearth-purge-client-errors) clears rate limit rows older than 1 hour
+  8 | ok     | S11 a co-parent (guardian, viewer in the other household's space) can't unlink the child from it
+  9 | ok     | S11 setup: Blair can still unlink Sam from Blair's own space
+ 10 | ok     | S11 the owner of a family space can still unlink a child from their own space
+ 11 | ok     | S13 setup: two relatives in the same group see each other's profile
+ 12 | ok     | S13 once their only shared group is deleted, they no longer see each other's profile
+ 13 | ok     | S15 a photo whose key was never saved is marked failed, not ready, even when its upload checked out
+ 14 | ok     | S15 a photo with its key saved is marked ready as before
+ 15 | ok     | S15 ...so the post can't be published half-broken (all photos must be ready)  [23514 all media must finish uploading first]
+
+
+PRIVACY-AUDIT RESULT: 15 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+psql:tests/groups_v2_test.sql:283: WARNING:  place_person joe in g_chase failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:284: WARNING:  place_person rachel in g_chase failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:285: WARNING:  place_person sue in g_dan failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:286: WARNING:  place_person rachel in g_dan failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:287: WARNING:  place_person linda in g_dan failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:288: WARNING:  place_person sue in g_meemaw failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:289: WARNING:  place_person rachel in g_meemaw failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:290: WARNING:  place_person opal in g_meemaw failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:291: WARNING:  place_person joe in g_porch failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:292: WARNING:  place_person linda in g_porch failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:295: WARNING:  setup failed: people go only in households (insert into public.circle_people (circle_id, user_id, added_by)
+                   values (tests.c('g_dan'), tests.u('mom'), tests.u('chase')))
+psql:tests/groups_v2_test.sql:296: WARNING:  set_comment_mode g_meemaw always failed: 42883 function public.set_comment_mode(p_circle => uuid, p_mode => text) does not exist
+psql:tests/groups_v2_test.sql:317: WARNING:  place_person ray in g_chase failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:401: WARNING:  comment c4 failed: P0002 post not found
+psql:tests/groups_v2_test.sql:402: WARNING:  comment c4b failed: P0002 post not found
+psql:tests/groups_v2_test.sql:417: WARNING:  comment c5 failed: P0002 post not found
+psql:tests/groups_v2_test.sql:434: WARNING:  set_comment_mode g_porch always failed: 42883 function public.set_comment_mode(p_circle => uuid, p_mode => text) does not exist
+psql:tests/groups_v2_test.sql:441: WARNING:  set_comment_mode g_porch private failed: 42883 function public.set_comment_mode(p_circle => uuid, p_mode => text) does not exist
+psql:tests/groups_v2_test.sql:447: WARNING:  place_person beth in g_meemaw failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:497: WARNING:  create_invite dee failed: 23514 an invite names one household
+psql:tests/groups_v2_test.sql:499: WARNING:  redeem dee failed: 22023 invite is invalid or expired
+psql:tests/groups_v2_test.sql:507: WARNING:  create_invite eve failed: 23514 an invite names one household
+psql:tests/groups_v2_test.sql:508: WARNING:  redeem eve failed: 22023 invite is invalid or expired
+psql:tests/groups_v2_test.sql:518: WARNING:  create_invite fay failed: 23514 an invite names one household
+psql:tests/groups_v2_test.sql:665: WARNING:  feature_on failed: 42883 function private.feature_on(uuid, unknown) does not exist
+psql:tests/groups_v2_test.sql:666: WARNING:  my_features failed: 42883 function public.my_features(uuid) does not exist
+psql:tests/groups_v2_test.sql:667: WARNING:  feature_flags write failed: 42P01 relation "public.feature_flags" does not exist
+psql:tests/groups_v2_test.sql:668: WARNING:  space_features write failed: 42P01 relation "public.space_features" does not exist
+psql:tests/groups_v2_test.sql:670: WARNING:  feature_on failed: 42883 function private.feature_on(uuid, unknown) does not exist
+psql:tests/groups_v2_test.sql:670: WARNING:  feature_on failed: 42883 function private.feature_on(uuid, unknown) does not exist
+psql:tests/groups_v2_test.sql:671: WARNING:  feature_on failed: 42883 function private.feature_on(uuid, unknown) does not exist
+psql:tests/groups_v2_test.sql:673: WARNING:  my_features failed: 42883 function public.my_features(uuid) does not exist
+psql:tests/groups_v2_test.sql:673: WARNING:  my_features failed: 42883 function public.my_features(uuid) does not exist
+psql:tests/groups_v2_test.sql:679: WARNING:  feature_flags write failed: 42P01 relation "public.feature_flags" does not exist
+psql:tests/groups_v2_test.sql:680: WARNING:  feature_on failed: 42883 function private.feature_on(uuid, unknown) does not exist
+psql:tests/groups_v2_test.sql:681: WARNING:  feature_flags write failed: 42P01 relation "public.feature_flags" does not exist
+psql:tests/groups_v2_test.sql:682: WARNING:  space_features write failed: 42P01 relation "public.space_features" does not exist
+psql:tests/groups_v2_test.sql:683: WARNING:  feature_on failed: 42883 function private.feature_on(uuid, unknown) does not exist
+psql:tests/groups_v2_test.sql:696: WARNING:  setup failed: relation "public.space_features" does not exist (update public.space_features set enabled = true where space_id = '22222222-0000-0000-0000-0000000000e0')
+psql:tests/groups_v2_test.sql:715: WARNING:  feature_flags write failed: 42P01 relation "public.feature_flags" does not exist
+psql:tests/groups_v2_test.sql:726: WARNING:  feature_flags write failed: 42P01 relation "public.feature_flags" does not exist
+  n  | result |                                                                                                    description                                                                                                    
+-----+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1 | NOT OK | GRP-2 shape: circles.comment_mode exists
+   2 | NOT OK | GRP-7 shape: comment_mode_log exists
+   3 | NOT OK | GRP-9/11/14 FLAG-1 shape: set_comment_mode, add_people_from, private.feature_on, my_features, private.group_reply_ok exist
+   4 | NOT OK | GRP-10 shape: place_person takes p_group (any group, not only households)
+   5 | NOT OK | FLAG shape: feature_flags and space_features exist
+   6 | NOT OK | GRP-9/11 shape: anon cannot call set_comment_mode or add_people_from
+   7 | NOT OK | FLAG shape: app users cannot call private.feature_on directly (they use my_features)
+   8 | NOT OK | GRP-2 every seed circle (Everyone and groups) is Private after 0013  [42703 column "comment_mode" does not exist]
+   9 | NOT OK | GRP-2 comment_mode_log backfill: exactly one row per existing circle, set_at = circles.created_at, same mode  [42P01 relation "public.comment_mode_log" does not exist]
+  10 | NOT OK | GRP-11 a parent copies everyone in Chase's side into Chase's birthday  [42883 function public.add_people_from(p_target => unknown, p_source => unknown, p_history => unknown) does not exist]
+  11 | NOT OK | GRP-11 ...and everyone in Mom's side (Auntie Rachel, in both, does not make it fail)  [42883 function public.add_people_from(p_target => unknown, p_source => unknown, p_history => unknown) does not exist]
+  12 | NOT OK | GRP-11 the birthday holds exactly Pop Joe, Auntie Rachel, Meemaw Sue and Aunt Linda, each once (no parent copied)
+  13 | ok     | GRP-11 copied, not linked: no circle_links row for the birthday
+  14 | NOT OK | GRP-11 no share-history choice is refused  [42883 function public.add_people_from(p_target => unknown, p_source => unknown, p_history => unknown) does not exist]
+  15 | NOT OK | GRP-11 a relative calling add_people_from gets "not found"  [42883 function public.add_people_from(p_target => unknown, p_source => unknown, p_history => unknown) does not exist]
+  16 | NOT OK | GRP-11 Uncle Ray, added to Chase's side later, is not in Chase's birthday
+  17 | NOT OK | GRP-9 a group made with create_level starts Private
+  18 | NOT OK | GRP-9 an event made with create_level (by either parent) starts Shared on this group's posts
+  19 | NOT OK | GRP-9 a parent sets Meemaw's to Always shared with set_comment_mode
+  20 | NOT OK | GRP-9 comment_mode_log has a row for the new group (Private) and one for the change (Always shared, set by Chase)  [42P01 relation "public.comment_mode_log" does not exist]
+  21 | NOT OK | GRP-9 set_comment_mode refuses a fourth value  [42883 function public.set_comment_mode(p_circle => unknown, p_mode => unknown) does not exist]
+  22 | NOT OK | GRP-9 set_comment_mode refuses no value  [42883 function public.set_comment_mode(p_circle => unknown, p_mode => unknown) does not exist]
+  23 | NOT OK | GRP-9 Everyone's setting can't be changed (the owner's AUD-10 switch is the one way to open it)  [42883 function public.set_comment_mode(p_circle => unknown, p_mode => unknown) does not exist]
+  24 | NOT OK | GRP-9 Everyone is still Private
+  25 | NOT OK | GRP-9 a relative calling set_comment_mode gets "not found"  [42883 function public.set_comment_mode(p_circle => unknown, p_mode => unknown) does not exist]
+  26 | ok     | GRP-9 a relative calling create_level gets "not found"  [P0002 not found]
+  27 | NOT OK | GRP-9 a parent can't change comment_mode with a direct UPDATE (only set_comment_mode)  [42703 column "comment_mode" of relation "circles" does not exist]
+  28 | NOT OK | GRP-9 app users can't write comment_mode_log  [42P01 relation "public.comment_mode_log" does not exist]
+  29 | NOT OK | GRP-9 Porch is still Private after the refused writes
+  30 | NOT OK | GRP-10 place_person put people in plain groups (Porch, Meemaw's), and they are members
+  31 | NOT OK | GRP-10 place_person into an event succeeds  [42883 function public.place_person(p_group => unknown, p_user => unknown, p_history => unknown) does not exist]
+  32 | NOT OK | GRP-10 ...and Neighbor Ann is a member of Reunion
+  33 | NOT OK | GRP-10 placing someone in Everyone is still refused  [42883 function public.place_person(p_group => unknown, p_user => unknown, p_history => unknown) does not exist]
+  34 | NOT OK | GRP-10 no share-history choice is refused  [42883 function public.place_person(p_group => unknown, p_user => unknown, p_history => unknown) does not exist]
+  35 | NOT OK | GRP-10 an unknown share-history choice is refused  [42883 function public.place_person(p_group => unknown, p_user => unknown, p_history => unknown) does not exist]
+  36 | NOT OK | GRP-10 a relative calling place_person gets "not found"  [42883 function public.place_person(p_group => unknown, p_user => unknown, p_history => unknown) does not exist]
+  37 | ok     | GRP-10 the refused placements left Porch unchanged
+  38 | NOT OK | GRP-3 Chase, Mom and Auntie Rachel (Meemaw's, Always shared) read Meemaw's comment on the Everyone post
+  39 | NOT OK | GRP-3 ...and her heart
+  40 | ok     | GRP-3 everyone else who sees the post (Linda, Joe, Ann, Beth, Ray) does not read her comment
+  41 | ok     | GRP-3 ...nor her heart
+  42 | NOT OK | GRP-3 reply_readers for Meemaw names exactly Chase, Mom and Auntie Rachel (got {Chase,Mom})
+  43 | NOT OK | GRP-4 every birthday member reads Pop Joe's comment on a post sent to the birthday
+  44 | NOT OK | GRP-4 ...and Aunt Linda's
+  45 | NOT OK | GRP-4 people outside the birthday (who can't see the post) read nothing
+  46 | NOT OK | GRP-4 reply_readers for Pop Joe on the birthday post names the parents and every other member (got {})
+  47 | ok     | GRP-5 birthday members Joe and Linda don't read Meemaw's comment on an Everyone-only post
+  48 | NOT OK | GRP-5 ...unless another rule allows it (Rachel shares the Always-shared Meemaw's)
+  49 | NOT OK | GRP-5 same for a post sent to another group: Linda (birthday + Mom's side, both with Meemaw) doesn't read her comment on the Mom's side post
+  50 | NOT OK | GRP-5 reply_readers for Meemaw on the Mom's side post leaves out Aunt Linda (got {})
+  51 | NOT OK | GRP-6 Rachel (Meemaw's, Always shared) reads Meemaw's comment on a post not sent to Meemaw's
+  52 | NOT OK | GRP-6 Great-aunt Opal (Meemaw's, can't see that post) reads nothing: get_comments says not found, RLS hides it
+  53 | ok     | GRP-6 ...and can't read Meemaw's heart on a post she can't see
+  54 | ok     | GRP-7 setup: Porch is Private, Linda doesn't read Joe's comment on the Everyone post
+  55 | NOT OK | GRP-7 setup: a parent switched Porch to Always shared
+  56 | ok     | GRP-7 the comment written while Porch was Private keeps its readers after the switch to Always shared
+  57 | NOT OK | GRP-7 a comment written after the switch follows Always shared (Linda reads it)
+  58 | NOT OK | GRP-7 ...and reply_readers for Joe now names Aunt Linda
+  59 | ok     | GRP-7 switching Always shared -> Private hides the earlier comment from the group at once
+  60 | ok     | GRP-7 ...and reply_readers drops Aunt Linda
+  61 | NOT OK | GRP-8 setup: Cousin Beth is now in Meemaw's
+  62 | ok     | GRP-8 Beth, added to Meemaw's after Meemaw's comment, doesn't read it through the group
+  63 | ok     | GRP-8 ...nor Meemaw's earlier heart
+  64 | NOT OK | GRP-8 Beth does read Meemaw's next comment, written after Beth joined
+  65 | NOT OK | EVT-1 a birthday member's feed row for a post to the birthday carries the event's id and name
+  66 | NOT OK | EVT-1 ...and so does the timeline row
+  67 | NOT OK | EVT-1 a post sent only to the event carries it too
+  68 | NOT OK | EVT-1 Neighbor Ann (sees it only through Everyone) gets no event id or name, anywhere in the feed row
+  69 | NOT OK | EVT-1 ...nor in the timeline row
+  70 | NOT OK | GRP-12 a parent can name two groups (a group and an event) in one invite
+  71 | NOT OK | GRP-12 redeeming places Cousin Dee in each named group
+  72 | NOT OK | GRP-12 ...and NOT in Everyone, because Everyone wasn't named
+  73 | NOT OK | GRP-12 the legacy direct circle_members path is gone: every membership Dee got is derived from a placement
+  74 | NOT OK | GRP-12 an invite naming Everyone and Porch puts Cousin Eve in Everyone and in Porch
+  75 | ok     | GRP-12 an old-style invite naming a household still puts the person in Everyone too
+  76 | NOT OK | GRP-12 setup: invite naming Old porch and Meemaw's made
+  77 | NOT OK | GRP-12 / UX-G7 preview refuses an invite naming a retired group (22023) with the inviter's name
+  78 | ok     | GRP-12 ...and redeem refuses it too (22023); Cousin Fay does not join
+  79 | ok     | GRP-13 my_circles gives a relative nothing (AUD-14)
+  80 | ok     | GRP-13 reading circles, a relative sees only groups they are in
+  81 | NOT OK | GRP-13 a relative can't read any group's comment setting from circles  [42703 column "comment_mode" does not exist]
+  82 | NOT OK | GRP-13 a relative reads no comment_mode_log rows  [42P01 relation "public.comment_mode_log" does not exist]
+  83 | ok     | GRP-13 feed rows never carry a comment setting for a relative
+  84 | NOT OK | GRP-14 reply_ok, reply_scope and feed_rows all call private.group_reply_ok and none checks kind household/event
+  85 | NOT OK | GRP-14 for the 24-row family x post x writer x reader table, get_comments, RLS and reply_ok all give the expected answer (12 wrong)
+  86 | NOT OK | GRP-14 every person x every comment: get_comments = table RLS = reply_ok (0 disagree)
+  87 | ok     | GRP-14 feed_rows comment and heart counts equal what table RLS shows, for every person x post (0 differ)
+  88 | ok     | GRP-14 reply_scope = 'parents' exactly when reply_readers names only parents and the poster (0 differ)
+  89 | NOT OK | FLAG-1 with no rows, feature_on(space, 'video_posting') is false (default off)
+  90 | NOT OK | FLAG-1 ...and my_features doesn't list it
+  91 | NOT OK | FLAG-2 global on + family on: a parent (owner or adult) gets true
+  92 | NOT OK | FLAG-2 ...a relative asking for the parents-only capability gets false
+  93 | NOT OK | FLAG-2 my_features lists video_posting for a parent, not for a relative
+  94 | NOT OK | FLAG-2 can(space, 'use_video') is true for a parent  [22023 unknown capability]
+  95 | NOT OK | FLAG-2 can(space, 'use_video') is false for a relative  [22023 unknown capability]
+  96 | NOT OK | FLAG-2 global switch off (family on, parent): false
+  97 | NOT OK | FLAG-2 family add-on off (global on, parent): false
+  98 | NOT OK | FLAG-3 the owner can't write the global table  [42P01 relation "public.feature_flags" does not exist]
+  99 | NOT OK | FLAG-3 ...nor switch the global video flag on  [42P01 relation "public.feature_flags" does not exist]
+ 100 | NOT OK | FLAG-3 a relative can't write the global table  [42P01 relation "public.feature_flags" does not exist]
+ 101 | NOT OK | FLAG-3 a relative can't write the family add-on  [42P01 relation "public.space_features" does not exist]
+ 102 | NOT OK | FLAG-3 ...nor switch it on with an UPDATE (still off)  [42P01 relation "public.space_features" does not exist]
+ 103 | NOT OK | FLAG-3 setup: a parent may switch the family add-on  [42P01 relation "public.space_features" does not exist]
+ 104 | NOT OK | FLAG-3 the parent's family add-on switch took effect  [42P01 relation "public.space_features" does not exist]
+ 105 | NOT OK | FLAG-4 video_posting off: preparing a video upload is refused (42501 video_posting_off)  [expected 42501, none raised]
+ 106 | ok     | FLAG-4 ...photos still upload with the flag off
+ 107 | NOT OK | FLAG-4 ...and no video row was created
+ 108 | ok     | FLAG-4 with all three switches on, a parent can prepare a video upload
+
+
+GROUPS-V2 RESULT: 22 passed, 86 failed
+SOME TESTS FAILED
+psql:tests/groups_v2_test.sql:742: ERROR:  division by zero
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+
+Narrowing for Chase (readable before 0011 only through "members see each other's replies"):
+     reader     |  kind   |                                 reply_id                                  
+----------------+---------+---------------------------------------------------------------------------
+ Grandma Rivera | comment | 1bf0a2f7-34f3-4e0b-bc35-911b34f3235c
+ Grandma Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a2
+ Grandpa Rivera | comment | 1a863cd1-025a-4868-b1fc-4745f1892c30
+ Grandpa Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a1
+
+ n  | result |                                                     description                                                      
+----+--------+----------------------------------------------------------------------------------------------------------------------
+  1 | ok     | BETA-AUD-16: migration 0011 was applied (circles.kind exists), so the diffs below compare before/after 0011
+  2 | ok     | BETA-AUD-16: exactly one Everyone per space
+  3 | ok     | BETA-AUD-16: today's "Everyone" groups became kind everyone
+  4 | ok     | BETA-AUD-16: every other existing group became kind group (4 in seed)
+  5 | ok     | BETA-AUD-16 / privacy item 12: each Everyone has exactly the members it had before (none added, none lost)
+  6 | ok     | BETA-AUD-16 / privacy item 12: Blair (co-parent, a member of Sam at Dad's) is still NOT in its Everyone
+  7 | ok     | BETA-AUD-16: can_view_post unchanged for every (member, post): 0 changes
+  8 | ok     | BETA-AUD-16: get_feed unchanged (same posts, same order) for every member of every space: 0 changes
+  9 | ok     | BETA-AUD-16: get_timeline unchanged for every member of every space: 0 changes
+ 10 | ok     | BETA-AUD-16 / privacy item 12: no reply widens (readable now but not before): 0
+ 11 | ok     | BETA-AUD-16: the only narrowing is replies that were readable through the dropped 0009 switch (nothing else is lost)
+
+
+AUD-16 RESULT: 11 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+
+GRP-1 differences (should be none):
+ what | reader | item 
+------+--------+------
+
+ n | result |                                                                                                                               description                                                                                                                               
+---+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 1 | NOT OK | GRP-1: migration 0013 was applied (circles.comment_mode exists), so the diffs below compare before/after 0013  [0013 not applied: circles.comment_mode missing; app-engineer adds supabase/migrations/0013_*.sql and reruns tests/run.sh]
+ 2 | NOT OK | GRP-1: can_view_post unchanged for every (member, post): 0 changes  [0013 not applied: circles.comment_mode missing; app-engineer adds supabase/migrations/0013_*.sql and reruns tests/run.sh]
+ 3 | NOT OK | GRP-1: can_see_reply unchanged for every (member, comment or heart): 0 changes  [0013 not applied: circles.comment_mode missing; app-engineer adds supabase/migrations/0013_*.sql and reruns tests/run.sh]
+ 4 | NOT OK | GRP-1: reply_ok at each comment's own time unchanged for every (member, comment): 0 changes  [0013 not applied: circles.comment_mode missing; app-engineer adds supabase/migrations/0013_*.sql and reruns tests/run.sh]
+ 5 | NOT OK | GRP-1: reply_readers unchanged for every (member, post): 0 changes  [0013 not applied: circles.comment_mode missing; app-engineer adds supabase/migrations/0013_*.sql and reruns tests/run.sh]
+ 6 | ok     | GRP-1 setup: the snapshot includes replies relatives read through a household or event (not only parents)
+ 7 | NOT OK | GRP-2 backfill: household -> always, event -> on_group_posts, group and everyone -> private  [0013 not applied: circles.comment_mode missing; app-engineer adds supabase/migrations/0013_*.sql and reruns tests/run.sh]  [42703 column c.comment_mode does not exist]
+ 8 | NOT OK | GRP-2 comment_mode_log backfill: one row per circle, set_at = circles.created_at  [0013 not applied: circles.comment_mode missing; app-engineer adds supabase/migrations/0013_*.sql and reruns tests/run.sh]  [42P01 relation "public.comment_mode_log" does not exist]
+
+
+GRP-1 RESULT: 1 passed, 7 failed
+SOME TESTS FAILED
+psql:tests/grp1/after.sql:82: ERROR:  division by zero
+ok      setup v2: backend/scripts/family-setup-v2.sql exists
+ok      setup v2 dry run: runs without error
+ok      setup v2 dry run: changes nothing (groups, members, placements, links, audiences, invites identical)
+ok      setup v2 dry run: says "DRY RUN: nothing was changed"
+ok      setup v2 dry run: one "<name>: gains N posts, loses M posts" line for every member of the family
+ok      S-0011-4 / privacy item 14: the dry run counts what 0011 gives a Parent (Mom gains the 3 posts outside her v1 groups) and says why
+ok      setup v2 apply=yes: runs without error
+ok      setup v2: the dry-run report equals each person's real posts gained and lost after apply
+ok      setup v2 apply: one Everyone
+ok      setup v2 apply: the set groups are Chase's side and Mom's side (legacy groups retired)
+ok      setup v2 apply: Gammy is placed in Gammy's house, under Chase's side
+ok      setup v2 apply: Pawpaw and Granny share one house
+ok      setup v2 apply: the Charleston trip and Birthday at Gigi's events exist
+ok      setup v2: a person it can't place by name (Test viewer) is reported as not placed, not silently dropped
+ok      setup v2: applying twice adds nothing (safe to re-run)
+
+SETUP V2 RESULT: 15 passed, 0 failed
+ok      SETUP-API: backend/scripts/family-setup.sh exists
+ok      SETUP-API: without SUPABASE_ACCESS_TOKEN it stops and names the secret
+ok      SETUP-API: without --chase-email it stops and says what's missing
+ok      SETUP-API: before Chase has an account it says "sign in once in the app" and fails
+ok      SETUP-API: ... and changes nothing
+ok      SETUP-API: fresh setup runs without error
+        | Family "Chase's kids" is ready: Everyone, Chase's side, Mom's side, 7 houses, 2 events.
+        | Test viewer invite (account B): code ME7PTME8ZN, works once until Oct 25, link https://hearth.family/i/95157b8d179d9b72e3e9e8b932b49aba391bec37
+        | Mom's poster invite: code K3MKDAA2KY, works once until Oct 25, only for mom@example.com, link https://hearth.family/i/948351fc8d6b5a99039f6fdc5df17c4f2fbc5001
+ok      SETUP-API: Chase owns one family, named as given (an apostrophe in the name is kept, not a SQL error)
+ok      SETUP-API: one Everyone
+ok      SETUP-API: the set groups are Chase's side and Mom's side (no v1 groups to retire later)
+ok      SETUP-API: the family's houses (SPEC-GROUPS section 2) plus a Test house for account B
+ok      SETUP-API: the Charleston trip and Birthday at Gigi's events
+ok      SETUP-API: Chase's parents' houses sit under Chase's side
+ok      SETUP-API: the Test house is under no group or event (account B sees only Everyone and Test house posts)
+ok      SETUP-API: everything is made as Chase (through the app's RPCs, not as the database owner)
+ok      SETUP-API: prints the test viewer's 10-letter invite code
+ok      SETUP-API: prints Mom's poster invite code when --mom-email is given
+ok      SETUP-API: Mom's invite is a poster (adult) invite for her email
+ok      SETUP-API: the test viewer's invite names the Test house and says "all past photos"
+ok      SETUP-API: says the family is ready
+ok      SETUP-API: one Management API request (got 1)
+ok      SETUP-API: the token goes in the Authorization header
+ok      SETUP-API: the token is never printed
+ok      SETUP-API: psql is never called
+ok      SETUP-API: re-running runs without error
+ok      SETUP-API: re-running adds no family, group, house or event
+ok      SETUP-API: re-running prints a fresh test viewer code
+ok      SETUP-API: no Mom invite unless --mom-email is given
+ok      SETUP-API: account B's code places it in the Test house
+ok      SETUP-API: account B sees a Test house post and not a Gammy's house post
+ok      SETUP-API: once someone else has joined, it stops and points to family-setup-v2.sql's dry run
+ok      SETUP-API: ... and changes nothing (no new invite either)
+ok      SETUP-API: --print-sql works without the token
+ok      SETUP-API: --print-sql sends nothing
+ok      SETUP-API: values are SQL-quoted (a quote in an email can't end the string)
+
+SETUP API RESULT: 34 passed, 0 failed
+ok      QA-3 setup: 12 published posts and 1 draft seeded
+ok      QA-3: backend/scripts/sent-vs-received.sh exists
+ok      QA-3: without SUPABASE_ACCESS_TOKEN it stops and names the secret
+ok      QA-3: without --receiver-email it stops and says what's missing
+ok      QA-3: an unknown email stops with "no account"
+        | Sent since 2026-10-19 00:00 UTC: 12 published posts
+        | Not finished sending: 1 post(s) still drafts (tapped Share but never published; check the sender's upload queue)
+        | Missing: f0000000-0000-0000-0000-000000000007 (shared 2026-10-19 19:00 UTC, 1 photo): the receiver can't see this post
+        | RESULT: sent 12, received 11, lost 1
+ok      QA-3: exits non-zero when anything is lost
+ok      QA-3: reports "sent 12, received 11, lost 1"
+ok      QA-3: names the missing post's id
+ok      QA-3: lists only the missing post
+ok      QA-3: counts the stuck draft separately (tapped Share, never published)
+ok      QA-3: prints no caption, email, URL or storage key
+ok      QA-3: the token is never printed
+ok      QA-3: one Management API request (got 1)
+ok      QA-3: the token goes in the Authorization header
+ok      QA-3: psql is never called
+ok      QA-3: changes nothing (read only)
+ok      QA-3: the received side runs as the authenticated role (RLS applies)
+ok      QA-3: exits 0 when nothing is lost
+ok      QA-3: --audience Everyone counts only posts shared to Everyone (sent 11, received 11, lost 0)
+ok      QA-3: a visible post with a photo not ready counts as missing, and says so
+
+SENT-RECEIVED RESULT: 20 passed, 0 failed
+ok      D1 smoke: backend/scripts/smoke-check.sh exists
+ok      D1 smoke: without SUPABASE_ACCESS_TOKEN it stops and names the secret
+        | ok    all 12 migrations applied
+        | ok    RLS is on for every public table
+        | ok    cron job hearth-notify
+        | ok    cron job hearth-purge-client-errors
+        | ok    no IP addresses in Supabase Auth's audit log
+        | ok    edge function sign-media is active
+        | ok    edge function notify is active
+        | ok    all 10 function secrets are set
+        | SMOKE RESULT: 8 ok, 0 failed
+ok      D1 smoke: a healthy project passes (exit 0)
+ok      D1 smoke: ends with "SMOKE RESULT: N ok, 0 failed"
+ok      D1 smoke: says all 12 local migrations are applied
+ok      D1 smoke: never prints a secret value
+ok      D1 smoke: never prints the token
+ok      D1 smoke: its SQL runs inside a read-only transaction (no write attempted)
+ok      D1 smoke: only GETs and the read-only query call
+ok      D1 smoke: the token goes in the Authorization header
+ok      D1 smoke: no psql, no unexpected endpoint
+ok      D1 smoke: changes nothing
+ok      D1 smoke: a migration not applied on hosted fails and names it (0012)
+ok      D1 smoke: a public table without RLS fails and names it
+ok      D1 smoke: a missing cron job fails and names it
+ok      D1 smoke: a missing edge function fails and names it
+ok      D1 smoke: an edge function that isn't ACTIVE fails
+ok      D1 smoke: a missing function secret fails and names it (MEDIA_KEK)
+ok      D1 smoke: ... and still prints no secret value
+ok      D1 smoke: the leftover placeholder secret is a warning to clean up, not a failure
+ok      PRIV-1 smoke: no auth audit table (or no IPs in it) reads as ok
+ok      PRIV-1 smoke: IP addresses in Supabase Auth's audit log are a warning with a count
+ok      PRIV-1 smoke: ... and the address itself is never printed
+
+SMOKE CHECK TEST RESULT: 23 passed, 0 failed
+run.sh exit=1
+
+# FLAG-4 Deno half: deno test --allow-env --allow-read supabase/functions/sign-media/ (deno 2.9.6 via npx)
+running 4 tests from ./supabase/functions/sign-media/index_test.ts
+upload then view round-trips the data key; URLs are 10-minute SigV4 ... ok (71ms)
+view denied -> 404, no key lookups ... ok (557µs)
+exif not stripped -> 422; no auth -> 401 ... ok (582µs)
+FLAG-4 video_posting off -> sign-media refuses a video upload (403 video_posting_off), signs nothing ... FAILED (1ms)
+running 2 tests from ./supabase/functions/sign-media/sigv4_test.ts
+matches AWS documented presigned GET example ... ok (3ms)
+uriEncode keeps unreserved, encodes others ... ok (79µs)
+
+ ERRORS 
+
+FLAG-4 video_posting off -> sign-media refuses a video upload (403 video_posting_off), signs nothing => ./supabase/functions/sign-media/index_test.ts:88:6
+error: Error: error forbidden
+function assert(c: unknown, msg: string) { if (!c) throw new Error(msg); }
+                                                         ^
+    at assert (file:///home/user/Hearth/backend/supabase/functions/sign-media/index_test.ts:51:58)
+    at file:///home/user/Hearth/backend/supabase/functions/sign-media/index_test.ts:96:3
+
+ FAILURES 
+
+FLAG-4 video_posting off -> sign-media refuses a video upload (403 video_posting_off), signs nothing => ./supabase/functions/sign-media/index_test.ts:88:6
+
+FAILED | 5 passed | 1 failed (289ms)
+
+error: Test failed
+
+Stack backtrace:
+   0: <unknown>
