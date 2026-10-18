@@ -4418,6 +4418,27 @@
    "where": "backend/tests/privacy_audit_test.sql"
   },
   {
+   "id": "PRIVACY-AUDIT-013",
+   "title": "S15 a photo whose key was never saved is marked failed, not ready, even when its upload checked out",
+   "area": "Privacy audit (no raw IPs)",
+   "tickets": [],
+   "where": "backend/tests/privacy_audit_test.sql"
+  },
+  {
+   "id": "PRIVACY-AUDIT-014",
+   "title": "S15 a photo with its key saved is marked ready as before",
+   "area": "Privacy audit (no raw IPs)",
+   "tickets": [],
+   "where": "backend/tests/privacy_audit_test.sql"
+  },
+  {
+   "id": "PRIVACY-AUDIT-015",
+   "title": "S15 ...so the post can't be published half-broken (all photos must be ready)",
+   "area": "Privacy audit (no raw IPs)",
+   "tickets": [],
+   "where": "backend/tests/privacy_audit_test.sql"
+  },
+  {
    "id": "AUD-16-001",
    "title": "BETA-AUD-16: migration 0011 was applied (circles.kind exists), so the diffs below compare before/after 0011",
    "area": "Groups, households, events",

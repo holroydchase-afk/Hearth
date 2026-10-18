@@ -515,11 +515,15 @@
    "kind": "bug",
    "layer": "edge",
    "severity": "Low",
-   "status": "open",
+   "status": "fixed",
    "title": "Media can be marked ready without its key saved, which breaks that post (fails closed)",
-   "tests": [],
+   "tests": [
+    "PRIVACY-AUDIT-013",
+    "PRIVACY-AUDIT-014",
+    "PRIVACY-AUDIT-015"
+   ],
    "found": "2026-10-15",
-   "fixed": null
+   "fixed": "2026-10-18"
   },
   {
    "id": "S16",
@@ -778,6 +782,17 @@
    "severity": "High",
    "status": "fixed",
    "title": "Photos with no EXIF date take the photo library's creation time, with no new permission prompt",
+   "tests": [],
+   "found": "2026-10-18",
+   "fixed": "2026-10-18"
+  },
+  {
+   "id": "T7",
+   "kind": "test fix",
+   "layer": "app",
+   "severity": "Low",
+   "status": "fixed",
+   "title": "Contract test BETA-TIME-4 failed on the real-API harness (also on main): BETA-TIME-2 had made a 2019 post in the same database. It now uses years no other test uses",
    "tests": [],
    "found": "2026-10-18",
    "fixed": "2026-10-18"

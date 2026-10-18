@@ -96,7 +96,10 @@ Deno.test("create -> publish -> heart -> comment -> delete, as two users, with v
   await t.step("upload + publish (idempotent)", async () => {
     const items = [{ kind: "photo", mime_type: "image/jpeg", width: 2048, height: 1536, byte_size: 1000, thumb_byte_size: 100, exif_stripped: true }];
     const prepared = ok(await rpc(as("alex"), "prepare_media_upload", { p_post: postId, p_items: items }), "prepare") as any[];
-    // what sign-media's finalize step does with the service role after HEAD-checking the blob
+    // what sign-media does with the service role: save the wrapped key at upload (S15: ready needs it),
+    // then mark the item ready after HEAD-checking the blob
+    ok(await call(H.serviceRoleKey, "media_keys", { method: "POST", body: JSON.stringify({ media_id: prepared[0].media_id, wrapped_dek: "\\x00" }) },
+                  { prefer: "return=minimal" }), "save wrapped key");
     ok(await rpc(H.serviceRoleKey, "mark_media_upload_result", { p_media: prepared[0].media_id, p_ok: true }), "mark ready");
     ok(await rpc(as("alex"), "publish_post", { p_post: postId }), "publish");
     ok(await rpc(as("alex"), "publish_post", { p_post: postId }), "publish again is a no-op");

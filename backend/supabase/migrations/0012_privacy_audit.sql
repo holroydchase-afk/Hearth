@@ -1,4 +1,4 @@
--- 0012: overnight privacy audit (Oct 18). PRIV-1: Hearth's own tables never keep a raw IP address. Also S11 and S13 below.
+-- 0012: overnight privacy audit (Oct 18). PRIV-1: Hearth's own tables never keep a raw IP address. Also S11, S13 and S15 below.
 -- The invite rate limit (S10, 0002) counted failures under 'ip:<addr>' and only pruned old rows when a
 -- new failure came in, so the last failing addresses could sit in private.rate_limit_events forever.
 -- Now the key is 'ip:' + HMAC-SHA256(addr, ip_pepper): the same address still maps to the same key, so
@@ -74,3 +74,18 @@ language sql stable security definer set search_path = '' as $fn$
   or exists (select 1 from public.reactions r
              where r.user_id = p_user and public.can_see_reply(r.post_id, p_user))
 $fn$;
+
+-- ---------------------------------------------------------------------------
+-- S15: sign-media's finalize step could mark a photo ready though its wrapped key was never saved, so viewers
+-- got a photo nobody can decrypt. Ready now also needs the media_keys row; without it the item is 'failed'
+-- (the app re-uploads it) and publish_post keeps refusing the post until every photo is ready.
+-- ---------------------------------------------------------------------------
+create or replace function public.mark_media_upload_result(p_media uuid, p_ok boolean) returns void
+language sql security definer set search_path = '' as $$
+  update public.media_items m
+     set upload_status = case when p_ok and exists (select 1 from public.media_keys k where k.media_id = m.id)
+                              then 'ready'::public.upload_status else 'failed'::public.upload_status end
+   where m.id = p_media and m.upload_status = 'pending'
+$$;
+revoke execute on function public.mark_media_upload_result(uuid, boolean) from public, anon, authenticated;
+grant execute on function public.mark_media_upload_result(uuid, boolean) to service_role;

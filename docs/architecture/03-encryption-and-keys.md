@@ -30,6 +30,7 @@ MEDIA_KEK  (256-bit, Edge Function secret only; one for the whole service)
 
 - **Minting.** On upload, `sign-media` generates a data key with WebCrypto, wraps it under `MEDIA_KEK`, stores the wrapped key in `media_keys` (`kek_version` recorded), and returns the raw key to the uploader over TLS (`backend/supabase/functions/sign-media/index.ts`).
 - **Release.** On view, `sign-media` checks `can_view_post` as the caller, then unwraps and returns the key with 10-minute download URLs. A caller without access gets `404`, never a key.
+- **Ready needs the key.** A photo is marked ready only if its wrapped key was saved; otherwise it's marked failed and the app uploads it again, so a post never publishes with a photo nobody can decrypt (`mark_media_upload_result`, migration 0012, S15).
 - **Storage.** `media_keys` has RLS on and no client policy; select is revoked from signed-in users. Only the service role reads it.
 - **On the phone.** Keys and decrypted bytes stay in memory; nothing decrypted is written to disk except an explicit "Save to my phone".
 - **Deletion.** Deleting a post deletes its wrapped keys, which makes its objects unreadable even before B2 removes them (crypto-shredding per post).
@@ -53,4 +54,4 @@ Each step makes one more claim true. Order and status live in `docs/product/MARK
 4. **The family vault** (post-beta, opt-in). Keys live only on family devices, with a printed recovery card; Hearth's server can no longer decrypt. This is the only step that would make "end-to-end encrypted" true.
 
 ---
-Last checked against code: 2026-10-18, 3031b37
+Last checked against code: 2026-10-18, 0fb7ad1 (plus migration 0012, S15)

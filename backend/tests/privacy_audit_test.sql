@@ -94,6 +94,34 @@ set role authenticated;
 select tests.ok_sql($q$select not exists (select 1 from public.profiles where id = 'd0000000-0000-0000-0000-0000000000d2')$q$,
   'S13 once their only shared group is deleted, they no longer see each other''s profile');
 
+
+-- 7. S15: sign-media's finalize could mark a photo ready even if its key was never saved. Viewers would then
+-- get a photo nobody can decrypt (it fails closed, but the post breaks). Ready now needs the wrapped key.
+reset role;
+select set_config('request.jwt.claim.sub', '', false);
+insert into public.posts (id, space_id, author_id, caption)
+values ('f5000000-0000-0000-0000-0000000000f5', '22222222-0000-0000-0000-00000000000a', 'a0000000-0000-0000-0000-00000000000a', 's15');
+insert into public.media_items (id, post_id, space_id, uploader_id, position, kind, mime_type, display_key, thumb_key,
+                                width, height, byte_size, thumb_byte_size, exif_stripped) values
+  ('f5000000-0000-0000-0000-0000000000a1', 'f5000000-0000-0000-0000-0000000000f5', '22222222-0000-0000-0000-00000000000a',
+   'a0000000-0000-0000-0000-00000000000a', 0, 'photo', 'image/jpeg', 'd1', 't1', 100, 100, 1000, 100, true),
+  ('f5000000-0000-0000-0000-0000000000a2', 'f5000000-0000-0000-0000-0000000000f5', '22222222-0000-0000-0000-00000000000a',
+   'a0000000-0000-0000-0000-00000000000a', 1, 'photo', 'image/jpeg', 'd2', 't2', 100, 100, 1000, 100, true);
+insert into public.media_keys (media_id, wrapped_dek) values ('f5000000-0000-0000-0000-0000000000a2', '\x00');
+select public.mark_media_upload_result('f5000000-0000-0000-0000-0000000000a1', true);
+select public.mark_media_upload_result('f5000000-0000-0000-0000-0000000000a2', true);
+select tests.ok_sql($q$select upload_status = 'failed' from public.media_items where id = 'f5000000-0000-0000-0000-0000000000a1'$q$,
+  'S15 a photo whose key was never saved is marked failed, not ready, even when its upload checked out');
+select tests.ok_sql($q$select upload_status = 'ready' from public.media_items where id = 'f5000000-0000-0000-0000-0000000000a2'$q$,
+  'S15 a photo with its key saved is marked ready as before');
+insert into public.post_audiences (post_id, circle_id) values ('f5000000-0000-0000-0000-0000000000f5', '33333333-0000-0000-0000-0000000000a0');
+select set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-00000000000a', false);
+set role authenticated;
+select tests.throws_code($q$select public.publish_post('f5000000-0000-0000-0000-0000000000f5')$q$,
+  'S15 ...so the post can''t be published half-broken (all photos must be ready)', '23514');
+reset role;
+select set_config('request.jwt.claim.sub', '', false);
+
 reset role;
 \o
 \pset format aligned
