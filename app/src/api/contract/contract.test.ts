@@ -616,6 +616,21 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(seen).not.toContain(outP.user_id);
     });
 
+    it('EVT-1 feed and timeline rows carry the event id and name for its members and parents; others get nulls', async () => {
+      const name = fresh("Chase's birthday");
+      const e = await poster.createLevel(h.spaceId, 'event', name);
+      await poster.placePerson(e, (await viewerIn.myProfile()).user_id, 'all');
+      const id = await publishedPost('Cake', [e, h.circleOut]);
+      const feedRow = async (api: HearthApi) => (await api.getFeed({ space: h.spaceId, limit: 50 })).find((p) => p.post_id === id);
+      expect(await feedRow(viewerIn)).toMatchObject({ event_id: e, event_name: name });
+      expect(await feedRow(poster)).toMatchObject({ event_id: e, event_name: name });
+      const out = await feedRow(viewerOut);
+      expect(out).toMatchObject({ event_id: null, event_name: null });
+      expect(JSON.stringify(out)).not.toContain(name);
+      const tl = (await viewerIn.getTimeline({ space: h.spaceId, limit: 50 })).find((p) => p.post_id === id);
+      expect(tl).toMatchObject({ event_id: e, event_name: name });
+    });
+
     it('FLAG-5 my_features: off by default for everyone (FLAG-1); a list of names', async () => {
       expect(await poster.myFeatures(h.spaceId)).toEqual([]);
       expect(await viewerIn.myFeatures(h.spaceId)).toEqual([]);
