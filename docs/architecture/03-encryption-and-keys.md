@@ -54,4 +54,4 @@ Each step makes one more claim true. Order and status live in `docs/product/MARK
 4. **The family vault** (post-beta, opt-in). Keys live only on family devices, with a printed recovery card; Hearth's server can no longer decrypt. This is the only step that would make "end-to-end encrypted" true.
 
 ---
-Last checked against code: 2026-10-18, 0fb7ad1 (plus migration 0012, S15)
+Last checked against code: 2026-10-18, b0d1d2b (plus migration 0013; no change to encryption or keys)

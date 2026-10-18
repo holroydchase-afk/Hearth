@@ -231,6 +231,17 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(joiner.redeemInvite(c))).toBe('22023'); // already used
     });
 
+    itJoiner('GRP-12 / PRIV-G2: one invite can name two groups; the joiner gets both', async () => {
+      const inId = await publishedPost('to the in group');
+      const outId = await publishedPost('to the out group', [h.circleOut]);
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn, h.circleOut], history: 'all', channel: 'email', targetEmail: h.joinerEmail });
+      const joiner = h.as('joiner');
+      expect(await joiner.redeemInvite(c)).toBe(h.spaceId);
+      const ids = await feedIds(joiner);
+      expect(ids).toContain(inId);
+      expect(ids).toContain(outId);
+    });
+
     itJoiner('an invite addressed to someone else is refused (22023)', async () => {
       const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all', channel: 'email', targetEmail: 'someone.else@example.com' });
       expect(await code(h.as('joiner').redeemInvite(c))).toBe('22023');
@@ -540,6 +551,89 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchSize: 3 }))).toBe('23514');
       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid(), batchSize: 101 }))).toBe('23514');
       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid(), batchSize: 5, takenAt: '2024-07-04T14:00:00.000Z' }))).toBe('ok');
+    });
+  });
+  describe('groups v2 (SPEC-GROUPS v2, migration 0013)', () => {
+    const fresh = (what: string) => `${what} ${uuid().slice(0, 8)}`;
+    const mineIn = async (id: string) => (await poster.myCircles(h.spaceId)).find((c) => c.circle_id === id);
+
+    it('GRP-15 create_level: a group starts Private, an event Shared on its posts; relatives get P0002; Everyone is 23514', async () => {
+      const g = await poster.createLevel(h.spaceId, 'group', fresh('Contract group'));
+      const e = await poster.createLevel(h.spaceId, 'event', fresh('Contract event'));
+      expect(await mineIn(g)).toMatchObject({ kind: 'group', comment_mode: 'private', member_count: 0 });
+      expect(await mineIn(e)).toMatchObject({ kind: 'event', comment_mode: 'on_group_posts' });
+      expect(await code(viewerIn.createLevel(h.spaceId, 'group', fresh('Nope')))).toBe('P0002');
+      expect(await code(poster.createLevel(h.spaceId, 'everyone' as never, fresh('Nope')))).toBe('23514');
+      expect(await code(poster.createLevel(h.spaceId, 'group', '   '))).toBe('23514');
+    });
+
+    it('GRP-17 set_comment_mode: parents set the three values; anything else 23514; Everyone 23514; relatives P0002', async () => {
+      const g = await poster.createLevel(h.spaceId, 'group', fresh('Mode group'));
+      expect(await code(poster.setCommentMode(g, 'always'))).toBe('ok');
+      expect((await mineIn(g))?.comment_mode).toBe('always');
+      expect(await code(poster.setCommentMode(g, 'on_group_posts'))).toBe('ok');
+      expect(await code(poster.setCommentMode(g, 'sometimes' as never))).toBe('23514');
+      expect(await code(viewerIn.setCommentMode(g, 'private'))).toBe('P0002');
+      // the seed loads after the migrations, so a stack may have no kind-'everyone' row (the SQL suite covers it there)
+      const everyone = (await poster.myCircles(h.spaceId)).find((c) => c.kind === 'everyone');
+      if (everyone) expect(await code(poster.setCommentMode(everyone.circle_id, 'always'))).toBe('23514');
+    });
+
+    it('GRP-15 place_person: a relative goes into any group with a share-history choice; none is 23514; Everyone 23514', async () => {
+      const g = await poster.createLevel(h.spaceId, 'group', fresh('Place group'));
+      const out = await viewerOut.myProfile();
+      expect(await code(poster.placePerson(g, out.user_id, null as never))).toBe('23514');
+      expect(await code(poster.placePerson(g, out.user_id, 'all'))).toBe('ok');
+      expect(await mineIn(g)).toMatchObject({ member_count: 1, member_names: [out.display_name] });
+      const everyone = (await poster.myCircles(h.spaceId)).find((c) => c.kind === 'everyone');
+      if (everyone) expect(await code(poster.placePerson(everyone.circle_id, out.user_id, 'all'))).toBe('23514');
+      expect(await code(viewerIn.placePerson(g, out.user_id, 'all'))).toBe('P0002');
+    });
+
+    it('GRP-16 add_people_from copies the relatives once (not linked); relatives P0002', async () => {
+      const src = await poster.createLevel(h.spaceId, 'group', fresh('Source side'));
+      const target = await poster.createLevel(h.spaceId, 'event', fresh('Birthday'));
+      const inP = await viewerIn.myProfile();
+      const outP = await viewerOut.myProfile();
+      await poster.placePerson(src, inP.user_id, 'all');
+      expect(await code(poster.addPeopleFrom(target, src, 'new'))).toBe('ok');
+      expect((await mineIn(target))?.member_names).toEqual([inP.display_name]);
+      await poster.placePerson(src, outP.user_id, 'all');
+      expect((await mineIn(target))?.member_names).toEqual([inP.display_name]); // copied once, not linked
+      expect(await code(poster.addPeopleFrom(target, src, null as never))).toBe('23514');
+      expect(await code(viewerIn.addPeopleFrom(target, src, 'all'))).toBe('P0002');
+    });
+
+    it('GRP-15 family_people: a parent lists everyone in the family with ids; a relative never sees another relative', async () => {
+      const inP = await viewerIn.myProfile();
+      const outP = await viewerOut.myProfile();
+      const all = await poster.familyPeople(h.spaceId);
+      expect(all).toEqual(expect.arrayContaining([
+        { user_id: inP.user_id, name: inP.display_name, role: 'viewer' },
+        { user_id: outP.user_id, name: outP.display_name, role: 'viewer' },
+      ]));
+      const seen = (await viewerIn.familyPeople(h.spaceId)).map((p) => p.user_id);
+      expect(seen).not.toContain(outP.user_id);
+    });
+
+    it('EVT-1 feed and timeline rows carry the event id and name for its members and parents; others get nulls', async () => {
+      const name = fresh("Chase's birthday");
+      const e = await poster.createLevel(h.spaceId, 'event', name);
+      await poster.placePerson(e, (await viewerIn.myProfile()).user_id, 'all');
+      const id = await publishedPost('Cake', [e, h.circleOut]);
+      const feedRow = async (api: HearthApi) => (await api.getFeed({ space: h.spaceId, limit: 50 })).find((p) => p.post_id === id);
+      expect(await feedRow(viewerIn)).toMatchObject({ event_id: e, event_name: name });
+      expect(await feedRow(poster)).toMatchObject({ event_id: e, event_name: name });
+      const out = await feedRow(viewerOut);
+      expect(out).toMatchObject({ event_id: null, event_name: null });
+      expect(JSON.stringify(out)).not.toContain(name);
+      const tl = (await viewerIn.getTimeline({ space: h.spaceId, limit: 50 })).find((p) => p.post_id === id);
+      expect(tl).toMatchObject({ event_id: e, event_name: name });
+    });
+
+    it('FLAG-5 my_features: off by default for everyone (FLAG-1); a list of names', async () => {
+      expect(await poster.myFeatures(h.spaceId)).toEqual([]);
+      expect(await viewerIn.myFeatures(h.spaceId)).toEqual([]);
     });
   });
 });

@@ -19,6 +19,8 @@ const POST = "55555555-0000-0000-0000-0000000000a1";
 const MEDIA = "66666666-0000-0000-0000-000000000001";
 let canView = true;
 let storedKey = "";
+// FLAG-4: what the 0013 database answers when video_posting is off for the family (prepare_media_upload refuses)
+let videoPostingOff = false;
 const calls: string[] = [];
 
 globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
@@ -27,6 +29,10 @@ globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) =>
   const ok = (b: unknown) => new Response(JSON.stringify(b), { status: 200 });
   if (url.endsWith("/rpc/can_view_post")) return ok(canView);
   if (url.endsWith("/rpc/prepare_media_upload")) {
+    const items = JSON.parse(String(init?.body ?? "{}")).p_items ?? [];
+    if (videoPostingOff && items.some((i: { kind?: string }) => i?.kind === "video")) {
+      return new Response(JSON.stringify({ code: "42501", message: "video_posting_off", details: null, hint: null }), { status: 403 });
+    }
     return ok([{ media_id: MEDIA, item_index: 0, kind: "photo", display_key: `s/x/p/${POST}/m/${MEDIA}/display`, thumb_key: `s/x/p/${POST}/m/${MEDIA}/thumb` }]);
   }
   if (url.includes("/media_keys") && init?.method === "POST") {
@@ -77,4 +83,17 @@ Deno.test("exif not stripped -> 422; no auth -> 401", async () => {
   assert(r.status === 422, `status ${r.status}`);
   const r2 = await handler(new Request(`https://fn/sign-media?post_id=${POST}`));
   assert(r2.status === 401, `status ${r2.status}`);
+});
+
+Deno.test("FLAG-4 video_posting off -> sign-media refuses a video upload (403 video_posting_off), signs nothing", async () => {
+  videoPostingOff = true; calls.length = 0;
+  const r = await handler(new Request("https://fn/sign-media", { method: "POST", headers: auth,
+    body: JSON.stringify({ action: "upload", post_id: POST, items: [{ kind: "video", mime_type: "video/mp4",
+      width: 1920, height: 1080, duration_ms: 5000, byte_size: 100000, thumb_byte_size: 1000, exif_stripped: true }] }) }));
+  videoPostingOff = false;
+  assert(r.status === 403, `status ${r.status}`);
+  const body = await r.json();
+  assert(body.error === "video_posting_off", `error ${body.error}`);
+  assert(!JSON.stringify(body).includes("X-Amz-"), "no presigned URL in the refusal");
+  assert(!calls.some((c) => c.startsWith("POST") && c.includes("media_keys")), "must not store a key for a refused upload");
 });

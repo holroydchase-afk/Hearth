@@ -71,7 +71,8 @@ begin
                      (select count(*) from public.circles where space_id = v_space and kind = 'household' and deleted_at is null));
 
   v_inv := public.create_invite(v_space, 'viewer',
-             array[(select id from public.circles where space_id = v_space and name = 'Test house' and kind = 'household' and deleted_at is null)],
+             array[(select id from public.circles where space_id = v_space and name = 'Test house' and kind = 'household' and deleted_at is null),
+                   (select id from public.circles where space_id = v_space and kind = 'everyone' and deleted_at is null)],   -- 0013: Everyone only if named
              p_history => 'all');
   return next format('Test viewer invite (account B): code %s, works once until %s%s', v_inv.code,
                      to_char(v_inv.expires_at at time zone 'America/New_York', 'Mon DD'),
