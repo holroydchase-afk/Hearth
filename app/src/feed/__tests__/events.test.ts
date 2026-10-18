@@ -17,8 +17,8 @@ const BDAY = { id: 'e-bday', name: "Chase's birthday" };
 const BEACH = { id: 'e-beach', name: 'Beach week' };
 
 describe('EVT-2 / EVT-3 Photos rows', () => {
-  it('EVT-3 the recommendation is the default: later event posts stay inside the event (one constant flips it)', () => {
-    expect(EVENT_LATER_POSTS_IN_PHOTOS).toBe(false);
+  it('EVT-3 Chase (Oct 18): later event posts also show in Photos, like relatives adding photos a few days later', () => {
+    expect(EVENT_LATER_POSTS_IN_PHOTOS).toBe(true);
   });
 
   it('EVT-2 the first post of an event is an event card with the event name, where that post falls in Photos', () => {
@@ -30,29 +30,29 @@ describe('EVT-2 / EVT-3 Photos rows', () => {
     expect(rows[1]).toMatchObject({ type: 'event', eventId: BDAY.id, eventName: BDAY.name, post: first });
   });
 
-  it('EVT-3 later posts to the same event become one update line (photo count, event name) at the newest one, not cards', () => {
+  it('EVT-3 (switch off) later posts to the same event become one update line (photo count, event name) at the newest one, not cards', () => {
     const later2 = post('2026-10-12T12:00:00Z', BDAY, 2);
     const plain = post('2026-10-11T12:00:00Z');
     const later1 = post('2026-10-10T12:00:00Z', BDAY, 1);
     const first = post('2026-10-09T12:00:00Z', BDAY, 4);
-    const rows = photosRows([later2, plain, later1, first]);
+    const rows = photosRows([later2, plain, later1, first], false);
     expect(rows.map((r) => r.type)).toEqual(['update', 'post', 'event']);
     expect(rows[0]).toMatchObject({ type: 'update', eventId: BDAY.id, eventName: BDAY.name, photoCount: 3 });
     expect(rows.some((r) => r.type === 'post' && (r.post === later1 || r.post === later2))).toBe(false);
   });
 
-  it('EVT-3 two events each get their own card and update line', () => {
+  it('EVT-3 (switch off) two events each get their own card and update line', () => {
     const b2 = post('2026-10-12T12:00:00Z', BEACH);
     const a2 = post('2026-10-11T12:00:00Z', BDAY);
     const b1 = post('2026-10-10T12:00:00Z', BEACH);
     const a1 = post('2026-10-09T12:00:00Z', BDAY);
-    const rows = photosRows([b2, a2, b1, a1]);
+    const rows = photosRows([b2, a2, b1, a1], false);
     expect(rows.map((r) => `${r.type}:${'eventId' in r ? r.eventId : ''}`)).toEqual([
       'update:e-beach', 'update:e-bday', 'event:e-beach', 'event:e-bday',
     ]);
   });
 
-  it('EVT-3 flipped (Chase says "show them in Photos too"): later posts are ordinary cards and there is no update line', () => {
+  it('EVT-3 Chase\'s choice: later posts are ordinary cards and there is no update line', () => {
     const later = post('2026-10-10T12:00:00Z', BDAY);
     const first = post('2026-10-09T12:00:00Z', BDAY);
     const rows = photosRows([later, first], true);

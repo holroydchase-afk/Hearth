@@ -77,7 +77,7 @@ Phase: **0013** = backend migration now (SQL test first, `backend/tests/groups_v
 |---|---|---|---|
 | EVT-1 | auto | 0013 | **Given** a post whose audience includes an event, **When** a member of that event reads the feed or timeline, **Then** the row carries the event's id and name; a viewer who sees the post only through another group gets no event id or name (they never learn it exists). |
 | EVT-2 | auto | app-now | **Given** the first post of an event, **When** a member opens Photos, **Then** it shows as a bigger event card with the event's name. |
-| EVT-3 | auto | app-now | **Given** later posts to the same event, **When** a member opens Photos, **Then** each shows as one update line ("3 new photos in Chase's birthday") that opens the event, not as day-to-day cards. Open for Chase: recommendation is event posts only inside the event plus the update line. |
+| EVT-3 | auto | app-now | **Given** later posts to the same event, **When** a member opens Photos, **Then** each shows as an ordinary card in Photos as well as inside the event (Chase, Oct 18: "like others could upload a handful of photos a few days later"). The update-line alternative stays behind `EVENT_LATER_POSTS_IN_PHOTOS`. |
 | EVT-4 | auto | app-now | **Given** a member of two events, **When** they open the Events section, **Then** both events are listed, newest first, each opening its posts; relatives see only events they're in. |
 | EVT-5 | auto | later | Event dates, place, RSVPs, event chat (ANCHORS coordination idea). |
 
