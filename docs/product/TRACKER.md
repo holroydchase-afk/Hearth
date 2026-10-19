@@ -34,8 +34,8 @@ Group and event chat, end to end encrypted with MLS (`SPEC-MESSENGER.md`, `docs/
 
 | # | Step | Owner | Status |
 |---|---|---|---|
-| MS1 | Say "merge" for PR #29 | Chase | ☐ |
-| MS2 | Deploy migration 0015 to hosted (`deploy.sh`) and publish the Expo Go update | Claude | ☐ |
+| MS1 | Say "merge" for PR #29 | Chase | ☑ merged Oct 19 |
+| MS2 | Deploy migration 0015 to hosted (`deploy.sh`) and publish the Expo Go update | Claude | ☑ Oct 19 (smoke check 9/9; preview from main a833288) |
 | MS3 | MSG-9 by hand: Chase in Expo Go and account B on the web trade 5 messages each way on a shared group | Chase | ☐ |
 | MS4 | privacy-security review of `app/src/messenger/` and 0015; spec safety numbers (key verification). Crypto review done Oct 19 (randomness fix in PR #29); still open: outside audit, RFC 9180 test vectors, safety numbers, review of 0015 | Claude | ◐ |
 | MS5 | grandparent-ux review of the Messages words and the button-vs-tab placement | Claude | ☐ |
@@ -84,12 +84,16 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 - Phone survey: each relative's phone model, OS version and the email they check (was due Oct 20).
 - Apple Developer ($99) at the start of milestone 2, after D3.
 - Android test phone (~$100) and Google Play ($25), milestone 5.
+- QA-R3 (high, Oct 18): `SUPABASE_DB_URL` as a Hearth environment secret, never in chat, so QA can query hosted and re-measure `get_timeline` speed.
+- **Real data starts at milestone 2** (Oct 18): milestone 1 data and the bucket `family-photos-testing-kq7m` are test data and can be wiped. Before Danielle joins, decide: wipe and keep them, or a fresh bucket (and project) for real photos. Photos from before the S17 fix must not carry over (S18).
+- **QA environment before milestone 3** (Oct 18): once anyone beyond Danielle is on, every release is tried in QA first (its own Supabase project and bucket, plus the `preview` channel). Ties to IN-9 in REMAINING.md.
 
 ## Waiting on Claude, later (not milestone 1)
 
 - Milestone 2 build: push on a real iPhone build (NOTIFY-3), Resend domain and SPF/DKIM after the name is final, invite links.
 - Spec the duplicate catcher (first AI add-on, no ML) when milestone 1 is behind us (`AI-FEATURES.md`).
 - grandparent-ux review of the family vault ideas before any vault spec (post-beta).
+- QA-R4 (high, Oct 18): browser tests in CI (`npm run e2e:web` in `.github/workflows/ci.yml`), after milestone 1 unless Chase pulls it forward.
 - **Privacy path** (marketing thread, Oct 17). Chase's stance: the family vault is a later, higher tier, rolled out slowly; the steps below come first. Post-milestone 1 unless Chase pulls them forward.
   - Per-family media keys: deleting a family makes its photos unreadable. A small test-first change in media signing; easiest while the hosted database has no photos. Outside BETA-SPEC, so staff-pm approves first. See D8.
   - A "what Hearth can see" page listing every vendor and what it can read; grandparent-ux reviews the wording.
@@ -114,6 +118,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 
 ## Done (latest first)
 
+- Oct 19: messenger merged (PR #29) and migration 0015 deployed. Open PR #20's still-true items folded in here and in ACCOUNTS.md (QA-R1 and QA-R2 were already done: account B exists, keys live Oct 18).
 - Oct 19: decision log started (`DECISION-LOG.md`, DEC-1 to DEC-27): each decision, why, and what it beat. Answered D-items above move there.
 - Oct 19: native look built (PR #30): system fonts, Apple colors on iPhone and Material 3 on Android, the phone's own tab bar, native buttons and switches, DS-1..DS-9 tests. The old look is saved in `docs/design/versions/`. Still to confirm on a phone in UAT: the tab bar and the gray buttons.
 - Oct 19: `grandparent-ux` rebuilt as Hearth's UI/UX designer with the ranked family personas.
