@@ -80,5 +80,6 @@ describe.each(factories)('%s messenger contract (MSG)', (_name, factory) => {
     const parents = (await poster.chatList(h.spaceId)).find((x) => x.circle_id === h.circleIn);
     expect(parents).toBeDefined();
     expect(mine!.title).not.toBe(parents!.title);
+    expect([mine!.named, parents!.named]).toEqual([false, true]);
   });
 });
