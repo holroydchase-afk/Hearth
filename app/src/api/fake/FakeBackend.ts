@@ -19,6 +19,7 @@ import type {
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
   HeartState, InvitePreview, MediaKind, MediaStatus, Role, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
   TimelineArgs, TimelinePost, TimelineYear,
+  ChatKind, ChatMember, ChatRow, ChatRowKind, ChatSummary, ClaimedKeyPackage,
 } from '../types';
 import { fromBase64, toBase64 } from '../../crypto/base64';
 import { randomBytes, uuid } from '../../crypto/random';
@@ -73,6 +74,13 @@ export interface FakeState {
   /** FLAG (0013): global switch per feature (Hearth only) and the family add-on, keyed `${space}:${feature}`. */
   featureFlags?: Record<string, boolean>;
   spaceFeatures?: Record<string, boolean>;
+  /** 0015 messenger relay: opaque base64 MLS bytes only. */
+  chat?: {
+    devices: Record<string, string>;
+    keyPackages: { user: string; kp: string }[];
+    groups: string[];
+    rows: (ChatRow & { circle: string; recipient: string | null })[];
+  };
 }
 
 /** 0013: a new circle's comment setting by kind (households stay 'always'). */
@@ -227,6 +235,102 @@ export class FakeBackend {
     if (choice !== 'parents' && choice !== 'everyone') throw new ApiError('23514', 'choose parents or everyone');
     this.state.spaces[space]!.reply_audience = choice;
     this.changed();
+  }
+
+  // ---- messenger relay (0015): same rules as tests/chat_test.sql, minus the joined-at cutoff ----
+  private get chat() {
+    return (this.state.chat ??= { devices: {}, keyPackages: [], groups: [], rows: [] });
+  }
+  /** private.chat_people: the circle's members plus the family's parents; households have no chat. */
+  chatPeople(circle: string): string[] {
+    const c = this.state.circles[circle];
+    if (!c || c.deleted || c.kind === 'household') return [];
+    const ids = new Set(this.circleMemberIds(circle).filter((u) => this.member(c.space, u)));
+    for (const m of this.state.members) if (m.space === c.space && this.isPoster(c.space, m.user)) ids.add(m.user);
+    return [...ids];
+  }
+  private chatMe(user: string | null, circle: string): string {
+    const me = this.requireUser(user);
+    if (!this.chatPeople(circle).includes(me)) throw new ApiError('P0002', 'not found');
+    return me;
+  }
+  chatList(user: string | null, space: string): ChatSummary[] {
+    const me = this.requireUser(user);
+    if (!this.member(space, me)) throw new ApiError('P0002', 'not found');
+    const parent = this.isPoster(space, me);
+    const order = { everyone: 0, group: 1, event: 2 } as Record<string, number>;
+    return Object.values(this.state.circles)
+      .filter((c) => c.space === space && this.chatPeople(c.id).includes(me))
+      .map((c) => {
+        const kind = (c.kind ?? 'group') as ChatKind;
+        const others = this.chatPeople(c.id).filter((u) => u !== me).map((u) => this.state.users[u]?.name ?? '?').sort();
+        const people = others.length === 0 ? 'Just you' : others.length === 1 ? others[0]!
+          : others.length <= 3 ? `${others.slice(0, -1).join(', ')} and ${others.at(-1)}` : `${others[0]}, ${others[1]} and ${others.length - 2} more`;
+        const named = parent || kind !== 'group';
+        return { circle_id: c.id, kind, title: named ? c.name : people, named, member_count: this.chatPeople(c.id).length };
+      })
+      .sort((a, b) => (order[a.kind]! - order[b.kind]!) || a.title.localeCompare(b.title));
+  }
+  chatPublishDevice(user: string | null, signatureKey: string, keyPackages: string[]): void {
+    const me = this.requireUser(user);
+    if (!signatureKey) throw new ApiError('23514', 'signing key must be base64');
+    if (keyPackages.length < 1 || keyPackages.length > 50) throw new ApiError('23514', 'publish 1-50 key packages');
+    if (this.chat.devices[me] !== signatureKey) this.chat.keyPackages = this.chat.keyPackages.filter((k) => k.user !== me);
+    this.chat.devices[me] = signatureKey;
+    for (const kp of keyPackages) this.chat.keyPackages.push({ user: me, kp });
+    this.changed();
+  }
+  chatKeyPackageCount(user: string | null): number {
+    const me = this.requireUser(user);
+    return this.chat.keyPackages.filter((k) => k.user === me).length;
+  }
+  chatStart(user: string | null, circle: string): boolean {
+    this.chatMe(user, circle);
+    if (this.chat.groups.includes(circle)) return false;
+    this.chat.groups.push(circle);
+    this.changed();
+    return true;
+  }
+  chatRoster(user: string | null, circle: string): ChatMember[] {
+    this.chatMe(user, circle);
+    return this.chatPeople(circle)
+      .map((u) => ({ user_id: u, name: this.state.users[u]?.name ?? '?', signature_key: this.chat.devices[u] ?? null }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+  chatClaim(user: string | null, circle: string, users: string[]): ClaimedKeyPackage[] {
+    this.chatMe(user, circle);
+    const people = this.chatPeople(circle);
+    const out: ClaimedKeyPackage[] = [];
+    for (const u of new Set(users)) {
+      if (!people.includes(u)) continue;
+      const i = this.chat.keyPackages.findIndex((k) => k.user === u);
+      if (i < 0) continue;
+      out.push({ user_id: u, key_package: this.chat.keyPackages[i]!.kp });
+      this.chat.keyPackages.splice(i, 1);
+    }
+    if (out.length) this.changed();
+    return out;
+  }
+  chatSend(user: string | null, circle: string, kind: ChatRowKind, epoch: number, body: string, recipient?: string): number {
+    const me = this.chatMe(user, circle);
+    if (!['commit', 'welcome', 'message'].includes(kind)) throw new ApiError('23514', 'bad kind');
+    if ((kind === 'welcome') !== !!recipient) throw new ApiError('23514', 'a welcome (and only a welcome) names who it is for');
+    if (recipient && !this.chatPeople(circle).includes(recipient)) throw new ApiError('23514', 'that person is not in this group');
+    if (!(epoch >= 0) || !/^[A-Za-z0-9+/]+={0,2}$/.test(body) || body.length % 4 !== 0 || body.length > 65536) throw new ApiError('23514', 'bad body');
+    if (kind === 'commit' && this.chat.rows.some((r) => r.circle === circle && r.kind === 'commit' && r.epoch === epoch)) {
+      throw new ApiError('23505', 'another phone changed the keys first');
+    }
+    const id = (this.chat.rows.at(-1)?.id ?? 0) + 1;
+    this.chat.rows.push({ id, circle, sender_id: me, kind, epoch, body, recipient: recipient ?? null, created_at: new Date().toISOString() });
+    this.changed();
+    return id;
+  }
+  chatFetch(user: string | null, circle: string, after: number, limit = 200): ChatRow[] {
+    const me = this.chatMe(user, circle);
+    return this.chat.rows
+      .filter((r) => r.circle === circle && r.id > after && (!r.recipient || r.recipient === me))
+      .slice(0, Math.min(Math.max(limit, 1), 500))
+      .map(({ circle: _c, recipient: _r, ...row }) => row);
   }
 
   isPoster(space: string, user: string): boolean {
@@ -840,4 +944,13 @@ export class FakeApi implements HearthApi {
   addPeopleFrom = (t: string, f: string, h: ShareHistory) => this.run(() => this.be.addPeopleFrom(this.userId, t, f, h));
   familyPeople = (space: string) => this.run(() => this.be.familyPeople(this.userId, space));
   myFeatures = (space: string) => this.run(() => this.be.myFeatures(this.userId, space));
+  chatList = (space: string) => this.run(() => this.be.chatList(this.userId, space));
+  chatPublishDevice = (k: string, kps: string[]) => this.run(() => this.be.chatPublishDevice(this.userId, k, kps));
+  chatKeyPackageCount = () => this.run(() => this.be.chatKeyPackageCount(this.userId));
+  chatStart = (c: string) => this.run(() => this.be.chatStart(this.userId, c));
+  chatRoster = (c: string) => this.run(() => this.be.chatRoster(this.userId, c));
+  chatClaim = (c: string, users: string[]) => this.run(() => this.be.chatClaim(this.userId, c, users));
+  chatSend = (c: string, kind: ChatRowKind, epoch: number, body: string, recipient?: string) =>
+    this.run(() => this.be.chatSend(this.userId, c, kind, epoch, body, recipient));
+  chatFetch = (c: string, after: number, limit?: number) => this.run(() => this.be.chatFetch(this.userId, c, after, limit));
 }

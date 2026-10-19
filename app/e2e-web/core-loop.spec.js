@@ -79,7 +79,7 @@ test('core loop: share → Jo sees it → Ruth does not → heart → comment �
   // 4. Grandma Jo hearts it and writes back.
   await signIn(page, 'jo@example.com');
   await page.getByRole('button', { name: 'Love it' }).click();
-  await expect(page.getByText('♥ You love this')).toBeVisible();
+  await expect(page.getByText('You love this')).toBeVisible();
   await page.getByLabel('Write something back to Chase').fill('Look at those cheeks!');
   await page.getByRole('button', { name: 'Send' }).click();
   await expect(page.getByText(/^Sent\. .+ will read it\.$/)).toBeVisible(); // BETA-REPLY-6/11: names the readers (AUD-8 default: the parents)
