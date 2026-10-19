@@ -36,7 +36,7 @@ Group and event chat, end to end encrypted with MLS (`SPEC-MESSENGER.md`, `docs/
 | MS1 | Say "merge" for PR #29 | Chase | ☐ |
 | MS2 | Deploy migration 0015 to hosted (`deploy.sh`) and publish the Expo Go update | Claude | ☐ |
 | MS3 | MSG-9 by hand: Chase in Expo Go and account B on the web trade 5 messages each way on a shared group | Chase | ☐ |
-| MS4 | privacy-security review of `app/src/messenger/` and 0015; spec safety numbers (key verification) | Claude | ☐ |
+| MS4 | privacy-security review of `app/src/messenger/` and 0015; spec safety numbers (key verification). Crypto review done Oct 19 (randomness fix in PR #29); still open: outside audit, RFC 9180 test vectors, safety numbers, review of 0015 | Claude | ◐ |
 | MS5 | grandparent-ux review of the Messages words and the button-vs-tab placement | Claude | ☐ |
 | MS6 | marketing: add "messages are end-to-end encrypted (MLS)" to the claims register once deployed, with the limits in 06-messenger | Claude | ☐ |
 | MS7 | Push notice for new messages (milestone 2, with NOTIFY-3) | Claude | ☐ |
