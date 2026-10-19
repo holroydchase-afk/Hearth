@@ -12,6 +12,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - `docs/product/TRACKER.md`: the one list of what's next, what's missing for milestone 1 and what's pending on Chase or Claude. Work its sequence in order, and update it in the same PR whenever a thread finishes, adds or blocks an item.
 - `docs/product/STORY.md`: why Hearth exists, the 8 problems and Hearth's answers, family stories, WV vs Charlotte. Read before any UX or positioning call.
 - `docs/product/PERSONA-CHECK.md`: TDPM. Run a persona check (one Green/Red row per persona, in `docs/product/decisions/`) before any product decision is final; `scripts/check-persona-checks.sh` enforces it.
+- `docs/product/PM-TOOLS.md`: log of every PM tool (tracker, persona check, UAT log, #idea inbox…) and the action items (ACT-n) about them. Add a row when a PM tool is added or changed.
 - `docs/product/GOALS.md`: 6 product goals (blow them away in the first three sessions, no help on old phones, set up from far away, deep not wide), each with its signal.
 - `docs/product/ANCHORS.md`: milestones, anchors (A1–A3), ideas log. Add new anchors and ideas there as Chase names them; never delete built features to satisfy one.
 - `HANDOFF.md`: current state and what's next. Start here every session.
