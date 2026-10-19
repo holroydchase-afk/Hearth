@@ -55,11 +55,18 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Source:** PR #24, `docs/product/PERSONA-CHECK.md`, `scripts/check-persona-checks.sh`
 
 ### DEC-7 · Open source under AGPL-3.0, public after milestone 1 and a final name
-- **When / status:** Oct 19 · Decided (in PR #26)
+- **When / status:** Oct 19 · Decided (PR #26)
 - **Chose:** AGPL-3.0, keeping dual licensing possible.
 - **Over:** MIT, and a personal or family-only license.
 - **Because:** MIT lets someone ship a closed clone; a family-only license isn't real open source. AGPL suits a self-hostable, privacy-first product for dev and product folks, with a hosted plan to pay for it.
 - **Source:** PR #26, `docs/product/decisions/2026-10-19-license-agpl.md`
+
+### DEC-27 · Native look: Apple's guidelines on iPhone, Material 3 on Android
+- **When / status:** Oct 19 · Built (PR #30)
+- **Chose:** follow Apple's Human Interface Guidelines on iPhone and Material Design 3 on Android (system fonts, components, icons, sheets), with Hearth's stricter rules winning where they differ: 17 pt text, 48 pt tap targets, words under every icon, no gesture-only actions.
+- **Over:** a custom Hearth look on both phones.
+- **Because:** Chase: "go 100% apple UI/UX … that should make it intuitive out of the gate without us guessing." Familiar system screens are easier to explain over the phone, Dynamic Type and screen readers work for free, and the guidelines are guardrails we don't have to invent. Same features, photos and words on both phones; only the look differs.
+- **Source:** `docs/product/DESIGN-SYSTEM.md`, `docs/product/decisions/2026-10-19-native-design-system.md`
 
 ## Stack
 
@@ -163,6 +170,14 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Chose:** per-photo heart, comment and a fixed set of emoji; remove "Seen by N of M".
 - **Because:** a returned heart proves the photo arrived without counting who didn't look (A2). Emoji sit behind a worded "More" button so the heart stays one tap.
 - **Source:** `docs/product/decisions/2026-10-19-reactions-drop-seen-by.md`
+
+### DEC-26 · Built-in messenger, end-to-end encrypted with MLS
+- **When / status:** Oct 19 · Built (PR #29; deploy and on-phone check pending)
+- **Chose:** group and event chat inside Hearth, encrypted end to end with MLS (RFC 9420, the IETF group-chat standard), using the pure-TypeScript ts-mls library on Hearth's own noble crypto so it runs in Expo Go.
+- **Over:** linking out to Signal (every relative would need to install Signal), and Signal's open library, libsignal, on our own servers.
+- **Because:** Chase wanted a built-in messenger ("maybe we use Signal"). Signal's network has no API for other apps. MLS is built for groups, removing someone is cheap, and the same group keys can later protect the family vault (DEC-16). A chat belongs to one group or event, so nobody can message someone they can't see, and there are no read receipts, typing dots or last-seen (A2).
+- **Trade-off:** it widens milestone 1 against the Oct 17 focus; Chase chose that knowingly and it sits behind a Messages button. An outside audit and safety numbers are still open.
+- **Source:** `docs/product/decisions/2026-10-19-messenger-mls.md`, `docs/product/SPEC-MESSENGER.md`, `docs/architecture/06-messenger.md`, TRACKER D13
 
 ## Engineering practice
 
