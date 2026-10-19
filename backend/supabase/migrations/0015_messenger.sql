@@ -46,6 +46,9 @@ create table public.chat_messages (
 );
 create unique index chat_messages_one_commit_per_epoch on public.chat_messages (circle_id, epoch) where kind = 'commit';
 create index chat_messages_circle_id on public.chat_messages (circle_id, id);
+create index chat_messages_sender on public.chat_messages (sender_id);
+create index chat_messages_recipient on public.chat_messages (recipient_id) where recipient_id is not null;
+create index chat_groups_created_by on public.chat_groups (created_by);
 
 alter table public.chat_devices enable row level security;
 alter table public.chat_key_packages enable row level security;
