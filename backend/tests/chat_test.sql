@@ -32,6 +32,8 @@ insert into public.circle_members (circle_id, user_id) values
   ('33333333-0000-0000-0000-0000000000d1', 'a0000000-0000-0000-0000-0000000000a1'),
   ('33333333-0000-0000-0000-0000000000d1', 'a0000000-0000-0000-0000-0000000000a2')
 on conflict do nothing;
+-- the seed predates kinds: make Dad's "Everyone" the family's Everyone, as 0011 does for real families
+update public.circles set kind = 'everyone' where id = '33333333-0000-0000-0000-0000000000a0';
 -- the group was made an hour ago, so the joined-at rule has room
 update public.circle_members set added_at = now() - interval '1 hour' where circle_id in (:g, '33333333-0000-0000-0000-0000000000e1');
 
@@ -57,6 +59,28 @@ select tests.throws_code(format('select * from public.chat_fetch(%L, 0)', gen_ra
 :as_ma
 select tests.throws_code($$select public.chat_start('33333333-0000-0000-0000-0000000000d1')$$, 'MSG-2 households have no chat (groups and events first)', 'P0002');
 select tests.throws_code($$select * from public.chat_fetch('33333333-0000-0000-0000-0000000000d1', 0)$$, 'MSG-2 ...not even to fetch', 'P0002');
+
+-- ---------- the list of chats ----------
+:as_ma
+select tests.ok_sql($$select array_agg(kind order by kind) = array['event', 'everyone', 'group'] from public.chat_list('22222222-0000-0000-0000-00000000000a')$$,
+                    'MSG-1 Grandma''s chats: Everyone, her group and her event (no household, nothing she isn''t in)');
+select tests.ok_sql($$select title = 'Grandpa Rivera' and member_count = 2 from public.chat_list('22222222-0000-0000-0000-00000000000a') where kind = 'group'$$,
+                    'AUD-14 a relative sees a group chat titled by its people, never the group''s name');
+select tests.ok_sql($$select title = 'Charleston trip' from public.chat_list('22222222-0000-0000-0000-00000000000a') where kind = 'event'$$,
+                    'MSG-7 an event chat keeps the event''s name');
+:as_blair
+select tests.ok_sql($$select not exists (select 1 from public.chat_list('22222222-0000-0000-0000-00000000000a') where title like 'Grandparents%' or circle_id = '33333333-0000-0000-0000-0000000000a1')$$,
+                    'AUD-14 Blair never sees the grandparents'' group');
+:as_jo
+select tests.throws_code($$select * from public.chat_list('22222222-0000-0000-0000-00000000000b')$$, 'MSG-2 a family you aren''t in is "not found"', 'P0002');
+:as_admin
+select set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-00000000000a', false);
+insert into public.circle_members (circle_id, user_id) values (:g, 'a0000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select tests.ok_sql($$select title like 'Grandparents%' from public.chat_list('22222222-0000-0000-0000-00000000000a') where circle_id = '33333333-0000-0000-0000-0000000000a1'$$,
+                    'MSG-1 a parent sees the group''s own name');
+:as_admin
+delete from public.circle_members where circle_id = :g and user_id = 'a0000000-0000-0000-0000-00000000000a';
 
 -- ---------- starting, roster, claiming ----------
 :as_ma

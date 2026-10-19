@@ -8,6 +8,9 @@
 -- * One commit per epoch (unique index), so two phones changing keys at once can't split the group (MSG-5).
 -- * Members fetch only rows created since they joined the circle; a welcome only by the person it names (MSG-6).
 -- * Tables are RPC-only: RLS on, no policies, no grants to app roles.
+-- * chat_list titles a chat by its group's name only for parents and for events and Everyone; for a relative a
+--   plain group is titled by its people ("Grandpa Rivera and Aunt Jo"), so viewers still never see group
+--   names (AUD-14) while chat shows them who they're talking to, as it must.
 
 create table public.chat_devices (
   user_id uuid primary key references public.profiles(id) on delete cascade,
@@ -90,6 +93,35 @@ begin
   insert into public.chat_devices (user_id, signature_key) values (v_uid, p_signature_key)
   on conflict (user_id) do update set signature_key = excluded.signature_key, updated_at = now();
   insert into public.chat_key_packages (user_id, key_package) select v_uid, unnest(p_key_packages);
+end $$;
+
+-- The chats the caller is in, in one family: groups, events and Everyone (not households).
+create or replace function public.chat_list(p_space uuid)
+returns table (circle_id uuid, kind text, title text, member_count int)
+language plpgsql stable security definer set search_path = '' as $$
+declare v_uid uuid := auth.uid(); v_parent boolean;
+begin
+  if v_uid is null then raise exception 'not authenticated' using errcode = '42501'; end if;
+  if not public.is_space_member(p_space) then raise exception 'not found' using errcode = 'P0002'; end if;
+  v_parent := public.is_space_manager(p_space);
+  return query
+    select c.id, c.kind,
+           case when v_parent or c.kind <> 'group' then c.name
+                else coalesce((select case when count(*) <= 3 then string_agg(o.display_name, ' and ' order by o.display_name)
+                                           else (array_agg(o.display_name order by o.display_name))[1] || ', '
+                                                || (array_agg(o.display_name order by o.display_name))[2] || ' and '
+                                                || (count(*) - 2)::text || ' more' end
+                               from public.circle_members om
+                               join public.space_members osm on osm.space_id = c.space_id and osm.user_id = om.user_id
+                               join public.profiles o on o.id = om.user_id
+                               where om.circle_id = c.id and om.user_id <> v_uid), 'Just you') end,
+           (select count(*)::int from public.circle_members mm
+              join public.space_members msm on msm.space_id = c.space_id and msm.user_id = mm.user_id
+            where mm.circle_id = c.id)
+    from public.circle_members cm
+    join public.circles c on c.id = cm.circle_id and c.space_id = p_space and c.deleted_at is null and c.kind <> 'household'
+    where cm.user_id = v_uid
+    order by case c.kind when 'everyone' then 0 when 'group' then 1 else 2 end, c.name;
 end $$;
 
 -- How many unused key packages the caller's phone still has on the server (it tops up when low).
@@ -188,9 +220,9 @@ begin
 end $$;
 
 revoke execute on function private.chat_member_since(uuid), private.chat_is_b64(text, int) from public, anon;
-revoke execute on function public.chat_publish_device(text, text[]), public.chat_key_package_count(), public.chat_start(uuid),
+revoke execute on function public.chat_list(uuid), public.chat_publish_device(text, text[]), public.chat_key_package_count(), public.chat_start(uuid),
   public.chat_roster(uuid), public.chat_claim(uuid, uuid[]), public.chat_send(uuid, text, bigint, text, uuid),
   public.chat_fetch(uuid, bigint, int) from public, anon;
-grant execute on function public.chat_publish_device(text, text[]), public.chat_key_package_count(), public.chat_start(uuid),
+grant execute on function public.chat_list(uuid), public.chat_publish_device(text, text[]), public.chat_key_package_count(), public.chat_start(uuid),
   public.chat_roster(uuid), public.chat_claim(uuid, uuid[]), public.chat_send(uuid, text, bigint, text, uuid),
   public.chat_fetch(uuid, bigint, int) to authenticated, service_role;
