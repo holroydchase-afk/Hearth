@@ -1,0 +1,195 @@
+# Hearth decision log
+
+Every decision that shaped Hearth, with the reason and what we chose it over, in one place. Started Oct 19, 2026 at Chase's ask, rebuilt from the repo, PR history and project memory.
+
+**What it's for.** Telling Hearth's story: paste this file (or one section) into Claude and ask "tell the story of how Hearth's stack came together" or "why did we pick Supabase?". Each entry stands alone so it can be quoted.
+
+**How to add one.** When Chase makes a call, or a thread makes one he approves, add an entry in the same PR, newest at the bottom of its section, with the next free `DEC-n`. Keep each line short. Mark any reason nobody wrote down at the time as *(inferred)*. Don't rewrite an old entry when a decision changes: add a new one that says "Replaces DEC-n" and set the old one's status to "Replaced by DEC-n", so the story keeps its turns.
+
+**Not here.** The full persona checks stay in `docs/product/decisions/` (an entry links to its file). Questions still waiting on Chase live in `TRACKER.md` "Decisions waiting on Chase" (D1–D12); an answered one moves here. Vendor prices and sources are in `docs/eng/research.md`.
+
+Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced** (superseded by a later entry).
+
+---
+
+## Product direction
+
+### DEC-1 · Proof of concept first, milestones by person
+- **When / status:** Oct 16, 2026 · Decided
+- **Chose:** a proof of concept, a birthday present Chase builds for himself and for job experience. Milestones go by person: Chase, then his wife, then the most tech-savvy relative, then everyone else by savviness, then Android, maybe a smart frame, then decide on costs.
+- **Over:** a startup-style plan (Ring 0–3 gates, funding, pricing).
+- **Because:** the problems are Chase's own family's; proving it works for them comes before any business question. Funding, pricing, self-hosted auth, pentest and legal wait for milestone 7.
+- **Source:** `docs/product/ANCHORS.md` "Milestones"
+
+### DEC-2 · Four anchors every feature is checked against
+- **When / status:** A1–A3 Oct 16, A4 Oct 18 · Decided
+- **Chose:** A1 Anxiety-less, A2 Guilt-free, A3 Stays on US soil, A4 White-paper ready.
+- **Because:** split families need to trust who sees what (A1), and neither side should be able to tell whether the other is engaging (A2). A3 because parents worry about kids' photos leaving the US. A4 because the audience is privacy-minded tech people who will check claims against the code.
+- **Source:** `docs/product/ANCHORS.md` "Anchors"
+
+### DEC-3 · Invite-only, no public sign-up or "start a family" in the app
+- **When / status:** Oct 16 · Built
+- **Chose:** you join only with an invite code; families are set up by script for now.
+- **Over:** an in-app "Start a family" screen (deferred to milestone 7).
+- **Because:** keeps Hearth exclusive to people the family trusts (A1), and there is only one family to set up during the proof of concept.
+- **Source:** `HANDOFF.md` Oct 16 morning (staff-pm call)
+
+### DEC-4 · Milestone 1 runs fully in Expo Go; push moves to milestone 2
+- **When / status:** Oct 17 · Built
+- **Chose:** run milestone 1 in the free Expo Go app, with email notices.
+- **Over:** paying $99 for the Apple Developer account up front to get push notifications.
+- **Because:** Expo Go can't receive push from our server, but everything else works in it. That takes the $99 and Apple's approval wait off the milestone 1 path.
+- **Source:** PR #15, `docs/product/MILESTONE-1.md`
+
+### DEC-5 · One to-do list: the tracker
+- **When / status:** Oct 17 · Built
+- **Chose:** `docs/product/TRACKER.md` is the single list of what's next; every thread updates it in the same PR.
+- **Over:** to-dos spread across HANDOFF, REMAINING and thread replies.
+- **Because:** Chase follows from his phone between other things; one list means nothing gets lost between threads.
+- **Source:** PR #16
+
+### DEC-6 · Persona check before any product decision is final (TDPM)
+- **When / status:** Oct 19 · Built
+- **Chose:** every product decision gets one Green/Red row per persona, and every Red needs a mitigation or Chase's override. CI enforces it.
+- **Because:** test-driven product management, the same idea as writing the failing test first. It catches the grandparent or Android relative a decision would leave behind before it's built.
+- **Source:** PR #24, `docs/product/PERSONA-CHECK.md`, `scripts/check-persona-checks.sh`
+
+### DEC-7 · Open source under AGPL-3.0, public after milestone 1 and a final name
+- **When / status:** Oct 19 · Decided (in PR #26)
+- **Chose:** AGPL-3.0, keeping dual licensing possible.
+- **Over:** MIT, and a personal or family-only license.
+- **Because:** MIT lets someone ship a closed clone; a family-only license isn't real open source. AGPL suits a self-hostable, privacy-first product for dev and product folks, with a hosted plan to pay for it.
+- **Source:** PR #26, `docs/product/decisions/2026-10-19-license-agpl.md`
+
+## Stack
+
+### DEC-8 · Expo (React Native, TypeScript) for iPhone, Android and web
+- **When / status:** Oct 15 · Built
+- **Chose:** one Expo codebase for iPhone, Android and a web viewer, TypeScript strict.
+- **Over:** native Swift and Kotlin apps. Flutter was never compared on paper.
+- **Because:** one codebase covers the iPhone parents, the Android grandpas and a browser link for relatives who won't install anything. EAS's free tier covers early builds, Expo Push is free, and over-the-air updates reach Chase's phone without a store build. *(Inferred:* TypeScript in the app, the tests and the Supabase functions means one language for a solo builder, and Expo Go let milestone 1 skip the $99 Apple account, DEC-4.)
+- **Trade-off:** Expo Go supports only the newest SDK, which drops older iPhones (DEC-22). HEIC and video transcoding need a dev build later.
+- **Source:** `docs/eng/research.md` §0, `docs/product/PLAN.md`
+
+### DEC-9 · Supabase (Postgres, Auth, Edge Functions) in East US
+- **When / status:** Oct 15 · Built
+- **Chose:** Supabase for the database, sign-in and server functions.
+- **Because:** access rules live in Postgres row-level security, so "a post you can't see doesn't exist for you" is enforced by the database, not app code. It was the only vendor with an explicit contract clause against training AI on customer data. Free tier for the beta, Pro ($25/mo) before real launch.
+- **Trade-off:** Supabase stores logs and telemetry outside the US and contracts through a Singapore entity, so the honest promise is "stored in the US", not "never leaves the US" (DEC-10). Closing that means self-hosted Postgres later.
+- **Source:** `docs/eng/research.md` §0 and §4, `docs/architecture/01-system-overview.md`
+
+### DEC-10 · Promise "stored in the US", not "never leaves the US"
+- **When / status:** Oct 15 · Decided
+- **Chose:** claim only what's true today: database and photos stored in US regions.
+- **Because:** Supabase's logs, support access and push delivery through Apple and Google cross borders. The white-paper readers will check.
+- **Source:** `docs/product/PLAN.md`, `docs/architecture/01-system-overview.md` "Residency", `docs/product/MARKETING.md` claims register
+
+### DEC-11 · Backblaze B2 (US East) for photos
+- **When / status:** Oct 15 · Built (keys pending, tracker step 6)
+- **Chose:** Backblaze B2 in US East, behind an S3-compatible layer.
+- **Over:** Cloudflare R2 (kept as the fallback, `us` jurisdiction) and Supabase Storage.
+- **Because:** B2 storage costs about half of R2's, and family viewing stays inside B2's free download allowance. The region is fixed at account creation, so a US account stays in the US by construction. Supabase Storage charges $0.09/GB to download and caches through a global CDN outside the region.
+- **Trade-off:** B2's terms let it use files to "improve" its service, so photos are encrypted before they reach it (DEC-14).
+- **Source:** `docs/eng/research.md` §0, §1, §4
+
+### DEC-12 · Resend for email, Expo Push for push
+- **When / status:** Oct 15 · Built (Resend live for sign-in codes Oct 18)
+- **Chose:** Resend's free tier for sign-in codes and notices; Expo Push for push notices (milestone 2).
+- **Over:** Amazon SES (cheaper past about 3,000 emails a month; move then).
+- **Because:** Resend is free at family size, simple, and keeps account data in the US. Expo Push is free and holds content only in memory. Notices carry names and counts only, never photos, captions or comments.
+- **Source:** `docs/eng/research.md` §0 and §3
+
+### DEC-13 · Deploy through Supabase's Management API, with one token
+- **When / status:** Oct 16 · Built
+- **Chose:** `deploy.sh` applies migrations, cron jobs and functions through the Management API, needing only `SUPABASE_ACCESS_TOKEN`.
+- **Over:** `supabase db push`, `psql` and Docker, which need a database password.
+- **Because:** Claude's cloud sessions have no Docker, and a single scoped token is safer to keep in the environment than a database password.
+- **Source:** PR #1, PR #2, `HANDOFF.md` Oct 16 afternoon
+
+## Privacy and security
+
+### DEC-14 · Encrypt photos on the phone; server holds the keys (for now)
+- **When / status:** Oct 15 · Built
+- **Chose:** each photo is encrypted on the phone with its own AES-256-GCM key; the server wraps those keys under one master key (`MEDIA_KEK`). Deleting a post deletes its keys.
+- **Over:** plain storage (the vendor could read photos), and full end-to-end encryption for v1.
+- **Because:** the storage vendor only ever holds ciphertext, the strongest guarantee available without making key loss a family's problem. End-to-end is the later family vault (DEC-16).
+- **Trade-off:** Hearth's server can unlock every photo. We never call this "end-to-end".
+- **Source:** `docs/architecture/03-encryption-and-keys.md`
+
+### DEC-15 · Strip location and camera data on the phone, configurable, default strip
+- **When / status:** strip Oct 15; policy value Oct 19 · Built
+- **Chose:** a media policy with `location: strip | keep | extract`, default `strip`; colour profile kept; 2048 px JPEG for milestone 1.
+- **Because:** a kid's photo shouldn't reveal where they live (A1). Chase asked for configurable infrastructure so location features can come later without rework. Colour profile kept so photos look as they did on the iPhone. 2048 px loads on one bar of LTE; full size is one value later.
+- **Source:** `docs/product/SPEC-MEDIA.md` D2, D6, D7; `docs/product/decisions/2026-10-19-media-*.md`
+
+### DEC-16 · Family vault (end-to-end encryption) later, as a higher tier
+- **When / status:** Oct 17 · Decided, after the beta
+- **Chose:** an opt-in end-to-end encrypted vault as a later, paid tier, rolled out slowly.
+- **Because:** real end-to-end makes key loss permanent and blocks server features like search; families should choose it knowingly. Smaller steps (per-family keys, a "what Hearth can see" page) come first.
+- **Source:** PR #14, `TRACKER.md` "Privacy path"
+
+### DEC-17 · No third-party analytics, crash or ad SDKs
+- **When / status:** Oct 16 · Built
+- **Chose:** our own error-report table with fixed fields only, kept 30 days.
+- **Over:** Sentry, Crashlytics or any analytics SDK.
+- **Because:** no media or metadata goes to any analytics service (CLAUDE.md rule 2), and the claim "no trackers" has to be checkable in the code.
+- **Source:** migration 0006, `docs/architecture/01-system-overview.md`
+
+### DEC-18 · AI off by default, every feature behind an off-switch
+- **When / status:** Oct 17 and Oct 18 · Decided
+- **Chose:** each AI feature is a family add-on a parent turns on, with a Hearth-wide kill switch and per-role permission. Any in-picture analysis runs on the phone only. Nothing on family media is ever used for training.
+- **Over:** AI on for everyone, or a paid AI tier.
+- **Because:** "no AI on our kids' photos" is a reason families pick Hearth. Small quiet helpers (bulk-upload audience suggestions, duplicates) are welcome only if they can be switched off and never act without asking.
+- **Source:** `docs/product/AI-FEATURES.md`, `/mnt/project-files/plans/v1-groups-plan.md`
+
+## Sharing and the people model
+
+### DEC-19 · Plain groups, no required family shape
+- **When / status:** Oct 18 · Decided (building)
+- **Chose:** a group is a plain list of people; anyone can be in several groups. Events copy people in from groups once.
+- **Replaces:** the Oct 17 fixed shape (Everyone, sides, households, events; migration 0011).
+- **Because:** real split families don't fit one hierarchy (Mom's sister belongs in two houses). Plain groups cover every case with less to explain.
+- **Source:** `/mnt/project-files/plans/v1-groups-plan.md`, PR #22
+
+### DEC-20 · Who reads a comment: three settings per group
+- **When / status:** Oct 16 → Oct 17 → Oct 18 · Decided (building)
+- **Chose:** each group is **Private** (parents, the poster and the writer read it), **Shared on this group's posts**, or **Always shared**. Readers are fixed when the comment is written, and the comment box names them.
+- **Replaces:** everyone on the post reads every comment (Oct 15), then parents-only by default (Oct 16, migration 0009), then by household (Oct 17).
+- **Because:** the story's core worry: one grandparent's comment shouldn't land in front of the other side of the family (A2). Two "shared" values so a birthday group's chatter doesn't spill onto Everyone posts.
+- **Source:** `/mnt/project-files/plans/v1-groups-plan.md`, `docs/product/SPEC-GROUPS.md` §6
+
+### DEC-21 · Hearts, comments and per-photo reactions; drop "Seen by"
+- **When / status:** Oct 19 · Decided (proposed resolution awaits Chase's OK)
+- **Chose:** per-photo heart, comment and a fixed set of emoji; remove "Seen by N of M".
+- **Because:** a returned heart proves the photo arrived without counting who didn't look (A2). Emoji sit behind a worded "More" button so the heart stays one tap.
+- **Source:** `docs/product/decisions/2026-10-19-reactions-drop-seen-by.md`
+
+## Engineering practice
+
+### DEC-22 · Expo SDK 57, and versions only from the vendor's live page
+- **When / status:** Oct 18 · Built
+- **Chose:** SDK 57, plus a CI check that our SDK matches what App Store Expo Go runs.
+- **Because:** SDK 54, picked from memory, wouldn't open in Expo Go on Chase's iPhone. Rule since: look versions up live, and a build is ready only once a phone opened it.
+- **Trade-off:** SDK 56+ needs iOS 16.4, so iPhone 7, 6s and SE (1st gen) can't run Hearth.
+- **Source:** `docs/eng/LESSONS.md` Oct 18, PR #24
+
+### DEC-23 · Test first, with the ticket ID in the test's name
+- **When / status:** Oct 15 · Built
+- **Chose:** a failing test first, then the fix; the full suite runs 3 times before anything is called done.
+- **Because:** privacy bugs (a relative seeing the other household's posts) must be caught by a test, not by a grandparent. On day 2 it found 10 prototype bugs and 7 backend holes.
+- **Source:** `CLAUDE.md` rule 1, `docs/product/PLAN.md` "Day 2"
+
+### DEC-24 · The app talks to one contract with a real and a fake backend
+- **When / status:** Oct 15 · Built
+- **Chose:** a `HearthApi` interface with a Supabase and a Fake implementation; the backend exposes a small set of Postgres functions (RPCs) instead of raw table access.
+- **Because:** screens can be tested fast without a server, and contract tests prove both sides agree. RPCs keep every access check in the database.
+- **Source:** `docs/eng/API.md`, `app/src/api/`
+
+### DEC-25 · Claude merges only on Chase's word, with merge commits
+- **When / status:** Oct 17 · Built
+- **Chose:** a PR merges only when Chase says so and CI is green; no rebases or force-pushes.
+- **Because:** Chase is the only human reviewer, and merge commits keep every thread's branch valid.
+- **Source:** `docs/eng/MERGING.md`
+
+---
+Last updated: Oct 19, 2026
