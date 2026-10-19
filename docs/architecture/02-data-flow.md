@@ -39,6 +39,10 @@ The upload queue survives app restarts and bad signal; each step can be retried 
 
 **Planned:** a setting to send notices with no names (tracker D9).
 
+## Messages (Built, migration 0015)
+
+Group chat is end-to-end encrypted with MLS: phones seal messages before sending, the server relays them, and the history lives on each phone. The full flow is in [06-messenger.md](06-messenger.md).
+
 ## Deletion
 
 - **Delete a post (Built).** `delete_post` soft-deletes the post, deletes its wrapped keys and queues its B2 objects for removal. With the keys gone, Hearth can no longer decrypt those objects, even before they are removed.
@@ -46,4 +50,4 @@ The upload queue survives app restarts and bad signal; each step can be retried 
 - **Gap.** The nightly hard purge (`purge_soft_deleted`, 30 days) is not scheduled by `backend/scripts/deploy.sh`; the worker that deletes queued B2 objects, removes the auth user and builds data exports is not written (`backend/README.md`). Database backups keep deleted rows, including wrapped keys, for Supabase's backup window.
 
 ---
-Last checked against code: 2026-10-19, 624fc39 (plus the MEDIA-1/2/3 on-phone cleaner; migration 0014, ONB-3/4)
+Last checked against code: 2026-10-19, a522a3a (plus migrations 0014, 0015) and 624fc39 (MEDIA-1/2/3 on-phone cleaner)

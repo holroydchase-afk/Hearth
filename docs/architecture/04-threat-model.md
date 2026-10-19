@@ -42,6 +42,7 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 3. Hard purge not scheduled on the hosted project; B2 deletion, auth-user removal and export worker not written (02 "Deletion").
 4. Residency: Supabase logs outside the US; push via Apple and Google (01 "Residency").
 5. No outside security review yet; open-sourcing is undecided (D10).
+6. Messenger: no key verification (a compromised server could add a hidden phone to a chat), and chat metadata is visible to the server ([06-messenger.md](06-messenger.md)).
 
 ---
-Last checked against code: 2026-10-19, 624fc39 (plus the MEDIA-1/2/3 on-phone cleaner; migration 0014, ONB-3/4 invite links)
+Last checked against code: 2026-10-19, a522a3a (plus migrations 0014, 0015 messenger) and 624fc39 (MEDIA-1/2/3 on-phone cleaner, ONB-3/4 invite links)
