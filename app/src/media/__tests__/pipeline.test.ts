@@ -101,8 +101,18 @@ describe('processPhoto (BETA-SHARE-2, BETA-SHARE-5)', () => {
     expect(calls.length).toBeGreaterThan(2);
   });
 
-  it('refuses to continue if the re-encoded file still carries EXIF', async () => {
+  // Was "refuses to continue if the re-encoded file still carries EXIF": that refusal is the
+  // UAT item 6 bug. MEDIA-1 replaces it: an encoder's Exif block is cleaned, and the pipeline
+  // still fails closed when it can't read what the encoder made (META_* is covered in clean.test.ts).
+  it('MEDIA-1 an Exif block left by the encoder is cleaned, not refused', async () => {
     const { m, readBytes } = mockManipulator({ width: 4032, height: 3024 }, { leaveExif: true });
+    const out = await processPhoto({ uri: 'file:///pick/x.jpg' }, { manipulator: m, readBytes });
+    expect([hasExif(out.display.bytes), hasExif(out.thumb.bytes)]).toEqual([false, false]);
+  });
+
+  it('MEDIA-3 refuses to continue (EXIF) if the encoder output is not a readable JPEG', async () => {
+    const { m } = mockManipulator({ width: 4032, height: 3024 });
+    const readBytes = async () => new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0, 0, 0, 0]);
     await expect(processPhoto({ uri: 'file:///pick/x.jpg' }, { manipulator: m, readBytes })).rejects.toMatchObject({ code: 'EXIF' });
   });
 });
