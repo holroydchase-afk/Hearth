@@ -55,11 +55,11 @@ describe('Photos screen', () => {
     await renderApp(<PhotosScreen />, { be, user: 'jo' });
     const heart = await screen.findByRole('button', { name: 'Love it' });
     fireEvent.press(heart);
-    expect(await screen.findByText('♥ You love this')).toBeTruthy();
+    expect(await screen.findByText('You love this')).toBeTruthy();
     await waitFor(() => expect(be.state.hearts).toHaveLength(1));
     expect(screen.getByText('1 person loves this')).toBeTruthy();
     fireEvent.press(screen.getByRole('button', { name: 'Love it' }));
-    expect(await screen.findByText('♡ Love it')).toBeTruthy();
+    expect(await screen.findByText('Love it')).toBeTruthy();
     await waitFor(() => expect(be.state.hearts).toHaveLength(0));
   });
 

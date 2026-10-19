@@ -60,7 +60,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 | D10 | Open-source the repo, and under which license? Options: AGPL-3.0, MIT, personal/family-only (PolyForm Noncommercial, not OSI open source), or AGPL plus a paid commercial license. MIT can't also be limited to personal and family use. Sentry (FSL) and PostHog (MIT + paid `ee`) sell to companies; Signal, Ente and Immich use AGPL. See "Developer edition" below | **Decided: AGPL-3.0** (Chase, Oct 19; `decisions/2026-10-19-license-agpl.md`); the name stays Chase's (trademark), and a contributor agreement once outside PRs arrive keeps dual licensing open. Repo goes public only after D3 (name final) | Developer edition |
 | D11 | Text message codes as the primary, default way to get a sign-in code (email as fallback). Needs an SMS provider and US carrier registration, which can take weeks | Keep email for milestones 1 and 2; staff-pm specs texts, and you start carrier registration early so it's ready for the grandparents (milestone 3+) | Grandparent milestones |
 | D12 | Other sign-in options, including Sign in with Apple | Explore after milestone 1; Apple needs the $99 account and a final name | Nothing today |
-| D13 | Native look (Apple HIG on iPhone, Material 3 on Android, plus Hearth's overrides; `DESIGN-SYSTEM.md`): when to switch the app over | Right after the milestone 1 demo, screen by screen, system fonts first | Nothing today |
+| D13 | Native look (Apple HIG on iPhone, Material 3 on Android, plus Hearth's overrides; `DESIGN-SYSTEM.md`): when to switch the app over | **Decided: all now** (Chase, Oct 19); built in PR #30 | Nothing |
 
 ## Waiting on Chase, later (not milestone 1)
 
@@ -97,7 +97,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 
 ## Done (latest first)
 
-- Oct 19: design system written: native first plus Hearth overrides DS-1..DS-9 (`DESIGN-SYSTEM.md`, persona check proposed).
+- Oct 19: native look built (PR #30): system fonts, Apple colors on iPhone and Material 3 on Android, the phone's own tab bar, native buttons and switches, DS-1..DS-9 tests. The old look is saved in `docs/design/versions/`. Still to confirm on a phone in UAT: the tab bar and the gray buttons.
 - Oct 19: `grandparent-ux` rebuilt as Hearth's UI/UX designer with the ranked family personas.
 - Oct 18: anchor A4 White-paper ready; `docs/architecture/` started (overview, data flow, encryption and keys, threat model).
 - Oct 18: sign-in code email set up in Supabase (Resend SMTP, both templates, 6-digit code, 1 hour); PR #14 and #16 merged.

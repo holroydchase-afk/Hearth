@@ -42,6 +42,16 @@ The web viewer (for GG and anyone without the app) follows the iPhone column wit
 | DS-8 | **Errors and loading use words**: what happened, what to do, who to call; spinners always have a line of text | Platforms allow a bare spinner | G2, GOALS "never empty, never silent" |
 | DS-9 | **One main action per screen**, as one filled button | Platforms allow several prominent buttons | "Just show me the babies" (LG) |
 
-## What changes in the app (not built yet)
+## How the app does it (built Oct 19, 2026; Chase picked "All now")
 
-Today the app uses its own fonts (Figtree and Young Serif in `app/src/ui/theme.ts`), its own tab bar (`app/src/screens/TabBar.tsx`) and its own button kit (`app/src/ui/kit.tsx`). Moving to native is app-engineer work, test-first, screen by screen, after Chase picks the timing (TRACKER). Expected order: system fonts and text styles (smallest change, unlocks Dynamic Type), then the native tab bar, then buttons, sheets and alerts. Component and library versions come from Expo's and the vendors' live pages (rule 8), never from memory.
+- **Fonts:** no bundled fonts. `fontFamily` is unset on iPhone and Android, so the phone's own font is used; the web uses the system stack (`app/src/ui/theme.ts`).
+- **Colors:** `paletteFor(os, dark)` in `theme.ts`. iPhone uses Apple's system colors, with the Increase Contrast variants where the standard ones miss 4.5:1. Android uses a Material 3 scheme generated from systemBlue with Google's material-color-utilities, so both phones read as blue. One override: Apple's accessible green is only 3.8:1 on its tint, so "safe" green is darker (#1C6E31).
+- **Tab bar:** the phone's own tab bar (expo-router `NativeTabs`) on iPhone and Android, with SF Symbols and Material Symbols, 17 pt labels, `minimizeBehavior: never` and Android labels always shown (DS-2, DS-5). The web keeps Hearth's own bar in the same style, because the web version of `NativeTabs` puts the tabs at the top of the screen.
+- **Buttons:** iPhone filled, gray and plain buttons; Android filled, outlined and text buttons with the ripple. Icons come from `expo-symbols` and always sit beside words (DS-3).
+- **Switches:** the phone's own switch, with the word On or Off beside it.
+- **Fields and cards:** iPhone grouped-list style; Android outlined field and outlined card.
+- **Confirm dialogs:** a custom dialog shaped like the phone's own (14 pt corners on iPhone, 28 dp on Android). This is a custom control on purpose: Android's system dialog uses 14 sp buttons (DS-2), and the system alert doesn't work on the web or in tests.
+- **Tests:** `app/src/ui/__tests__/designSystem.test.tsx` checks fonts, the type ramp, every color pair at 4.5:1 on both phones in light and dark, and tab icons and labels.
+- **Old look:** saved in `docs/design/versions/` (screenshots of every main screen, before and after).
+
+**Confirm on a phone (milestone 1 UAT):** the native tab bar with 17 pt labels on an iPhone (Liquid Glass) and on Android, and whether gray buttons stand out enough on the light gray background.

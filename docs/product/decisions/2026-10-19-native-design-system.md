@@ -1,5 +1,5 @@
 # Decision: Hearth follows Apple's HIG on iPhone and Material 3 on Android, with Hearth's stricter overrides
-Date: Oct 19, 2026 · Status: proposed · Source: Chase, Oct 19: "can't we go 100% apple UI/UX. guidelines, guardrails, components, fonts, etc. and maybe the same for android". Spec: `docs/product/DESIGN-SYSTEM.md` (DS-1..DS-9)
+Date: Oct 19, 2026 · Status: Chase's (asked for it; picked "All now" on the decision card, Oct 19) · Source: Chase, Oct 19: "can't we go 100% apple UI/UX. guidelines, guardrails, components, fonts, etc. and maybe the same for android". Spec: `docs/product/DESIGN-SYSTEM.md` (DS-1..DS-9)
 
 | Persona | Green/Red | Why |
 |---|---|---|
