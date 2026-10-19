@@ -4,7 +4,8 @@
 #   bash scripts/smoke-check.sh
 # Needs only SUPABASE_ACCESS_TOKEN (an environment secret, never in chat or git). Through the Management API:
 # every local migration is applied, RLS is on for every public table, both cron jobs exist, both edge
-# functions are active, and every function secret in supabase/functions/.env.example is set. It reads
+# functions are active, every function secret in supabase/functions/.env.example is set, and invite links
+# open the web build's /join/ screen, not hearth.family (ONB-3; the stored value is never printed). It reads
 # secret NAMES only and never prints a value. It also counts (never prints) IP addresses in Supabase Auth's
 # audit log, as a warning. One SELECT, two GETs; it changes nothing.
 # Exit 0 when every check passes (warnings allowed), 1 when any fails.
@@ -37,6 +38,13 @@ select 'rls', n = 0, case when n = 0 then 'RLS is on for every public table' els
 union all
 select 'cron', exists (select 1 from cron.job j where j.jobname = w.name and j.active),
        'cron job ' || w.name from (values ('hearth-notify'), ('hearth-purge-client-errors')) w(name)
+union all
+select 'invite_link', coalesce(b not like 'https://hearth.family%' and b like 'https://%/join/', false),
+       case when b is null then 'invite_link_base is not set (apply 0014)'
+            when b like 'https://hearth.family%' then 'invite links point at hearth.family, a domain Hearth doesn''t own (apply 0014)'
+            when b not like 'https://%/join/' then 'invite links don''t end in /join/, the path the app opens (apply 0014)'
+            else 'invite links open the web build''s /join/ screen' end
+from (select (select value from private.secrets where name = 'invite_link_base') as b) l
 union all
 select 'auth_ips', n = 0,
        case when n = 0 then 'no IP addresses in Supabase Auth''s audit log'

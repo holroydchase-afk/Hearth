@@ -4,6 +4,9 @@ set -u
 cd "$(dirname "$0")"
 mkdir -p e2e/results
 bash scripts/check-agents.sh
+bash scripts/tests/check_persona_checks_test.sh > e2e/results/persona-checks.txt 2>&1 ; tail -1 e2e/results/persona-checks.txt
+bash scripts/check-expo-go.sh
+bash scripts/tests/check_expo_go_test.sh > e2e/results/expo-go.txt 2>&1 ; tail -1 e2e/results/expo-go.txt
 bash scripts/tests/check_logs_test.sh > e2e/results/priv2-logs.txt 2>&1 ; tail -1 e2e/results/priv2-logs.txt
 bash app/scripts/tests/eas_test.sh > e2e/results/app-eas.txt 2>&1 ; tail -1 e2e/results/app-eas.txt
 (cd e2e && npx playwright test) ; P=$?

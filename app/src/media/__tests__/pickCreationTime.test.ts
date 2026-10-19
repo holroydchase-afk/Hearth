@@ -11,14 +11,14 @@ jest.mock('expo-image-picker', () => ({
   requestMediaLibraryPermissionsAsync: jest.fn(async () => ({ granted: true })),
   launchImageLibraryAsync: jest.fn(async () => ({ canceled: false, assets })),
 }));
-jest.mock('expo-media-library', () => ({
+jest.mock('expo-media-library/legacy', () => ({
   getPermissionsAsync: jest.fn(async () => ({ granted: true, accessPrivileges: 'all' })),
   requestPermissionsAsync: jest.fn(async () => ({ granted: true })),
   getAssetInfoAsync: jest.fn(async (id: string) => ({
     id, creationTime: Date.UTC(2023, 11, 25, 15, 0, 0), location: { latitude: 38.3, longitude: -81.6 }, exif: { GPSLatitude: 38.3 },
   })),
 }));
-import * as MediaLibrary from 'expo-media-library';
+import * as MediaLibrary from 'expo-media-library/legacy';
 import { pickBulk } from '../pick';
 import { planBatch, type PickedAsset } from '../../share/bulk';
 

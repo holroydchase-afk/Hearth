@@ -19,6 +19,15 @@ jobs:
       - uses: actions/checkout@v5
       - run: bash scripts/check-agents.sh
 
+  # TDPM (CLAUDE.md rule 9): every product decision has a full persona check; Reds need a resolution.
+  persona-checks:
+    name: Persona checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v5
+      - run: bash scripts/tests/check_persona_checks_test.sh
+
   # PRIV-2 (CLAUDE.md rule 2): no console.* call logs a key, URL, caption, email or raw error.
   logs:
     name: No secrets in logs
@@ -27,6 +36,17 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - run: bash scripts/tests/check_logs_test.sh
+
+  # EXPO-4 (docs/eng/LESSONS.md): the app's SDK is the one the App Store's Expo Go runs. Goes red on its
+  # own when Expo ships a new Expo Go; that is the alarm, not a flake.
+  expo-go:
+    name: Expo Go runs our SDK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v5
+      - run: bash scripts/tests/check_expo_go_test.sh
+      - run: bash scripts/check-expo-go.sh
 
   # ---------------------------------------------------------------------------
   # Backend on a REAL local Supabase stack (S16): Postgres + GoTrue + PostgREST + Kong.
