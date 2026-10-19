@@ -55,6 +55,8 @@ Decide before milestone 4 (when grandparents on different sides join). Options: 
 
 | Date | Idea | Anchor | Status | Notes |
 |---|---|---|---|---|
+| Oct 19 | **Location features, "cool stuff"** (Chase): details not given yet | A1, A3 | Idea; not specced. Question Q1 open in `docs/product/SPEC-MEDIA.md` §2 | Rules any location idea must meet (SPEC-MEDIA §2): never in the file; opt-in per post, off by default; city level only, rounded on the phone; no photo sent to any map service, US-hosted lookup; behind `feature_on(space,'location')`, checked by the server; never in notices or logs; privacy-security reviews the threat model first |
+| Oct 19 | **Full-quality or HEIC originals, and video compression** (staff-pm, from Chase's "whether to compress") | A1 | Idea; after a dev build | Expo Go can't write HEIC, clean a HEIC original or transcode video. M1 stays JPEG at 2048 px (SPEC-MEDIA D7) |
 | Oct 18 | **Inviters live far away** (Chase): "I think a lot of tech folks will have moved from rural areas." The tech-savvy relatives invite and set up from a distance; grandparents stay | A1 | Design input; in `docs/product/GOALS.md` G3 | Nobody in the room: invite text works alone, every step readable aloud over the phone, every error names who to call. Weakens STORY's "local helper" assumption; Chase to confirm a STORY update |
 | Oct 18 | **"Step 2 of 3" on every setup screen** (staff-pm, from GOALS G3) | A1 | Idea; not in scope | Lets a helper on the phone ask "what step are you on?" |
 | Oct 18 | **"See what Mom will see"** (staff-pm, from GOALS G1) | A1 | Idea; not in scope | Inviter previews the invite and first screen before sending |
