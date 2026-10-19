@@ -1,27 +1,27 @@
 # Spec: media policy, location ideas, Live Photos
 
-Owner: staff-pm. Oct 19, 2026. Status: **proposed**, waiting on Chase for D2, D6 and Q1. Source: Chase, Oct 19: "I like the cleaning step but I want to flush it out some more. I also have features in mind around location (cool stuff) can we make them all configurable as in an admin (code level) can modify what's extracted and whether to compress - will the compress work with Live Photos? Make a plan for getting Live Photos built as well".
+Owner: staff-pm. Oct 19, 2026. Status: D2, D6, D7 and the Live Photos plan (D11–D13) **decided by Chase, Oct 19** (persona checks in `docs/product/decisions/2026-10-19-*.md`); the rest proposed. Q1 still open. Source: Chase, Oct 19: "I like the cleaning step but I want to flush it out some more. I also have features in mind around location (cool stuff) can we make them all configurable as in an admin (code level) can modify what's extracted and whether to compress - will the compress work with Live Photos? Make a plan for getting Live Photos built as well".
 
-## Decisions (staff-pm pick on each; Chase can overrule any)
+## Decisions (staff-pm pick on each unless marked Chase's; Chase can overrule any)
 | # | Decision | Pick |
 |---|---|---|
 | D1 | Where the rules live | One typed, frozen policy object in `app/src/media/policy.ts`. Code-level only: no remote switch, so a hacked server can't turn location on |
-| D2 | Location (GPS) in the file | **Strip, always.** Not a "keep" option in the policy type. Extraction only for a future feature, behind a flag (section 2) |
+| D2 | Location (GPS) in the file | **Chase's (Oct 19): a policy value, `strip \| keep \| extract`, default `strip`.** "why do you recommend removing the location? I think we should build the infrastructure and make it configurable". Changing the default needs Chase's word and a persona check (`decisions/2026-10-19-media-location-policy.md`). CLAUDE.md rule 2 ("Strip EXIF/GPS on the device") stays true while the default is `strip`; changing the default amends rule 2 in the same PR. Location features use `extract`, never `keep` (section 2) |
 | D3 | Date and time | Extract to Hearth (`taken_at`, as today), strip from the file |
 | D4 | Camera, lens, settings, software, Apple MakerNote, XMP, faces/regions, IPTC | Strip. None serves June or Megan; serial numbers and face boxes are risk with no payoff |
 | D5 | Orientation | Bake into the pixels, strip the tag (as today) |
-| D6 | ICC colour profile | **Keep.** It is colour, not identity; dropping it makes iPhone (Display P3) photos look dull. privacy-security confirms it carries no device ID |
-| D7 | Compression in M1 | On: JPEG, 2048 px long edge, quality 0.82, thumb about 40 KB. HEIC and "original" need a native build; not M1 |
+| D6 | ICC colour profile | **Chase's (Oct 19): keep, the largest possible** ("keep the colour profile (we want the largest possible)"): the photo's own profile (Display P3 on iPhone), never converted down to sRGB. It is colour, not identity. privacy-security confirms it carries no device ID |
+| D7 | Compression in M1 | **Chase's (Oct 19): on for M1**: JPEG, 2048 px long edge, quality 0.82, thumb about 40 KB ("Im fine with compression right now"). **Full size is one policy value** (`long_edge: 'original'`), not more build: its only cost is upload size and time and storage (and slow signal for grandparents; needs its own persona check). **HEIC is more work:** Expo Go can't encode HEIC, so it needs native encoding in a dev build |
 | D8 | The current failure (M1) | Our own JS cleaner removes metadata blocks after encode; the check fails only if a "strip" group survives; failures reported by error code |
 | D9 | What the server enforces | M1: policy version and file type allowlist. M2: `sign-media` scans the decrypted file header at finalize |
 | D10 | Location features | Ideas only (ANCHORS ideas log, Oct 19), with rules. One question to Chase (Q1) |
-| D11 | Live Photos in M1 | Still only (BULK-5 unchanged): one clean JPEG, motion dropped |
-| D12 | Live Photo motion | Milestone 4, with video, after FLAG-7 proof. Plays in Hearth with a "Play" button. Possible in Expo Go |
-| D13 | Save to phone as a real Live Photo | After M4, and only if relatives ask. Needs our own native module, a dev build, and a new random pairing ID |
+| D11 | Live Photos in M1 | Still only (BULK-5 unchanged): one clean JPEG, motion dropped. The only phase where the video is not kept |
+| D12 | Live Photo motion | **Chase's (Oct 19): build once, never undo** ("I don't want to work we will undo"). From L1 (M4, with video, after FLAG-7 proof) store the still + the cleaned video + a new random Hearth pairing ID, and play through one playback component (`LiveMedia`) with a "Play" button, on iPhone and Android |
+| D13 | Real Apple Live Photo view and save | **Chase's (Oct 19): yes, once the $99 account and a dev build exist.** L3 swaps what's inside `LiveMedia` for `expo-live-photo` `LivePhotoView` on iPhone, and writes the stored Hearth pairing ID into both halves on save. Nothing from L1 is thrown away: same storage, same rows, same component |
 
 ## 1. Media policy (code-level config)
 
-**Why strip at all** (Chase is unsure). STORY.md, problem 1: "Kids' privacy. Deepfakes, predators, stalkers, AI training, ads → … Location stripped on the phone." The threat model's "location stalker" row depends on it, and so do CLAUDE.md rule 2 and anchor A1. Location stays non-negotiable. Everything else in the policy can be changed by a reviewed code change.
+**Why strip by default.** STORY.md, problem 2: "Kids' privacy. Deepfakes, predators, stalkers, AI training, ads → … Location stripped on the phone." The threat model's "location stalker" row depends on it, and so do CLAUDE.md rule 2 and anchor A1. Chase (Oct 19) wants the infrastructure built and configurable (D2), so location is a policy value like every other group, with the strictest change process: the default stays `strip`, and moving it needs Chase's word, a persona check and a rule 2 amendment. Every other group can be changed by a reviewed code change.
 
 ### 1.1 Field groups
 | Group | What's in it | M1 | Why |
@@ -37,13 +37,13 @@ Owner: staff-pm. Oct 19, 2026. Status: **proposed**, waiting on Chase for D2, D6
 | faces | Apple/MWG face and region boxes (XMP, MakerNote) | strip | Face data; anchor A3 and the no-AI promise |
 | other | IPTC (APP13), comments (COM), unknown APPn blocks | strip | Default for anything not named: strip |
 
-Each group is a TypeScript union `'strip' | 'keep' | 'extract'`; `location` is typed `'strip' | 'extract'` so "keep" won't compile. Unknown blocks are always stripped.
+Each group is a TypeScript union `'strip' | 'keep' | 'extract'`, `location` included (D2). The default for `location` is pinned by MEDIA-5, so a change is a visible test edit, not a quiet value flip. Unknown blocks are always stripped.
 
 ### 1.2 Compression
 | Setting | M1 | Options (in Expo Go) | Note |
 |---|---|---|---|
 | on/off | on | on, off | "off" = clean the original. JPEG originals only; a HEIC original can't be cleaned in Expo Go, so it is still re-encoded |
-| long edge | 2048 px | any | SEE-5 saves at 2048; grandparents on one bar of LTE |
+| long edge | 2048 px | any, or `'original'` (full size, D7) | SEE-5 saves at 2048; grandparents on one bar of LTE |
 | quality | 0.82 | 0–1 | |
 | format | JPEG | JPEG, PNG, WebP | `expo-image-manipulator` 57.0.21 `SaveFormat` has no HEIC. HEIC needs native code |
 | thumb | ~40 KB, max 48 KB | as today | |
@@ -72,14 +72,14 @@ Chase's first iPhone photo died in `prepareItem` → `processPhoto`. Leading gue
 | MEDIA-2 | auto | M1 | **Given** fixtures with GPS, MakerNote (incl. content ID), XMP faces, IPTC, COM and serials, **When** they are cleaned, **Then** none survive (checked by group), and ICC survives when the policy keeps it. |
 | MEDIA-3 | auto | M1 | **Given** a cleaner stubbed to leave GPS in, **When** the job runs, **Then** it fails `META_LOCATION`, nothing is signed, and one error report with only that code is sent. |
 | MEDIA-4 | auto | M1 | **Given** `meta_policy` below the minimum or a mime type not on the allowlist, **When** `sign-media` is asked, **Then** 422 and no rows. |
-| MEDIA-5 | auto | M1 | **Given** `policy.ts`, **When** someone sets `location: 'keep'`, **Then** typecheck fails. |
+| MEDIA-5 | auto | M1 | **Given** `policy.ts`, **When** `location` is set to anything but `'strip'`, **Then** the test titled "MEDIA-5 D2 location default is strip (Chase's word + persona check to change)" fails, and CI stays red until that test, the MEDIA-6 snapshot, CLAUDE.md rule 2 and a new file in `docs/product/decisions/` change in the same PR. **And** `'keep'` and `'extract'` both compile, so the infrastructure exists. |
 | MEDIA-6 | auto | M1 | **Given** a policy edit, **When** CI runs, **Then** it fails until the snapshot, the server minimum and the `02-data-flow.md` table match. |
 | MEDIA-7 | manual | M1 | **Given** Chase's iPhone in Expo Go, **When** he posts the same photo that failed Oct 19, plus a HEIC and a Live Photo, **Then** all 3 publish, and a saved copy run through exiftool shows no GPS, MakerNote or serial (M-09). |
 | MEDIA-8 | auto | M2 | **Given** an upload with GPS that is marked `exif_stripped: true`, **When** it is finalized, **Then** `sign-media` refuses it and the item never becomes ready. |
 
 ## 2. Location features (ideas only)
 Logged in `docs/product/ANCHORS.md` ideas log (Oct 19). Not specced. Any location idea must meet **all** of these rules:
-1. Never in the file: location is extracted to its own field and the file is always stripped (D2).
+1. Never in the file: a location feature uses `extract` (its own field) and the file is stripped. `keep` is only for a Chase-approved change of the default (D2), never for a feature.
 2. Per post, opt-in, off by default. The poster turns it on for that post, with words saying who will see it (G4).
 3. Coarse only: city or town ("Charleston, WV"), never coordinates. Rounding to the city happens on the phone; the precise point never leaves it.
 4. Place names come from on-device lookup or a US-hosted service that is sent no photo (A3). No Google or Apple Maps calls carrying a child's photo.
@@ -94,6 +94,7 @@ Logged in `docs/product/ANCHORS.md` ideas log (Oct 19). Not specced. Any locatio
 - **The still:** yes. It is cleaned and shrunk like any photo, which is how BULK-5 works today. But re-encoding drops the MakerNote content ID that pairs it with its video, so the iPhone can no longer treat it as a Live Photo.
 - **The video (about 3 s .mov):** not compressible in Expo Go. Nothing in our SDK 57 set transcodes video, and the picker docs say Live Photos come "at original quality, regardless of the `quality` option". We can remove its metadata in place without re-encoding (section 3.3). Real compression needs a native transcode (AVFoundation), so a dev build.
 - **Native playback or saving as a Live Photo** needs both halves unaltered or re-paired. `expo-live-photo` says: "the photo and video parts of the live photo must come from a valid live photo file and be unaltered … If the pairing is broken, joining them into a live photo is impossible." So cleaning and native Live Photo playback conflict, unless we write a **new random** pairing ID into both halves (native code).
+- **So, from L1 (Chase, Oct 19: "I don't want to work we will undo"):** we keep both halves and our own random pairing ID from the first Live upload, and every screen plays Live items through one component. L3 then changes only what's inside that component and adds the re-pairing on save. Apple's own content ID is still stripped (it links our copy to the sender's iCloud); the Hearth ID is new and random.
 
 ### 3.1 What I verified (vendor sources, Oct 19)
 docs.expo.dev and Apple's pages were not reachable from this sandbox (DNS failure / empty page), so I read the vendor's shipped packages instead:
@@ -103,25 +104,29 @@ docs.expo.dev and Apple's pages were not reachable from this sandbox (DNS failur
 - Apple pairing (MakerNote key 17 ↔ QuickTime `com.apple.quicktime.content.identifier`, `PHAssetCreationRequest` with `.photo` + `.pairedVideo`): **not verified**; Apple's page returned no body. Confirm before phase L3.
 
 ### 3.2 Phases
-| Phase | Milestone | Build | What |
-|---|---|---|---|
-| L0 | M1 | Expo Go | Still only (BULK-5 as is) + MEDIA-7 |
-| L1 | M4, with video | Expo Go | Pick with `'livePhotos'`, upload the still + the cleaned .mov as one item, play in Hearth |
-| L2 | M4 | Expo Go | Android and web: still only, always |
-| L3 | after M4, if asked | Dev build ($99 account, M2+) | Save to phone as a real Live Photo, with a new random pairing ID; optional video compression |
+Each phase adds to the last; none replaces stored data or a screen.
+
+| Phase | Milestone | Build | What | Kept by later phases |
+|---|---|---|---|---|
+| L0 | M1 | Expo Go | Still only (BULK-5 as is) + MEDIA-7 | The still pipeline |
+| L1 | M4, with video | Expo Go | Pick with `'livePhotos'`. One item, kind `live`: the cleaned still + the cleaned .mov + `live_pair_id` (new random UUID, stored on the item). Every screen shows it through `LiveMedia`, which today shows the still and plays the .mov with a "Play" button | Storage layout, `live_pair_id`, `LiveMedia` and its props |
+| L2 | M4 | Expo Go | Android and web: the same `LiveMedia` plays the stored .mov with the same "Play" button (picking a Live Photo is iPhone-only; viewing isn't) | Same |
+| L3 | when the $99 account and a dev build exist (M2+) | Dev build | Inside `LiveMedia` on iPhone, swap the player for `expo-live-photo` `LivePhotoView` (press, or the "Play" button, plays it the Apple way). "Save to phone" writes `live_pair_id` into both halves (MakerNote key 17 and the QuickTime content identifier) and saves `.photo` + `.pairedVideo`, so Photos treats it as a Live Photo. Optional video compression | Everything; no migration, no re-upload |
 
 ### 3.3 Acceptance criteria
 | ID | Type | Phase | Given / When / Then |
 |---|---|---|---|
-| LIVE-1 | auto | L1 | **Given** a pick that includes a Live Photo, **When** it is planned, **Then** it is one item, kind `live`, with a still and a video; a picker that returns no `pairedVideoAsset` falls back to the still alone. |
+| LIVE-1 | auto | L1 | **Given** a pick that includes a Live Photo, **When** it is planned, **Then** it is one item, kind `live`, with a still, a video and a `live_pair_id` that is a new random UUID (never Apple's content ID); a picker that returns no `pairedVideoAsset` falls back to the still alone. |
+| LIVE-9 | auto | L1 | **Given** any screen that shows a Live item, **When** the code is scanned, **Then** it renders `LiveMedia` and nothing else touches the .mov directly, so L3 changes one component (Chase's "no rework"). |
 | LIVE-2 | auto | L1 | **Given** the .mov half, **When** it is cleaned, **Then** every `meta`/`udta`/`keys` box (location ISO6709, content ID, make, software) is overwritten in place with a `free` box of the same size, and the verifier finds none. |
 | LIVE-3 | manual | L1 | **Given** 3 Live Photos from Chase's iPhone, one taken abroad, **When** posted and downloaded, **Then** exiftool shows no location or content ID in either half (shares FLAG-7's proof; video stays off until it passes). |
 | LIVE-4 | auto | L1 | **Given** a Live post, **When** shown, **Then** it has a visible "Play" word button (48 pt, 17 pt text); press-and-hold also plays it, and is never the only way (rule 3). |
 | LIVE-5 | manual | L1 | **Given** June on an old phone, **When** she sees a Live post, **Then** she plays it within 60 s, unaided. |
 | LIVE-6 | auto | L1 | **Given** "Save to phone" on a Live post (L1), **When** tapped, **Then** the still is saved at 2048 px with no location, and the words say "Saved as a photo". |
-| LIVE-7 | auto | L2 | **Given** Android or web, **When** a Live post is shown, **Then** the still shows with no Play button and no error. |
-| LIVE-8 | manual | L3 | **Given** a dev build, **When** a Live post is saved, **Then** the iPhone Photos app plays it as a Live Photo, and its pairing ID differs from the original's. |
+| LIVE-7 | auto | L2 | **Given** Android or web, **When** a Live post is shown, **Then** the still shows with the same "Play" word button, and it plays the stored video (persona check: the Android grandpa gets what the iPhone relatives get). |
+| LIVE-8 | manual | L3 | **Given** a dev build, **When** a Live post is saved, **Then** the iPhone Photos app plays it as a Live Photo, and its pairing ID is the item's `live_pair_id`, not the original's. |
+| LIVE-10 | manual | L3 | **Given** a dev build and Live items posted in L1, **When** they are viewed on an iPhone, **Then** they play in Apple's Live Photo view with no re-upload, no migration and the "Play" button still there. |
 
 **Storage cost:** a Live item stores a .mov beside each still, probably several times a 2048 px JPEG. Measure on 10 of Chase's Live Photos in L1 before turning it on; the free-tier video cap (`free_video_cap_reached`) should count Live items too.
 
-**Cut:** video compression in Expo Go, HEIC output and full-quality originals are out until a dev build (ideas log).
+**Cut:** video compression in Expo Go and HEIC output are out until a dev build (ideas log). Full-quality originals are not cut by the build, only by size: one policy value (D7), with its own persona check before it's turned on.

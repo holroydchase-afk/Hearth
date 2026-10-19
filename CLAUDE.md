@@ -11,6 +11,7 @@ Hearth is a private family photo app for split families and for grandparents who
 ## Read first
 - `docs/product/TRACKER.md`: the one list of what's next, what's missing for milestone 1 and what's pending on Chase or Claude. Work its sequence in order, and update it in the same PR whenever a thread finishes, adds or blocks an item.
 - `docs/product/STORY.md`: why Hearth exists, the 8 problems and Hearth's answers, family stories, WV vs Charlotte. Read before any UX or positioning call.
+- `docs/product/PERSONA-CHECK.md`: TDPM. Run a persona check (one Green/Red row per persona, in `docs/product/decisions/`) before any product decision is final; `scripts/check-persona-checks.sh` enforces it.
 - `docs/product/GOALS.md`: 6 product goals (blow them away in the first three sessions, no help on old phones, set up from far away, deep not wide), each with its signal.
 - `docs/product/ANCHORS.md`: milestones, anchors (A1–A3), ideas log. Add new anchors and ideas there as Chase names them; never delete built features to satisfy one.
 - `HANDOFF.md`: current state and what's next. Start here every session.
@@ -76,3 +77,4 @@ The main Claude session is Chase's **chief of staff**. It doesn't do specialist 
 6. **Docs as we go (A4).** A PR that changes how data is stored, moved, encrypted, logged or shared updates the matching `docs/architecture/` section and its "Last checked" footer in the same PR, or adds a TRACKER row naming the stale section.
 7. **PostgREST quirks.** Branch on `error.code`, never on HTTP status (P0002 comes back as 500).
 8. **Versions from the vendor, builds on a phone** (`docs/eng/LESSONS.md`). Look up any SDK, runtime or library version on the vendor's live page; never pick one from memory. A build is ready for Chase only once a phone opened it or `scripts/check-expo-go.sh` passes.
+9. **Persona check before product decisions** (docs/product/PERSONA-CHECK.md).
