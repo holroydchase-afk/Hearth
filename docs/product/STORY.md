@@ -32,7 +32,7 @@ Eight problems, each with Hearth's answer. Two are only partly solved for the be
 | Problem | Hearth's answer | Status |
 | --- | --- | --- |
 | **Split families, 5+ group texts.** Grandma A can't comment without Grandpa B seeing it | Post once and pick the groups. Comments are visible only to that post's audience. Viewers never see group names or that other groups exist. Co-parent households are fully separated | Beta (backend tested); co-parent setup UI in v1.0 |
-| **Kids' privacy.** Deepfakes, predators, stalkers, AI training, ads | Invite-only, nothing public. Encrypted before upload. Location stripped on the phone. No AI training, face scanning, or ads, in writing | Beta. Keys are server-held, not end-to-end |
+| **Kids' privacy.** Deepfakes, predators, stalkers, AI training, ads | Invite-only, nothing public. Encrypted before upload. Location stripped on the phone. No AI training or ads, in writing. AI helpers are off until a parent turns them on, and run only on the phone (DEC-28) | Beta. Keys are server-held, not end-to-end |
 | **iPhone vs Android photos.** Missing or blurry | Native apps on both. Same 2048 px photo for everyone. No MMS | Beta |
 | **Video anxiety.** Android relatives get degraded video, so you re-send it and worry about who feels slighted | One upload, same quality for every phone | **Not in beta.** iOS video location can't be stripped yet. v1.0 (CF-17) |
 | **Parental guilt over distance.** Hard to share "enough" with grandparents far away | Sharing in 3 taps. One notice per post, so you can share often without spamming | Beta. Picking the best of 30 is an open AI question |

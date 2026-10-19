@@ -26,7 +26,8 @@ Say only what's in **True today**. Update when the code or vendors change.
 | Claim | Status | Notes |
 |---|---|---|
 | Invite-only; nothing public | True today | |
-| No ads, no AI training, no face scanning, no trackers | True today | "Never build" in CORE-FEATURES.md; keep it in writing |
+| No ads, no AI training, no trackers | True today | "Never build" in CORE-FEATURES.md; keep it in writing |
+| AI is off until your family turns it on. Then it runs only on your phones, and your photos never train anyone else's AI | True today (no AI has shipped) | DEC-28, Oct 19. Re-check when the first AI add-on ships. "No face scanning" is **retired**: don't use it, since face suggestions are planned (AI-1 phase 2) |
 | Location stripped on the phone | True today (photos) | Not video; video isn't in beta |
 | Encrypted before upload | True today | Keys are server-held. Never say "end-to-end" |
 | Stored in the US | True today | Supabase East US, Backblaze US East |
