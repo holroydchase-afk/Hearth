@@ -10,6 +10,7 @@ import { andList } from '../ui/format';
 import { useTheme } from '../ui/theme';
 import { AppGate } from './AppGate';
 import { EventCard, EventsScreen, EventUpdate, type EventsView } from './EventsScreen';
+import { MessagesScreen } from './MessagesScreen';
 import { PostCard, SessionCard } from './PostCard';
 import { QueueStatus } from './QueueStatus';
 import { TimelineScreen } from './TimelineScreen';
@@ -34,8 +35,11 @@ export function PhotosScreen() {
   const [timeline, setTimeline] = useState<{ startAt: string | null } | null>(null);
   // EVT-3/4: the Events list or one event, opened in place; Back returns here.
   const [events, setEvents] = useState<EventsView | null>(null);
+  // SPEC-MESSENGER: Messages opens in place too; Back returns here.
+  const [messages, setMessages] = useState(false);
   if (app.status !== 'ready' || !app.space || !app.feed) return <AppGate />;
   const feed = app.feed;
+  if (messages) return <MessagesScreen onClose={() => setMessages(false)} />;
   if (timeline) return <TimelineScreen startAt={timeline.startAt} onClose={() => setTimeline(null)} />;
   if (events) {
     return (
@@ -69,6 +73,7 @@ export function PhotosScreen() {
     <View style={{ gap: 12 }}>
       <Txt variant="display" role="header">{`Photos of ${app.space.name}`}</Txt>
       {senders ? <Txt variant="muted">{`Sent by ${senders}`}</Txt> : null}
+      <Button label="Messages" text="💬 Messages" variant="secondary" onPress={() => setMessages(true)} />
       {hasEvents ? (
         <Button label="See events" variant="secondary" onPress={() => setEvents({ eventId: null, fromList: true })} />
       ) : null}
