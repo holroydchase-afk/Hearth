@@ -97,6 +97,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
   - Later: encrypt captions and replies (this blocks caption search).
 - **Architecture docs (A4, white-paper source).** Write the access-control section (groups, households, events, roles, RLS from 0011) next; then retention and deletion once the purge worker exists. Keep every footer current (CLAUDE.md rule 6).
 - Schedule the nightly hard purge (`purge_soft_deleted`) on the hosted project; `deploy.sh` doesn't today. Found while writing `docs/architecture/02-data-flow.md`.
+- **Inventory of everything Hearth is building** (Chase, Oct 19, "at some point"): one list of screens, backend functions, scripts, docs and accounts, read from the repo. Not started; good fit for the central PM hub (ACT-1).
 - 0012 households-only migration (spec'd in `SPEC-GROUPS.md`, needed before milestone 3).
 
 - **Developer edition** (Chase, Oct 19; post-milestone 1, decided by D10). The bet: a developer parent clones Hearth, deploys their own copy with one command, and grows it with Claude. The repo (CLAUDE.md, agents, TDD, `docs/architecture/`) is already most of the kit. Goal: an impressive dev-community contribution, built by product and dev folks for product and dev folks.
@@ -113,6 +114,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 
 ## Done (latest first)
 
+- Oct 19: decision log started (`DECISION-LOG.md`, DEC-1 to DEC-27): each decision, why, and what it beat. Answered D-items above move there.
 - Oct 19: native look built (PR #30): system fonts, Apple colors on iPhone and Material 3 on Android, the phone's own tab bar, native buttons and switches, DS-1..DS-9 tests. The old look is saved in `docs/design/versions/`. Still to confirm on a phone in UAT: the tab bar and the gray buttons.
 - Oct 19: `grandparent-ux` rebuilt as Hearth's UI/UX designer with the ranked family personas.
 - Oct 18: anchor A4 White-paper ready; `docs/architecture/` started (overview, data flow, encryption and keys, threat model).
