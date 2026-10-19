@@ -118,7 +118,8 @@ function Hearts({ post }: { post: FeedPost }) {
     <View style={{ gap: 6 }}>
       <Button
         label="Love it"
-        text={post.i_hearted ? '♥ You love this' : '♡ Love it'}
+        text={post.i_hearted ? 'You love this' : 'Love it'}
+        icon={post.i_hearted ? { sf: 'heart.fill', md: 'favorite' } : { sf: 'heart', md: 'favorite' }}
         selected={post.i_hearted}
         variant="secondary"
         onPress={() => void feed?.toggleHeart(post.post_id)}

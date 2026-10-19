@@ -807,6 +807,83 @@
    "tests": [],
    "found": "2026-10-18",
    "fixed": "2026-10-18"
+  },
+  {
+   "id": "S17",
+   "kind": "bug",
+   "layer": "app",
+   "severity": "High",
+   "status": "fixed",
+   "title": "In Expo Go, keys could come from Math.random: expo-crypto's getRandomBytes falls back to it in dev builds. Hit photo keys, the local-storage key and chat keys. Now getRandomValues only, and it fails rather than fall back (MS4 tests)",
+   "tests": [],
+   "found": "2026-10-19",
+   "fixed": "2026-10-19"
+  },
+  {
+   "id": "S18",
+   "kind": "bug",
+   "layer": "app",
+   "severity": "Medium",
+   "status": "open",
+   "title": "Photos encrypted in Expo Go before the S17 fix may have guessable keys. Milestone 1 test data only; clear the test bucket before any real family photos go in",
+   "tests": [],
+   "found": "2026-10-19",
+   "fixed": null
+  },
+  {
+   "id": "S19",
+   "kind": "bug",
+   "layer": "app",
+   "severity": "Medium",
+   "status": "open",
+   "title": "Messenger has no key check (safety numbers): a compromised server could add a hidden phone to a chat (MS4)",
+   "tests": [],
+   "found": "2026-10-19",
+   "fixed": null
+  },
+  {
+   "id": "S20",
+   "kind": "task",
+   "layer": "app",
+   "severity": "Medium",
+   "status": "open",
+   "title": "Outside review of app/src/messenger/mlsCrypto.ts, our own HPKE and ciphersuite glue around audited libraries (not audited)",
+   "tests": [],
+   "found": "2026-10-19",
+   "fixed": null
+  },
+  {
+   "id": "T8",
+   "kind": "test fix",
+   "layer": "app",
+   "severity": "Low",
+   "status": "open",
+   "title": "Messenger crypto has no RFC 9180 known-answer vectors, and export is interop-tested in one direction only",
+   "tests": [],
+   "found": "2026-10-19",
+   "fixed": null
+  },
+  {
+   "id": "T9",
+   "kind": "test fix",
+   "layer": "ops",
+   "severity": "Low",
+   "status": "open",
+   "title": "QA-3 sent_received_test fails when run on 2026-10-19: seed posts dated that day land in its 'since today' window (also on main)",
+   "tests": [],
+   "found": "2026-10-19",
+   "fixed": null
+  },
+  {
+   "id": "T10",
+   "kind": "test fix",
+   "layer": "app",
+   "severity": "Low",
+   "status": "open",
+   "title": "The fake backend's chatFetch has no joined-at cutoff, so app tests don't cover 'newcomers can't fetch older chat rows' (SQL tests do)",
+   "tests": [],
+   "found": "2026-10-19",
+   "fixed": null
   }
  ]
 }
