@@ -1,5 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
-import * as MediaLibrary from 'expo-media-library';
+// SDK 57 moved these functions to /legacy; the root import now throws on them at runtime.
+import * as MediaLibrary from 'expo-media-library/legacy';
 import { captureInfo } from './captureDate';
 import type { QueueItem } from '../upload/queue';
 import { BULK_PICK_LIMIT, type PickedAsset } from '../share/bulk';

@@ -8,7 +8,9 @@ How data moves through Hearth, one flow at a time. Each step says who sees what.
 2. The app exchanges the code for a session (a JWT). Every later database call and every `sign-media` call carries it, and Postgres reads the user's id from it (`auth.uid()`).
 3. New members join through an invite created by a parent; the invite decides which family space and groups they land in.
 
-**Who sees what.** Supabase and Resend see the email address and the code. Supabase Auth logs the IP address (a residency gap, see 01). **Planned:** text-message codes as the default (tracker D11); other sign-in options (D12).
+**Invite links (Built, migration 0014).** `create_invite` returns a 10-letter code (for typing or reading aloud) and a link: the hosted web build's address (Expo's EAS Hosting, `https://thefreighttrains-team-hearth.expo.app/join/`) plus a 160-bit random token. Both are stored only as keyed hashes (S9). The app's one join route, `/join/<code-or-token>`, shows "Chase invited you" through `invite_preview` and joins through `redeem_invite`; both accept either value and share the rate limit (S10: 10 failures per account or address in 10 minutes). The parent sends the link from their own Messages app; Hearth doesn't send it.
+
+**Who sees what.** Supabase and Resend see the email address and the code. Supabase Auth logs the IP address (a residency gap, see 01). The phone carrier sees the invite text. The web host sees the invite link's path, token included, in its request logs; **planned (ONB-6, milestone 2):** the token moves after `#`, which browsers never send. Before 0014 links pointed at `hearth.family`, a domain Hearth hasn't bought; `backend/scripts/smoke-check.sh` fails if hosted still does. **Planned:** text-message codes as the default (tracker D11); other sign-in options (D12).
 
 ## Posting a photo (Built)
 
@@ -43,4 +45,4 @@ The upload queue survives app restarts and bad signal; each step can be retried 
 - **Gap.** The nightly hard purge (`purge_soft_deleted`, 30 days) is not scheduled by `backend/scripts/deploy.sh`; the worker that deletes queued B2 objects, removes the auth user and builds data exports is not written (`backend/README.md`). Database backups keep deleted rows, including wrapped keys, for Supabase's backup window.
 
 ---
-Last checked against code: 2026-10-18, 3031b37
+Last checked against code: 2026-10-18, 894311a (plus migration 0014, ONB-3/4)

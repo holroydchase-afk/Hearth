@@ -1,6 +1,6 @@
 // EXPO-3: milestone 1 runs in Expo Go (Chase, Oct 17), so the app reaches Chase's iPhone as an EAS Update
 // opened in Expo Go, with no laptop dev server. Expo Go only loads an update whose runtime version is its
-// SDK ("exposdk:54.0.0"), so the policy must be sdkVersion until the first real build (milestone 2).
+// SDK ("exposdk:57.0.0"), so the policy must be sdkVersion until the first real build (milestone 2).
 import appJson from '../../app.json';
 import pkg from '../../package.json';
 

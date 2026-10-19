@@ -42,8 +42,14 @@ for cmd in build submit; do
   rm -f "$T/out"; env -u EXPO_TOKEN STUB_OUT="$T/out" EAS_CLI="$T/eas" EXPO_ACCESS_TOKEN=tok-a bash scripts/eas.sh $cmd --profile preview >"$T/err" 2>&1; rc=$?
   check "NAME-1: eas $cmd refuses while the name isn't final, says why, and never calls the CLI" "(( rc != 0 )) && [[ ! -f '$T/out' ]] && grep -q 'Name final' '$T/err' && grep -q 'family.hearth.app' '$T/err'"
 done
-rm -f "$T/out"; env -u EXPO_TOKEN STUB_OUT="$T/out" EAS_CLI="$T/eas" EXPO_ACCESS_TOKEN=tok-a bash scripts/eas.sh update --branch x >/dev/null 2>&1
+# EXPO-4: `eas update` publishes only what the App Store's Expo Go can open (saved API answers, no network).
+APP_MAJOR=$(python3 -I -c "import json,re; print(re.search(r'(\d+)\.', json.load(open('package.json'))['dependencies']['expo']).group(1))")
+echo "{\"expoGoSdkVersion\": \"$APP_MAJOR.0.0\"}" > "$T/go-same.json"
+echo "{\"expoGoSdkVersion\": \"$((APP_MAJOR + 1)).0.0\"}" > "$T/go-newer.json"
+rm -f "$T/out"; env -u EXPO_TOKEN STUB_OUT="$T/out" EAS_CLI="$T/eas" EXPO_ACCESS_TOKEN=tok-a EXPO_VERSIONS_FILE="$T/go-same.json" bash scripts/eas.sh update --branch x >/dev/null 2>&1
 check "NAME-1: other EAS commands still run" "grep -q 'args=update --branch x' '$T/out'"
+rm -f "$T/out"; env -u EXPO_TOKEN STUB_OUT="$T/out" EAS_CLI="$T/eas" EXPO_ACCESS_TOKEN=tok-a EXPO_VERSIONS_FILE="$T/go-newer.json" bash scripts/eas.sh update --branch x >"$T/err" 2>&1; rc=$?
+check "EXPO-4: eas update refuses when Expo Go has moved past our SDK, says why, never calls the CLI" "(( rc != 0 )) && [[ ! -f '$T/out' ]] && grep -q 'Expo Go' '$T/err'"
 sed -i 's/^\*\*Name final:\*\* no.*/**Name final:** yes/' ../docs/product/ACCOUNTS.md
 rm -f "$T/out"; env -u EXPO_TOKEN STUB_OUT="$T/out" EAS_CLI="$T/eas" EXPO_ACCESS_TOKEN=tok-a bash scripts/eas.sh build --profile preview >/dev/null 2>&1
 check "NAME-1: once the name is final, eas build runs" "grep -q 'args=build --profile preview' '$T/out'"

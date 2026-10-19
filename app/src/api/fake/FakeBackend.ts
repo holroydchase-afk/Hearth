@@ -4,6 +4,7 @@
 // It is NOT a security boundary; it exists so the app can be built and tested against the
 // contract before the real stack is reachable. The contract tests keep the two honest.
 import { ApiError, type HearthApi } from '../HearthApi';
+import { JOIN_LINK_BASE } from '../links';
 import type {
   CircleKind,
   CommentMode,
@@ -571,7 +572,7 @@ export class FakeBackend {
       name: a.name?.trim() || null, history: a.role === 'viewer' ? a.history ?? null : null, householdMeansEveryone: false,
     };
     this.changed();
-    return { code, link: `https://hearth.family/join/${code}` };
+    return { code, link: JOIN_LINK_BASE + code };
   }
 
   renameCircle(user: string | null, circle: string, name: string): void {

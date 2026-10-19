@@ -11,11 +11,16 @@ Hearth is a private family photo app for split families and for grandparents who
 ## Read first
 - `docs/product/TRACKER.md`: the one list of what's next, what's missing for milestone 1 and what's pending on Chase or Claude. Work its sequence in order, and update it in the same PR whenever a thread finishes, adds or blocks an item.
 - `docs/product/STORY.md`: why Hearth exists, the 8 problems and Hearth's answers, family stories, WV vs Charlotte. Read before any UX or positioning call.
+- `docs/product/PERSONA-CHECK.md`: TDPM. Run a persona check (one Green/Red row per persona, in `docs/product/decisions/`) before any product decision is final; `scripts/check-persona-checks.sh` enforces it.
+- `docs/product/PM-TOOLS.md`: log of every PM tool (tracker, persona check, UAT log, #idea inbox…) and the action items (ACT-n) about them. Add a row when a PM tool is added or changed.
+- `docs/product/GOALS.md`: 6 product goals (blow them away in the first three sessions, no help on old phones, set up from far away, deep not wide), each with its signal.
 - `docs/product/ANCHORS.md`: milestones, anchors (A1–A3), ideas log. Add new anchors and ideas there as Chase names them; never delete built features to satisfy one.
 - `HANDOFF.md`: current state and what's next. Start here every session.
 - `docs/product/MILESTONE-1.md`: Chase's setup steps and the 2-day demo for milestone 1 (incl. the $99 Apple answer).
 - `docs/product/REMAINING.md`: the critical path to the Ring 0 gate (Oct 29) and the beta.
 - `docs/product/BETA-SPEC.md`: 35 acceptance criteria (BETA-*), the scope source of truth.
+- `docs/product/SPEC-MEDIA.md`: media policy (what is stripped, kept or extracted from photos; compression), rules for location ideas, Live Photos plan (MEDIA-*, LIVE-*).
+- `docs/eng/LESSONS.md`: post mortems and the rules they added. Read before choosing any version or calling a build ready.
 - `docs/eng/MERGING.md`: when and how Claude merges PRs (only on Chase's word, CI green, merge commits).
 - `docs/architecture/`: system overview, data flow, encryption and keys, threat model, written for technical privacy-focused readers (anchor A4). Its README has the writing rules.
 - `docs/eng/API.md`: the app↔backend contract. Change the contract tests before changing it.
@@ -31,7 +36,7 @@ Hearth is a private family photo app for split families and for grandparents who
   - `functions/notify/`: Deno TS; Expo Push + Resend sender, run by a 1-minute cron.
   - `functions/sign-media/`: Deno TS; presigned Backblaze B2 URLs and per-item keys.
   - `tests/`: SQL, perf, integration (PostgREST harness).
-- `app/`: Expo SDK 54, TypeScript strict, `HearthApi` with a Supabase and a Fake implementation, upload queue, media pipeline.
+- `app/`: Expo SDK 57, TypeScript strict, `HearthApi` with a Supabase and a Fake implementation, upload queue, media pipeline.
 - `prototype/`, `e2e/`: the clickable HTML prototype and its Playwright tests. Throwaway.
 - `tracker/`: Hearth Test Log seed builder.
 - `.claude/agents/`: the specialist agents. See "Chief of staff and agent roster" below.
@@ -72,3 +77,5 @@ The main Claude session is Chase's **chief of staff**. It doesn't do specialist 
 5. **Cost.** Chase is on a $20/mo plan. Run one agent lane at a time and keep reports short.
 6. **Docs as we go (A4).** A PR that changes how data is stored, moved, encrypted, logged or shared updates the matching `docs/architecture/` section and its "Last checked" footer in the same PR, or adds a TRACKER row naming the stale section.
 7. **PostgREST quirks.** Branch on `error.code`, never on HTTP status (P0002 comes back as 500).
+8. **Versions from the vendor, builds on a phone** (`docs/eng/LESSONS.md`). Look up any SDK, runtime or library version on the vendor's live page; never pick one from memory. A build is ready for Chase only once a phone opened it or `scripts/check-expo-go.sh` passes.
+9. **Persona check before product decisions** (docs/product/PERSONA-CHECK.md).
