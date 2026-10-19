@@ -110,6 +110,21 @@ Failing tests written first (Oct 18): `backend/tests/groups_v2_test.sql`, `backe
 
 **Timeline and future capture dates (Oct 17).** `get_timeline`'s `sort_at` and `get_timeline_years` treat a `taken_at` later than `published_at` as `published_at` (`timeline_future_test.sql`). The phone ignores capture dates more than 1 day in the future (BETA-BULK-1).
 
+## Messenger relay (0015, SPEC-MESSENGER; contract tests `app/src/api/contract/chat.contract.test.ts`)
+
+Bodies, key packages and signing keys are base64 MLS bytes the server never opens. Every call on a chat the caller isn't in (not a member, not a parent, a household, deleted, or no such circle) is `P0002`.
+
+| RPC | Args | Returns | Errors |
+|---|---|---|---|
+| `chat_list` | `p_space` | `circle_id, kind, title, named, member_count` per chat I'm in; `named=false` means the title lists the people (AUD-14) | `P0002` not in the space |
+| `chat_publish_device` | `p_signature_key, p_key_packages text[]` (1-50) | void; a new signing key drops the old phone's unused packages | `23514` not base64 / count; `42501` signed out |
+| `chat_key_package_count` | none | my unused packages on the server | |
+| `chat_start` | `p_circle` | `true` if I started the chat (make the MLS group), `false` if someone had | `P0002` |
+| `chat_roster` | `p_circle` | `user_id, name, signature_key` (null until they open Messages) | `P0002` |
+| `chat_claim` | `p_circle, p_users uuid[]` | one `user_id, key_package` per listed person in the chat who has one; used up | `P0002` |
+| `chat_send` | `p_circle, p_kind` (`commit`/`welcome`/`message`), `p_epoch, p_body, p_recipient` (welcome only) | row id | `23505` a commit for that epoch exists (MSG-5); `23514` kind, recipient, base64, > 64 KB |
+| `chat_fetch` | `p_circle, p_after, p_limit` (≤ 500) | rows after `p_after` in id order, created since I joined; welcomes only to their recipient | `P0002` |
+
 ## Notifications (server only)
 Triggers queue a notice on publish (audience members, not the author) and on a comment or heart (the post's author, never the reactor). The `notify` edge function runs on a 1-minute cron, calls `claim_notification_batches()` (service_role only) and sends one notice per recipient: at most 1 push per 10 minutes; email goes out when the Help screen promises (Eastern): each evening from 6 pm, or Sunday from 8 am. **Payload:** the actor's chosen display name, counts and post id only (a bulk import's batch notice also names the month and year its photos were taken, "from July 2024", counted only from posts that recipient can see); never a photo, caption, comment text or child's name. Push `data.post_id` opens the post.
 

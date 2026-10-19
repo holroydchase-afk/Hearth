@@ -12,6 +12,7 @@ import type {
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
   HeartState, InvitePreview, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
   TimelineArgs, TimelinePost, TimelineYear,
+  ChatMember, ChatRow, ChatRowKind, ChatSummary, ClaimedKeyPackage,
 } from './types';
 import { toApiError } from '../errors/messages';
 import { JOIN_LINK_BASE } from './links';
@@ -201,6 +202,21 @@ export class SupabaseApi implements HearthApi {
     const names = new Map(((profiles.data ?? []) as { id: string; display_name: string }[]).map((p) => [p.id, p.display_name]));
     return rows.filter((r) => names.has(r.user_id)).map((r) => ({ user_id: r.user_id, name: names.get(r.user_id)!, role: r.role }));
   };
+
+  // ---- messenger relay (0015) ----
+  chatList = (space: string) => this.rpc<ChatSummary[]>('chat_list', { p_space: space }).then((r) => r ?? []);
+  chatPublishDevice = (signatureKey: string, keyPackages: string[]) =>
+    this.rpc<void>('chat_publish_device', { p_signature_key: signatureKey, p_key_packages: keyPackages });
+  chatKeyPackageCount = () => this.rpc<number>('chat_key_package_count');
+  chatStart = (circle: string) => this.rpc<boolean>('chat_start', { p_circle: circle });
+  chatRoster = (circle: string) => this.rpc<ChatMember[]>('chat_roster', { p_circle: circle }).then((r) => r ?? []);
+  chatClaim = (circle: string, users: string[]) =>
+    this.rpc<ClaimedKeyPackage[]>('chat_claim', { p_circle: circle, p_users: users }).then((r) => r ?? []);
+  chatSend = (circle: string, kind: ChatRowKind, epoch: number, body: string, recipient?: string) =>
+    this.rpc<number>('chat_send', { p_circle: circle, p_kind: kind, p_epoch: epoch, p_body: body, p_recipient: recipient ?? null }).then(Number);
+  chatFetch = (circle: string, after: number, limit = 200) =>
+    this.rpc<ChatRow[]>('chat_fetch', { p_circle: circle, p_after: after, p_limit: limit })
+      .then((r) => (r ?? []).map((x) => ({ ...x, id: Number(x.id), epoch: Number(x.epoch) })));
 
   // ---- sign-media ----
   signUpload = (post: string, items: UploadItemSpec[]) => this.fnCall<UploadGrant>('POST', '', { action: 'upload', post_id: post, items });

@@ -14,7 +14,8 @@ How data moves through Hearth, one flow at a time. Each step says who sees what.
 
 ## Posting a photo (Built)
 
-1. **On the phone.** The photo is decoded (applying its rotation), resized to a display and a thumbnail version, and re-encoded. Re-encoding drops all EXIF, GPS and maker data. The pipeline then scans the output bytes and refuses to continue if any EXIF segment survived (`app/src/media/pipeline.ts`). Video posting is off until video location data can be stripped the same way (`app/src/media/prepare.ts`).
+1. **On the phone.** The photo is decoded (applying its rotation), resized to a display and a thumbnail version, and re-encoded as JPEG at the media policy's size and quality (2048 px, 0.82). The encoder may still write a small Exif block (iOS writes colour space and pixel size), so a pure-TypeScript cleaner then copies each JPEG segment by segment and keeps only the image itself, the JFIF header and the colour profile (ICC, e.g. Display P3); location, date, camera and lens, serial numbers, software, maker notes (including Apple's Live Photo ID), XMP, face regions, IPTC, comments, unknown blocks and anything after the image end are removed. A verifier re-reads the result and refuses to continue (`META_<GROUP>`, e.g. `META_LOCATION`) if anything the policy strips survived. The rules are one frozen, versioned object in the app's code (`app/src/media/policy.ts`, `clean.ts`, `pipeline.ts`); no server setting can change them. The date taken is read from the photo picker, not the file, and only the date is sent. Video posting is off until video location data can be stripped the same way (`app/src/media/prepare.ts`).
+   If a photo fails for good, the app sends one error report with only the error code and the screen name `upload` (never the file, a URL, a key, a caption or any metadata) to our own fixed-shape error table.
 2. **Draft.** The app calls `create_post` with a caption and the chosen groups. It is idempotent on a client-generated id, so a retry never creates a duplicate.
 3. **Upload grant.** The app asks `sign-media` for an upload. Postgres checks the caller may post in that space and creates pending media rows; the database refuses any row not marked `exif_stripped`. `sign-media` creates a fresh 256-bit key per item, stores it wrapped, and returns the key plus presigned PUT URLs valid for 10 minutes.
 4. **Encrypt and upload.** The app encrypts each version with its key (format in [03](03-encryption-and-keys.md)) and PUTs the ciphertext straight to B2. The signed URL only accepts `application/octet-stream`.
@@ -38,6 +39,10 @@ The upload queue survives app restarts and bad signal; each step can be retried 
 
 **Planned:** a setting to send notices with no names (tracker D9).
 
+## Messages (Built, migration 0015)
+
+Group chat is end-to-end encrypted with MLS: phones seal messages before sending, the server relays them, and the history lives on each phone. The full flow is in [06-messenger.md](06-messenger.md).
+
 ## Deletion
 
 - **Delete a post (Built).** `delete_post` soft-deletes the post, deletes its wrapped keys and queues its B2 objects for removal. With the keys gone, Hearth can no longer decrypt those objects, even before they are removed.
@@ -45,4 +50,4 @@ The upload queue survives app restarts and bad signal; each step can be retried 
 - **Gap.** The nightly hard purge (`purge_soft_deleted`, 30 days) is not scheduled by `backend/scripts/deploy.sh`; the worker that deletes queued B2 objects, removes the auth user and builds data exports is not written (`backend/README.md`). Database backups keep deleted rows, including wrapped keys, for Supabase's backup window.
 
 ---
-Last checked against code: 2026-10-18, 894311a (plus migration 0014, ONB-3/4)
+Last checked against code: 2026-10-19, a522a3a (plus migrations 0014, 0015) and 624fc39 (MEDIA-1/2/3 on-phone cleaner)

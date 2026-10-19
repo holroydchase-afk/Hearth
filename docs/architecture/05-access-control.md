@@ -66,6 +66,10 @@ A feature such as video posting is on for someone only when three switches are a
 
 A relative's profile (display name) is visible to the people they share a family space with as a parent, to people in a live group with them (`public.can_see_profile`; a deleted group, or a deleted family space, no longer counts, migration 0012, S13), and to whoever can read one of their replies. Only a family space's parents can unlink a child from that space; a co-parent who is a viewer there can't (migration 0012, S11).
 
+## Who is in a chat (Built, migration 0015)
+
+A group's or event's chat holds the group's members plus the family's parents; households have no chat. Anyone else gets "not found". Relatives see a plain group's chat titled by its people, not its name. Details in [06-messenger.md](06-messenger.md); tests in `backend/tests/chat_test.sql`.
+
 ## How it's tested (Built)
 
 - `backend/tests/rls_test.sql` (120 checks), `backend/tests/groups_test.sql` (167) and `backend/tests/groups_v2_test.sql` (108): each rule in both directions, the allowed person sees it and the excluded person doesn't, including grandparent and co-parent separation. The v2 suite also checks that `get_comments`, table RLS, `reply_ok`, the feed counts and `reply_scope` agree for every person and every reply.
@@ -86,4 +90,4 @@ RLS limits what each family member's app can read. It does not limit Hearth's se
 - **Planned:** event dates (`starts_on`, `ends_on`) exist in the schema but the app doesn't use them yet.
 
 ---
-Last checked against code: 2026-10-18, b0d1d2b (plus migration 0013)
+Last checked against code: 2026-10-19, a522a3a (plus migrations 0013, 0015)

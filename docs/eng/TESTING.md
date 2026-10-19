@@ -2,7 +2,7 @@
 
 **Rule:** no fix or feature without a test that fails first.
 
-1. Log it as a ticket: B# bug, E# enhancement, S# security, T# test fix.
+1. Log it as a ticket: B# bug, E# enhancement, S# security, T# test fix. Tickets live in `tracker/build_seed.py`; a bug found but not fixed still gets an open ticket in the same PR that found it.
 2. Write the test, with the ticket ID in its title, e.g. `POST-04 Remove a picked photo (E6)`.
 3. Run it and confirm it **fails**. Save the run.
 4. Fix the code.
