@@ -28,6 +28,7 @@ Built means it exists and is in use. "Hub" marks what ACT-1 should show.
 | #idea inbox | Any message with "#idea" is logged word for word, with a 👍 and no discussion | `/mnt/project-files/ideas/IDEAS.md` | Built | Yes |
 | Hearth Test Log | Test cases, tickets and runs, built from real test output | `tracker/hearth-test-log.html`, `tracker/build_seed.py` | Built | Yes |
 | Gate reviews | Staff-pm go/no-go reviews of plans and milestones | `docs/product/PM-REVIEW.md`, `REMAINING.md` | Built | No |
+| Decision log | Every decision with why and what it was chosen over (DEC-n), so Claude can retell the story ("we chose Supabase because…"). Threads add an entry when a call is made | `docs/product/DECISION-LOG.md` | Built (Oct 19) | Yes |
 | Post mortems | What went wrong and the rules it added | `docs/eng/LESSONS.md` | Built | No |
 | Claims register | What marketing can truthfully say today, plus marketing ideas | `docs/product/MARKETING.md` | Built | No |
 | Accounts list | Every outside account and where the name "Hearth" is baked in | `docs/product/ACCOUNTS.md` | Built | No |
