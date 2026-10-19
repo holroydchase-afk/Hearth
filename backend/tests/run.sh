@@ -7,6 +7,7 @@
 #   tests/timeline_future_test.sql  capture dates after the share date (BETA-TIME-2/4)
 #   tests/privacy_audit_test.sql  PRIV-1: no raw IP addresses kept (migration 0012)
 #   tests/groups_v2_test.sql  GRP-2..14, FLAG-1..4, EVT-1: plain groups, comment settings, feature flags (SPEC-GROUPS v2, migration 0013)
+#   tests/chat_test.sql       MSG-1..8: messenger relay, MLS bytes only (SPEC-MESSENGER, migration 0015)
 #   tests/aud16/  BETA-AUD-16: snapshot on 0001-0010, apply 0011+, diff (0011 must change nobody's access)
 #   tests/grp1/   GRP-1/GRP-2: snapshot on 0001-0012, apply 0013+, diff (0013 must change nobody's access)
 # Usage: tests/run.sh   (needs a local Postgres 15+; PGUSER must be a superuser)
@@ -15,7 +16,7 @@ cd "$(dirname "$0")/.."
 DB=${DB:-hearth_test}
 STATUS=0
 for suite in tests/rls_test.sql tests/api_test.sql tests/notify_test.sql tests/setup_test.sql tests/reply_test.sql tests/timeline_test.sql \
-             tests/groups_test.sql tests/timeline_future_test.sql tests/privacy_audit_test.sql tests/groups_v2_test.sql; do
+             tests/groups_test.sql tests/timeline_future_test.sql tests/privacy_audit_test.sql tests/groups_v2_test.sql tests/chat_test.sql; do
   dropdb --if-exists "$DB"
   createdb "$DB"
   files=(-f tests/supabase_stub.sql)

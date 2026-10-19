@@ -7,7 +7,7 @@
 // Plaintext chunks are 64 KiB (the last may be shorter, or empty for an empty file).
 // Binding the index and the last flag into the nonce makes reordering, dropping
 // or truncating chunks fail authentication (the STREAM construction).
-import { gcm } from '@noble/ciphers/aes';
+import { gcm } from '@noble/ciphers/aes.js';
 import { fromBase64 } from './base64';
 import { randomBytes } from './random';
 

@@ -9,7 +9,7 @@ export interface MessageContext {
   action?: 'post' | 'comment' | 'join' | 'invite' | 'group' | 'other';
 }
 
-const KNOWN: ApiErrorCode[] = ['23514', '42501', 'P0002', '22023', '54000'];
+const KNOWN: ApiErrorCode[] = ['23514', '23505', '42501', 'P0002', '22023', '54000'];
 
 export function toApiError(e: unknown): ApiError {
   if (e instanceof ApiError) return e;
