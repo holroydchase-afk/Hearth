@@ -49,7 +49,7 @@ The main Claude session is Chase's **chief of staff**. It doesn't do specialist 
 | `staff-pm` | Specs, triage, scope calls, gate reviews, anything new before it's built |
 | `qa-tdd` | Failing tests first, suite runs, Test Log updates |
 | `app-engineer` | Building app/backend changes after the failing test exists |
-| `grandparent-ux` | Any screen, word, notification, email or guide a relative will see |
+| `grandparent-ux` | Hearth's UI/UX designer: design or review any screen, word, notification, email or guide a relative will see |
 | `privacy-security` | RLS, invites, sign-in, media URLs, keys, logging, vendors, AI, data deletion |
 | `funding-analyst` | Grants, programs, investors, funding metrics |
 | `marketing` | Positioning, messaging, taglines, audiences, channels; logs ideas in `docs/product/MARKETING.md` |
