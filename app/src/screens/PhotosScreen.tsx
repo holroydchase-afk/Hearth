@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApp, useFeed } from '../state/AppContext';
+import { eventList, photosRows, type PhotosRow } from '../feed/events';
+import { withSessions } from '../feed/sessions';
 import { earlierGroups, isFromEarlier, monthSpan, startOfNextMonth, type EarlierGroup } from '../feed/timeline';
 import { Button, Card, Loading, Notice, Txt } from '../ui/kit';
 import { andList } from '../ui/format';
 import { useTheme } from '../ui/theme';
 import { AppGate } from './AppGate';
-import { PostCard } from './PostCard';
+import { EventCard, EventsScreen, EventUpdate, type EventsView } from './EventsScreen';
+import { MessagesScreen } from './MessagesScreen';
+import { PostCard, SessionCard } from './PostCard';
 import { QueueStatus } from './QueueStatus';
 import { TimelineScreen } from './TimelineScreen';
 import { YourName } from './YourName';
@@ -29,18 +33,50 @@ export function PhotosScreen() {
   const { c } = useTheme();
   // BETA-TIME-2: the timeline opens in place; "Back to Photos" returns here.
   const [timeline, setTimeline] = useState<{ startAt: string | null } | null>(null);
+  // EVT-3/4: the Events list or one event, opened in place; Back returns here.
+  const [events, setEvents] = useState<EventsView | null>(null);
+  // SPEC-MESSENGER: Messages opens in place too; Back returns here.
+  const [messages, setMessages] = useState(false);
   if (app.status !== 'ready' || !app.space || !app.feed) return <AppGate />;
   const feed = app.feed;
+  if (messages) return <MessagesScreen onClose={() => setMessages(false)} />;
   if (timeline) return <TimelineScreen startAt={timeline.startAt} onClose={() => setTimeline(null)} />;
+  if (events) {
+    return (
+      <EventsScreen
+        posts={state.posts}
+        view={events}
+        hasMore={state.hasMore}
+        loadingMore={state.status === 'loadingMore'}
+        onLoadMore={() => void feed.loadMore()}
+        onOpen={(eventId) => setEvents({ eventId, fromList: true })}
+        onClose={() => setEvents(null)}
+      />
+    );
+  }
   const senders = andList(state.posts.map((p) => p.author_name));
   // BETA-TIME-1: old photos added today don't take over the top; they go in a card.
   const earlier = earlierGroups(state.posts);
   const recent = state.posts.filter((p) => !isFromEarlier(p));
+  // EVT-2/3: an event's first post is a bigger card; its later posts are ordinary cards (EVENT_LATER_POSTS_IN_PHOTOS).
+  // SESS-1/2: a sender's posts to the same groups within an hour are one entry (display only).
+  const rows = withSessions(photosRows(recent));
+  const hasEvents = eventList(state.posts).length > 0;
+  const openEvent = (eventId: string) => setEvents({ eventId, fromList: false });
+  const renderRow = ({ item }: { item: PhotosRow }) =>
+    item.type === 'post' ? <PostCard post={item.post} />
+      : item.type === 'session' ? <SessionCard posts={item.posts} />
+      : item.type === 'event' ? <EventCard eventId={item.eventId} eventName={item.eventName} post={item.post} onOpen={() => openEvent(item.eventId)} />
+        : <EventUpdate eventId={item.eventId} eventName={item.eventName} photoCount={item.photoCount} onOpen={() => openEvent(item.eventId)} />;
 
   const header = (
     <View style={{ gap: 12 }}>
       <Txt variant="display" role="header">{`Photos of ${app.space.name}`}</Txt>
       {senders ? <Txt variant="muted">{`Sent by ${senders}`}</Txt> : null}
+      <Button label="Messages" icon={{ sf: 'bubble.left.and.bubble.right', md: 'chat' }} variant="secondary" onPress={() => setMessages(true)} />
+      {hasEvents ? (
+        <Button label="See events" variant="secondary" onPress={() => setEvents({ eventId: null, fromList: true })} />
+      ) : null}
       {app.space.can_post ? <YourName /> : null}
       <QueueStatus />
       {state.notice ? <Notice text={state.notice} onClose={() => feed.clearNotice()} /> : null}
@@ -69,9 +105,9 @@ export function PhotosScreen() {
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={{ flex: 1, backgroundColor: c.bg }}>
       <FlatList
-        data={recent}
-        keyExtractor={(p) => p.post_id}
-        renderItem={({ item }) => <PostCard post={item} />}
+        data={rows}
+        keyExtractor={(r) => r.key}
+        renderItem={renderRow}
         ListHeaderComponent={header}
         ListEmptyComponent={empty}
         ListFooterComponent={

@@ -1,6 +1,7 @@
 import React, { Component, type ReactNode } from 'react';
 import { View } from 'react-native';
 import type { ClientErrorReport } from '../api/types';
+import { recordProblem } from '../errors/problemLog';
 import { errorReport } from '../errors/report';
 import { Button, Txt } from './kit';
 
@@ -21,6 +22,7 @@ export class ErrorBoundary extends Component<Props, { failed: boolean }> {
   override componentDidCatch(e: unknown) {
     // Never log captions, keys or URLs: only the error type.
     console.warn('Hearth screen error', e instanceof Error ? e.name : typeof e);
+    recordProblem(e, this.props.screen ?? 'app'); // DBG-1: debug builds only, redacted
     try {
       this.props.onReport?.(errorReport(e, this.props.screen ?? 'app')).catch(() => {});
     } catch { /* a report must never cause a second error */ }

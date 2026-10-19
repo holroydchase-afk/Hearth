@@ -68,13 +68,26 @@ def section_for(desc):
         if pos < m.start(): idx = i + 1
     return SECT_NAME.get(idx, "Other")
 
-sql_lines = re.findall(r"^\s*(\d+)\s*\|\s*(ok|not ok|FAIL)\s*\|\s*(.+?)\s*$", ANSI.sub("", (RES / "backend-sql.txt").read_text()), re.M)
+# backend-sql.txt holds every suite run.sh runs, each numbered from 1 and closed by "<NAME> RESULT:".
+# The first (rls_test.sql) keeps the SQL-nnn ids older runs used; the others are <NAME>-nnn (T6: before,
+# every suite's case 1 became SQL-001 and overwrote the others).
+SUITE_FILE = {"SQL": "rls_test.sql", "API": "api_test.sql", "NOTIFY": "notify_test.sql", "SETUP": "setup_test.sql",
+              "REPLY": "reply_test.sql", "TIMELINE": "timeline_test.sql", "GROUPS": "groups_test.sql",
+              "TIMELINE-FUTURE": "timeline_future_test.sql", "PRIVACY-AUDIT": "privacy_audit_test.sql", "AUD-16": "aud16/"}
+SUITE_AREA = {"API": "API contract", "NOTIFY": "Notices", "SETUP": "Family setup", "REPLY": "Who reads replies",
+              "TIMELINE": "Timeline", "GROUPS": "Groups, households, events", "TIMELINE-FUTURE": "Timeline",
+              "PRIVACY-AUDIT": "Privacy audit (no raw IPs)", "AUD-16": "Groups, households, events"}
+sql_txt = ANSI.sub("", (RES / "backend-sql.txt").read_text())
 sql_cases, sql_res = [], {}
-for n, status, desc in sql_lines:
-    desc = re.sub(r"\s+\[.*\]$", "", desc).strip()
-    cid = f"SQL-{int(n):03d}"
-    sql_cases.append({"id": cid, "title": desc, "area": section_for(desc), "tickets": [], "where": "backend/tests/rls_test.sql"})
-    sql_res[cid] = status == "ok"
+for chunk, name in re.findall(r"(.*?)^([A-Z0-9 -]*?)\s*RESULT:[^\n]*$", sql_txt, re.M | re.S):
+    name = (name.strip() or "SQL").replace(" ", "-")
+    for n, status, desc in re.findall(r"^\s*(\d+)\s*\|\s*(ok|not ok|NOT OK|FAIL)\s*\|\s*(.+?)\s*$", chunk, re.M):
+        desc = re.sub(r"\s+\[.*\]$", "", desc).strip()
+        cid = f"{name}-{int(n):03d}"
+        area = section_for(desc) if name == "SQL" else SUITE_AREA.get(name, name.title())
+        sql_cases.append({"id": cid, "title": desc, "area": area, "tickets": [],
+                          "where": "backend/tests/" + SUITE_FILE.get(name, "")})
+        sql_res[cid] = status == "ok"
 SEC_TICKETS = {"S1": ["removed", "no longer a member", "left the space", "former member"],
                "S2": ["publish", "viewers_can_post"], "S3": ["mime", "kind"], "S4": ["billing", "plan_customer", "quota", "video count"],
                "S5": ["child", "half-sibling"], "S6": ["birth"], "S7": ["edit their comment", "lost access to a post cannot edit"]}
@@ -104,7 +117,6 @@ manual = [
  ("M-03", "Larger text is readable at arm's length", "Prototype", "As a grandparent, turn on Larger text in Me. Hold the phone at arm's length.", "Captions and comments readable without glasses (or with their usual pair)."),
  ("M-04", "New circle end to end", "Prototype", "Make a circle, add 2 people, share a photo only to it, then switch Viewing as to someone outside it.", "Only the 2 people see it; the outsider sees nothing."),
  ("M-05", "Install from TestFlight link on iPhone", "iPhone", "Open the TestFlight public link on an iPhone that has never had Hearth.", "Installed and signed in by text link in under 3 minutes. Blocked until build #1."),
- ("M-06", "Android, no app: invite link opens web viewer", "Android", "Text an invite link to an Android phone without the app. Open it.", "Photos show in the browser; no app or password needed."),
  ("M-07", "iPhone to Android photo arrives full quality", "iPhone + Android", "Post from an iPhone to a circle with an Android grandparent who chose Text message link.", "Text arrives within a minute; photo opens sharp, not an MMS thumbnail."),
  ("M-08", "60-second video over cellular", "iPhone", "On cellular (Wi-Fi off), share a 60s video.", "Uploads in under 30s and plays on an older phone."),
  ("M-09", "Location removed from photos", "iPhone + Android", "Share a photo taken with location on. Download it on another phone and check its info.", "No GPS location in the file."),
@@ -115,6 +127,20 @@ manual = [
  ("M-14", "BETA-BULK-4/7 Bulk send survives no network, then network", "iPhone", "Bulk-pick 48 photos. Tap Send, then turn on airplane mode at about 'Sending 12 of 48'. Force-quit. Wait 1 minute, turn airplane mode off, reopen Hearth.", "It finishes on its own: 48 photos in the right posts, none twice. The other phone gets 1 notice. A downloaded copy has no location."),
  ("M-15", "BETA-AUD-17 Share sheet: Everyone first, then Groups, then Events", "iPhone", "On Chase's iPhone, Chase and then Mom each share one photo to Everyone and one to the Charleston trip. Then ask each: who sees this one?", "Everyone is first and takes 1 tap; Groups then Events follow, each as name plus 'N people'; both answer 'who sees this?' correctly from the screen alone (2 of 2)."),
  ("M-16", "BETA-AUD-22 Make an event unaided (milestone 4)", "iPhone", "Ask Chase to make 'Thanksgiving 2026' by ticking groups and households. Time it. Don't help.", "Under 60 seconds; it shows under Events in the share sheet as name plus 'N people'; the screen says everyone in it can read each other's comments on its photos."),
+ # QA-4 (Oct 18): the real app's cases. M-06 (web viewer for Android without the app) is dropped: not in BETA-SPEC.
+ ("M-17", "BETA-JOIN-5 Still signed in after 7 days", "iPhone", "Sign in, then don't open Hearth for 7 days. Open it.", "Photos open straight away; no new code asked for."),
+ ("M-18", "BETA-NOTIFY-1 Notices arrive within a minute", "iPhone + account B", "As B, comment on 10 posts over 2 days. Note when each notice arrives (the Help screen's timing log, AE-10).", "9 of 10 arrive within 1 minute."),
+ # Milestone 1 demo (docs/product/MILESTONE-1.md): Chase's iPhone in Expo Go plus account B on the web build.
+ ("M1-01", "BETA-JOIN-2 Sign in with the 6-digit email code", "iPhone (Expo Go)", "Sign in with your email; type the 6-digit code from the email.", "In within a minute; no password."),
+ ("M1-02", "BETA-JOIN-1 Account B joins with the Test house code", "Web build", "As account B, tap 'I have an invite code' and type the Test house code.", "B joins and sees only Everyone and Test house posts."),
+ ("M1-03", "BETA-SHARE-1 Post 3 photos to Test house in 3 taps or fewer", "iPhone (Expo Go)", "Post 3 photos to 'Test house'.", "At the top of your Photos right away; B sees all 3 within a minute."),
+ ("M1-04", "BETA-SEE-3 Full screen with buttons", "Web build", "As B: tap a photo, use Next/Back, then Close.", "Full screen; buttons work, not just swipes."),
+ ("M1-05", "BETA-AUD-1 A post to Gammy's house never reaches B", "iPhone (Expo Go)", "Post 1 photo to 'Gammy's house' only.", "B never sees it."),
+ ("M1-06", "BETA-SHARE-4 Airplane mode, then network", "iPhone (Expo Go)", "Turn on airplane mode, post, turn it off.", "It sends on its own."),
+ ("M1-07", "BETA-REPLY-3 / NOTIFY-4 Comment and heart send one email notice", "Web build + email", "As B: comment and heart.", "You get one email notice."),
+ ("M1-08", "M-09 / BETA-SEE-5 Save to phone, no location", "iPhone (Expo Go)", "Save a photo to your phone; check its info in Photos.", "It's there at 2048 px with no location."),
+ ("M1-09", "Gate: 10+ posts over 2 days, 0 lost (QA-3)", "iPhone + web build", "Keep posting until 10+ posts over 2 days, then run backend/scripts/sent-vs-received.sh (MILESTONE-1.md).", "RESULT: sent N, received N, lost 0; 0 crash reports."),
+ ("M1-10", "BETA-BULK-1 fallback: a screenshot gets its date", "iPhone (Expo Go)", "Bulk-pick a screenshot (no EXIF date) with 2 normal photos.", "The screenshot sits under the day it was taken, not undated."),
 ]
 write("suites", "manual", {"name": "Manual tests (people + real phones)", "kind": "manual",
       "how": "Run on a real phone, then log the result on this page.", "order": 4,
@@ -157,23 +183,57 @@ tickets = [
  ("S7", "bug", B, "Low", "fixed", "Could edit your comment on a post you can no longer see", []),
  ("S8", "bug", E_, "Low", "fixed", "Edge function failed type-checking on current Deno, so the documented test command didn't run", []),
  # open backlog
- ("S9", "bug", B, "Medium", "open", "Space managers can read invite code hashes; 8-character codes are crackable offline in about a day. Salt or lengthen codes.", []),
- ("S10", "bug", B, "Medium", "open", "No rate limit on redeeming invite codes", []),
- ("S11", "bug", B, "Medium", "open", "A guardian can unlink their child from the other household's space", []),
- ("S12", "bug", B, "Low", "open", "Removed members can still edit captions on their old posts", []),
- ("S13", "bug", B, "Low", "open", "Members of a deleted circle can still see each other's profiles", []),
+ ("S9", "bug", B, "Medium", "fixed", "Space managers can read invite code hashes; 8-character codes are crackable offline in about a day. Salt or lengthen codes.", []),
+ ("S10", "bug", B, "Medium", "fixed", "No rate limit on redeeming invite codes", []),
+ ("S11", "bug", B, "Medium", "fixed", "A guardian can unlink their child from the other household's space", []),
+ ("S12", "bug", B, "Low", "fixed", "Removed members can still edit captions on their old posts", []),
+ ("S13", "bug", B, "Low", "fixed", "Members of a deleted circle can still see each other's profiles", []),
  ("S14", "bug", B, "Low", "open", "Free-tier video cap is per space; someone can make extra spaces", []),
- ("S15", "bug", E_, "Low", "open", "Media can be marked ready without its key saved, which breaks that post (fails closed)", []),
- ("S16", "task", B, "High", "open", "Rerun the backend suite on a real Supabase stack before launch (today's runs use a stand-in)", []),
+ ("S15", "bug", E_, "Low", "fixed", "Media can be marked ready without its key saved, which breaks that post (fails closed)", []),
+ ("S16", "task", B, "High", "fixed", "Rerun the backend suite on a real Supabase stack before launch (today's runs use a stand-in)", []),
  ("E9", "enhancement", P, "High", "open", "Filter the feed by child (tag Mia / Leo on a post)", []),
- ("E10", "enhancement", P, "High", "open", "Save a photo to your phone (grandparents print them)", []),
+ ("E10", "enhancement", "app", "High", "fixed", "Save a photo to your phone (grandparents print them)", []),
  ("E11", "enhancement", P, "Medium", "open", "Undo for 10 seconds after deleting a post", []),
  ("E12", "enhancement", P, "Medium", "open", "Tell people about the 60-second video limit and free-tier video count when they pick a video", []),
  ("E13", "enhancement", P, "Medium", "open", "Invite status: joined or pending, plus resend and cancel", []),
- ("E14", "enhancement", P, "Medium", "open", "Upload progress and automatic retry on bad cell signal", []),
+ ("E14", "enhancement", "app", "Medium", "fixed", "Upload progress and automatic retry on bad cell signal", []),
  ("E15", "enhancement", P, "Low", "open", "Multilingual app (Spanish first)", []),
  ("E16", "enhancement", P, "Low", "open", "Send a circle's photos to a smart frame", []),
+ # QA-5 (Oct 18): app-engineer work items as tickets, and what BETA-SPEC defers
+ ("AE-2", "enhancement", B, "High", "fixed", "Notification sender: outbox (0003) plus the notify function (Expo Push + Resend), 1-minute cron", []),
+ ("AE-3", "task", "app", "High", "open", "First real-device pass on Chase's iPhone: resize, EXIF scan (M-09), encrypted upload, save to phone, code sign-in", []),
+ ("AE-4", "task", "app", "Medium", "fixed", "Publish to Expo Go as an EAS Update (branch preview) and the web build", []),
+ ("AE-5", "enhancement", "app", "Medium", "fixed", "'Take me off Hearth' for non-owners (BETA-JOIN-7)", []),
+ ("AE-6", "task", "app", "Medium", "open", "TestFlight external submission (milestone 3, after the name is final)", []),
+ ("AE-7", "enhancement", B, "Medium", "fixed", "Our own error reports, fixed fields only, 30 days (0006, BETA-OPS-1)", []),
+ ("AE-8", "bug", B, "Low", "fixed", "S12: removed members can't edit their old captions (0005, BETA-REPLY-4)", []),
+ ("V1", "enhancement", "app", "Medium", "deferred", "Video posting: off until location can be stripped from video too (BETA-SPEC)", []),
+ ("REPLY-1", "enhancement", "app", "Low", "deferred", "BETA-REPLY-1, deferred in BETA-SPEC", []),
+ # Overnight Oct 18 (privacy first)
+ ("PRIV-1", "bug", B, "Medium", "fixed", "The invite rate limit kept raw IP addresses, and the last ones could stay forever. Now a keyed hash, purged daily, pepper replaced daily (0012)", []),
+ ("PRIV-2", "bug", "ops", "Medium", "fixed", "Nothing stopped a log line from printing a key, URL or caption; sign-media logged raw error messages. CI log check added", []),
+ ("QA-3", "task", "ops", "High", "fixed", "Sent-vs-received check for the milestone 1 gate's '0 lost' (backend/scripts/sent-vs-received.sh)", []),
+ ("QA-2", "task", "ops", "High", "fixed", "Read-only smoke check of the hosted project (D1; backend/scripts/smoke-check.sh)", []),
+ ("BULK-1F", "enhancement", "app", "High", "fixed", "Photos with no EXIF date take the photo library's creation time, with no new permission prompt", []),
+ ("T7", "test fix", "app", "Low", "fixed", "Contract test BETA-TIME-4 failed on the real-API harness (also on main): BETA-TIME-2 had made a 2019 post in the same database. It now uses years no other test uses", []),
+ ("T6", "test fix", "ops", "Medium", "fixed", "Test Log builder gave every backend suite's case 1 the same id (SQL-001), so later suites overwrote earlier ones. Ids are now per suite", []),
+ # Messenger build and its crypto review (Oct 19, PR #29)
+ ("S17", "bug", "app", "High", "fixed", "In Expo Go, keys could come from Math.random: expo-crypto's getRandomBytes falls back to it in dev builds. Hit photo keys, the local-storage key and chat keys. Now getRandomValues only, and it fails rather than fall back (MS4 tests)", []),
+ ("S18", "bug", "app", "Medium", "open", "Photos encrypted in Expo Go before the S17 fix may have guessable keys. Milestone 1 test data only; clear the test bucket before any real family photos go in", []),
+ ("S19", "bug", "app", "Medium", "open", "Messenger has no key check (safety numbers): a compromised server could add a hidden phone to a chat (MS4)", []),
+ ("S20", "task", "app", "Medium", "open", "Outside review of app/src/messenger/mlsCrypto.ts, our own HPKE and ciphersuite glue around audited libraries (not audited)", []),
+ ("T8", "test fix", "app", "Low", "open", "Messenger crypto has no RFC 9180 known-answer vectors, and export is interop-tested in one direction only", []),
+ ("T9", "test fix", "ops", "Low", "open", "QA-3 sent_received_test fails when run on 2026-10-19: seed posts dated that day land in its 'since today' window (also on main)", []),
+ ("T10", "test fix", "app", "Low", "open", "The fake backend's chatFetch has no joined-at cutoff, so app tests don't cover 'newcomers can't fetch older chat rows' (SQL tests do)", []),
 ]
+# When each ticket was found and fixed, where it isn't Oct 15.
+DATES = {"S9": ("2026-10-15", "2026-10-16"), "S10": ("2026-10-15", "2026-10-16"), "S12": ("2026-10-15", "2026-10-16"),
+         "S16": ("2026-10-15", "2026-10-17"), "S11": ("2026-10-15", "2026-10-18"), "S13": ("2026-10-15", "2026-10-18"), "S15": ("2026-10-15", "2026-10-18"), "E10": ("2026-10-15", "2026-10-16"), "E14": ("2026-10-15", "2026-10-16"),
+         "AE-2": ("2026-10-16", "2026-10-16"), "AE-3": ("2026-10-16", None), "AE-4": ("2026-10-16", "2026-10-18"),
+         "AE-5": ("2026-10-16", "2026-10-16"), "AE-6": ("2026-10-16", None), "AE-7": ("2026-10-16", "2026-10-16"),
+         "AE-8": ("2026-10-16", "2026-10-16"), "V1": ("2026-10-16", None), "REPLY-1": ("2026-10-16", None),
+         **{t: ("2026-10-18", "2026-10-18") for t in ("PRIV-1", "PRIV-2", "QA-3", "QA-2", "BULK-1F", "T6", "T7")},
+         "S17": ("2026-10-19", "2026-10-19"), **{t: ("2026-10-19", None) for t in ("S18", "S19", "S20", "T8", "T9", "T10")}}
 # link backend tickets to SQL tests
 for c in sql_cases:
     for t in c["tickets"]:
@@ -181,8 +241,15 @@ for c in sql_cases:
             if tk[0] == t: tk[6].append(c["id"])
 for tk in tickets:
     if tk[0] == "S8": tk[6].extend(c["id"] for c in edge_cases)
+# a ticket id written in a test's title, e.g. "BETA-JOIN-4 (S9) ..." or "PRIV-1 ..."
+ids = {tk[0] for tk in tickets}
+for c in sql_cases:
+    for t in re.findall(r"\b(S\d+|PRIV-\d+)\b", c["title"]):
+        if t in ids:
+            next(tk for tk in tickets if tk[0] == t)[6].append(c["id"])
 write("tickets", "all", {"items": [{"id": i, "kind": k, "layer": l, "severity": s, "status": st, "title": t,
-      "tests": sorted(set(ts)), "found": "2026-10-15", "fixed": "2026-10-15" if st == "fixed" else None}
+      "tests": sorted(set(ts)), "found": DATES.get(i, ("2026-10-15",))[0],
+      "fixed": DATES[i][1] if i in DATES else ("2026-10-15" if st == "fixed" else None)}
       for i, k, l, s, st, t, ts in tickets]})
 
 # ---------------- Runs ----------------
@@ -198,7 +265,8 @@ run("r2", suite="prototype", at="2026-10-15T08:30:00-04:00", label="Prototype v2
 run("r3", suite="backend", at="2026-10-15T00:55:00-04:00", label="Day 1 backend baseline", passed=90, failed=0, results={},
     note="Per-test results weren't saved for this run. The 20 security tests didn't exist yet.")
 run("r4", suite="backend", at="2026-10-15T08:05:00-04:00", label="After security review (7 holes fixed)",
-    passed=sum(sql_res.values()), failed=len(sql_res) - sum(sql_res.values()), results={k: ("pass" if v else "fail") for k, v in sql_res.items()},
+    passed=sum(v for k, v in sql_res.items() if k.startswith("SQL-")), failed=sum(not v for k, v in sql_res.items() if k.startswith("SQL-")),
+    results={k: ("pass" if v else "fail") for k, v in sql_res.items() if k.startswith("SQL-")},   # rls_test.sql only, as on Oct 15
     note="Each of the 20 new tests failed before its fix; red counts weren't saved.")
 run("r5", suite="edge", at="2026-10-15T00:55:00-04:00", label="Day 1 baseline", passed=5, failed=0, results={},
     note="Only passed with type-checking turned off (S8).")
@@ -217,6 +285,14 @@ run("r9", suite="backend", at="2026-10-17T07:30:00-04:00", label="Groups, househ
 run("r10", suite="app", at="2026-10-17T07:30:00-04:00", label="Groups + bulk/timeline follow-ups: app tests written first (red)",
     passed=313, failed=15, results={},
     note="Red on purpose: invite form has no share-history choice (AUD-19, 4); the reply switch and setGroupRepliesShared still exist (REPLY-12, 2); the comment box doesn't call replyReaders (REPLY-11, 2); a relative who can post still gets 'Pick lots of photos' (1); a timeline card can't open its post (2); the phone keeps capture dates more than a day ahead (4). Existing 311 green, 1 skipped; typecheck clean; web smoke test 1/1. Found and fixed T5 (flaky ciphertext regex in bulk.test) on the way; after it, 3 full runs gave identical counts.")
+run("r11", suite="backend", at="2026-10-18T03:30:00-04:00", label="Overnight privacy audit: PRIV-1 written first (red), then migration 0012",
+    passed=sum(sql_res.values()), failed=len(sql_res) - sum(sql_res.values()), results={k: ("pass" if v else "fail") for k, v in sql_res.items()},
+    note="PRIV-1 was red 2 of 6 before 0012, S11 and S13 1 each and S15 2 before their fixes (raw IP stored; stale rows never purged); the pepper-rotation check was added after privacy-security's review. "
+         "Green 3 runs in a row with every other suite unchanged. Also green 3x, not in this table: QA-3 sent-vs-received 20/20, D1 smoke check 20/20, "
+         "SETUP-API 34, SETUP V2 15, deploy 20, PRIV-2 log check 11/11 (red first on sign-media). Deno not run here (CI only).")
+run("r12", suite="app", at="2026-10-18T03:00:00-04:00", label="BETA-BULK-1 fallback: creation time for undated photos (red, then green)",
+    passed=351, failed=0, results={},
+    note="pickCreationTime.test.ts was red 3 of 8 before the change (no creation time read). After: Jest 351 passed, 1 skipped, the same on 3 runs; typecheck clean.")
 print("proto", len(proto_cases), "red", sum(v == "fail" for v in red_map.values()), "| sql", len(sql_cases), "| edge", len(edge_cases),
       "| tickets", len(tickets), "| sec-linked", {t[0]: len(t[6]) for t in tickets if t[0].startswith("S")})
 print("areas", sorted({c['area'] for c in sql_cases}))

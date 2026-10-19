@@ -193,6 +193,9 @@ reset role;
 -- ======================================================================
 -- 6. Uploads: EXIF flag + free-tier video cap (10/month)
 -- ======================================================================
+-- 0013 (FLAG-1/4): video posting is off by default; these cap tests need it on for space A (global + family).
+insert into private.feature_flags (feature, enabled) values ('video_posting', true);
+insert into public.space_features (space_id, feature, enabled) values (:space_a, 'video_posting', true);
 set role authenticated;
 select set_config('request.jwt.claim.sub', :alex, false);
 select tests.throws(format($q$select * from public.prepare_media_upload(%L, '[{"kind":"photo","mime_type":"image/jpeg","width":10,"height":10,"byte_size":100,"thumb_byte_size":10,"exif_stripped":false}]')$q$, :p_a_all),
@@ -229,6 +232,7 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', :alex, false);
 select media_id as draft_media from public.prepare_media_upload(:'draft_id', '[{"kind":"photo","mime_type":"image/jpeg","width":10,"height":10,"byte_size":100,"thumb_byte_size":10,"exif_stripped":true}]') \gset
 reset role;
+insert into public.media_keys (media_id, wrapped_dek) values (:'draft_media', '\x00');   -- sign-media saves the key at upload (S15)
 select public.mark_media_upload_result(:'draft_media', true);   -- what sign-media finalize does as service_role
 update spaces set plan = 'free' where id = :space_a;
 set role authenticated;
@@ -369,6 +373,7 @@ select public.create_post(gen_random_uuid(), :space_a, 'Blair published', array[
 select media_id as b_m1 from public.prepare_media_upload(:'b_draft', '[{"kind":"photo","mime_type":"image/jpeg","width":10,"height":10,"byte_size":100,"thumb_byte_size":10,"exif_stripped":true}]') \gset
 select media_id as b_m2 from public.prepare_media_upload(:'b_pub', '[{"kind":"photo","mime_type":"image/jpeg","width":10,"height":10,"byte_size":100,"thumb_byte_size":10,"exif_stripped":true}]') \gset
 reset role;
+insert into public.media_keys (media_id, wrapped_dek) values (:'b_m1', '\x00'), (:'b_m2', '\x00');
 select public.mark_media_upload_result(:'b_m1', true), public.mark_media_upload_result(:'b_m2', true);
 set role authenticated;
 select set_config('request.jwt.claim.sub', :blair, false);

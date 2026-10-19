@@ -1,4 +1,4 @@
-# Hearth app (Expo SDK 54, TypeScript strict, expo-router)
+# Hearth app (Expo SDK 57, TypeScript strict, expo-router)
 
 The real Hearth mobile app: a private family photo feed for grandparents. Built test-first against
 `../API.md`; the UX follows `../UX-REVIEW.md` (group not circle, Help tab for viewers, Bigger text
@@ -40,8 +40,10 @@ EXPO_PUBLIC_HELP_PHONE=+13045550100      # behind "Call Chase" on the Help tab
 
 Supabase Auth: enable Email, and change the "Magic Link" email template to show `{{ .Token }}` (a
 6-digit code) instead of a link. The app calls `signInWithOtp` + `verifyOtp({type:'email'})`.
-Deep links: scheme `hearth://join/<code>`, plus `https://hearth.family/join/<code>` (associated
-domains / Android intent filter in `app.json`; the AASA/assetlinks files still have to be hosted).
+Deep links: scheme `hearth://join/<code>`. Invite links are `https://thefreighttrains-team-hearth.expo.app/join/<token>`
+(ONB-3, migration 0014; the hosted web build, `src/api/links.ts`); `/join/[code]` takes the typed code or the link
+token. `app.json` still declares `hearth.family` for universal links, which need that domain bought plus the
+AASA/assetlinks files and a real build (ONB-8).
 Push: `app.json` has `extra.eas.projectId` (Expo project `@thefreighttrains-team/hearth`, linked Oct 17, 2026 with `npm run eas -- init`). Without it push is a no-op. Don't commit what `eas init` writes back: it expands the config and adds Android permissions (RECORD_AUDIO, storage); keep only `owner` and `extra.eas` (EXPO-2).
 
 Contract tests against any PostgREST/Supabase stack:

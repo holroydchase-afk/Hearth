@@ -5,7 +5,7 @@
 //           key, but only if can_view_post(post_id) is true for the caller.
 //   POST /sign-media  {"action":"upload","post_id":..., "items":[{kind,mime_type,width,height,
 //                      duration_ms?,byte_size,thumb_byte_size,exif_stripped:true}, ...]}
-//        -> creates pending media rows (RLS + free-tier video cap enforced in SQL),
+//        -> creates pending media rows (RLS, free-tier video cap and the video_posting flag enforced in SQL),
 //           mints a fresh AES-256 data key per item, and returns presigned PUT URLs.
 //   POST /sign-media  {"action":"finalize","media_ids":[...]}
 //        -> HEADs each uploaded object, checks size, marks rows ready/failed.
@@ -213,6 +213,8 @@ async function handleUpload(req: Request, user: Auth, postId: string, items: Upl
       if (e.message.includes("free_video_cap_reached")) {
         return json(req, 402, { error: "free_video_cap_reached", message: "Free spaces can upload 10 videos per month." });
       }
+      // FLAG-4: the family's video_posting switch is off (0013, private.feature_on). Signs nothing.
+      if (e.code === "42501" && e.message === "video_posting_off") return json(req, 403, { error: "video_posting_off" });
       if (e.code === "42501") return json(req, 403, { error: "forbidden" });
       if (["23514", "22023", "22P02", "23502"].includes(e.code ?? "")) return json(req, 400, { error: "invalid", message: e.message });
     }
@@ -285,7 +287,8 @@ export async function handler(req: Request): Promise<Response> {
     return json(req, 405, { error: "method_not_allowed" });
   } catch (e) {
     if (e instanceof DbError && (e.status === 401 || e.code === "PGRST301")) return json(req, 401, { error: "unauthorized" });
-    console.error("sign-media error", e instanceof Error ? e.message : e); // never log keys/URLs
+    // Name and code only: database and storage messages can carry row values or object paths (PRIV-2).
+    console.error(`sign-media error (${e instanceof DbError ? `DbError ${e.status} ${e.code ?? ""}` : e instanceof Error ? e.name : "unknown"})`);
     return json(req, 500, { error: "internal" });
   }
 }

@@ -1,7 +1,8 @@
 // "Save to my phone" (BETA-SEE-5): write the decrypted 2048 px JPEG (already stripped of
 // location data before upload) to a temp file, hand it to the photo library, delete the temp.
 import { File, Paths } from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
+// SDK 57 moved these functions to /legacy; the root import now throws on them at runtime.
+import * as MediaLibrary from 'expo-media-library/legacy';
 
 export type SaveResult = 'saved' | 'denied';
 

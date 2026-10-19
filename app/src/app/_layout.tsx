@@ -1,6 +1,3 @@
-import { Figtree_400Regular, Figtree_600SemiBold, Figtree_700Bold } from '@expo-google-fonts/figtree';
-import { YoungSerif_400Regular } from '@expo-google-fonts/young-serif';
-import { useFonts } from 'expo-font';
 import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useMemo } from 'react';
@@ -23,7 +20,6 @@ const nav: Nav = {
 };
 
 export default function RootLayout() {
-  useFonts({ YoungSerif_400Regular, Figtree_400Regular, Figtree_600SemiBold, Figtree_700Bold });
   useNotificationTaps(useMemo(() => (postId: string) => nav.openViewer(postId, 0), []));
   if ('error' in runtime) {
     return <SafeAreaProvider><Screen><Txt variant="title">{runtime.error}</Txt></Screen></SafeAreaProvider>;

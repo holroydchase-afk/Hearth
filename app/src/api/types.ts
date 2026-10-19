@@ -19,6 +19,17 @@ export type ReplyScope = 'parents' | 'group' | 'everyone';
 /** 0011 (SPEC-GROUPS): every container is a "group" in the app's words; kind says which part of the family shape. */
 export type CircleKind = 'everyone' | 'group' | 'household' | 'event';
 
+/** SPEC-GROUPS v2 (0013): who reads a member's comments, besides the writer, the parents and the poster.
+ *  App words: Private / Shared on this group's photos / Always shared. Parents only; relatives never get it. */
+export type CommentMode = 'private' | 'on_group_posts' | 'always';
+
+/** A person in the family (space_members + profiles, parents read it through RLS). */
+export interface Person {
+  user_id: string;
+  name: string;
+  role: Role;
+}
+
 /** BETA-AUD-19: when someone is added, do they see photos already shared? No default. */
 export type ShareHistory = 'all' | 'new';
 
@@ -31,6 +42,8 @@ export interface Circle {
   kind?: CircleKind;
   /** 0011: the groups and events this one sits under. */
   parent_ids?: string[];
+  /** 0013 (GRP-13): parents only; older servers omit it. */
+  comment_mode?: CommentMode;
 }
 
 export type MediaKind = 'photo' | 'video';
@@ -69,6 +82,10 @@ export interface FeedPost {
   reply_scope?: ReplyScope;
   /** 0010 (BETA-TIME-1): when it was taken, read on the phone; null if unknown. Older servers omit it. */
   taken_at?: string | null;
+  /** 0013 (EVT-1): the event the post was sent to, only for that event's members and the parents; else null.
+   *  Older servers omit it. */
+  event_id?: string | null;
+  event_name?: string | null;
 }
 
 export interface FeedArgs {
@@ -235,3 +252,14 @@ export interface MyProfile {
   display_name: string;
   name_set: boolean;
 }
+
+/** Messenger (SPEC-MESSENGER, 0015). The server relays opaque MLS bytes as base64; it never sees plaintext. */
+export type ChatKind = 'group' | 'event' | 'everyone';
+/** chat_list: a relative's plain-group chat is titled by its people, never the group's name (AUD-14). */
+/** named: the title is the group's or event's own name (parents, events, Everyone); false: it lists the people. */
+export interface ChatSummary { circle_id: string; kind: ChatKind; title: string; named: boolean; member_count: number }
+/** chat_roster: signature_key is the person's phone's public MLS signing key (null until they open Messages). */
+export interface ChatMember { user_id: string; name: string; signature_key: string | null }
+export type ChatRowKind = 'commit' | 'welcome' | 'message';
+export interface ChatRow { id: number; sender_id: string | null; kind: ChatRowKind; epoch: number; body: string; created_at: string }
+export interface ClaimedKeyPackage { user_id: string; key_package: string }
