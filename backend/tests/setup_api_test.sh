@@ -108,9 +108,9 @@ code=$(echo "$out" | sed -n 's/^Test viewer invite (account B): code \([A-Z0-9]\
 echo "$out" | grep -q "^Danielle's poster invite: code [A-Z0-9]\{10\}"; ok $? "SETUP-API: prints Danielle's poster invite code when --danielle-email is given"
 [ "$(q "select role || ':' || coalesce(target_email, '') from public.invites where space_id = '$SPACE' and role = 'adult'")" = "adult:danielle@example.com" ]
 ok $? "SETUP-API: Danielle's invite is a poster (adult) invite for her email"
-[ "$(q "select c.name || ':' || i.history from public.invites i join public.invite_circles ic on ic.invite_id = i.id join public.circles c on c.id = ic.circle_id
-        where i.space_id = '$SPACE' and i.role = 'viewer'")" = "Test house:all" ]
-ok $? "SETUP-API: the test viewer's invite names the Test house and says \"all past photos\""
+[ "$(q "select string_agg(c.name || ':' || i.history, ',' order by c.name) from public.invites i join public.invite_circles ic on ic.invite_id = i.id join public.circles c on c.id = ic.circle_id
+        where i.space_id = '$SPACE' and i.role = 'viewer'")" = "Everyone:all,Test house:all" ]
+ok $? "SETUP-API / PRIV-G2: the test viewer's invite names Everyone and the Test house (a new invite adds Everyone only if named) and says \"all past photos\""
 echo "$out" | grep -q "is ready"; ok $? "SETUP-API: says the family is ready"
 
 # the token stays in a header; only the Management API is called; no psql, no database URL

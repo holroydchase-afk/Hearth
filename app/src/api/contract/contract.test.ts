@@ -1,6 +1,7 @@
 // API.md contract tests. They run against every HearthApi implementation we can reach:
 // FakeApi always; SupabaseApi when HEARTH_API_URL/HEARTH_ANON_KEY/HEARTH_USERS_JSON are set.
 import { ApiError, type HearthApi } from '../HearthApi';
+import { JOIN_LINK_BASE } from '../links';
 import { decryptMedia, encryptMedia, encryptedSize } from '../../crypto/media';
 import { uuid } from '../../crypto/random';
 import { fakeHarness } from './fakeHarness';
@@ -218,6 +219,14 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(h.anon().invitePreview('NOPE-NOPE-1'))).toBe('22023');
     });
 
+    it('ONB-3/ONB-4 the link is the web build\'s /join/ address, and its last segment previews signed out', async () => {
+      const { link } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn], history: 'all' });
+      expect(link.startsWith(JOIN_LINK_BASE)).toBe(true);
+      const segment = link.slice(JOIN_LINK_BASE.length); // the code (Fake) or the 160-bit link token (server)
+      expect(segment).toMatch(/^[A-Za-z0-9]+$/);
+      expect((await h.anon().invitePreview(segment)).inviter_name).toBeTruthy();
+    });
+
     itJoiner('a bad code is 22023 with no space data', async () => {
       expect(await code(h.as('joiner').redeemInvite('ZZZZZZZZZZ'))).toBe('22023');
     });
@@ -229,6 +238,17 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await joiner.redeemInvite(c)).toBe(h.spaceId);
       expect(await feedIds(joiner)).toContain(id);
       expect(await code(joiner.redeemInvite(c))).toBe('22023'); // already used
+    });
+
+    itJoiner('GRP-12 / PRIV-G2: one invite can name two groups; the joiner gets both', async () => {
+      const inId = await publishedPost('to the in group');
+      const outId = await publishedPost('to the out group', [h.circleOut]);
+      const { code: c } = await poster.createInvite({ space: h.spaceId, role: 'viewer', circleIds: [h.circleIn, h.circleOut], history: 'all', channel: 'email', targetEmail: h.joinerEmail });
+      const joiner = h.as('joiner');
+      expect(await joiner.redeemInvite(c)).toBe(h.spaceId);
+      const ids = await feedIds(joiner);
+      expect(ids).toContain(inId);
+      expect(ids).toContain(outId);
     });
 
     itJoiner('an invite addressed to someone else is refused (22023)', async () => {
@@ -272,7 +292,9 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       const v = view.items[0]!;
       expect(v.id).toBe(g.media_id);
       const bytes = await viewerIn.getObject(v.display_url);
-      expect(bytes[0]).not.toBe(0); // stored bytes are ciphertext
+      // Stored bytes are ciphertext: no run of the plaintext appears in them. (Was `bytes[0] !== 0`, which
+      // failed 1 run in 256 because byte 0 is the random nonce prefix.)
+      expect(Buffer.from(bytes).includes(Buffer.from(display.subarray(0, 64)))).toBe(false);
       expect(Buffer.from(decryptMedia(bytes, v.dek))).toEqual(Buffer.from(display));
       expect(await code(viewerOut.signView(id))).toBe('P0002');
       const fp = (await viewerIn.getFeed({ space: h.spaceId })).find((p) => p.post_id === id)!;
@@ -519,14 +541,16 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
     it('BETA-TIME-4 years, newest first, with post and photo counts; the year follows the phone time zone', async () => {
       await datedPost('2021-05-01T12:00:00.000Z');
       await datedPost('2021-06-01T12:00:00.000Z');
-      await datedPost('2019-01-01T03:30:00.000Z'); // 10:30 pm Dec 31 2018 in New York
+      // T7: years no other test uses, since the real-API harness keeps one database for the whole run
+      // (BETA-TIME-2 above makes a 2019 post).
+      await datedPost('2017-01-01T03:30:00.000Z'); // 10:30 pm Dec 31 2016 in New York
       const ny = await viewerIn.getTimelineYears(h.spaceId, 'America/New_York');
       expect(ny.map((y) => y.year)).toEqual([...ny.map((y) => y.year)].sort((a, b) => b - a));
       expect(ny.find((y) => y.year === 2021)).toMatchObject({ post_count: 2, photo_count: 2 });
-      expect(ny.find((y) => y.year === 2018)).toMatchObject({ post_count: 1 });
-      expect(ny.find((y) => y.year === 2019)).toBeUndefined();
+      expect(ny.find((y) => y.year === 2016)).toMatchObject({ post_count: 1 });
+      expect(ny.find((y) => y.year === 2017)).toBeUndefined();
       const utc = await viewerIn.getTimelineYears(h.spaceId, 'UTC');
-      expect(utc.find((y) => y.year === 2019)).toMatchObject({ post_count: 1 });
+      expect(utc.find((y) => y.year === 2017)).toMatchObject({ post_count: 1 });
     });
 
     it('BETA-TIME-4 an unknown time zone is 22023', async () => {
@@ -538,6 +562,89 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchSize: 3 }))).toBe('23514');
       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid(), batchSize: 101 }))).toBe('23514');
       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], batchId: uuid(), batchSize: 5, takenAt: '2024-07-04T14:00:00.000Z' }))).toBe('ok');
+    });
+  });
+  describe('groups v2 (SPEC-GROUPS v2, migration 0013)', () => {
+    const fresh = (what: string) => `${what} ${uuid().slice(0, 8)}`;
+    const mineIn = async (id: string) => (await poster.myCircles(h.spaceId)).find((c) => c.circle_id === id);
+
+    it('GRP-15 create_level: a group starts Private, an event Shared on its posts; relatives get P0002; Everyone is 23514', async () => {
+      const g = await poster.createLevel(h.spaceId, 'group', fresh('Contract group'));
+      const e = await poster.createLevel(h.spaceId, 'event', fresh('Contract event'));
+      expect(await mineIn(g)).toMatchObject({ kind: 'group', comment_mode: 'private', member_count: 0 });
+      expect(await mineIn(e)).toMatchObject({ kind: 'event', comment_mode: 'on_group_posts' });
+      expect(await code(viewerIn.createLevel(h.spaceId, 'group', fresh('Nope')))).toBe('P0002');
+      expect(await code(poster.createLevel(h.spaceId, 'everyone' as never, fresh('Nope')))).toBe('23514');
+      expect(await code(poster.createLevel(h.spaceId, 'group', '   '))).toBe('23514');
+    });
+
+    it('GRP-17 set_comment_mode: parents set the three values; anything else 23514; Everyone 23514; relatives P0002', async () => {
+      const g = await poster.createLevel(h.spaceId, 'group', fresh('Mode group'));
+      expect(await code(poster.setCommentMode(g, 'always'))).toBe('ok');
+      expect((await mineIn(g))?.comment_mode).toBe('always');
+      expect(await code(poster.setCommentMode(g, 'on_group_posts'))).toBe('ok');
+      expect(await code(poster.setCommentMode(g, 'sometimes' as never))).toBe('23514');
+      expect(await code(viewerIn.setCommentMode(g, 'private'))).toBe('P0002');
+      // the seed loads after the migrations, so a stack may have no kind-'everyone' row (the SQL suite covers it there)
+      const everyone = (await poster.myCircles(h.spaceId)).find((c) => c.kind === 'everyone');
+      if (everyone) expect(await code(poster.setCommentMode(everyone.circle_id, 'always'))).toBe('23514');
+    });
+
+    it('GRP-15 place_person: a relative goes into any group with a share-history choice; none is 23514; Everyone 23514', async () => {
+      const g = await poster.createLevel(h.spaceId, 'group', fresh('Place group'));
+      const out = await viewerOut.myProfile();
+      expect(await code(poster.placePerson(g, out.user_id, null as never))).toBe('23514');
+      expect(await code(poster.placePerson(g, out.user_id, 'all'))).toBe('ok');
+      expect(await mineIn(g)).toMatchObject({ member_count: 1, member_names: [out.display_name] });
+      const everyone = (await poster.myCircles(h.spaceId)).find((c) => c.kind === 'everyone');
+      if (everyone) expect(await code(poster.placePerson(everyone.circle_id, out.user_id, 'all'))).toBe('23514');
+      expect(await code(viewerIn.placePerson(g, out.user_id, 'all'))).toBe('P0002');
+    });
+
+    it('GRP-16 add_people_from copies the relatives once (not linked); relatives P0002', async () => {
+      const src = await poster.createLevel(h.spaceId, 'group', fresh('Source side'));
+      const target = await poster.createLevel(h.spaceId, 'event', fresh('Birthday'));
+      const inP = await viewerIn.myProfile();
+      const outP = await viewerOut.myProfile();
+      await poster.placePerson(src, inP.user_id, 'all');
+      expect(await code(poster.addPeopleFrom(target, src, 'new'))).toBe('ok');
+      expect((await mineIn(target))?.member_names).toEqual([inP.display_name]);
+      await poster.placePerson(src, outP.user_id, 'all');
+      expect((await mineIn(target))?.member_names).toEqual([inP.display_name]); // copied once, not linked
+      expect(await code(poster.addPeopleFrom(target, src, null as never))).toBe('23514');
+      expect(await code(viewerIn.addPeopleFrom(target, src, 'all'))).toBe('P0002');
+    });
+
+    it('GRP-15 family_people: a parent lists everyone in the family with ids; a relative never sees another relative', async () => {
+      const inP = await viewerIn.myProfile();
+      const outP = await viewerOut.myProfile();
+      const all = await poster.familyPeople(h.spaceId);
+      expect(all).toEqual(expect.arrayContaining([
+        { user_id: inP.user_id, name: inP.display_name, role: 'viewer' },
+        { user_id: outP.user_id, name: outP.display_name, role: 'viewer' },
+      ]));
+      const seen = (await viewerIn.familyPeople(h.spaceId)).map((p) => p.user_id);
+      expect(seen).not.toContain(outP.user_id);
+    });
+
+    it('EVT-1 feed and timeline rows carry the event id and name for its members and parents; others get nulls', async () => {
+      const name = fresh("Chase's birthday");
+      const e = await poster.createLevel(h.spaceId, 'event', name);
+      await poster.placePerson(e, (await viewerIn.myProfile()).user_id, 'all');
+      const id = await publishedPost('Cake', [e, h.circleOut]);
+      const feedRow = async (api: HearthApi) => (await api.getFeed({ space: h.spaceId, limit: 50 })).find((p) => p.post_id === id);
+      expect(await feedRow(viewerIn)).toMatchObject({ event_id: e, event_name: name });
+      expect(await feedRow(poster)).toMatchObject({ event_id: e, event_name: name });
+      const out = await feedRow(viewerOut);
+      expect(out).toMatchObject({ event_id: null, event_name: null });
+      expect(JSON.stringify(out)).not.toContain(name);
+      const tl = (await viewerIn.getTimeline({ space: h.spaceId, limit: 50 })).find((p) => p.post_id === id);
+      expect(tl).toMatchObject({ event_id: e, event_name: name });
+    });
+
+    it('FLAG-5 my_features: off by default for everyone (FLAG-1); a list of names', async () => {
+      expect(await poster.myFeatures(h.spaceId)).toEqual([]);
+      expect(await viewerIn.myFeatures(h.spaceId)).toEqual([]);
     });
   });
 });

@@ -13,4 +13,6 @@ if [[ ${1:-} == build || ${1:-} == submit ]] && ! grep -q '^\*\*Name final:\*\* 
   echo "     When Chase decides the name, set '**Name final:** yes' in docs/product/ACCOUNTS.md, then run this again." >&2
   exit 1
 fi
+# EXPO-4: an update Expo Go can't open helps nobody (post mortem, docs/eng/LESSONS.md). Check first.
+if [[ ${1:-} == update ]]; then bash ../scripts/check-expo-go.sh || exit 1; fi
 exec ${EAS_CLI:-npx --yes eas-cli@25.1.1} "$@"

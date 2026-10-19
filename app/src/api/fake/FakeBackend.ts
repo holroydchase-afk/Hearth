@@ -4,8 +4,11 @@
 // It is NOT a security boundary; it exists so the app can be built and tested against the
 // contract before the real stack is reachable. The contract tests keep the two honest.
 import { ApiError, type HearthApi } from '../HearthApi';
+import { JOIN_LINK_BASE } from '../links';
 import type {
   CircleKind,
+  CommentMode,
+  Person,
   ReplyAudience,
   ReplyScope,
   ShareHistory,
@@ -16,6 +19,7 @@ import type {
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
   HeartState, InvitePreview, MediaKind, MediaStatus, Role, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
   TimelineArgs, TimelinePost, TimelineYear,
+  ChatKind, ChatMember, ChatRow, ChatRowKind, ChatSummary, ClaimedKeyPackage,
 } from '../types';
 import { fromBase64, toBase64 } from '../../crypto/base64';
 import { randomBytes, uuid } from '../../crypto/random';
@@ -28,7 +32,7 @@ const INVITE_ALPHABET = 'ABCDEFGHJKMNPQRSTVWXYZ23456789';
 
 interface UserRow { id: string; email: string; name: string; nameSet?: boolean } // nameSet undefined = set
 interface MemberRow { space: string; user: string; role: Role; invited_by: string | null }
-interface CircleRow { id: string; space: string; name: string; created_by: string; deleted: boolean; kind?: CircleKind }
+interface CircleRow { id: string; space: string; name: string; created_by: string; deleted: boolean; kind?: CircleKind; comment_mode?: CommentMode }
 interface PostRow {
   id: string; space: string; author: string; caption: string | null; status: 'draft' | 'published';
   deleted: boolean; circles: string[]; client_id: string; created_at: string; published_at: string | null;
@@ -44,6 +48,8 @@ interface CommentRec { id: string; post: string; author: string; body: string; c
 interface InviteRow {
   code: string; space: string; role: Role; circles: string[]; created_by: string; target_email: string | null;
   expires_at: string; max_uses: number; uses: number; revoked: boolean; name?: string | null; history?: ShareHistory | null;
+  /** Server invites.household_means_everyone: only invites made before 0013 (PRIV-G2). */
+  householdMeansEveryone?: boolean;
 }
 
 export interface FakeState {
@@ -65,7 +71,23 @@ export interface FakeState {
   failures: Record<string, number[]>;
   appSession: string | null;
   lastTs: number;
+  /** FLAG (0013): global switch per feature (Hearth only) and the family add-on, keyed `${space}:${feature}`. */
+  featureFlags?: Record<string, boolean>;
+  spaceFeatures?: Record<string, boolean>;
+  /** 0015 messenger relay: opaque base64 MLS bytes only. */
+  chat?: {
+    devices: Record<string, string>;
+    keyPackages: { user: string; kp: string }[];
+    groups: string[];
+    rows: (ChatRow & { circle: string; recipient: string | null })[];
+  };
 }
+
+/** 0013: a new circle's comment setting by kind (households stay 'always'). */
+const defaultMode = (k: CircleKind | undefined): CommentMode => (k === 'household' ? 'always' : k === 'event' ? 'on_group_posts' : 'private');
+const MODES: CommentMode[] = ['private', 'on_group_posts', 'always'];
+/** private.feature_capability: who may use each feature (parents only to start). */
+const FEATURE_CAPABILITY: Record<string, 'use_video'> = { video_posting: 'use_video' };
 
 const U = (n: number) => `00000000-0000-4000-8000-${n.toString(16).padStart(12, '0')}`;
 export const FIXTURE = {
@@ -215,6 +237,102 @@ export class FakeBackend {
     this.changed();
   }
 
+  // ---- messenger relay (0015): same rules as tests/chat_test.sql, minus the joined-at cutoff ----
+  private get chat() {
+    return (this.state.chat ??= { devices: {}, keyPackages: [], groups: [], rows: [] });
+  }
+  /** private.chat_people: the circle's members plus the family's parents; households have no chat. */
+  chatPeople(circle: string): string[] {
+    const c = this.state.circles[circle];
+    if (!c || c.deleted || c.kind === 'household') return [];
+    const ids = new Set(this.circleMemberIds(circle).filter((u) => this.member(c.space, u)));
+    for (const m of this.state.members) if (m.space === c.space && this.isPoster(c.space, m.user)) ids.add(m.user);
+    return [...ids];
+  }
+  private chatMe(user: string | null, circle: string): string {
+    const me = this.requireUser(user);
+    if (!this.chatPeople(circle).includes(me)) throw new ApiError('P0002', 'not found');
+    return me;
+  }
+  chatList(user: string | null, space: string): ChatSummary[] {
+    const me = this.requireUser(user);
+    if (!this.member(space, me)) throw new ApiError('P0002', 'not found');
+    const parent = this.isPoster(space, me);
+    const order = { everyone: 0, group: 1, event: 2 } as Record<string, number>;
+    return Object.values(this.state.circles)
+      .filter((c) => c.space === space && this.chatPeople(c.id).includes(me))
+      .map((c) => {
+        const kind = (c.kind ?? 'group') as ChatKind;
+        const others = this.chatPeople(c.id).filter((u) => u !== me).map((u) => this.state.users[u]?.name ?? '?').sort();
+        const people = others.length === 0 ? 'Just you' : others.length === 1 ? others[0]!
+          : others.length <= 3 ? `${others.slice(0, -1).join(', ')} and ${others.at(-1)}` : `${others[0]}, ${others[1]} and ${others.length - 2} more`;
+        const named = parent || kind !== 'group';
+        return { circle_id: c.id, kind, title: named ? c.name : people, named, member_count: this.chatPeople(c.id).length };
+      })
+      .sort((a, b) => (order[a.kind]! - order[b.kind]!) || a.title.localeCompare(b.title));
+  }
+  chatPublishDevice(user: string | null, signatureKey: string, keyPackages: string[]): void {
+    const me = this.requireUser(user);
+    if (!signatureKey) throw new ApiError('23514', 'signing key must be base64');
+    if (keyPackages.length < 1 || keyPackages.length > 50) throw new ApiError('23514', 'publish 1-50 key packages');
+    if (this.chat.devices[me] !== signatureKey) this.chat.keyPackages = this.chat.keyPackages.filter((k) => k.user !== me);
+    this.chat.devices[me] = signatureKey;
+    for (const kp of keyPackages) this.chat.keyPackages.push({ user: me, kp });
+    this.changed();
+  }
+  chatKeyPackageCount(user: string | null): number {
+    const me = this.requireUser(user);
+    return this.chat.keyPackages.filter((k) => k.user === me).length;
+  }
+  chatStart(user: string | null, circle: string): boolean {
+    this.chatMe(user, circle);
+    if (this.chat.groups.includes(circle)) return false;
+    this.chat.groups.push(circle);
+    this.changed();
+    return true;
+  }
+  chatRoster(user: string | null, circle: string): ChatMember[] {
+    this.chatMe(user, circle);
+    return this.chatPeople(circle)
+      .map((u) => ({ user_id: u, name: this.state.users[u]?.name ?? '?', signature_key: this.chat.devices[u] ?? null }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+  chatClaim(user: string | null, circle: string, users: string[]): ClaimedKeyPackage[] {
+    this.chatMe(user, circle);
+    const people = this.chatPeople(circle);
+    const out: ClaimedKeyPackage[] = [];
+    for (const u of new Set(users)) {
+      if (!people.includes(u)) continue;
+      const i = this.chat.keyPackages.findIndex((k) => k.user === u);
+      if (i < 0) continue;
+      out.push({ user_id: u, key_package: this.chat.keyPackages[i]!.kp });
+      this.chat.keyPackages.splice(i, 1);
+    }
+    if (out.length) this.changed();
+    return out;
+  }
+  chatSend(user: string | null, circle: string, kind: ChatRowKind, epoch: number, body: string, recipient?: string): number {
+    const me = this.chatMe(user, circle);
+    if (!['commit', 'welcome', 'message'].includes(kind)) throw new ApiError('23514', 'bad kind');
+    if ((kind === 'welcome') !== !!recipient) throw new ApiError('23514', 'a welcome (and only a welcome) names who it is for');
+    if (recipient && !this.chatPeople(circle).includes(recipient)) throw new ApiError('23514', 'that person is not in this group');
+    if (!(epoch >= 0) || !/^[A-Za-z0-9+/]+={0,2}$/.test(body) || body.length % 4 !== 0 || body.length > 65536) throw new ApiError('23514', 'bad body');
+    if (kind === 'commit' && this.chat.rows.some((r) => r.circle === circle && r.kind === 'commit' && r.epoch === epoch)) {
+      throw new ApiError('23505', 'another phone changed the keys first');
+    }
+    const id = (this.chat.rows.at(-1)?.id ?? 0) + 1;
+    this.chat.rows.push({ id, circle, sender_id: me, kind, epoch, body, recipient: recipient ?? null, created_at: new Date().toISOString() });
+    this.changed();
+    return id;
+  }
+  chatFetch(user: string | null, circle: string, after: number, limit = 200): ChatRow[] {
+    const me = this.chatMe(user, circle);
+    return this.chat.rows
+      .filter((r) => r.circle === circle && r.id > after && (!r.recipient || r.recipient === me))
+      .slice(0, Math.min(Math.max(limit, 1), 500))
+      .map(({ circle: _c, recipient: _r, ...row }) => row);
+  }
+
   isPoster(space: string, user: string): boolean {
     const r = this.member(space, user)?.role;
     return r === 'owner' || r === 'adult';
@@ -270,7 +388,10 @@ export class FakeBackend {
       .filter((c) => c.space === space && !c.deleted && (c.created_by === me || this.inCircle(c.id, me)))
       .map((c) => {
         const ids = this.circleMemberIds(c.id);
-        return { circle_id: c.id, name: c.name, member_count: ids.length, member_names: ids.map((i) => this.state.users[i]?.name ?? '?'), kind: c.kind ?? 'group', parent_ids: [] };
+        return {
+          circle_id: c.id, name: c.name, member_count: ids.length, member_names: ids.map((i) => this.state.users[i]?.name ?? '?').sort(),
+          kind: c.kind ?? 'group', parent_ids: [], comment_mode: c.comment_mode ?? defaultMode(c.kind),
+        };
       });
   }
 
@@ -343,7 +464,16 @@ export class FakeBackend {
         reach_count: mine ? reach.size : null,
         reply_scope: this.replyScope(me, p),
         taken_at: p.taken_at ?? null,
+        ...this.postEvent(me, p),
       };
+  }
+
+  /** private.post_event (0013, EVT-1): the first live event on the post's audience, only for a parent or a member
+   *  of that event; anyone else gets nulls (they never learn it exists). The fake doesn't model share-history cutoffs. */
+  private postEvent(me: string, p: PostRow): { event_id: string | null; event_name: string | null } {
+    const e = Object.values(this.state.circles).find((c) => c.kind === 'event' && !c.deleted && p.circles.includes(c.id)
+      && (this.isPoster(p.space, me) || this.inCircle(c.id, me)));
+    return { event_id: e?.id ?? null, event_name: e?.name ?? null };
   }
 
   createPost(user: string | null, a: CreatePostArgs): string {
@@ -516,7 +646,11 @@ export class FakeBackend {
     this.state.members.push({ space: inv.space, user: me, role: inv.role, invited_by: inv.created_by });
     const u = this.state.users[me];
     if (u && inv.name && u.nameSet === false) { u.name = inv.name; u.nameSet = true; } // JOIN-1
-    for (const c of inv.circles) if (!this.inCircle(c, me)) this.state.circleMembers.push({ circle: c, user: me });
+    // PRIV-G2 / GRP-12: Everyone only if named, or (an invite made before 0013) a household is named
+    const places = [...inv.circles];
+    const everyone = Object.values(this.state.circles).find((c) => c.space === inv.space && c.kind === 'everyone' && !c.deleted);
+    if (everyone && inv.householdMeansEveryone && inv.circles.some((c) => this.state.circles[c]?.kind === 'household')) places.push(everyone.id);
+    for (const c of places) if (!this.inCircle(c, me)) this.state.circleMembers.push({ circle: c, user: me });
     this.changed();
     return inv.space;
   }
@@ -527,9 +661,8 @@ export class FakeBackend {
     if (a.role !== 'viewer' && this.member(a.space, me)?.role !== 'owner') throw new ApiError('42501', 'only owners invite adults');
     if (!a.circleIds.length) throw new ApiError('23514', 'at least one circle');
     if (a.circleIds.some((c) => this.state.circles[c]?.space !== a.space)) throw new ApiError('23514', 'circle not in space');
-    // BETA-AUD-19 (0011): a relative's invite names one group and says whether they see past photos
+    // BETA-AUD-19: a relative's invite says whether they see past photos. GRP-12 (0013): it may name several groups.
     if (a.role === 'viewer' && (a.history !== 'all' && a.history !== 'new')) throw new ApiError('23514', 'choose all or new for past photos');
-    if (a.role === 'viewer' && a.circleIds.length !== 1) throw new ApiError('23514', 'an invite names one household');
     if (a.name != null && !validName(a.name)) throw new ApiError('23514', 'a name is 1-40 characters, not an email address');
     if (a.name != null && this.state.members.some((m) => m.space === a.space && this.state.users[m.user]?.name.toLowerCase() === a.name!.trim().toLowerCase())) {
       throw new ApiError('23514', 'someone in this family already has that name'); // no impersonation, like the SQL
@@ -540,10 +673,10 @@ export class FakeBackend {
     this.state.invites[code] = {
       code, space: a.space, role: a.role, circles: [...a.circleIds], created_by: me, target_email: a.targetEmail?.toLowerCase() ?? null,
       expires_at: new Date(Date.now() + days * 864e5).toISOString(), max_uses: a.maxUses ?? 1, uses: 0, revoked: false,
-      name: a.name?.trim() || null, history: a.role === 'viewer' ? a.history ?? null : null,
+      name: a.name?.trim() || null, history: a.role === 'viewer' ? a.history ?? null : null, householdMeansEveryone: false,
     };
     this.changed();
-    return { code, link: `https://hearth.family/join/${code}` };
+    return { code, link: JOIN_LINK_BASE + code };
   }
 
   renameCircle(user: string | null, circle: string, name: string): void {
@@ -555,6 +688,78 @@ export class FakeBackend {
     if (Object.values(this.state.circles).some((o) => o.id !== circle && o.space === c.space && !o.deleted && o.name === n)) throw new ApiError('23514', 'name taken');
     c.name = n;
     this.changed();
+  }
+
+  // ---------------- groups v2 (0013) ----------------
+  /** private.managed_circle: live, and in a family the caller is a parent of; else "not found". */
+  managedCircle(user: string | null, circle: string): CircleRow {
+    const me = this.requireUser(user);
+    const c = this.state.circles[circle];
+    if (!c || c.deleted || !this.isPoster(c.space, me)) throw new ApiError('P0002', 'not found');
+    return c;
+  }
+  historyChoice(h: unknown): void {
+    if (h !== 'all' && h !== 'new') throw new ApiError('23514', 'choose "all" or "new" for past photos');
+  }
+
+  createLevel(user: string | null, space: string, kind: string, name: string): string {
+    const me = this.requireUser(user);
+    if (!this.isPoster(space, me)) throw new ApiError('P0002', 'not found');
+    if (kind !== 'group' && kind !== 'household' && kind !== 'event') throw new ApiError('23514', 'kind');
+    const n = (name ?? '').trim();
+    if (n.length < 1 || n.length > 60) throw new ApiError('23514', 'name length');
+    if (Object.values(this.state.circles).some((o) => o.space === space && o.name === n)) throw new ApiError('23514', 'name taken');
+    const id = uuid();
+    this.state.circles[id] = { id, space, name: n, created_by: me, deleted: false, kind, comment_mode: defaultMode(kind) };
+    this.changed();
+    return id;
+  }
+
+  setCommentMode(user: string | null, circle: string, mode: CommentMode): void {
+    const c = this.managedCircle(user, circle);
+    if (c.kind === 'everyone') throw new ApiError('23514', "Everyone's setting stays Private");
+    if (!MODES.includes(mode)) throw new ApiError('23514', 'comment setting');
+    c.comment_mode = mode;
+    this.changed();
+  }
+
+  /** The fake keeps one membership list, so placing a person is adding them (history is checked, not modelled). */
+  placePerson(user: string | null, group: string, person: string, history: ShareHistory): void {
+    const c = this.managedCircle(user, group);
+    this.historyChoice(history);
+    if (c.kind === 'everyone') throw new ApiError('23514', 'people join Everyone through an invite');
+    if (!this.member(c.space, person)) throw new ApiError('23514', 'not a member of this family');
+    if (!this.inCircle(group, person)) this.state.circleMembers.push({ circle: group, user: person });
+    this.changed();
+  }
+
+  addPeopleFrom(user: string | null, target: string, source: string, history: ShareHistory): void {
+    const t = this.managedCircle(user, target);
+    const s = this.managedCircle(user, source);
+    this.historyChoice(history);
+    if (t.space !== s.space) throw new ApiError('23514', 'both must be in the same family');
+    if (t.kind === 'everyone') throw new ApiError('23514', 'people join Everyone through an invite');
+    for (const u of this.circleMemberIds(source)) {
+      if (this.member(t.space, u)?.role === 'viewer' && !this.inCircle(target, u)) this.state.circleMembers.push({ circle: target, user: u });
+    }
+    this.changed();
+  }
+
+  /** space_members + profiles under RLS: parents see everyone; others themselves and the parents. */
+  familyPeople(user: string | null, space: string): Person[] {
+    const me = this.requireUser(user);
+    const parent = this.isPoster(space, me);
+    return this.state.members
+      .filter((m) => m.space === space && (parent || m.user === me || m.role === 'owner' || m.role === 'adult'))
+      .filter(() => !!this.member(space, me))
+      .map((m) => ({ user_id: m.user, name: this.state.users[m.user]?.name ?? '?', role: m.role }));
+  }
+
+  /** private.feature_on for each known feature: global switch AND family add-on AND can(capability). */
+  myFeatures(user: string | null, space: string): string[] {
+    const me = this.requireUser(user);
+    return Object.keys(FEATURE_CAPABILITY).filter((f) =>
+      !!this.state.featureFlags?.[f] && !!this.state.spaceFeatures?.[`${space}:${f}`] && this.isPoster(space, me)).sort();
   }
 
   // ---------------- sign-media ----------------
@@ -733,4 +938,19 @@ export class FakeApi implements HearthApi {
     return this.be.getObject(url).slice();
   };
   renameCircle = (c: string, name: string) => this.run(() => this.be.renameCircle(this.userId, c, name));
+  createLevel = (space: string, kind: Exclude<CircleKind, 'everyone'>, name: string) => this.run(() => this.be.createLevel(this.userId, space, kind, name));
+  setCommentMode = (c: string, mode: CommentMode) => this.run(() => this.be.setCommentMode(this.userId, c, mode));
+  placePerson = (g: string, u: string, h: ShareHistory) => this.run(() => this.be.placePerson(this.userId, g, u, h));
+  addPeopleFrom = (t: string, f: string, h: ShareHistory) => this.run(() => this.be.addPeopleFrom(this.userId, t, f, h));
+  familyPeople = (space: string) => this.run(() => this.be.familyPeople(this.userId, space));
+  myFeatures = (space: string) => this.run(() => this.be.myFeatures(this.userId, space));
+  chatList = (space: string) => this.run(() => this.be.chatList(this.userId, space));
+  chatPublishDevice = (k: string, kps: string[]) => this.run(() => this.be.chatPublishDevice(this.userId, k, kps));
+  chatKeyPackageCount = () => this.run(() => this.be.chatKeyPackageCount(this.userId));
+  chatStart = (c: string) => this.run(() => this.be.chatStart(this.userId, c));
+  chatRoster = (c: string) => this.run(() => this.be.chatRoster(this.userId, c));
+  chatClaim = (c: string, users: string[]) => this.run(() => this.be.chatClaim(this.userId, c, users));
+  chatSend = (c: string, kind: ChatRowKind, epoch: number, body: string, recipient?: string) =>
+    this.run(() => this.be.chatSend(this.userId, c, kind, epoch, body, recipient));
+  chatFetch = (c: string, after: number, limit?: number) => this.run(() => this.be.chatFetch(this.userId, c, after, limit));
 }

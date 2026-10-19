@@ -287,6 +287,7 @@ select tests.throws_code(format($q$select public.create_post(gen_random_uuid(), 
 select tests.throws_code(format('select public.publish_post(%L)', tests.v('cp1')), 'publish_post: media not ready is 23514', '23514');
 select tests.setv('cp1_media', format($q$select media_id from public.prepare_media_upload(%L, '[{"kind":"photo","mime_type":"image/jpeg","width":10,"height":10,"byte_size":100,"thumb_byte_size":10,"exif_stripped":true}]')$q$, tests.v('cp1')));
 :as_admin
+insert into public.media_keys (media_id, wrapped_dek) values (tests.v('cp1_media')::uuid, '\x00');   -- saved at upload (S15)
 select public.mark_media_upload_result(tests.v('cp1_media')::uuid, true);
 :as_gma_chen
 select tests.throws_code(format('select public.publish_post(%L)', tests.v('cp1')), 'publish_post: someone who cannot see the draft gets P0002', 'P0002');
@@ -449,6 +450,22 @@ select tests.ok_sql($q$select public.invite_preview(substring(tests.v('inv1')::j
 select tests.throws_code($q$select public.invite_preview('NOPE234567')$q$, 'invite_preview: unknown code is 22023', '22023');
 select tests.ok_sql($q$select (tests.rest($s$select public.invite_preview('NOPE234567')$s$)) @> '{"status":"400","body":{"code":"22023"}}'$q$,
                     'invite_preview over PostgREST: 400 with code 22023');
+
+-- ======================================================================
+-- ONB-3 / ONB-4: invite links open the hosted web build's join screen, never a domain we don't own
+-- ======================================================================
+:as_admin
+select tests.ok_sql($q$select value = 'https://thefreighttrains-team-hearth.expo.app/join/' from private.secrets where name = 'invite_link_base'$q$,
+                    'ONB-3 invite_link_base is the hosted web build''s /join/ address');
+select tests.ok_sql($q$select starts_with(tests.v('inv1')::jsonb->>'link', (select value from private.secrets where name = 'invite_link_base'))$q$,
+                    'ONB-3 create_invite: the link starts with the configured invite_link_base');
+select tests.ok_sql($q$select tests.v('inv1')::jsonb->>'link' not like 'https://hearth.family%'$q$,
+                    'ONB-3 create_invite: the link never points at hearth.family (not bought, ACCOUNTS.md)');
+select tests.ok_sql($q$select tests.v('inv1')::jsonb->>'link' ~ '^https://[^/]+/join/[0-9a-f]{40}$'$q$,
+                    'ONB-4 create_invite: the link path is /join/<token>, the route the app opens (app/src/app/join/[code].tsx)');
+:as_anon
+select tests.ok_sql($q$select public.invite_preview(substring(tests.v('inv1')::jsonb->>'link' from '/join/([^/]+)$'))::jsonb->>'inviter_name' = 'Alex'$q$,
+                    'ONB-4 invite_preview: the /join/ path segment of the link previews the invite');
 
 -- ======================================================================
 -- redeem_invite: BETA-JOIN-3 (every bad invite -> 22023, nothing leaks)

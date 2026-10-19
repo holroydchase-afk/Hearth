@@ -1,5 +1,6 @@
 import type {
   ReplyAudience,
+  CircleKind, CommentMode, Person, ShareHistory,
   MyProfile,
   ClientErrorReport,
   NotificationPrefs,
@@ -7,6 +8,7 @@ import type {
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost,
   FinalizeResult, HeartState, InvitePreview, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
   TimelineArgs, TimelinePost, TimelineYear,
+  ChatMember, ChatRow, ChatRowKind, ChatSummary, ClaimedKeyPackage,
 } from './types';
 
 export * from './types';
@@ -20,9 +22,13 @@ export type ApiErrorCode =
   | '42501' // not allowed
   | 'P0002' // not found or not visible
   | '22023' // invalid invite or code
+  | '23505' // already taken (MSG-5: another phone changed the chat's keys first)
   | '54000' // rate limited
   | 'BAD_OTP' // wrong or old 6-digit sign-in code
-  | 'EXIF' // sign-media 422: metadata not stripped
+  | 'EXIF' // sign-media 422: metadata not stripped; or the phone couldn't read the photo it made
+  // MEDIA-3: the on-phone verifier found a field group the media policy strips (SPEC-MEDIA 1.1)
+  | 'META_LOCATION' | 'META_DATETIME' | 'META_CAMERA' | 'META_ORIENTATION' | 'META_SOFTWARE'
+  | 'META_MAKERNOTE' | 'META_XMP' | 'META_ICC' | 'META_FACES' | 'META_OTHER'
   | 'VIDEO_CAP' // sign-media 402
   | 'VIDEO_TOO_LONG' // pipeline: > 60 s
   | 'AUTH' // not signed in / session expired
@@ -102,4 +108,29 @@ export interface HearthApi {
 
   // --- rename_circle (API.md) ---
   renameCircle(circle: string, name: string): Promise<void>;
+
+  // --- groups v2 (SPEC-GROUPS v2, migration 0013; parents only, relatives get P0002) ---
+  /** create_level: a group starts Private, an event Shared on this group's photos. Returns the new id. */
+  createLevel(space: string, kind: Exclude<CircleKind, 'everyone'>, name: string): Promise<string>;
+  /** set_comment_mode (GRP-9/17). Everyone or an unknown value: 23514. */
+  setCommentMode(circle: string, mode: CommentMode): Promise<void>;
+  /** place_person (GRP-10): any live group; a share-history choice is required (23514). */
+  placePerson(group: string, user: string, history: ShareHistory): Promise<void>;
+  /** add_people_from (GRP-11): copies the relatives now in source into target, once (not linked). */
+  addPeopleFrom(target: string, source: string, history: ShareHistory): Promise<void>;
+  /** The family's people with ids (space_members + profiles under RLS): parents get everyone; a relative only
+   *  herself and the parents. Only the Groups screen (parents) calls it. */
+  familyPeople(space: string): Promise<Person[]>;
+  /** my_features (FLAG-5): the features on for the caller in this family. Default none. */
+  myFeatures(space: string): Promise<string[]>;
+
+  // --- messenger relay (SPEC-MESSENGER, 0015): opaque base64 MLS bytes ---
+  chatList(space: string): Promise<ChatSummary[]>;
+  chatPublishDevice(signatureKey: string, keyPackages: string[]): Promise<void>;
+  chatKeyPackageCount(): Promise<number>;
+  chatStart(circle: string): Promise<boolean>;
+  chatRoster(circle: string): Promise<ChatMember[]>;
+  chatClaim(circle: string, users: string[]): Promise<ClaimedKeyPackage[]>;
+  chatSend(circle: string, kind: ChatRowKind, epoch: number, body: string, recipient?: string): Promise<number>;
+  chatFetch(circle: string, after: number, limit?: number): Promise<ChatRow[]>;
 }

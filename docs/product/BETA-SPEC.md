@@ -89,7 +89,7 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 - SMS or text-link notices: needs Twilio (paid) and A2P registration. Push and email are enough.
 - Smart frames (E16) and other languages (E15): no tester has asked.
 - Editing photos or captions: delete and repost is fine for the beta.
-- Chat or DMs: families already have texting.
+- One-to-one DMs: families already have texting. (Group and event chat moved in on Chase's call, Oct 19: `SPEC-MESSENGER.md`.)
 - Invite status, resend, and cancel (E13): Chase handles invites by hand for 12 people.
 - Undo delete (E11): the delete confirm step (E1) is enough.
 - Purge and export worker: no deletions at scale in 5 weeks, and Chase can run them by hand.
@@ -266,3 +266,6 @@ Full spec, roles, data model, reply rule and worked cases: `docs/product/SPEC-GR
 **Trace:** AUD-11, AUD-12: "Two families' worth of households, not one"; "My parents are divorced and remarried" (the sibling). AUD-17: "for us 90% of the content we post will be to everyone". AUD-18, AUD-22, REPLY-8: birthday at Gigi's; the Charleston trip. AUD-19, AUD-20: PERSONAS "A new partner may join later, or may be kept out"; A1. AUD-21: "only people they trust are in it"; Chase, Oct 17 ("Maybe only parents can send to everyone"). AUD-13, AUD-15, AUD-16: A1. AUD-14: "Viewers never see group names or that other groups exist". REPLY-7, 9, 10, 11: "Grandma A should be able to comment on a photo without divorced Grandpa B seeing it, and without worrying that he might"; A2. REPLY-12: Chase's Oct 17 call. REPLY-13: "Parents set it up; everyone else just posts".
 
 **Count:** 44 IDs before Oct 17 (incl. AUD-8 to 10 and JOIN-8) + 12 AUD + 7 REPLY = 63; 62 live once AUD-9 retires. New ones by milestone: M2 1, M3 16, M4 2.
+
+## Groups v2 criteria (Oct 18, staff-pm; Chase's Oct 18 decisions)
+Plain groups with a comment setting (Private, Shared on this group's posts, Always shared), people in any group, invites to any groups, feature flags, event cards. Criteria GRP-1..22, FLAG-1..7, EVT-1..5, SRCH-1..4 live in `docs/product/SPEC-GROUPS.md` §3 (one copy, to avoid drift); where they conflict with the Oct 17 groups criteria above, v2 wins: AUD-19's "names one household" → GRP-12; the household and event reply rules in REPLY-7..9 → GRP-3..8 (same outcomes for today's data, GRP-1); AUD-22 → GRP-15/16. Migration 0013 is v2 (the households-only 0013 is cancelled).

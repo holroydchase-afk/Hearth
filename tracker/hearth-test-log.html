@@ -59,7 +59,7 @@ select.sel{border:1px solid var(--line);background:var(--surface);border-radius:
 .right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
 .pill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
 .pill.pass{background:var(--pass-soft);color:var(--pass)} .pill.fail{background:var(--fail-soft);color:var(--fail)}
-.pill.blocked{background:var(--warn-soft);color:var(--warn)} .pill.none,.pill.open{background:var(--idle-soft);color:var(--idle)}
+.pill.blocked{background:var(--warn-soft);color:var(--warn)} .pill.none,.pill.open,.pill.deferred{background:var(--idle-soft);color:var(--idle)}
 .pill.fixed{background:var(--pass-soft);color:var(--pass)}
 .trail{display:flex;gap:3px;align-items:center}
 .trail i{width:9px;height:9px;border-radius:2px;display:block;background:var(--idle-soft)}
@@ -144,9 +144,10 @@ function renderSummary(){
       <div class="bar" aria-hidden="true"><i style="width:${n?p/n*100:0}%;background:var(--pass)"></i><i style="width:${n?f/n*100:0}%;background:var(--fail)"></i><i style="width:${n?b/n*100:0}%;background:var(--warn)"></i></div>
       <span class="s">${esc(sub)}</span></div>`);
   }
-  const fixed = S.tickets.filter(t=>t.status==="fixed").length, open = S.tickets.length - fixed;
+  const fixed = S.tickets.filter(t=>t.status==="fixed").length, open = S.tickets.filter(t=>t.status==="open").length,
+        deferred = S.tickets.filter(t=>t.status==="deferred").length;
   if (S.tickets.length) tiles.push(`<div class="tile"><span class="k">Bugs &amp; features</span><span class="v">${fixed} fixed</span>
-    <div class="bar" aria-hidden="true"><i style="width:${fixed/S.tickets.length*100}%;background:var(--pass)"></i></div><span class="s">${open} open in the backlog</span></div>`);
+    <div class="bar" aria-hidden="true"><i style="width:${fixed/S.tickets.length*100}%;background:var(--pass)"></i></div><span class="s">${open} open in the backlog${deferred?`, ${deferred} deferred`:""}</span></div>`);
   $("#summary").innerHTML = tiles.join("");
 }
 
@@ -210,8 +211,8 @@ function logHTML(l){
 function renderTickets(){
   const idx = caseIndex();
   let h = `<div class="filters" style="margin:14px 0">
-    ${[["open","Open"],["fixed","Fixed"],["all","All"]].map(([v,l])=>`<button class="chip" data-tstatus="${v}" aria-pressed="${UI.tstatus===v}">${l}</button>`).join("")}
-    <select class="sel" id="fLayer" aria-label="Filter by layer">${[["all","All layers"],["prototype","Prototype"],["backend","Backend"],["edge","Media signing"]].map(([v,l])=>`<option value="${v}" ${UI.tlayer===v?"selected":""}>${l}</option>`).join("")}</select></div>`;
+    ${[["open","Open"],["fixed","Fixed"],["deferred","Deferred"],["all","All"]].map(([v,l])=>`<button class="chip" data-tstatus="${v}" aria-pressed="${UI.tstatus===v}">${l}</button>`).join("")}
+    <select class="sel" id="fLayer" aria-label="Filter by layer">${[["all","All layers"],["prototype","Prototype"],["backend","Backend"],["edge","Media signing"],["app","App"],["ops","Scripts and CI"]].map(([v,l])=>`<option value="${v}" ${UI.tlayer===v?"selected":""}>${l}</option>`).join("")}</select></div>`;
   const items = S.tickets.filter(t=>(UI.tstatus==="all"||t.status===UI.tstatus)&&(UI.tlayer==="all"||t.layer===UI.tlayer));
   const sev = {High:0, Medium:1, Low:2};
   items.sort((a,b)=>(a.status===b.status?0:a.status==="open"?-1:1) || (sev[a.severity]-sev[b.severity]) || a.id.localeCompare(b.id, undefined, {numeric:true}));
@@ -227,7 +228,7 @@ function renderTickets(){
       <span class="id mono">${esc(t.id)}</span>
       <span class="t">${esc(t.title)}<span class="meta"><span class="tk">${esc(t.kind)}</span><span class="tk">${esc(SUITE_LABEL[t.layer]||t.layer)}</span><span class="tk">${esc(t.severity)}</span>${tests.slice(0,6).map(x=>`<span class="tk">${esc(x.id)}</span>`).join("")}${tests.length>6?`<span class="tk">+${tests.length-6}</span>`:""}</span>
         <span class="note">${esc(proof)}</span></span>
-      <span class="right"><span class="pill ${t.status}">${t.status==="fixed"?"Fixed":"Open"}</span></span></div></div>`;
+      <span class="right"><span class="pill ${t.status}">${t.status==="fixed"?"Fixed":t.status==="deferred"?"Deferred":"Open"}</span></span></div></div>`;
   }
   $("#view").innerHTML = h + `</div>`;
 }

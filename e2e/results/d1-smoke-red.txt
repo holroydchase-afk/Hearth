@@ -1,0 +1,23 @@
+NOT OK  D1 smoke: backend/scripts/smoke-check.sh exists
+NOT OK  D1 smoke: without SUPABASE_ACCESS_TOKEN it stops and names the secret
+        | bash: scripts/smoke-check.sh: No such file or directory
+NOT OK  D1 smoke: a healthy project passes (exit 0)
+NOT OK  D1 smoke: ends with "SMOKE RESULT: N ok, 0 failed"
+NOT OK  D1 smoke: says all 12 local migrations are applied
+ok      D1 smoke: never prints a secret value
+ok      D1 smoke: never prints the token
+ok      D1 smoke: its SQL runs inside a read-only transaction (no write attempted)
+ok      D1 smoke: only GETs and the read-only query call
+NOT OK  D1 smoke: the token goes in the Authorization header
+ok      D1 smoke: no psql, no unexpected endpoint
+ok      D1 smoke: changes nothing
+NOT OK  D1 smoke: a migration not applied on hosted fails and names it (0012)
+NOT OK  D1 smoke: a public table without RLS fails and names it
+NOT OK  D1 smoke: a missing cron job fails and names it
+NOT OK  D1 smoke: a missing edge function fails and names it
+NOT OK  D1 smoke: an edge function that isn't ACTIVE fails
+NOT OK  D1 smoke: a missing function secret fails and names it (MEDIA_KEK)
+ok      D1 smoke: ... and still prints no secret value
+NOT OK  D1 smoke: the leftover placeholder secret is a warning to clean up, not a failure
+
+SMOKE CHECK TEST RESULT: 7 passed, 13 failed

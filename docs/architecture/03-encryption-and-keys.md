@@ -9,6 +9,7 @@ What is encrypted, with which keys, and who can decrypt it. The short version: *
 | Photo bytes (display and thumbnail) | AES-256-GCM, per-item key, encrypted on the phone | TLS | The family members the post is shared with, and Hearth's server (via `MEDIA_KEK`) |
 | Per-item keys | Wrapped with AES-KW under `MEDIA_KEK`, in a table no client can read | TLS | Hearth's server |
 | Captions, comments, names, groups, emails | Plaintext columns; disk-level encryption by Supabase | TLS | Hearth's server and Supabase |
+| Chat messages | MLS (RFC 9420), sealed on the phone; history on each phone, AES-256-GCM at rest | TLS | Only the people in the chat ([06-messenger.md](06-messenger.md)) |
 | Notices | Not stored after sending | TLS | Resend, Expo, Apple, Google (display names and counts only) |
 
 ## Media format: `aes-256-gcm-chunked-v1` (Built)
@@ -18,6 +19,7 @@ Defined in `app/src/crypto/media.ts`, using `@noble/ciphers`.
 - Plaintext is split into 64 KiB chunks. Each chunk is sealed with AES-256-GCM and stored as `nonce (12 bytes) ‖ ciphertext ‖ tag (16 bytes)`.
 - The nonce is `file prefix (7 random bytes per file) ‖ chunk index (4 bytes, big-endian) ‖ last flag (1 byte)`. Binding the index and the last-chunk flag into the nonce means reordering, dropping or truncating chunks fails authentication (the STREAM construction).
 - Each media item gets its own key, shared only by its display and thumbnail versions, which get different random file prefixes.
+- All keys, nonces and prefixes come from `app/src/crypto/random.ts`, which uses only the platform's secure `getRandomValues` and throws if it is missing. Before 2026-10-19 it used expo-crypto's `getRandomBytes`, which falls back to `Math.random` in development builds such as Expo Go; milestone 1 photos encrypted before that fix should be treated as test data only (MS4).
 - The backend never decrypts media. Only clients need to agree on the format, and the scheme name is stored per item (`media_items.enc_scheme`) so it can change later.
 
 ## Key hierarchy (Built)
@@ -30,6 +32,7 @@ MEDIA_KEK  (256-bit, Edge Function secret only; one for the whole service)
 
 - **Minting.** On upload, `sign-media` generates a data key with WebCrypto, wraps it under `MEDIA_KEK`, stores the wrapped key in `media_keys` (`kek_version` recorded), and returns the raw key to the uploader over TLS (`backend/supabase/functions/sign-media/index.ts`).
 - **Release.** On view, `sign-media` checks `can_view_post` as the caller, then unwraps and returns the key with 10-minute download URLs. A caller without access gets `404`, never a key.
+- **Ready needs the key.** A photo is marked ready only if its wrapped key was saved; otherwise it's marked failed and the app uploads it again, so a post never publishes with a photo nobody can decrypt (`mark_media_upload_result`, migration 0012, S15).
 - **Storage.** `media_keys` has RLS on and no client policy; select is revoked from signed-in users. Only the service role reads it.
 - **On the phone.** Keys and decrypted bytes stay in memory; nothing decrypted is written to disk except an explicit "Save to my phone".
 - **Deletion.** Deleting a post deletes its wrapped keys, which makes its objects unreadable even before B2 removes them (crypto-shredding per post).
@@ -53,4 +56,4 @@ Each step makes one more claim true. Order and status live in `docs/product/MARK
 4. **The family vault** (post-beta, opt-in). Keys live only on family devices, with a printed recovery card; Hearth's server can no longer decrypt. This is the only step that would make "end-to-end encrypted" true.
 
 ---
-Last checked against code: 2026-10-18, 3031b37
+Last checked against code: 2026-10-19, MS4 randomness fix (plus migration 0015: chat messages under MLS)
