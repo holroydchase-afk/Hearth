@@ -76,6 +76,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 | D11 | Text message codes as the primary, default way to get a sign-in code (email as fallback). Needs an SMS provider and US carrier registration, which can take weeks | Keep email for milestones 1 and 2; staff-pm specs texts, and you start carrier registration early so it's ready for the grandparents (milestone 3+) | Grandparent milestones |
 | D12 | Other sign-in options, including Sign in with Apple | Explore after milestone 1; Apple needs the $99 account and a final name | Nothing today |
 | D13 | Built-in messenger (Chase, Oct 19: "maybe we use Signal"). Signal's own network has no API for other apps, so "Signal" can mean: a "Message on Signal" link out, or Signal's open protocol library (libsignal, AGPL like Hearth) on our own servers. Other option: MLS (the group-chat encryption standard). Chat or DMs are out of BETA-SPEC today | **Decided (Chase, Oct 19): build now, on MLS**, group and event chat first (`SPEC-MESSENGER.md`, `decisions/2026-10-19-messenger-mls.md`). Building in the messenger thread, alongside milestone 1 | Nothing; behind a Messages button |
+| D14 | Native look (Apple HIG on iPhone, Material 3 on Android, plus Hearth's overrides; `DESIGN-SYSTEM.md`): when to switch the app over | **Decided: all now** (Chase, Oct 19); built in PR #30 | Nothing |
 
 ## Waiting on Chase, later (not milestone 1)
 
@@ -112,6 +113,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 
 ## Done (latest first)
 
+- Oct 19: native look built (PR #30): system fonts, Apple colors on iPhone and Material 3 on Android, the phone's own tab bar, native buttons and switches, DS-1..DS-9 tests. The old look is saved in `docs/design/versions/`. Still to confirm on a phone in UAT: the tab bar and the gray buttons.
 - Oct 19: `grandparent-ux` rebuilt as Hearth's UI/UX designer with the ranked family personas.
 - Oct 18: anchor A4 White-paper ready; `docs/architecture/` started (overview, data flow, encryption and keys, threat model).
 - Oct 18: sign-in code email set up in Supabase (Resend SMTP, both templates, 6-digit code, 1 hour); PR #14 and #16 merged.

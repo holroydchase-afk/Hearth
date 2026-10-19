@@ -73,7 +73,7 @@ export function PhotosScreen() {
     <View style={{ gap: 12 }}>
       <Txt variant="display" role="header">{`Photos of ${app.space.name}`}</Txt>
       {senders ? <Txt variant="muted">{`Sent by ${senders}`}</Txt> : null}
-      <Button label="Messages" text="💬 Messages" variant="secondary" onPress={() => setMessages(true)} />
+      <Button label="Messages" icon={{ sf: 'bubble.left.and.bubble.right', md: 'chat' }} variant="secondary" onPress={() => setMessages(true)} />
       {hasEvents ? (
         <Button label="See events" variant="secondary" onPress={() => setEvents({ eventId: null, fromList: true })} />
       ) : null}

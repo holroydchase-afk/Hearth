@@ -34,7 +34,7 @@ export function MessagesScreen({ onClose }: { onClose: () => void }) {
   return (
     <Shell>
       <Txt variant="display" role="header">Messages</Txt>
-      <Button label="Back to Photos" variant="secondary" onPress={onClose} />
+      <Button label="Back to Photos" icon={{ sf: 'chevron.backward', md: 'arrow_back' }} variant="secondary" onPress={onClose} />
       <Txt variant="muted">{PRIVACY}</Txt>
       {error ? <Notice text={error} /> : null}
       {!chats && !error ? <Loading words="Getting your chats…" /> : null}
@@ -102,7 +102,7 @@ function ChatScreen({ chat, client, onClose }: { chat: ChatSummary; client: Chat
   return (
     <Shell>
       <Txt variant="display" role="header">{chat.title}</Txt>
-      <Button label="Back to all messages" variant="secondary" onPress={onClose} />
+      <Button label="Back to all messages" icon={{ sf: 'chevron.backward', md: 'arrow_back' }} variant="secondary" onPress={onClose} />
       <Txt variant="muted">{PRIVACY}</Txt>
       {error ? <Notice text={error} /> : null}
       {!view ? <Loading words="Opening the chat…" /> : null}
