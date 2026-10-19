@@ -27,6 +27,20 @@ Chase uses Hearth end to end in Expo Go on his iPhone, with a test account B on 
 | 9 | **The 2-day demo** in `MILESTONE-1.md`: 10+ posts, B comments and hearts, airplane mode, save to phone. Log each row (or tell Claude) | Chase | ☐ |
 | 10 | Fix what the demo found (test first), then staff-pm gate review: pass or fail milestone 1 | Claude | ☐ |
 
+## Messenger (D13, built alongside milestone 1)
+
+Group and event chat, end to end encrypted with MLS (`SPEC-MESSENGER.md`, `docs/architecture/06-messenger.md`). Built in PR [#29](https://github.com/holroydchase-afk/Hearth/pull/29); Messages opens from a button at the top of Photos.
+
+| # | Step | Owner | Status |
+|---|---|---|---|
+| MS1 | Say "merge" for PR #29 | Chase | ☐ |
+| MS2 | Deploy migration 0015 to hosted (`deploy.sh`) and publish the Expo Go update | Claude | ☐ |
+| MS3 | MSG-9 by hand: Chase in Expo Go and account B on the web trade 5 messages each way on a shared group | Chase | ☐ |
+| MS4 | privacy-security review of `app/src/messenger/` and 0015; spec safety numbers (key verification) | Claude | ☐ |
+| MS5 | grandparent-ux review of the Messages words and the button-vs-tab placement | Claude | ☐ |
+| MS6 | marketing: add "messages are end-to-end encrypted (MLS)" to the claims register once deployed, with the limits in 06-messenger | Claude | ☐ |
+| MS7 | Push notice for new messages (milestone 2, with NOTIFY-3) | Claude | ☐ |
+
 ## Missing for MVP
 
 What stops milestone 1 from being testable today. Each line names its sequence step.

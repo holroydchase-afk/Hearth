@@ -23,6 +23,7 @@ Hearth is a private photo app for families. Every post has an explicit audience 
 | `sign-media` | Edge Function (Deno). The only path for media bytes in or out of storage: checks permission, mints and unwraps keys, presigns URLs | `backend/supabase/functions/sign-media/` |
 | `notify` | Edge Function (Deno), run every minute by `pg_cron`. Drains the notification outbox to Expo Push and Resend | `backend/supabase/functions/notify/` |
 | Media storage | Backblaze B2 (S3-compatible), region `us-east-005`. Stores encrypted display and thumbnail objects | env in `sign-media/index.ts` |
+| Messenger | MLS (RFC 9420) group chat; the server relays sealed bytes only. See [06-messenger.md](06-messenger.md) | `app/src/messenger/`, `migrations/0015_messenger.sql` |
 | Error reports | Our own table, fixed-shape fields only, kept 30 days; no third-party SDK | `migrations/0006_client_errors.sql` |
 
 ## Vendors and what they can read
@@ -43,4 +44,4 @@ Hearth is a private photo app for families. Every post has an explicit audience 
 **Gap:** "stored in the US" is true; "never leaves the US" is not yet. Supabase logs and telemetry are stored outside the US, its support staff are global, and its contracting entity is in Singapore (`docs/eng/research.md` §4). Push notices transit Apple and Google networks. Closing this means self-hosted auth and Postgres on US infrastructure, a post-proof-of-concept item (anchor A3).
 
 ---
-Last checked against code: 2026-10-18, 3031b37
+Last checked against code: 2026-10-19, a522a3a (messenger, migration 0015)
