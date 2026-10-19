@@ -1,8 +1,9 @@
 -- 0015: messenger relay for MLS group chat (docs/product/SPEC-MESSENGER.md, tests/chat_test.sql).
 -- * The server relays opaque MLS bytes (base64 text): key changes ("commit"), welcomes and sealed messages. It never
 --   holds a key that opens them. Plaintext, group state and history live on each phone.
--- * One chat per group or event (any live circle kind but household), following circle_members. Not in it, a
---   household or a deleted circle: P0002 "not found", the same as a circle that doesn't exist.
+-- * One chat per group or event (any live circle kind but household). Its people are the circle's members plus the
+--   family's parents (owner and adults), the same "parents read every reply" rule as comments (REPLY-10). Not in it,
+--   a household or a deleted circle: P0002 "not found", the same as a circle that doesn't exist.
 -- * One phone per person: chat_devices holds its public signing key; chat_key_packages its one-use key packages.
 --   Publishing again (a new phone) replaces both, so the others swap the old phone out at the next key change (MSG-8).
 -- * One commit per epoch (unique index), so two phones changing keys at once can't split the group (MSG-5).
@@ -52,17 +53,32 @@ alter table public.chat_groups enable row level security;
 alter table public.chat_messages enable row level security;
 revoke all on public.chat_devices, public.chat_key_packages, public.chat_groups, public.chat_messages from anon, authenticated;
 
--- The circle's chat, if the caller is in it: returns when they joined. Anything else is "not found".
+-- Everyone in a circle's chat, with when they joined it: the circle's members and the family's parents.
+create or replace function private.chat_people(p_circle uuid) returns table (user_id uuid, since timestamptz)
+language sql stable security definer set search_path = '' as $$
+  select x.user_id, min(x.since)
+  from public.circles c
+  cross join lateral (
+    select cm.user_id, cm.added_at as since
+    from public.circle_members cm
+    join public.space_members sm on sm.space_id = c.space_id and sm.user_id = cm.user_id
+    where cm.circle_id = c.id
+    union all
+    select sm.user_id, sm.joined_at
+    from public.space_members sm
+    where sm.space_id = c.space_id and sm.role in ('owner', 'adult')
+  ) x
+  where c.id = p_circle and c.deleted_at is null and c.kind <> 'household'
+  group by x.user_id
+$$;
+
+-- When the caller joined this circle's chat. Not in it (or no such chat): "not found".
 create or replace function private.chat_member_since(p_circle uuid) returns timestamptz
 language plpgsql stable security definer set search_path = '' as $$
 declare v timestamptz;
 begin
   if auth.uid() is null then raise exception 'not authenticated' using errcode = '42501'; end if;
-  select cm.added_at into v
-  from public.circle_members cm
-  join public.circles c on c.id = cm.circle_id and c.deleted_at is null and c.kind <> 'household'
-  join public.space_members sm on sm.space_id = c.space_id and sm.user_id = cm.user_id
-  where cm.circle_id = p_circle and cm.user_id = auth.uid();
+  select p.since into v from private.chat_people(p_circle) p where p.user_id = auth.uid();
   if v is null then raise exception 'not found' using errcode = 'P0002'; end if;
   return v;
 end $$;
@@ -111,16 +127,13 @@ begin
                                            else (array_agg(o.display_name order by o.display_name))[1] || ', '
                                                 || (array_agg(o.display_name order by o.display_name))[2] || ' and '
                                                 || (count(*) - 2)::text || ' more' end
-                               from public.circle_members om
-                               join public.space_members osm on osm.space_id = c.space_id and osm.user_id = om.user_id
-                               join public.profiles o on o.id = om.user_id
-                               where om.circle_id = c.id and om.user_id <> v_uid), 'Just you') end,
-           (select count(*)::int from public.circle_members mm
-              join public.space_members msm on msm.space_id = c.space_id and msm.user_id = mm.user_id
-            where mm.circle_id = c.id)
-    from public.circle_members cm
-    join public.circles c on c.id = cm.circle_id and c.space_id = p_space and c.deleted_at is null and c.kind <> 'household'
-    where cm.user_id = v_uid
+                               from private.chat_people(c.id) op
+                               join public.profiles o on o.id = op.user_id
+                               where op.user_id <> v_uid), 'Just you') end,
+           (select count(*)::int from private.chat_people(c.id))
+    from public.circles c
+    where c.space_id = p_space and c.deleted_at is null and c.kind <> 'household'
+      and exists (select 1 from private.chat_people(c.id) me where me.user_id = v_uid)
     order by case c.kind when 'everyone' then 0 when 'group' then 1 else 2 end, c.name;
 end $$;
 
@@ -148,14 +161,11 @@ language plpgsql stable security definer set search_path = '' as $$
 begin
   perform private.chat_member_since(p_circle);
   return query
-    select cm.user_id, p.display_name, d.signature_key
-    from public.circle_members cm
-    join public.circles c on c.id = cm.circle_id
-    join public.space_members sm on sm.space_id = c.space_id and sm.user_id = cm.user_id
-    join public.profiles p on p.id = cm.user_id
-    left join public.chat_devices d on d.user_id = cm.user_id
-    where cm.circle_id = p_circle
-    order by p.display_name, cm.user_id;
+    select cp.user_id, p.display_name, d.signature_key
+    from private.chat_people(p_circle) cp
+    join public.profiles p on p.id = cp.user_id
+    left join public.chat_devices d on d.user_id = cp.user_id
+    order by p.display_name, cp.user_id;
 end $$;
 
 -- Hand out (and use up) one key package per listed person who is in the chat; others are skipped silently.
@@ -166,11 +176,7 @@ begin
   perform private.chat_member_since(p_circle);
   return query
     with who as (
-      select distinct u.u as user_id
-      from unnest(p_users) u(u)
-      join public.circle_members cm on cm.circle_id = p_circle and cm.user_id = u.u
-      join public.circles c on c.id = cm.circle_id
-      join public.space_members sm on sm.space_id = c.space_id and sm.user_id = u.u
+      select cp.user_id from private.chat_people(p_circle) cp where cp.user_id = any (p_users)
     ), pick as (
       select (select k.id from public.chat_key_packages k where k.user_id = who.user_id
               order by k.created_at, k.id limit 1 for update skip locked) as id
@@ -192,7 +198,7 @@ begin
   if (p_kind = 'welcome') <> (p_recipient is not null) then
     raise exception 'a welcome (and only a welcome) names who it is for' using errcode = '23514';
   end if;
-  if p_recipient is not null and not exists (select 1 from public.circle_members where circle_id = p_circle and user_id = p_recipient) then
+  if p_recipient is not null and not exists (select 1 from private.chat_people(p_circle) cp where cp.user_id = p_recipient) then
     raise exception 'that person is not in this group' using errcode = '23514';
   end if;
   if p_epoch is null or p_epoch < 0 then raise exception 'epoch must be 0 or more' using errcode = '23514'; end if;
@@ -219,7 +225,7 @@ begin
     limit least(greatest(coalesce(p_limit, 200), 1), 500);
 end $$;
 
-revoke execute on function private.chat_member_since(uuid), private.chat_is_b64(text, int) from public, anon;
+revoke execute on function private.chat_people(uuid), private.chat_member_since(uuid), private.chat_is_b64(text, int) from public, anon;
 revoke execute on function public.chat_list(uuid), public.chat_publish_device(text, text[]), public.chat_key_package_count(), public.chat_start(uuid),
   public.chat_roster(uuid), public.chat_claim(uuid, uuid[]), public.chat_send(uuid, text, bigint, text, uuid),
   public.chat_fetch(uuid, bigint, int) from public, anon;

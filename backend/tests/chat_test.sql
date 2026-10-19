@@ -3,6 +3,7 @@
 -- plaintext, so MSG-1's "no words on the server" half is the app's test (src/messenger).
 -- Seed people (space A, "Sam at Dad's"): Grandma Rivera (ma) and Grandpa Rivera (pa) are the group
 -- "Grandparents – Dad's side" (a1). Aunt Jo (jo) is in Everyone (a0) but not a1. Blair is only in Co-parent.
+-- Alex owns the family (a parent), so he is in every chat (REPLY-10's "parents read every reply").
 -- Interpretations (staff-pm; change the test first):
 --   * Every chat RPC answers P0002 "not found" for a circle the caller isn't in, or a household, or a deleted circle.
 --   * chat_claim skips anyone not in the circle (no error, so it can't probe membership elsewhere).
@@ -16,6 +17,7 @@
 \set as_ma    'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''a0000000-0000-0000-0000-0000000000a1'', false);'
 \set as_pa    'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''a0000000-0000-0000-0000-0000000000a2'', false);'
 \set as_jo    'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''c0000000-0000-0000-0000-0000000000c1'', false);'
+\set as_alex  'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''a0000000-0000-0000-0000-00000000000a'', false);'
 \set as_blair 'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''b0000000-0000-0000-0000-00000000000b'', false);'
 \set g        '''33333333-0000-0000-0000-0000000000a1'''
 \set ma       '''a0000000-0000-0000-0000-0000000000a1'''
@@ -64,8 +66,8 @@ select tests.throws_code($$select * from public.chat_fetch('33333333-0000-0000-0
 :as_ma
 select tests.ok_sql($$select array_agg(kind order by kind) = array['event', 'everyone', 'group'] from public.chat_list('22222222-0000-0000-0000-00000000000a')$$,
                     'MSG-1 Grandma''s chats: Everyone, her group and her event (no household, nothing she isn''t in)');
-select tests.ok_sql($$select title = 'Grandpa Rivera' and member_count = 2 from public.chat_list('22222222-0000-0000-0000-00000000000a') where kind = 'group'$$,
-                    'AUD-14 a relative sees a group chat titled by its people, never the group''s name');
+select tests.ok_sql($$select title = 'Alex and Grandpa Rivera' and member_count = 3 from public.chat_list('22222222-0000-0000-0000-00000000000a') where kind = 'group'$$,
+                    'AUD-14 a relative sees a group chat titled by its people (the parent included), never the group''s name');
 select tests.ok_sql($$select title = 'Charleston trip' from public.chat_list('22222222-0000-0000-0000-00000000000a') where kind = 'event'$$,
                     'MSG-7 an event chat keeps the event''s name');
 :as_blair
@@ -73,22 +75,17 @@ select tests.ok_sql($$select not exists (select 1 from public.chat_list('2222222
                     'AUD-14 Blair never sees the grandparents'' group');
 :as_jo
 select tests.throws_code($$select * from public.chat_list('22222222-0000-0000-0000-00000000000b')$$, 'MSG-2 a family you aren''t in is "not found"', 'P0002');
-:as_admin
-select set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-00000000000a', false);
-insert into public.circle_members (circle_id, user_id) values (:g, 'a0000000-0000-0000-0000-00000000000a');
-set role authenticated;
-select tests.ok_sql($$select title like 'Grandparents%' from public.chat_list('22222222-0000-0000-0000-00000000000a') where circle_id = '33333333-0000-0000-0000-0000000000a1'$$,
-                    'MSG-1 a parent sees the group''s own name');
-:as_admin
-delete from public.circle_members where circle_id = :g and user_id = 'a0000000-0000-0000-0000-00000000000a';
+:as_alex
+select tests.ok_sql($$select array_agg(title order by title) = array['Charleston trip', 'Co-parent', 'Everyone', 'Grandparents – Dad''s side'] from public.chat_list('22222222-0000-0000-0000-00000000000a')$$,
+                    'REPLY-10 the parent is in every chat of the family (not households), by its real names');
 
 -- ---------- starting, roster, claiming ----------
 :as_ma
 select tests.ok_sql(format('select public.chat_start(%L)', :g), 'MSG-1 the first member to open Messages starts the group (true)');
 :as_pa
 select tests.ok_sql(format('select not public.chat_start(%L)', :g), 'MSG-1 the next one finds it already started (false)');
-select tests.ok_sql(format('select count(*) = 2 and bool_and(signature_key is not null) and bool_or(name = ''Grandma Rivera'') from public.chat_roster(%L)', :g),
-                    'MSG-1 the roster lists the group''s two people, their names and signing keys');
+select tests.ok_sql(format('select count(*) = 3 and count(signature_key) = 2 and bool_or(name = ''Grandma Rivera'') and bool_or(name = ''Alex'') from public.chat_roster(%L)', :g),
+                    'MSG-1 the roster lists the group''s two people plus the parent, with signing keys for those who have opened Messages');
 select tests.ok_sql(format('select not exists (select 1 from public.chat_roster(%L) where user_id = %L)', :g, :jo),
                     'MSG-2 ...and nobody outside it');
 :as_ma

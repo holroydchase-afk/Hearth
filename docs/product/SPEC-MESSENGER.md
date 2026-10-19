@@ -10,7 +10,8 @@ Every group and event has a **Messages** page. Only the people in that group rea
 - **History lives on the phone.** MLS gives forward secrecy, so a message can't be decrypted again later. Each phone keeps its own copy, encrypted at rest (the `secureSession` pattern). A new phone starts with an empty history.
 
 ## Rules
-- A conversation belongs to one group or event (any circle kind but household) and follows its membership. People only message people they already share that group with.
+- A conversation belongs to one group or event (any circle kind but household) and follows its membership, **plus the family's parents** (owner and adults), the same as "parents read every reply" (REPLY-10). People only message people they already share that group with.
+- A relative sees a plain group's chat titled by its people ("Alex and Grandpa Rivera"), never by the group's name (AUD-14). Parents see group names; events keep their name (EVT-1).
 - Joining the group lets you read messages sent **after** you were let in. Leaving or being removed stops your access at once (server) and at the next key change (MLS).
 - No read receipts, no typing dots, no last-seen, no "delivered" (A2 Guilt-free).
 - Words under every button. Text 17pt+, 48pt tap targets (CLAUDE.md rule 3).
