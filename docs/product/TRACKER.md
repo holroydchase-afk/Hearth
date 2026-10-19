@@ -1,6 +1,6 @@
 # Hearth tracker: what's next, what's missing, what's pending
 
-The one list of everything open between Chase and Claude. Updated Oct 18, 2026.
+The one list of everything open between Chase and Claude. Updated Oct 19, 2026.
 
 **How it works**
 - Work the **Sequence** top to bottom. One step at a time; nothing new gets built until milestone 1 passes (Chase, Oct 17).
@@ -57,7 +57,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 | D7 | Earlier "personal server" question: did you mean a separate locked store per family, run in the US? Your yes to the family vault may already answer it | Treat the vault as the answer | Nothing today |
 | D8 | Start per-family media keys now, before the first real photos (step 7), or after milestone 1 (then old photos need re-keying) | Before step 7, if staff-pm approves; it's small | Nothing today; cheaper before step 7 |
 | D9 | Push and email notices name the sender ("From Chase on Hearth", BETA-NOTIFY-7) or say nothing about who | Keep names for the beta; add a "hide names" setting later | Milestone 2 |
-| D10 | Open-source the repo? Prep would be a secrets scan and a license; a paid outside review waits for milestone 7 | Decide after milestone 1 | Nothing today |
+| D10 | Open-source the repo, and under which license? Options: AGPL-3.0, MIT, personal/family-only (PolyForm Noncommercial, not OSI open source), or AGPL plus a paid commercial license. MIT can't also be limited to personal and family use. Sentry (FSL) and PostHog (MIT + paid `ee`) sell to companies; Signal, Ente and Immich use AGPL. See "Developer edition" below | **AGPL-3.0**; the name stays Chase's (trademark), and a contributor agreement once outside PRs arrive keeps dual licensing open. Repo goes public only after D3 (name final) | Developer edition |
 | D11 | Text message codes as the primary, default way to get a sign-in code (email as fallback). Needs an SMS provider and US carrier registration, which can take weeks | Keep email for milestones 1 and 2; staff-pm specs texts, and you start carrier registration early so it's ready for the grandparents (milestone 3+) | Grandparent milestones |
 | D12 | Other sign-in options, including Sign in with Apple | Explore after milestone 1; Apple needs the $99 account and a final name | Nothing today |
 
@@ -81,6 +81,14 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 - **Architecture docs (A4, white-paper source).** Write the access-control section (groups, households, events, roles, RLS from 0011) next; then retention and deletion once the purge worker exists. Keep every footer current (CLAUDE.md rule 6).
 - Schedule the nightly hard purge (`purge_soft_deleted`) on the hosted project; `deploy.sh` doesn't today. Found while writing `docs/architecture/02-data-flow.md`.
 - 0012 households-only migration (spec'd in `SPEC-GROUPS.md`, needed before milestone 3).
+
+- **Developer edition** (Chase, Oct 19; post-milestone 1, decided by D10). The bet: a developer parent clones Hearth, deploys their own copy with one command, and grows it with Claude. The repo (CLAUDE.md, agents, TDD, `docs/architecture/`) is already most of the kit. Goal: an impressive dev-community contribution, built by product and dev folks for product and dev folks.
+  1. Scan the full git history for secrets (and anything family-identifying) before anything goes public.
+  2. Add the LICENSE file chosen in D10, plus the license field in `app/package.json`.
+  3. Self-host guide around `backend/scripts/deploy.sh`: your own Supabase project, your own B2 bucket, your own keys.
+  4. "Fix this with Claude": a bug report or change request opens a Claude Code session on *their* repo. Claude reads code and error reports, never photos, captions or names (rule 2); privacy-security reviews the data flow.
+  5. Make the repo public, only after D3 says the name is final (a public repo bakes the name into every fork and link).
+  - **Not doing yet:** a paid hosted plan (milestone 7 decides costs), a contributor agreement until outside PRs exist, forums or a Discord, a plugin system, an outside security review (milestone 7).
 
 ## Running
 
