@@ -3,6 +3,7 @@ import { useApp } from '../state/AppContext';
 import { Card, Screen, Txt } from '../ui/kit';
 import { AppGate } from './AppGate';
 import { NoticeTiming } from './NoticeTiming';
+import { ProblemDetailsCard } from './ProblemDetails';
 import { BiggerText, DeleteAccount, HowToTell, Privacy, ReplyAudience, SignOut } from './Preferences';
 
 export function MeScreen() {
@@ -20,6 +21,7 @@ export function MeScreen() {
       <ReplyAudience />
       <Privacy who={app.helper} />
       <NoticeTiming />
+      <ProblemDetailsCard />
       <SignOut />
       <DeleteAccount />
     </Screen>
