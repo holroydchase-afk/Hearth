@@ -23,7 +23,10 @@ export type ApiErrorCode =
   | '22023' // invalid invite or code
   | '54000' // rate limited
   | 'BAD_OTP' // wrong or old 6-digit sign-in code
-  | 'EXIF' // sign-media 422: metadata not stripped
+  | 'EXIF' // sign-media 422: metadata not stripped; or the phone couldn't read the photo it made
+  // MEDIA-3: the on-phone verifier found a field group the media policy strips (SPEC-MEDIA 1.1)
+  | 'META_LOCATION' | 'META_DATETIME' | 'META_CAMERA' | 'META_ORIENTATION' | 'META_SOFTWARE'
+  | 'META_MAKERNOTE' | 'META_XMP' | 'META_ICC' | 'META_FACES' | 'META_OTHER'
   | 'VIDEO_CAP' // sign-media 402
   | 'VIDEO_TOO_LONG' // pipeline: > 60 s
   | 'AUTH' // not signed in / session expired

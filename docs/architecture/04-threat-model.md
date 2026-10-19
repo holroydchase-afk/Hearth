@@ -20,7 +20,7 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 | **Someone with a leaked link** | Download photos | Presigned URLs expire in 10 minutes and return ciphertext only | Built |
 | **Someone with a forwarded or logged invite link** | Join the family as a relative | Invites are single-use, expire in at most 30 days and can be addressed to one email; the link token is 160 random bits and the typed code is rate limited (S10). Links point at the hosted web build, not at `hearth.family`, which isn't bought: whoever registered it would have received live tokens (migration 0014; `backend/scripts/smoke-check.sh` fails if hosted points there again) | Built. **Gap:** the token sits in the URL path, so the web host's request logs can hold it until it's used or expires; ONB-6 (milestone 2) moves it after `#`. Expo's EAS Hosting is the web host; where it keeps logs is not yet written down |
 | **Storage vendor (B2) breach or insider** | Read photos | Phone-side AES-256-GCM; B2 never sees a key | Built |
-| **Location stalker** | Find a child's home or school from a photo | EXIF and GPS stripped on the phone, verified on the output bytes, enforced by a database check; video posting off until it can be stripped too | Built (photos) |
+| **Location stalker** | Find a child's home or school from a photo | EXIF and GPS stripped on the phone by a code-level media policy (location default `strip`), verified on the output bytes, enforced by a database check; video posting off until it can be stripped too | Built (photos) |
 | **Ad, analytics or AI vendor** | Profile the family | None are present: no analytics, ad or crash SDKs; error reports are our own fixed-shape table, 30-day retention | Built |
 | **Push and email providers** | Learn content | Notices carry display names, counts and a link only | Built. **Planned:** names-off setting (D9) |
 | **Account takeover** | Sign in as a relative | One-time email codes, 1-hour expiry; no passwords to reuse | Built. **Gap:** an inbox compromise is an account compromise; SIM-swap risk if text codes ship (D11) |
@@ -44,4 +44,4 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 5. No outside security review yet; open-sourcing is undecided (D10).
 
 ---
-Last checked against code: 2026-10-18, 894311a (plus migration 0014, ONB-3/4 invite links)
+Last checked against code: 2026-10-19, 624fc39 (plus the MEDIA-1/2/3 on-phone cleaner; migration 0014, ONB-3/4 invite links)

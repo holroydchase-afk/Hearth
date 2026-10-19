@@ -1,6 +1,6 @@
 // expo-image-manipulator (SDK 54 context API) behind the pipeline's Manipulator interface.
 // Loading decodes the image with its EXIF orientation applied; saving writes a fresh JPEG with
-// no metadata. pipeline.ts verifies that by scanning the output bytes.
+// little metadata (iOS still writes a small Exif block). pipeline.ts cleans and verifies the bytes (clean.ts).
 import { ImageManipulator, SaveFormat, type ImageRef } from 'expo-image-manipulator';
 import type { LoadedImage, Manipulator } from './pipeline';
 

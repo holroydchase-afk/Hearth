@@ -53,7 +53,9 @@ Chase's first iPhone photo died in `prepareItem` → `processPhoto`. Leading gue
 1. After encode, a pure-TS cleaner (`app/src/media/clean.ts`) copies the JPEG segment by segment, keeping only SOI, APP0 (JFIF), APP2 (ICC, if policy keeps it), the image tables and the scan. Everything else is dropped. The same rule applies to PNG chunks.
 2. A verifier parses what is left and maps each surviving field to a group. It fails closed **only** if a group marked strip (or extract) is still in the file. The error code is `META_<GROUP>` (e.g. `META_LOCATION`), using the existing `errorReport` rules: the code is sent, never the bytes or a message.
 3. When a job fails as non-retryable, the queue sends `errorReport(e, 'upload')`. Today it sends nothing.
-4. `exif_stripped: true` stays, and the upload spec gains `meta_policy: <version>`.
+4. `exif_stripped: true` stays, and the upload spec gains `meta_policy: <version>` (not built: MEDIA-4).
+
+**Status (Oct 19):** steps 1-3 built for JPEG (`clean.ts`, `policy.ts`, `pipeline.ts`, queue report). PNG chunks are not cleaned: the pipeline only makes JPEG, and anything it can't parse fails closed (`EXIF`). APP14 (Adobe) is stripped as `other`. `compression.enabled: false` is refused until "clean the original" is built. Confirming the cause on a phone is MEDIA-7.
 
 ### 1.4 Server enforcement (a changed app can't leak quietly)
 - **M1, migration + `sign-media`:** refuse an upload whose `meta_policy` is below the minimum (the server's copy, `MEDIA_POLICY_MIN`). Refuse a `mime_type` that isn't on the allowlist (`image/jpeg`; video only when `video_posting` is on, FLAG-4).
@@ -68,11 +70,11 @@ Chase's first iPhone photo died in `prepareItem` → `processPhoto`. Leading gue
 ### 1.6 Acceptance criteria
 | ID | Type | When | Given / When / Then |
 |---|---|---|---|
-| MEDIA-1 | auto | M1 | **Given** a JPEG with an Exif block holding only ColorSpace and pixel size (what iOS writes), **When** it is cleaned, **Then** the job continues and the output has no APP1. |
-| MEDIA-2 | auto | M1 | **Given** fixtures with GPS, MakerNote (incl. content ID), XMP faces, IPTC, COM and serials, **When** they are cleaned, **Then** none survive (checked by group), and ICC survives when the policy keeps it. |
-| MEDIA-3 | auto | M1 | **Given** a cleaner stubbed to leave GPS in, **When** the job runs, **Then** it fails `META_LOCATION`, nothing is signed, and one error report with only that code is sent. |
+| MEDIA-1 | auto | M1 · **Built Oct 19** | **Given** a JPEG with an Exif block holding only ColorSpace and pixel size (what iOS writes), **When** it is cleaned, **Then** the job continues and the output has no APP1. |
+| MEDIA-2 | auto | M1 · **Built Oct 19** | **Given** fixtures with GPS, MakerNote (incl. content ID), XMP faces, IPTC, COM and serials, **When** they are cleaned, **Then** none survive (checked by group), and ICC survives when the policy keeps it. |
+| MEDIA-3 | auto | M1 · **Built Oct 19** | **Given** a cleaner stubbed to leave GPS in, **When** the job runs, **Then** it fails `META_LOCATION`, nothing is signed, and one error report with only that code is sent. |
 | MEDIA-4 | auto | M1 | **Given** `meta_policy` below the minimum or a mime type not on the allowlist, **When** `sign-media` is asked, **Then** 422 and no rows. |
-| MEDIA-5 | auto | M1 | **Given** `policy.ts`, **When** `location` is set to anything but `'strip'`, **Then** the test titled "MEDIA-5 D2 location default is strip (Chase's word + persona check to change)" fails, and CI stays red until that test, the MEDIA-6 snapshot, CLAUDE.md rule 2 and a new file in `docs/product/decisions/` change in the same PR. **And** `'keep'` and `'extract'` both compile, so the infrastructure exists. |
+| MEDIA-5 | auto | M1 · **Built Oct 19** (snapshot/CI guard is MEDIA-6, not built) | **Given** `policy.ts`, **When** `location` is set to anything but `'strip'`, **Then** the test titled "MEDIA-5 D2 location default is strip (Chase's word + persona check to change)" fails, and CI stays red until that test, the MEDIA-6 snapshot, CLAUDE.md rule 2 and a new file in `docs/product/decisions/` change in the same PR. **And** `'keep'` and `'extract'` both compile, so the infrastructure exists. |
 | MEDIA-6 | auto | M1 | **Given** a policy edit, **When** CI runs, **Then** it fails until the snapshot, the server minimum and the `02-data-flow.md` table match. |
 | MEDIA-7 | manual | M1 | **Given** Chase's iPhone in Expo Go, **When** he posts the same photo that failed Oct 19, plus a HEIC and a Live Photo, **Then** all 3 publish, and a saved copy run through exiftool shows no GPS, MakerNote or serial (M-09). |
 | MEDIA-8 | auto | M2 | **Given** an upload with GPS that is marked `exif_stripped: true`, **When** it is finalized, **Then** `sign-media` refuses it and the item never becomes ready. |
