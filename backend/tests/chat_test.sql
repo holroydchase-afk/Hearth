@@ -66,9 +66,9 @@ select tests.throws_code($$select * from public.chat_fetch('33333333-0000-0000-0
 :as_ma
 select tests.ok_sql($$select array_agg(kind order by kind) = array['event', 'everyone', 'group'] from public.chat_list('22222222-0000-0000-0000-00000000000a')$$,
                     'MSG-1 Grandma''s chats: Everyone, her group and her event (no household, nothing she isn''t in)');
-select tests.ok_sql($$select title = 'Alex and Grandpa Rivera' and member_count = 3 from public.chat_list('22222222-0000-0000-0000-00000000000a') where kind = 'group'$$,
+select tests.ok_sql($$select title = 'Alex and Grandpa Rivera' and not named and member_count = 3 from public.chat_list('22222222-0000-0000-0000-00000000000a') where kind = 'group'$$,
                     'AUD-14 a relative sees a group chat titled by its people (the parent included), never the group''s name');
-select tests.ok_sql($$select title = 'Charleston trip' from public.chat_list('22222222-0000-0000-0000-00000000000a') where kind = 'event'$$,
+select tests.ok_sql($$select title = 'Charleston trip' and named from public.chat_list('22222222-0000-0000-0000-00000000000a') where kind = 'event'$$,
                     'MSG-7 an event chat keeps the event''s name');
 :as_blair
 select tests.ok_sql($$select not exists (select 1 from public.chat_list('22222222-0000-0000-0000-00000000000a') where title like 'Grandparents%' or circle_id = '33333333-0000-0000-0000-0000000000a1')$$,

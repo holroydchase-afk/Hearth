@@ -264,8 +264,10 @@ export class FakeBackend {
       .map((c) => {
         const kind = (c.kind ?? 'group') as ChatKind;
         const others = this.chatPeople(c.id).filter((u) => u !== me).map((u) => this.state.users[u]?.name ?? '?').sort();
-        const people = others.length === 0 ? 'Just you' : others.length <= 3 ? others.join(' and ') : `${others[0]}, ${others[1]} and ${others.length - 2} more`;
-        return { circle_id: c.id, kind, title: parent || kind !== 'group' ? c.name : people, member_count: this.chatPeople(c.id).length };
+        const people = others.length === 0 ? 'Just you' : others.length === 1 ? others[0]!
+          : others.length <= 3 ? `${others.slice(0, -1).join(', ')} and ${others.at(-1)}` : `${others[0]}, ${others[1]} and ${others.length - 2} more`;
+        const named = parent || kind !== 'group';
+        return { circle_id: c.id, kind, title: named ? c.name : people, named, member_count: this.chatPeople(c.id).length };
       })
       .sort((a, b) => (order[a.kind]! - order[b.kind]!) || a.title.localeCompare(b.title));
   }

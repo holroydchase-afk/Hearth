@@ -256,7 +256,8 @@ export interface MyProfile {
 /** Messenger (SPEC-MESSENGER, 0015). The server relays opaque MLS bytes as base64; it never sees plaintext. */
 export type ChatKind = 'group' | 'event' | 'everyone';
 /** chat_list: a relative's plain-group chat is titled by its people, never the group's name (AUD-14). */
-export interface ChatSummary { circle_id: string; kind: ChatKind; title: string; member_count: number }
+/** named: the title is the group's or event's own name (parents, events, Everyone); false: it lists the people. */
+export interface ChatSummary { circle_id: string; kind: ChatKind; title: string; named: boolean; member_count: number }
 /** chat_roster: signature_key is the person's phone's public MLS signing key (null until they open Messages). */
 export interface ChatMember { user_id: string; name: string; signature_key: string | null }
 export type ChatRowKind = 'commit' | 'welcome' | 'message';

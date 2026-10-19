@@ -113,7 +113,7 @@ end $$;
 
 -- The chats the caller is in, in one family: groups, events and Everyone (not households).
 create or replace function public.chat_list(p_space uuid)
-returns table (circle_id uuid, kind text, title text, member_count int)
+returns table (circle_id uuid, kind text, title text, named boolean, member_count int)
 language plpgsql stable security definer set search_path = '' as $$
 declare v_uid uuid := auth.uid(); v_parent boolean;
 begin
@@ -123,13 +123,20 @@ begin
   return query
     select c.id, c.kind,
            case when v_parent or c.kind <> 'group' then c.name
-                else coalesce((select case when count(*) <= 3 then string_agg(o.display_name, ' and ' order by o.display_name)
+                else coalesce((select case count(*)
+                                           when 1 then min(o.display_name)
+                                           when 2 then (array_agg(o.display_name order by o.display_name))[1] || ' and '
+                                                       || (array_agg(o.display_name order by o.display_name))[2]
+                                           when 3 then (array_agg(o.display_name order by o.display_name))[1] || ', '
+                                                       || (array_agg(o.display_name order by o.display_name))[2] || ' and '
+                                                       || (array_agg(o.display_name order by o.display_name))[3]
                                            else (array_agg(o.display_name order by o.display_name))[1] || ', '
                                                 || (array_agg(o.display_name order by o.display_name))[2] || ' and '
                                                 || (count(*) - 2)::text || ' more' end
                                from private.chat_people(c.id) op
                                join public.profiles o on o.id = op.user_id
                                where op.user_id <> v_uid), 'Just you') end,
+           v_parent or c.kind <> 'group',
            (select count(*)::int from private.chat_people(c.id))
     from public.circles c
     where c.space_id = p_space and c.deleted_at is null and c.kind <> 'household'
