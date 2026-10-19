@@ -19,6 +19,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - `docs/product/MILESTONE-1.md`: Chase's setup steps and the 2-day demo for milestone 1 (incl. the $99 Apple answer).
 - `docs/product/REMAINING.md`: the critical path to the Ring 0 gate (Oct 29) and the beta.
 - `docs/product/BETA-SPEC.md`: 35 acceptance criteria (BETA-*), the scope source of truth.
+- `docs/product/DESIGN-SYSTEM.md`: native first (Apple HIG on iPhone, Material 3 on Android) plus Hearth's stricter overrides (DS-1..DS-9). Check it before designing any screen.
 - `docs/product/SPEC-MEDIA.md`: media policy (what is stripped, kept or extracted from photos; compression), rules for location ideas, Live Photos plan (MEDIA-*, LIVE-*).
 - `docs/eng/LESSONS.md`: post mortems and the rules they added. Read before choosing any version or calling a build ready.
 - `docs/eng/MERGING.md`: when and how Claude merges PRs (only on Chase's word, CI green, merge commits).
