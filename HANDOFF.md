@@ -130,6 +130,7 @@
 - Decisions (picks in `docs/product/CORE-FEATURES.md`): an Android test phone (~$100), upgrading the Claude plan, and the 5 product questions.
 
 ## Next session, in order
+- **Agent update (Oct 19): `grandparent-ux` is Hearth's UI/UX designer.** It designs as well as reviews, introduces itself to Chase, uses the ranked family personas (Bebar, Gigi, Phyllis first; Scott and John on Android) instead of "Grandma June", and measures sizes and contrast rather than guessing.
 - **New agent (Oct 16): `marketing`.** Logs and develops Chase's positioning ideas in `docs/product/MARKETING.md`. The chief of staff (main session) routes by the roster in `CLAUDE.md`; `scripts/check-agents.sh` keeps it in sync.
 0. **Read `docs/product/ANCHORS.md` (added Oct 16, midnight).** Chase reframed Hearth as a proof of concept with new milestones. staff-pm: reconcile `docs/product/BETA-SPEC.md`, `docs/product/REMAINING.md` and the ring gates to those milestones (Ring 0 ≈ Chase only, then wife, then 1 savvy relative). Raise the A2 "Seen by" conflict as a decision for Chase before milestone 4. Don't delete built features.
 1. Confirm the repo is pushed and CI is running. Fix CI until it's green; that closes S16.
