@@ -84,7 +84,7 @@ export function ViewerScreen({ postId, index }: { postId: string; index: number 
   return (
     <SafeAreaView edges={['top', 'bottom', 'left', 'right']} style={{ flex: 1, backgroundColor: c.bg }}>
       <View style={styles.top}>
-        <Button label="Close" text="✕ Close" variant="secondary" onPress={nav.close} />
+        <Button label="Close" icon={{ sf: 'xmark', md: 'close' }} variant="secondary" onPress={nav.close} />
         {entry ? <Txt variant="muted">{`Photo ${cur! + 1} of ${entries.length}`}</Txt> : null}
       </View>
       {!entry ? (
