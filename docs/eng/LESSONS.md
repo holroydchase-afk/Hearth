@@ -22,3 +22,13 @@ Full post mortem (Claude Doc): https://claude.ai/code/artifact/730d2640-da97-461
 - Tests: `scripts/tests/check_expo_go_test.sh`, `app/scripts/tests/eas_test.sh` (EXPO-4 cases).
 
 **Platform fact.** iPhone Expo Go supports only the newest Expo SDK (Android Expo Go too, in practice). SDK 56 and later need iOS 16.4+, so iPhone 7, 6s, SE (1st gen), iPad mini 4 and iPad Air 2 can't run Hearth.
+
+## Oct 19, 2026: a guessed Expo Go link didn't open
+
+**What happened.** Chase asked for one link that always opens the newest Hearth in Expo Go. Claude built `exp://u.expo.dev/<project>?channel-name=preview` from Expo's usual URL pattern and sent it without trying it. Expo answered 404: the project had a `preview` branch but no `preview` channel. Claude created the channel (`eas channel:create preview`, linked to the branch), and the same link then served the latest update.
+
+**Why.** The same mistake as Oct 18: an answer from memory of how a tool usually works, not from checking this project. Rule 3 above covered builds but not links.
+
+**Rule.** Anything Chase is asked to click, paste or type (a link, a code, a command) is tried first, or the message says plainly that it is untested. For an Expo Go link, fetching its manifest is enough: `curl -s -o /dev/null -w '%{http_code}' -H 'expo-platform: ios' -H 'expo-runtime-version: exposdk:<sdk>' 'https://u.expo.dev/<project>?channel-name=preview'` must print 200.
+
+**Standing link.** `exp://u.expo.dev/676e8cec-57a6-472f-9086-9a9318eaf556?channel-name=preview` opens the newest update on the `preview` branch (checked Oct 19: 200 for iOS).
