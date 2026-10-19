@@ -1,5 +1,6 @@
 // BETA-BULK-2, -3, -5: plan a bulk pick into posts on the phone.
 import { hasExif, processPhoto, type Manipulator } from '../../media/pipeline';
+import { iosReencode } from '../../test/jpeg';
 import { BULK_PICK_LIMIT, PHOTOS_PER_POST, overLimitLine, planBatch, reviewSummary, skippedVideosLine, type PickedAsset } from '../bulk';
 
 // The phone is in Eastern time (passed explicitly: Jest sandboxes process.env.TZ).
@@ -145,9 +146,10 @@ describe('BETA-BULK-5 videos, Live Photos, HEIC', () => {
     const plan = planBatch([live, pairedMotion, heic], NY);
     const items = plan.posts.flatMap((p) => p.items);
     expect(items.map((i) => i.takenAt)).toEqual(['2024-07-04T22:00:00.000Z', '2024-07-04T23:00:00.000Z']);
-    // The decoder reads the HEIC (with its EXIF); the encoder writes a fresh JPEG.
+    // The decoder reads the HEIC (with its EXIF); the encoder writes a fresh JPEG that, as on iOS,
+    // still carries a small Exif block (MEDIA-1), which the pipeline must clean.
     const out = new Map<string, Uint8Array>();
-    const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x04, 0x4a, 0x46, 0xff, 0xda, 1, 2, 3, 0xff, 0xd9]);
+    const jpeg = iosReencode();
     let k = 0;
     const m: Manipulator = {
       load: async (uri) => ({ width: 4032, height: 3024, handle: uri }),

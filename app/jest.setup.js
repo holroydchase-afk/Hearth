@@ -4,6 +4,7 @@ const nodeCrypto = require('crypto');
 
 jest.mock('expo-crypto', () => ({
   getRandomBytes: (n) => new Uint8Array(require('crypto').randomBytes(n)),
+  getRandomValues: (a) => { require('crypto').randomFillSync(a); return a; },
   randomUUID: () => require('crypto').randomUUID(),
 }));
 

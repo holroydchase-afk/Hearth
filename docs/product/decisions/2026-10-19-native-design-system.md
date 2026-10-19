@@ -3,6 +3,7 @@ Date: Oct 19, 2026 · Status: Chase's (asked for it; picked "All now" on the dec
 
 | Persona | Green/Red | Why |
 |---|---|---|
+| CU Cousin | Green | Same familiar look as their other apps; nothing slows them down |
 | PA Posting parent | Green | Looks like every other iPhone app; less to learn |
 | FA Far-away inviter | Green | Familiar system screens are easier to describe over the phone |
 | LG Least-savvy grandparent | Green | Dynamic Type works; overrides keep words under icons and no gesture-only actions |

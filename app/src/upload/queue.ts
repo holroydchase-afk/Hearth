@@ -5,7 +5,8 @@
 //     └──── restart ◀──────────┴── grant lost/expired, ────────┘   (old draft deleted, new p_client_id)
 //                                  media failed finalize
 //   any step ──network/5xx/rate limit──▶ failed-retryable ──backoff timer / kick()──▶ the step it left
-//   any step ──rule error (42501, 23514, EXIF, …)──▶ failed (shown with "Try again" / "Remove")
+//   any step ──rule error (42501, 23514, EXIF, META_*, …)──▶ failed (shown with "Try again" / "Remove";
+//                                                          one code-only error report, screen 'upload')
 //
 // Every transition is written to storage BEFORE the next network call, so an app kill at any
 // point resumes from the last saved step. create_post is idempotent on p_client_id, publish and
@@ -17,6 +18,8 @@ import { ApiError, isRetryable, type ApiErrorCode, type HearthApi, type UploadGr
 import { encryptMedia } from '../crypto/media';
 import { uuid as realUuid } from '../crypto/random';
 import { toApiError } from '../errors/messages';
+import { recordProblem } from '../errors/problemLog';
+import { errorReport } from '../errors/report';
 import type { KV } from '../platform/kv';
 
 export const STORAGE_KEY = 'hearth.uploadQueue.v1';
@@ -108,6 +111,8 @@ export class UploadQueue {
   private timer: (() => void) | null = null;
   private loop: Promise<void> | null = null;
   private again = false;
+  /** DBG-1: the step a job is in, for the problem log's "where" (never persisted). */
+  private step = 'create post';
   private stopped = false;
   private readonly now: () => number;
   private readonly setTimer: (fn: () => void, ms: number) => () => void;
@@ -311,12 +316,29 @@ export class UploadQueue {
       } else {
         job.state = 'failed';
         job.resumeAt = at;
+        this.report(err, job);
       }
       await this.save();
     }
   }
 
+  /**
+   * MEDIA-3 / BETA-OPS-1: one code-only report when a job fails for good (errorReport sends the
+   * error's type and code, never its message, so no URL, key, caption or metadata). Fire and
+   * forget: a report that can't be sent never changes the job.
+   */
+  private report(err: ApiError, job: Job): void {
+    // DBG-1: Chase's on-device problem log (debug builds only; redacted, caption scrubbed).
+    recordProblem(err, `upload: ${this.step}`, { scrub: [job.caption], ref: job.id });
+    try {
+      this.d.api.reportClientError(errorReport(err, 'upload')).catch(() => {});
+    } catch {
+      // never let reporting break the queue
+    }
+  }
+
   private async stepDraft(job: Job): Promise<void> {
+    this.step = 'create post';
     const postId = await this.d.api.createPost({
       clientId: job.clientId, space: job.space, caption: job.caption, circleIds: job.circleIds,
       ...(job.takenAt ? { takenAt: job.takenAt } : {}),
@@ -335,6 +357,7 @@ export class UploadQueue {
 
   /** Throw away the unpublished draft and start again under a new p_client_id. */
   private async restart(job: Job): Promise<void> {
+    this.step = 'restart';
     if (job.restarts >= MAX_RESTARTS) throw new ApiError('UNKNOWN', 'too many restarts');
     const old = job.postId;
     if (old) await this.d.api.deletePost(old).catch(() => {});
@@ -356,6 +379,7 @@ export class UploadQueue {
 
     let prepared = this.prepared.get(job.id);
     if (!prepared) {
+      this.step = 'prepare';
       prepared = [];
       for (const item of job.items) prepared.push(await this.d.prepare(item));
       this.prepared.set(job.id, prepared);
@@ -363,6 +387,7 @@ export class UploadQueue {
     if (!grant) {
       job.signing = true;
       await this.save();
+      this.step = 'sign';
       grant = await this.d.api.signUpload(job.postId!, prepared.map((p) => p.spec));
       if (this.stopped) throw new Killed();
       this.grants.set(job.id, { grant, expiresAt: this.now() + grant.expires_in * 1000 });
@@ -373,6 +398,7 @@ export class UploadQueue {
     for (const g of [...grant.items].sort((a, b) => a.item_index - b.item_index)) {
       if (g.item_index < job.progress.done) continue;
       const p = prepared[g.item_index]!;
+      this.step = 'send';
       await this.d.api.putObject(g.display_put_url, this.encrypt(p.display, g.dek), g.required_headers);
       await this.d.api.putObject(g.thumb_put_url, this.encrypt(p.thumb, g.dek), g.required_headers);
       if (this.stopped) throw new Killed();
@@ -385,12 +411,14 @@ export class UploadQueue {
 
   private async stepFinalize(job: Job): Promise<void> {
     const ids = job.mediaIds ?? [];
+    this.step = 'finalize';
     if (ids.length) {
       const res = await this.d.api.finalizeMedia(ids);
       if (this.stopped) throw new Killed();
       // Rows already finalized in an earlier run aren't pending, so finalize skips them.
       if (res.some((r) => !r.ok)) return this.restart(job);
     }
+    this.step = 'publish';
     try {
       await this.d.api.publishPost(job.postId!);
     } catch (e) {

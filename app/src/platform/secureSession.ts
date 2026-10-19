@@ -3,7 +3,7 @@
 // the Keychain / Keystore (the "LargeSecureStore" pattern). Signed in for months (JOIN-5).
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
-import { gcm } from '@noble/ciphers/aes';
+import { gcm } from '@noble/ciphers/aes.js';
 import { fromBase64, toBase64 } from '../crypto/base64';
 import { randomBytes } from '../crypto/random';
 
