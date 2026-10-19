@@ -13,4 +13,5 @@ Money stays with the hosted plan (storage tiers), the family vault tier and, lat
 | AG Android grandpa | Green | No effect on Android |
 | SG Step or other-household grandparent | Green | No effect on households |
 | GG Great-grandparent who won't install | Green | No effect on email or frame |
+| CU Cousin | Green | No effect on what they see or do; the hosted app stays the same |
 | TR Tech reader | Green | Real open source: can read, self-host, fork; no closed clones |
