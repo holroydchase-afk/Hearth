@@ -88,6 +88,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 
 ## Done (latest first)
 
+- Oct 19: `grandparent-ux` rebuilt as Hearth's UI/UX designer with the ranked family personas.
 - Oct 18: anchor A4 White-paper ready; `docs/architecture/` started (overview, data flow, encryption and keys, threat model).
 - Oct 18: sign-in code email set up in Supabase (Resend SMTP, both templates, 6-digit code, 1 hour); PR #14 and #16 merged.
 - Oct 17: tracker created (this file).
