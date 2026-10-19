@@ -2,7 +2,7 @@
 
 Hearth is built for this family first (milestones in `docs/product/ANCHORS.md`, story in `docs/product/STORY.md`). Use these names in specs and reviews. Each person is named the way the kids say it.
 
-**Still to confirm with Chase** (marked "?" below): phones, how comfortable each person is with tech, and the most and least tech-savvy relatives (milestones 3–4).
+**Still to confirm with Chase** (marked "?" below): phones. Tech-savvy ranking: Chase gave it Oct 19; the ranked persona cards live in `docs/product/PERSONA-CHECK.md`.
 
 ## Who's who
 
@@ -38,8 +38,8 @@ Older docs and test names still use the composites. Read them as:
 | Composite | Now |
 |---|---|
 | Megan (organizer parent) | Chase (and Danielle) |
-| June (least-techy WV grandma) | the least-techy grandparent: ? (Chase to say) |
-| Earl (never installs an app) | Bebar Fred (smart frame); maybe Gigi |
+| June (least-techy WV grandma) | the least-savvy grandparents on a phone: Scott, Susan, John (Chase's ranking, Oct 19; card LG) |
+| Earl (never installs an app) | Bebar (smart frame), Gigi, Phyllis (card GG) |
 | Linda (other-side grandma, feels left out) | any stepparent or other-household grandparent: Grandmomma, Granny, Memaw |
 | Rob (co-parent ex) | retired: the splits are among the grandparents, not the parents |
 | Kim (busy aunt) | retired unless Chase names someone |
