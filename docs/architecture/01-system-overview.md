@@ -24,6 +24,7 @@ Hearth is a private photo app for families. Every post has an explicit audience 
 | `notify` | Edge Function (Deno), run every minute by `pg_cron`. Drains the notification outbox to Expo Push and Resend | `backend/supabase/functions/notify/` |
 | Media storage | Backblaze B2 (S3-compatible), region `us-east-005`. Stores encrypted display and thumbnail objects | env in `sign-media/index.ts` |
 | Error reports | Our own table, fixed-shape fields only, kept 30 days; no third-party SDK | `migrations/0006_client_errors.sql` |
+| Problem details (debug builds only) | On the phone, in memory, the last 20 final upload failures and screen crashes with code, step, app and OS version; redacted (no URLs, keys, emails, captions, file paths, photo metadata). Never sent anywhere; lost when the app closes; copied out only when the user taps "Copy for Claude". Off unless the build sets `EXPO_PUBLIC_HEARTH_DEBUG=1` | `app/src/errors/problemLog.ts` |
 
 ## Vendors and what they can read
 
@@ -43,4 +44,4 @@ Hearth is a private photo app for families. Every post has an explicit audience 
 **Gap:** "stored in the US" is true; "never leaves the US" is not yet. Supabase logs and telemetry are stored outside the US, its support staff are global, and its contracting entity is in Singapore (`docs/eng/research.md` §4). Push notices transit Apple and Google networks. Closing this means self-hosted auth and Postgres on US infrastructure, a post-proof-of-concept item (anchor A3).
 
 ---
-Last checked against code: 2026-10-18, 3031b37
+Last checked against code: 2026-10-19, 716bc36 (problem details log)
