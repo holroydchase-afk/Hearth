@@ -6,6 +6,7 @@ The one list of everything open between Chase and Claude. Updated Oct 19, 2026.
 - Work the **Sequence** top to bottom. One step at a time; nothing new gets built until milestone 1 passes (Chase, Oct 17).
 - Every thread that finishes, adds or blocks something updates this file in the same PR. A thread is resolved once its open items are here.
 - `HANDOFF.md` is the history log; this file is the to-do list. Scope still comes from `BETA-SPEC.md`, steps from `MILESTONE-1.md`.
+- **Bugs found but not fixed** go in the Hearth Test Log as open tickets (B# bug, S# security, T# test fix), added to `tracker/build_seed.py` in the same PR that finds them; then rerun it. This file names a ticket only when it blocks a step here.
 - Owner: **Chase** or **Claude**. Status: ☐ open, ◐ in progress, ☑ done (move to "Done" at the bottom).
 
 ## Goal: milestone 1 ready for testing
