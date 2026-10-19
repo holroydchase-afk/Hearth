@@ -9,6 +9,7 @@ What is encrypted, with which keys, and who can decrypt it. The short version: *
 | Photo bytes (display and thumbnail) | AES-256-GCM, per-item key, encrypted on the phone | TLS | The family members the post is shared with, and Hearth's server (via `MEDIA_KEK`) |
 | Per-item keys | Wrapped with AES-KW under `MEDIA_KEK`, in a table no client can read | TLS | Hearth's server |
 | Captions, comments, names, groups, emails | Plaintext columns; disk-level encryption by Supabase | TLS | Hearth's server and Supabase |
+| Chat messages | MLS (RFC 9420), sealed on the phone; history on each phone, AES-256-GCM at rest | TLS | Only the people in the chat ([06-messenger.md](06-messenger.md)) |
 | Notices | Not stored after sending | TLS | Resend, Expo, Apple, Google (display names and counts only) |
 
 ## Media format: `aes-256-gcm-chunked-v1` (Built)
@@ -54,4 +55,4 @@ Each step makes one more claim true. Order and status live in `docs/product/MARK
 4. **The family vault** (post-beta, opt-in). Keys live only on family devices, with a printed recovery card; Hearth's server can no longer decrypt. This is the only step that would make "end-to-end encrypted" true.
 
 ---
-Last checked against code: 2026-10-18, b0d1d2b (plus migration 0013; no change to encryption or keys)
+Last checked against code: 2026-10-19, a522a3a (plus migration 0015: chat messages under MLS)

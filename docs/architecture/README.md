@@ -13,6 +13,7 @@ The living technical description of how Hearth works, written as we build. It ex
 | [03-encryption-and-keys.md](03-encryption-and-keys.md) | Media format, key hierarchy, who can decrypt what, roadmap | "Encryption" chapter |
 | [04-threat-model.md](04-threat-model.md) | Assets, adversaries, what we defend, what we don't yet | "Security model" chapter; honest limits |
 | [05-access-control.md](05-access-control.md) | Family spaces, roles, groups, households, events, the one visibility rule, who reads replies | "Who sees what" chapter |
+| [06-messenger.md](06-messenger.md) | Group chat end-to-end encrypted with MLS: ciphersuite, relay, membership, limits | "Messaging" chapter |
 
 Planned sections: data retention and deletion once the purge worker exists; the family vault (E2EE) once specced.
 
