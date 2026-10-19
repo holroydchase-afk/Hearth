@@ -17,7 +17,7 @@ export function HelpScreen() {
       <Card>
         <Txt variant="title">Need help?</Txt>
         {who && phone ? (
-          <Button label={`Call ${who}`} text={`📞 Call ${who}`} onPress={() => void app.deps.openUrl(`tel:${phone}`)} />
+          <Button label={`Call ${who}`} icon={{ sf: 'phone.fill', md: 'call' }} onPress={() => void app.deps.openUrl(`tel:${phone}`)} />
         ) : (
           <Txt>{`Ask ${who ?? 'the person who invited you'} for help.`}</Txt>
         )}
