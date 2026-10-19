@@ -47,7 +47,7 @@ The server decides who *may* be in the chat; the phones decide who *is* in the M
 - **Gap: one phone per person.** A new phone replaces the old one at the next key change; history doesn't move to the new phone.
 - **Gap: someone must open Messages to let a newcomer in.** Only members' phones can add people.
 - **Gap: no push for messages** until milestone 2; the screen checks every 10 seconds while open.
-- **Gap: no outside review** of the ciphersuite code. It is small and interop-tested against a reference, but it is our own glue around audited primitives.
+- **Gap: not audited.** `mlsCrypto.ts` is about 170 lines of our own glue code (hand-written HPKE plus the ciphersuite wiring) around the audited `@noble` primitives and ts-mls. It has had no outside review. Our privacy-security agent checked it against RFC 9180 and RFC 9420 on 2026-10-19 and found the math right (labels, key schedule, nonces, export, the all-zero X25519 check). It found one real problem, now fixed: expo-crypto's `getRandomBytes` quietly uses `Math.random` in development builds, which includes Expo Go, so keys could have been predictable. All app randomness now goes through `app/src/crypto/random.ts`, which uses only `getRandomValues` and fails rather than fall back (tests MS4). That fix also covers photo keys and the local-storage key, which used the same call. Smaller items still open: no RFC 9180 known-answer test vectors, and export is interop-tested in one direction only. Signatures use strict RFC 8032 checks.
 
 ---
-Last checked against code: 2026-10-19, a522a3a (migration 0015)
+Last checked against code: 2026-10-19, MS4 randomness fix (migration 0015)

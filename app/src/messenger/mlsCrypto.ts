@@ -10,7 +10,7 @@ import { expand, extract } from '@noble/hashes/hkdf.js';
 import { hmac } from '@noble/hashes/hmac.js';
 import { sha256 } from '@noble/hashes/sha2.js';
 import type { CiphersuiteImpl, CiphersuiteName } from 'ts-mls';
-import { getRandomBytes } from 'expo-crypto';
+import { randomBytes } from '../crypto/random';
 
 export const HEARTH_SUITE: CiphersuiteName = 'MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519';
 
@@ -56,7 +56,7 @@ function kemSharedSecret(dh: Uint8Array, kemContext: Uint8Array): Uint8Array {
 }
 
 function encap(pkR: Uint8Array): { ss: Uint8Array; enc: Uint8Array } {
-  const skE = getRandomBytes(32);
+  const skE = randomBytes(32);
   const pkE = x25519.getPublicKey(skE);
   const ss = kemSharedSecret(x25519.getSharedSecret(skE, pkR), cat(pkE, pkR));
   skE.fill(0);
@@ -111,7 +111,7 @@ const hpke: Hpke = {
     return { privateKey: priv(sk), publicKey: pub(x25519.getPublicKey(sk)) };
   },
   async generateKeyPair() {
-    const sk = getRandomBytes(32);
+    const sk = randomBytes(32);
     return { privateKey: priv(sk), publicKey: pub(x25519.getPublicKey(sk)) };
   },
   keyLength: NK,
@@ -130,7 +130,7 @@ function ensureGetRandomValues(): void {
   const g = globalThis as { crypto?: { getRandomValues?: unknown } };
   if (typeof g.crypto?.getRandomValues === 'function') return;
   const fill = <T extends ArrayBufferView>(a: T): T => {
-    new Uint8Array(a.buffer, a.byteOffset, a.byteLength).set(getRandomBytes(a.byteLength));
+    new Uint8Array(a.buffer, a.byteOffset, a.byteLength).set(randomBytes(a.byteLength));
     return a;
   };
   if (g.crypto) (g.crypto as { getRandomValues: unknown }).getRandomValues = fill;
@@ -154,14 +154,14 @@ export async function hearthCiphersuite(): Promise<CiphersuiteImpl> {
     signature: {
       async sign(signKey, message) { return ed25519.sign(message, signKey); },
       async verify(publicKey, message, signature) {
-        try { return ed25519.verify(signature, message, publicKey); } catch { return false; }
+        try { return ed25519.verify(signature, message, publicKey, { zip215: false }); } catch { return false; }
       },
       async keygen() {
-        const signKey = getRandomBytes(32);
+        const signKey = randomBytes(32);
         return { signKey, publicKey: ed25519.getPublicKey(signKey) };
       },
     },
     hpke,
-    rng: { randomBytes: (n: number) => getRandomBytes(n) },
+    rng: { randomBytes: (n: number) => randomBytes(n) },
   };
 }

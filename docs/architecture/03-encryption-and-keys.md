@@ -19,6 +19,7 @@ Defined in `app/src/crypto/media.ts`, using `@noble/ciphers`.
 - Plaintext is split into 64 KiB chunks. Each chunk is sealed with AES-256-GCM and stored as `nonce (12 bytes) ‖ ciphertext ‖ tag (16 bytes)`.
 - The nonce is `file prefix (7 random bytes per file) ‖ chunk index (4 bytes, big-endian) ‖ last flag (1 byte)`. Binding the index and the last-chunk flag into the nonce means reordering, dropping or truncating chunks fails authentication (the STREAM construction).
 - Each media item gets its own key, shared only by its display and thumbnail versions, which get different random file prefixes.
+- All keys, nonces and prefixes come from `app/src/crypto/random.ts`, which uses only the platform's secure `getRandomValues` and throws if it is missing. Before 2026-10-19 it used expo-crypto's `getRandomBytes`, which falls back to `Math.random` in development builds such as Expo Go; milestone 1 photos encrypted before that fix should be treated as test data only (MS4).
 - The backend never decrypts media. Only clients need to agree on the format, and the scheme name is stored per item (`media_items.enc_scheme`) so it can change later.
 
 ## Key hierarchy (Built)
@@ -55,4 +56,4 @@ Each step makes one more claim true. Order and status live in `docs/product/MARK
 4. **The family vault** (post-beta, opt-in). Keys live only on family devices, with a printed recovery card; Hearth's server can no longer decrypt. This is the only step that would make "end-to-end encrypted" true.
 
 ---
-Last checked against code: 2026-10-19, a522a3a (plus migration 0015: chat messages under MLS)
+Last checked against code: 2026-10-19, MS4 randomness fix (plus migration 0015: chat messages under MLS)
