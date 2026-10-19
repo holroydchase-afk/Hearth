@@ -1,0 +1,989 @@
+# MEDIA-1/2/3/5 red run, 2026-10-19T01:37:29Z, app jest --ci (full suite) + tsc --noEmit. Expected red: fix not built.
+
+FAIL src/upload/__tests__/prepareFailure.test.ts
+  ● non-retryable prepare failure is reported by code only › MEDIA-3 BETA-OPS-1 prepare fails EXIF: job is "Didn't send", nothing is signed, one report with only the code
+    expect(received).toEqual(expected) // deep equality
+    - Expected  - 9
+    + Received  + 1
+    - Array [
+    -   Object {
+    -     "appVersion": Any<String>,
+    -     "code": "EXIF",
+    -     "kind": "ApiError",
+    -     "os": Any<String>,
+    -     "screen": "upload",
+    -   },
+    - ]
+    + Array []
+      35 |     expect({ state: job.state, errorCode: job.errorCode, label: jobLabel(job) }).toEqual({ state: 'failed', errorCode: code, label: "Didn't send" });
+      36 |     expect(sign).not.toHaveBeenCalled();
+    > 37 |     expect(reports).toEqual([{ appVersion: expect.any(String), os: expect.any(String), screen: 'upload', kind: 'ApiError', code }]);
+         |                     ^
+      38 |     const sent = JSON.stringify(reports);
+      39 |     for (const s of ['file:', 'IMG_0001', CAPTION, '38.3498', 'c2VjcmV0a2V5', 'https:', 'sig=']) expect({ s, leaked: sent.includes(s) }).toEqual({ s, leaked: false });
+      40 |   });
+  ● non-retryable prepare failure is reported by code only › MEDIA-3 BETA-OPS-1 prepare fails META_LOCATION: job is "Didn't send", nothing is signed, one report with only the code
+    expect(received).toEqual(expected) // deep equality
+    - Expected  - 9
+    + Received  + 1
+    - Array [
+    -   Object {
+    -     "appVersion": Any<String>,
+    -     "code": "META_LOCATION",
+    -     "kind": "ApiError",
+    -     "os": Any<String>,
+    -     "screen": "upload",
+    -   },
+    - ]
+    + Array []
+      35 |     expect({ state: job.state, errorCode: job.errorCode, label: jobLabel(job) }).toEqual({ state: 'failed', errorCode: code, label: "Didn't send" });
+      36 |     expect(sign).not.toHaveBeenCalled();
+    > 37 |     expect(reports).toEqual([{ appVersion: expect.any(String), os: expect.any(String), screen: 'upload', kind: 'ApiError', code }]);
+         |                     ^
+      38 |     const sent = JSON.stringify(reports);
+      39 |     for (const s of ['file:', 'IMG_0001', CAPTION, '38.3498', 'c2VjcmV0a2V5', 'https:', 'sig=']) expect({ s, leaked: sent.includes(s) }).toEqual({ s, leaked: false });
+      40 |   });
+  ● non-retryable prepare failure is reported by code only › MEDIA-3 BETA-OPS-1 a report that cannot be sent never changes the job or throws
+    expect(jest.fn()).toHaveBeenCalledTimes(expected)
+    Expected number of calls: 1
+    Received number of calls: 0
+      54 |     await q.idle();
+      55 |     await new Promise((r) => setImmediate(r));
+    > 56 |     expect(report).toHaveBeenCalledTimes(1);
+         |                    ^
+      57 |     expect(report.mock.calls[0]![0]).toEqual({ appVersion: expect.any(String), os: expect.any(String), screen: 'upload', kind: 'ApiError', code: 'EXIF' });
+      58 |     expect(q.jobs()[0]!.state).toBe('failed');
+      59 |   });
+FAIL src/media/__tests__/iosExifUpload.test.ts
+  ● MEDIA-1 iOS re-encode with an Exif block › MEDIA-1 processPhoto cleans an iOS Exif block instead of rejecting it (display and thumb have no APP1, ICC kept)
+    ApiError: metadata survived re-encode
+      65 |   const out = await deps.manipulator.render(img, size, q);
+      66 |   const bytes = await deps.readBytes(out.uri);
+    > 67 |   if (hasExif(bytes)) throw new ApiError('EXIF', 'metadata survived re-encode');
+         |                             ^
+      68 |   return { uri: out.uri, width: out.width, height: out.height, bytes };
+      69 | }
+      70 |
+  ● MEDIA-1 iOS re-encode with an Exif block › MEDIA-1 the first iPhone photo goes create_post → prepare → sign-media → published, with no error report
+    expect(received).toEqual(expected) // deep equality
+    - Expected  - 2
+    + Received  + 2
+      Object {
+    -   "errorCode": undefined,
+    -   "state": "published",
+    +   "errorCode": "EXIF",
+    +   "state": "failed",
+      }
+      58 |     q.stop();
+      59 |     const job = q.jobs()[0]!;
+    > 60 |     expect({ state: job.state, errorCode: job.errorCode }).toEqual({ state: 'published', errorCode: undefined });
+         |                                                            ^
+      61 |     expect(signed).toHaveLength(1);
+      62 |     expect(signed[0]![0]).toMatchObject({ kind: 'photo', mime_type: 'image/jpeg', width: 2048, height: 1536, exif_stripped: true });
+      63 |     // What was handed to encryption (the plaintext that leaves the phone) carries no Exif.
+FAIL src/screens/__tests__/uploadFailure.test.tsx
+  ● upload that fails in the prepare step › MEDIA-3 BETA-SHARE-4 prepare fails EXIF: "Didn't send" with a short reason line and one code-only report
+    Unable to find an element with text: This photo couldn't be made private, so it wasn't sent. Try a different photo.
+    <RNCSafeAreaView>
+      <RCTScrollView>
+        <View>
+          <Text
+            accessibilityRole="header"
+          >
+            Share photos
+          </Text>
+          <View>
+            <View
+              testID="job-a73678a2-1d0b-40b2-b390-152103e74a67"
+            >
+              <Text>
+                "First snow!": Didn't send
+              </Text>
+              <Text>
+                Something went wrong. Try again.
+              </Text>
+              <View
+                accessibilityLabel="Try sending again"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Try again
+                </Text>
+              </View>
+              <View
+                accessibilityLabel="Remove this from the list"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Remove
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View>
+            <View
+              accessibilityLabel="Pick photos from your phone"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Pick photos
+              </Text>
+            </View>
+            <View />
+          </View>
+          <View>
+            <Text>
+              What's happening?
+            </Text>
+            <TextInput
+              accessibilityLabel="What's happening?"
+              placeholder="Say what's happening (Grandma will see this)"
+              value=""
+            />
+          </View>
+          <View>
+            <Text
+              accessibilityRole="header"
+            >
+              Who can see it
+            </Text>
+            <View
+              accessibilityLabel="Everyone, 5 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text />
+              </View>
+              <View>
+                <Text>
+                  Everyone · 5 people
+                </Text>
+                <Text>
+                  Alex, Chase, Grandma Jo, Grandpa Earl, Nana Ruth
+                </Text>
+              </View>
+            </View>
+            <Text
+              accessibilityRole="header"
+            >
+              Groups
+            </Text>
+            <View
+              accessibilityLabel="Grandparents – Dad's side, 3 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": true,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  ✓
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Grandparents – Dad's side · 3 people
+                </Text>
+                <Text>
+                  Chase, Grandma Jo, Grandpa Earl
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Grandparents – Mom's side, 3 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text />
+              </View>
+              <View>
+                <Text>
+                  Grandparents – Mom's side · 3 people
+                </Text>
+                <Text>
+                  Alex, Chase, Nana Ruth
+                </Text>
+              </View>
+            </View>
+            <Text>
+              Only Grandparents – Dad's side will see these.
+            </Text>
+          </View>
+          <View
+            accessibilityLabel="Post"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": false,
+                "disabled": true,
+                "selected": false,
+              }
+            }
+            accessible={true}
+          >
+            <Text>
+              Post
+            </Text>
+          </View>
+        </View>
+      </RCTScrollView>
+    </RNCSafeAreaView>
+      26 |
+      27 |     expect(await screen.findByText(/Didn't send/)).toBeTruthy();
+    > 28 |     expect(screen.getByText(REASON)).toBeTruthy();
+         |                   ^
+      29 |     expect(screen.queryByText(/Something went wrong/)).toBeNull();
+      30 |     expect(screen.getByRole('button', { name: 'Try sending again' })).toBeTruthy();
+      31 |     expect(screen.getByRole('button', { name: 'Remove this from the list' })).toBeTruthy();
+  ● upload that fails in the prepare step › MEDIA-3 BETA-SHARE-4 prepare fails META_LOCATION: "Didn't send" with a short reason line and one code-only report
+    Unable to find an element with text: This photo couldn't be made private, so it wasn't sent. Try a different photo.
+    <RNCSafeAreaView>
+      <RCTScrollView>
+        <View>
+          <Text
+            accessibilityRole="header"
+          >
+            Share photos
+          </Text>
+          <View>
+            <View
+              testID="job-3905e8e3-6d10-41d0-b00d-debf6b8fdd53"
+            >
+              <Text>
+                "First snow!": Didn't send
+              </Text>
+              <Text>
+                Something went wrong. Try again.
+              </Text>
+              <View
+                accessibilityLabel="Try sending again"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Try again
+                </Text>
+              </View>
+              <View
+                accessibilityLabel="Remove this from the list"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Remove
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View>
+            <View
+              accessibilityLabel="Pick photos from your phone"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Pick photos
+              </Text>
+            </View>
+            <View />
+          </View>
+          <View>
+            <Text>
+              What's happening?
+            </Text>
+            <TextInput
+              accessibilityLabel="What's happening?"
+              placeholder="Say what's happening (Grandma will see this)"
+              value=""
+            />
+          </View>
+          <View>
+            <Text
+              accessibilityRole="header"
+            >
+              Who can see it
+            </Text>
+            <View
+              accessibilityLabel="Everyone, 5 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text />
+              </View>
+              <View>
+                <Text>
+                  Everyone · 5 people
+                </Text>
+                <Text>
+                  Alex, Chase, Grandma Jo, Grandpa Earl, Nana Ruth
+                </Text>
+              </View>
+            </View>
+            <Text
+              accessibilityRole="header"
+            >
+              Groups
+            </Text>
+            <View
+              accessibilityLabel="Grandparents – Dad's side, 3 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": true,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  ✓
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Grandparents – Dad's side · 3 people
+                </Text>
+                <Text>
+                  Chase, Grandma Jo, Grandpa Earl
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Grandparents – Mom's side, 3 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text />
+              </View>
+              <View>
+                <Text>
+                  Grandparents – Mom's side · 3 people
+                </Text>
+                <Text>
+                  Alex, Chase, Nana Ruth
+                </Text>
+              </View>
+            </View>
+            <Text>
+              Only Grandparents – Dad's side will see these.
+            </Text>
+          </View>
+          <View
+            accessibilityLabel="Post"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": false,
+                "disabled": true,
+                "selected": false,
+              }
+            }
+            accessible={true}
+          >
+            <Text>
+              Post
+            </Text>
+          </View>
+        </View>
+      </RCTScrollView>
+    </RNCSafeAreaView>
+      26 |
+      27 |     expect(await screen.findByText(/Didn't send/)).toBeTruthy();
+    > 28 |     expect(screen.getByText(REASON)).toBeTruthy();
+         |                   ^
+      29 |     expect(screen.queryByText(/Something went wrong/)).toBeNull();
+      30 |     expect(screen.getByRole('button', { name: 'Try sending again' })).toBeTruthy();
+      31 |     expect(screen.getByRole('button', { name: 'Remove this from the list' })).toBeTruthy();
+FAIL src/media/__tests__/clean.test.ts
+  ● Test suite failed to run
+    Cannot find module '../clean' from 'src/media/__tests__/clean.test.ts'
+      3 | // the scan. The verifier fails closed with META_<GROUP> only if a stripped group survives.
+      4 | import { ApiError } from '../../api/HearthApi';
+    > 5 | import { cleanImage, verifyClean } from '../clean';
+        | ^
+      6 | import { hasExif } from '../pipeline';
+      7 | import { APP0_JFIF, APP1_FULL_EXIF, APP2_ICC, SECRETS, contains, everything, imageData, iosReencode, jpeg, segments, startsWith } from '../../test/jpeg';
+      8 |
+FAIL src/media/__tests__/policy.test.ts
+  ● Test suite failed to run
+    Cannot find module '../clean' from 'src/media/__tests__/policy.test.ts'
+      2 | // code-level object in app/src/media/policy.ts. These tests pin its defaults and prove
+      3 | // that changing the policy changes what the cleaner keeps and how the photo is encoded.
+    > 4 | import { cleanImage } from '../clean';
+        | ^
+      5 | import { DISPLAY_LONG_EDGE, DISPLAY_QUALITY, THUMB_MAX_BYTES, THUMB_TARGET_BYTES, processPhoto, type Manipulator } from '../pipeline';
+      6 | import { MEDIA_POLICY, type MediaPolicy } from '../policy';
+      7 | import { iosReencode, segments, startsWith } from '../../test/jpeg';
+Summary of all failing tests
+FAIL src/upload/__tests__/prepareFailure.test.ts
+  ● non-retryable prepare failure is reported by code only › MEDIA-3 BETA-OPS-1 prepare fails EXIF: job is "Didn't send", nothing is signed, one report with only the code
+    expect(received).toEqual(expected) // deep equality
+    - Expected  - 9
+    + Received  + 1
+    - Array [
+    -   Object {
+    -     "appVersion": Any<String>,
+    -     "code": "EXIF",
+    -     "kind": "ApiError",
+    -     "os": Any<String>,
+    -     "screen": "upload",
+    -   },
+    - ]
+    + Array []
+      35 |     expect({ state: job.state, errorCode: job.errorCode, label: jobLabel(job) }).toEqual({ state: 'failed', errorCode: code, label: "Didn't send" });
+      36 |     expect(sign).not.toHaveBeenCalled();
+    > 37 |     expect(reports).toEqual([{ appVersion: expect.any(String), os: expect.any(String), screen: 'upload', kind: 'ApiError', code }]);
+         |                     ^
+      38 |     const sent = JSON.stringify(reports);
+      39 |     for (const s of ['file:', 'IMG_0001', CAPTION, '38.3498', 'c2VjcmV0a2V5', 'https:', 'sig=']) expect({ s, leaked: sent.includes(s) }).toEqual({ s, leaked: false });
+      40 |   });
+  ● non-retryable prepare failure is reported by code only › MEDIA-3 BETA-OPS-1 prepare fails META_LOCATION: job is "Didn't send", nothing is signed, one report with only the code
+    expect(received).toEqual(expected) // deep equality
+    - Expected  - 9
+    + Received  + 1
+    - Array [
+    -   Object {
+    -     "appVersion": Any<String>,
+    -     "code": "META_LOCATION",
+    -     "kind": "ApiError",
+    -     "os": Any<String>,
+    -     "screen": "upload",
+    -   },
+    - ]
+    + Array []
+      35 |     expect({ state: job.state, errorCode: job.errorCode, label: jobLabel(job) }).toEqual({ state: 'failed', errorCode: code, label: "Didn't send" });
+      36 |     expect(sign).not.toHaveBeenCalled();
+    > 37 |     expect(reports).toEqual([{ appVersion: expect.any(String), os: expect.any(String), screen: 'upload', kind: 'ApiError', code }]);
+         |                     ^
+      38 |     const sent = JSON.stringify(reports);
+      39 |     for (const s of ['file:', 'IMG_0001', CAPTION, '38.3498', 'c2VjcmV0a2V5', 'https:', 'sig=']) expect({ s, leaked: sent.includes(s) }).toEqual({ s, leaked: false });
+      40 |   });
+  ● non-retryable prepare failure is reported by code only › MEDIA-3 BETA-OPS-1 a report that cannot be sent never changes the job or throws
+    expect(jest.fn()).toHaveBeenCalledTimes(expected)
+    Expected number of calls: 1
+    Received number of calls: 0
+      54 |     await q.idle();
+      55 |     await new Promise((r) => setImmediate(r));
+    > 56 |     expect(report).toHaveBeenCalledTimes(1);
+         |                    ^
+      57 |     expect(report.mock.calls[0]![0]).toEqual({ appVersion: expect.any(String), os: expect.any(String), screen: 'upload', kind: 'ApiError', code: 'EXIF' });
+      58 |     expect(q.jobs()[0]!.state).toBe('failed');
+      59 |   });
+FAIL src/media/__tests__/iosExifUpload.test.ts
+  ● MEDIA-1 iOS re-encode with an Exif block › MEDIA-1 processPhoto cleans an iOS Exif block instead of rejecting it (display and thumb have no APP1, ICC kept)
+    ApiError: metadata survived re-encode
+      65 |   const out = await deps.manipulator.render(img, size, q);
+      66 |   const bytes = await deps.readBytes(out.uri);
+    > 67 |   if (hasExif(bytes)) throw new ApiError('EXIF', 'metadata survived re-encode');
+         |                             ^
+      68 |   return { uri: out.uri, width: out.width, height: out.height, bytes };
+      69 | }
+      70 |
+  ● MEDIA-1 iOS re-encode with an Exif block › MEDIA-1 the first iPhone photo goes create_post → prepare → sign-media → published, with no error report
+    expect(received).toEqual(expected) // deep equality
+    - Expected  - 2
+    + Received  + 2
+      Object {
+    -   "errorCode": undefined,
+    -   "state": "published",
+    +   "errorCode": "EXIF",
+    +   "state": "failed",
+      }
+      58 |     q.stop();
+      59 |     const job = q.jobs()[0]!;
+    > 60 |     expect({ state: job.state, errorCode: job.errorCode }).toEqual({ state: 'published', errorCode: undefined });
+         |                                                            ^
+      61 |     expect(signed).toHaveLength(1);
+      62 |     expect(signed[0]![0]).toMatchObject({ kind: 'photo', mime_type: 'image/jpeg', width: 2048, height: 1536, exif_stripped: true });
+      63 |     // What was handed to encryption (the plaintext that leaves the phone) carries no Exif.
+FAIL src/screens/__tests__/uploadFailure.test.tsx
+  ● upload that fails in the prepare step › MEDIA-3 BETA-SHARE-4 prepare fails EXIF: "Didn't send" with a short reason line and one code-only report
+    Unable to find an element with text: This photo couldn't be made private, so it wasn't sent. Try a different photo.
+    <RNCSafeAreaView>
+      <RCTScrollView>
+        <View>
+          <Text
+            accessibilityRole="header"
+          >
+            Share photos
+          </Text>
+          <View>
+            <View
+              testID="job-a73678a2-1d0b-40b2-b390-152103e74a67"
+            >
+              <Text>
+                "First snow!": Didn't send
+              </Text>
+              <Text>
+                Something went wrong. Try again.
+              </Text>
+              <View
+                accessibilityLabel="Try sending again"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Try again
+                </Text>
+              </View>
+              <View
+                accessibilityLabel="Remove this from the list"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Remove
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View>
+            <View
+              accessibilityLabel="Pick photos from your phone"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Pick photos
+              </Text>
+            </View>
+            <View />
+          </View>
+          <View>
+            <Text>
+              What's happening?
+            </Text>
+            <TextInput
+              accessibilityLabel="What's happening?"
+              placeholder="Say what's happening (Grandma will see this)"
+              value=""
+            />
+          </View>
+          <View>
+            <Text
+              accessibilityRole="header"
+            >
+              Who can see it
+            </Text>
+            <View
+              accessibilityLabel="Everyone, 5 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text />
+              </View>
+              <View>
+                <Text>
+                  Everyone · 5 people
+                </Text>
+                <Text>
+                  Alex, Chase, Grandma Jo, Grandpa Earl, Nana Ruth
+                </Text>
+              </View>
+            </View>
+            <Text
+              accessibilityRole="header"
+            >
+              Groups
+            </Text>
+            <View
+              accessibilityLabel="Grandparents – Dad's side, 3 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": true,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  ✓
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Grandparents – Dad's side · 3 people
+                </Text>
+                <Text>
+                  Chase, Grandma Jo, Grandpa Earl
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Grandparents – Mom's side, 3 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text />
+              </View>
+              <View>
+                <Text>
+                  Grandparents – Mom's side · 3 people
+                </Text>
+                <Text>
+                  Alex, Chase, Nana Ruth
+                </Text>
+              </View>
+            </View>
+            <Text>
+              Only Grandparents – Dad's side will see these.
+            </Text>
+          </View>
+          <View
+            accessibilityLabel="Post"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": false,
+                "disabled": true,
+                "selected": false,
+              }
+            }
+            accessible={true}
+          >
+            <Text>
+              Post
+            </Text>
+          </View>
+        </View>
+      </RCTScrollView>
+    </RNCSafeAreaView>
+      26 |
+      27 |     expect(await screen.findByText(/Didn't send/)).toBeTruthy();
+    > 28 |     expect(screen.getByText(REASON)).toBeTruthy();
+         |                   ^
+      29 |     expect(screen.queryByText(/Something went wrong/)).toBeNull();
+      30 |     expect(screen.getByRole('button', { name: 'Try sending again' })).toBeTruthy();
+      31 |     expect(screen.getByRole('button', { name: 'Remove this from the list' })).toBeTruthy();
+  ● upload that fails in the prepare step › MEDIA-3 BETA-SHARE-4 prepare fails META_LOCATION: "Didn't send" with a short reason line and one code-only report
+    Unable to find an element with text: This photo couldn't be made private, so it wasn't sent. Try a different photo.
+    <RNCSafeAreaView>
+      <RCTScrollView>
+        <View>
+          <Text
+            accessibilityRole="header"
+          >
+            Share photos
+          </Text>
+          <View>
+            <View
+              testID="job-3905e8e3-6d10-41d0-b00d-debf6b8fdd53"
+            >
+              <Text>
+                "First snow!": Didn't send
+              </Text>
+              <Text>
+                Something went wrong. Try again.
+              </Text>
+              <View
+                accessibilityLabel="Try sending again"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Try again
+                </Text>
+              </View>
+              <View
+                accessibilityLabel="Remove this from the list"
+                accessibilityRole="button"
+                accessibilityState={
+                  {
+                    "busy": false,
+                    "disabled": false,
+                    "selected": false,
+                  }
+                }
+                accessible={true}
+              >
+                <Text>
+                  Remove
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View>
+            <View
+              accessibilityLabel="Pick photos from your phone"
+              accessibilityRole="button"
+              accessibilityState={
+                {
+                  "busy": false,
+                  "disabled": false,
+                  "selected": false,
+                }
+              }
+              accessible={true}
+            >
+              <Text>
+                Pick photos
+              </Text>
+            </View>
+            <View />
+          </View>
+          <View>
+            <Text>
+              What's happening?
+            </Text>
+            <TextInput
+              accessibilityLabel="What's happening?"
+              placeholder="Say what's happening (Grandma will see this)"
+              value=""
+            />
+          </View>
+          <View>
+            <Text
+              accessibilityRole="header"
+            >
+              Who can see it
+            </Text>
+            <View
+              accessibilityLabel="Everyone, 5 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text />
+              </View>
+              <View>
+                <Text>
+                  Everyone · 5 people
+                </Text>
+                <Text>
+                  Alex, Chase, Grandma Jo, Grandpa Earl, Nana Ruth
+                </Text>
+              </View>
+            </View>
+            <Text
+              accessibilityRole="header"
+            >
+              Groups
+            </Text>
+            <View
+              accessibilityLabel="Grandparents – Dad's side, 3 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": true,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text>
+                  ✓
+                </Text>
+              </View>
+              <View>
+                <Text>
+                  Grandparents – Dad's side · 3 people
+                </Text>
+                <Text>
+                  Chase, Grandma Jo, Grandpa Earl
+                </Text>
+              </View>
+            </View>
+            <View
+              accessibilityLabel="Grandparents – Mom's side, 3 people"
+              accessibilityRole="checkbox"
+              accessibilityState={
+                {
+                  "checked": false,
+                }
+              }
+              accessible={true}
+            >
+              <View>
+                <Text />
+              </View>
+              <View>
+                <Text>
+                  Grandparents – Mom's side · 3 people
+                </Text>
+                <Text>
+                  Alex, Chase, Nana Ruth
+                </Text>
+              </View>
+            </View>
+            <Text>
+              Only Grandparents – Dad's side will see these.
+            </Text>
+          </View>
+          <View
+            accessibilityLabel="Post"
+            accessibilityRole="button"
+            accessibilityState={
+              {
+                "busy": false,
+                "disabled": true,
+                "selected": false,
+              }
+            }
+            accessible={true}
+          >
+            <Text>
+              Post
+            </Text>
+          </View>
+        </View>
+      </RCTScrollView>
+    </RNCSafeAreaView>
+      26 |
+      27 |     expect(await screen.findByText(/Didn't send/)).toBeTruthy();
+    > 28 |     expect(screen.getByText(REASON)).toBeTruthy();
+         |                   ^
+      29 |     expect(screen.queryByText(/Something went wrong/)).toBeNull();
+      30 |     expect(screen.getByRole('button', { name: 'Try sending again' })).toBeTruthy();
+      31 |     expect(screen.getByRole('button', { name: 'Remove this from the list' })).toBeTruthy();
+FAIL src/media/__tests__/clean.test.ts
+  ● Test suite failed to run
+    Cannot find module '../clean' from 'src/media/__tests__/clean.test.ts'
+      3 | // the scan. The verifier fails closed with META_<GROUP> only if a stripped group survives.
+      4 | import { ApiError } from '../../api/HearthApi';
+    > 5 | import { cleanImage, verifyClean } from '../clean';
+        | ^
+      6 | import { hasExif } from '../pipeline';
+      7 | import { APP0_JFIF, APP1_FULL_EXIF, APP2_ICC, SECRETS, contains, everything, imageData, iosReencode, jpeg, segments, startsWith } from '../../test/jpeg';
+      8 |
+FAIL src/media/__tests__/policy.test.ts
+  ● Test suite failed to run
+    Cannot find module '../clean' from 'src/media/__tests__/policy.test.ts'
+      2 | // code-level object in app/src/media/policy.ts. These tests pin its defaults and prove
+      3 | // that changing the policy changes what the cleaner keeps and how the photo is encoded.
+    > 4 | import { cleanImage } from '../clean';
+        | ^
+      5 | import { DISPLAY_LONG_EDGE, DISPLAY_QUALITY, THUMB_MAX_BYTES, THUMB_TARGET_BYTES, processPhoto, type Manipulator } from '../pipeline';
+      6 | import { MEDIA_POLICY, type MediaPolicy } from '../policy';
+      7 | import { iosReencode, segments, startsWith } from '../../test/jpeg';
+Test Suites: 5 failed, 48 passed, 53 total
+Tests:       7 failed, 1 skipped, 462 passed, 470 total
+Snapshots:   0 total
+Time:        15.37 s
+Ran all test suites.
+Test Suites: 5 failed, 48 passed, 53 total
+Tests:       7 failed, 1 skipped, 462 passed, 470 total
+
+## tsc --noEmit
+src/media/__tests__/clean.test.ts(5,41): error TS2307: Cannot find module '../clean' or its corresponding type declarations.
+src/media/__tests__/policy.test.ts(4,28): error TS2307: Cannot find module '../clean' or its corresponding type declarations.
+src/media/__tests__/policy.test.ts(6,48): error TS2307: Cannot find module '../policy' or its corresponding type declarations.
+src/media/__tests__/policy.test.ts(85,99): error TS2353: Object literal may only specify known properties, and 'policy' does not exist in type 'PipelineDeps'.
+src/media/__tests__/policy.test.ts(89,99): error TS2353: Object literal may only specify known properties, and 'policy' does not exist in type 'PipelineDeps'.

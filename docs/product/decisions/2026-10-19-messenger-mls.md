@@ -13,4 +13,5 @@ Rules carried forward: a conversation belongs to one group or event and reads it
 | AG Android grandpa | Green | Built in, so no Android-only messaging gaps like group texts |
 | SG Step or other-household grandparent | Green | Conversations follow groups, so no one sees other households |
 | GG Great-grandparent who won't install | Green | Nothing changes for email or frame; chat is optional |
+| CU Cousin | Green | Family talk without another group text to mute; no counts, receipts or typing dots |
 | TR Tech reader | Green | Open, audited protocol, end to end encrypted, servers in the US |
