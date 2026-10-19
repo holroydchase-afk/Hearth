@@ -89,7 +89,7 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 - SMS or text-link notices: needs Twilio (paid) and A2P registration. Push and email are enough.
 - Smart frames (E16) and other languages (E15): no tester has asked.
 - Editing photos or captions: delete and repost is fine for the beta.
-- Chat or DMs: families already have texting.
+- One-to-one DMs: families already have texting. (Group and event chat moved in on Chase's call, Oct 19: `SPEC-MESSENGER.md`.)
 - Invite status, resend, and cancel (E13): Chase handles invites by hand for 12 people.
 - Undo delete (E11): the delete confirm step (E1) is enough.
 - Purge and export worker: no deletions at scale in 5 weeks, and Chase can run them by hand.
