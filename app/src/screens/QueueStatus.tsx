@@ -1,5 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
+import { ApiError } from '../api/HearthApi';
 import { messageFor } from '../errors/messages';
 import { useApp, useJobs } from '../state/AppContext';
 import { Button, Card, Txt } from '../ui/kit';
@@ -37,7 +38,7 @@ export function QueueStatus() {
             {j.state === 'failed-retryable' ? <Txt variant="muted">We'll keep trying. You can close Hearth; it will finish when you open it again.</Txt> : null}
             {j.state === 'failed' ? (
               <>
-                <Txt>{messageFor({ code: j.errorCode }, { inviter: helper, action: 'post' })}</Txt>
+                <Txt>{messageFor(new ApiError(j.errorCode ?? 'UNKNOWN'), { inviter: helper, action: 'post' })}</Txt>
                 <Button label="Try sending again" text="Try again" onPress={() => queue.retry(j.id)} />
                 <Button label="Remove this from the list" text="Remove" variant="secondary" onPress={() => queue.remove(j.id)} />
               </>

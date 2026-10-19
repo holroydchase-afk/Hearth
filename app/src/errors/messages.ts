@@ -45,6 +45,8 @@ export function messageFor(e: unknown, ctx: MessageContext = {}): string {
     case 'NETWORK':
       return "No internet right now. We'll keep trying.";
     case 'EXIF':
+    case 'META_LOCATION': case 'META_DATETIME': case 'META_CAMERA': case 'META_ORIENTATION': case 'META_SOFTWARE':
+    case 'META_MAKERNOTE': case 'META_XMP': case 'META_ICC': case 'META_FACES': case 'META_OTHER':
       return "This photo couldn't be made private, so it wasn't sent. Try a different photo.";
     case 'VIDEO_CAP':
       return 'This family has sent its 10 videos for this month. Photos still work.';

@@ -5,7 +5,8 @@
 //     └──── restart ◀──────────┴── grant lost/expired, ────────┘   (old draft deleted, new p_client_id)
 //                                  media failed finalize
 //   any step ──network/5xx/rate limit──▶ failed-retryable ──backoff timer / kick()──▶ the step it left
-//   any step ──rule error (42501, 23514, EXIF, …)──▶ failed (shown with "Try again" / "Remove")
+//   any step ──rule error (42501, 23514, EXIF, META_*, …)──▶ failed (shown with "Try again" / "Remove";
+//                                                          one code-only error report, screen 'upload')
 //
 // Every transition is written to storage BEFORE the next network call, so an app kill at any
 // point resumes from the last saved step. create_post is idempotent on p_client_id, publish and
@@ -17,6 +18,7 @@ import { ApiError, isRetryable, type ApiErrorCode, type HearthApi, type UploadGr
 import { encryptMedia } from '../crypto/media';
 import { uuid as realUuid } from '../crypto/random';
 import { toApiError } from '../errors/messages';
+import { errorReport } from '../errors/report';
 import type { KV } from '../platform/kv';
 
 export const STORAGE_KEY = 'hearth.uploadQueue.v1';
@@ -311,8 +313,22 @@ export class UploadQueue {
       } else {
         job.state = 'failed';
         job.resumeAt = at;
+        this.report(err);
       }
       await this.save();
+    }
+  }
+
+  /**
+   * MEDIA-3 / BETA-OPS-1: one code-only report when a job fails for good (errorReport sends the
+   * error's type and code, never its message, so no URL, key, caption or metadata). Fire and
+   * forget: a report that can't be sent never changes the job.
+   */
+  private report(err: ApiError): void {
+    try {
+      this.d.api.reportClientError(errorReport(err, 'upload')).catch(() => {});
+    } catch {
+      // never let reporting break the queue
     }
   }
 

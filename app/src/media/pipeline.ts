@@ -1,21 +1,27 @@
-// On-device media pipeline (BETA-SHARE-2, -5, -6).
+// On-device media pipeline (BETA-SHARE-2, -5, -6; SPEC-MEDIA 1.3).
 // Pure logic; the native image work is behind the Manipulator interface
 // (expoManipulator.ts on device/web, a mock in unit tests).
 //
-// Privacy: every photo is decoded and re-encoded as a fresh JPEG. The encoder writes
-// no EXIF/GPS/maker data. We then CHECK the output bytes and refuse to continue if any
-// EXIF segment survived, so `exif_stripped: true` is a verified claim, not a hope.
+// Privacy: every photo is decoded and re-encoded as a fresh JPEG at the media policy's size and
+// quality. The encoder may still write a small Exif block (iOS UIImage.jpegData writes ColorSpace
+// and pixel size), so every output then goes through cleanImage (clean.ts), which keeps only what
+// the policy keeps (by default the ICC colour profile), and verifyClean, which fails closed with
+// META_<GROUP> if a stripped group survived. So `exif_stripped: true` is a verified claim.
 // Orientation: the decoder applies the EXIF rotation on load, so the re-encoded pixels
 // are already upright and no orientation tag is needed.
 import { ApiError, type UploadItemSpec } from '../api/HearthApi';
 import { encryptedSize } from '../crypto/media';
+import { cleanImage, verifyClean } from './clean';
+import { MEDIA_POLICY, type MediaPolicy } from './policy';
 
-export const DISPLAY_LONG_EDGE = 2048;
-export const DISPLAY_QUALITY = 0.82;
+const DEFAULT_EDGE = MEDIA_POLICY.compression.long_edge;
+/** Default display long edge (from MEDIA_POLICY). */
+export const DISPLAY_LONG_EDGE: number = DEFAULT_EDGE === 'original' ? Number.POSITIVE_INFINITY : DEFAULT_EDGE;
+export const DISPLAY_QUALITY = MEDIA_POLICY.compression.quality;
 export const THUMB_LONG_EDGE = 480;
-export const THUMB_TARGET_BYTES = 40_000;
+export const THUMB_TARGET_BYTES = MEDIA_POLICY.compression.thumb_target_bytes;
 /** Hard cap for "about 40 KB". */
-export const THUMB_MAX_BYTES = 48_000;
+export const THUMB_MAX_BYTES = MEDIA_POLICY.compression.thumb_max_bytes;
 export const VIDEO_MAX_MS = 60_000;
 
 export interface LoadedImage { width: number; height: number; handle: unknown }
@@ -27,7 +33,12 @@ export interface Manipulator {
 }
 export interface Encoded { uri: string; width: number; height: number; bytes: Uint8Array }
 export interface ProcessedPhoto { kind: 'photo'; mime_type: 'image/jpeg'; display: Encoded; thumb: Encoded }
-export interface PipelineDeps { manipulator: Manipulator; readBytes: (uri: string) => Promise<Uint8Array> }
+export interface PipelineDeps {
+  manipulator: Manipulator;
+  readBytes: (uri: string) => Promise<Uint8Array>;
+  /** Defaults to MEDIA_POLICY. Tests pass variants; the app never does (D1: code-level only). */
+  policy?: MediaPolicy;
+}
 
 export function fitLongEdge(w: number, h: number, max: number): { width: number; height: number } {
   const long = Math.max(w, h);
@@ -61,27 +72,32 @@ export function hasExif(b: Uint8Array): boolean {
   return false;
 }
 
-async function encode(deps: PipelineDeps, img: LoadedImage, size: { width: number; height: number }, q: number): Promise<Encoded> {
+async function encode(deps: PipelineDeps, policy: MediaPolicy, img: LoadedImage, size: { width: number; height: number }, q: number): Promise<Encoded> {
   const out = await deps.manipulator.render(img, size, q);
-  const bytes = await deps.readBytes(out.uri);
-  if (hasExif(bytes)) throw new ApiError('EXIF', 'metadata survived re-encode');
+  const bytes = cleanImage(await deps.readBytes(out.uri), policy);
+  verifyClean(bytes, policy);
   return { uri: out.uri, width: out.width, height: out.height, bytes };
 }
 
 export async function processPhoto(src: { uri: string }, deps: PipelineDeps): Promise<ProcessedPhoto> {
+  const policy = deps.policy ?? MEDIA_POLICY;
+  const c = policy.compression;
+  // "Off" (clean the original, SPEC-MEDIA 1.2) is not built; refuse rather than send something unplanned.
+  if (!c.enabled || c.format !== 'jpeg') throw new ApiError('EXIF', 'media policy compression setting not supported');
   const img = await deps.manipulator.load(src.uri);
-  const display = await encode(deps, img, fitLongEdge(img.width, img.height, DISPLAY_LONG_EDGE), DISPLAY_QUALITY);
+  const edge = c.long_edge === 'original' ? Math.max(img.width, img.height) : c.long_edge;
+  const display = await encode(deps, policy, img, fitLongEdge(img.width, img.height, edge), c.quality);
 
-  // Thumbnail: step quality, then size, down until it's about 40 KB.
+  // Thumbnail: step quality, then size, down until it's about 40 KB (measured after cleaning).
   const attempts: [number, number][] = [[THUMB_LONG_EDGE, 0.6], [THUMB_LONG_EDGE, 0.45], [400, 0.4], [320, 0.4], [256, 0.35], [200, 0.3]];
   let thumb: Encoded | null = null;
   for (const [edge, q] of attempts) {
-    thumb = await encode(deps, img, fitLongEdge(img.width, img.height, edge), q);
-    if (thumb.bytes.length <= THUMB_TARGET_BYTES) break;
+    thumb = await encode(deps, policy, img, fitLongEdge(img.width, img.height, edge), q);
+    if (thumb.bytes.length <= c.thumb_target_bytes) break;
   }
-  if (!thumb || thumb.bytes.length > THUMB_MAX_BYTES) {
+  if (!thumb || thumb.bytes.length > c.thumb_max_bytes) {
     // Last resort: tiny. Never ship a heavy thumbnail to a grandma on one bar of LTE.
-    thumb = await encode(deps, img, fitLongEdge(img.width, img.height, 160), 0.3);
+    thumb = await encode(deps, policy, img, fitLongEdge(img.width, img.height, 160), 0.3);
   }
   return { kind: 'photo', mime_type: 'image/jpeg', display, thumb };
 }
