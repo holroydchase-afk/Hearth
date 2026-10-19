@@ -9,7 +9,7 @@ const KIND = /^[A-Za-z][A-Za-z0-9_]{0,59}$/;
 const SCREEN = /^[A-Za-z0-9_/[\]-]{1,40}$/;
 const CODE = /^[A-Za-z0-9_]{1,20}$/;
 
-function osString(): string {
+export function osString(): string {
   const os = Platform.OS === 'ios' || Platform.OS === 'android' ? Platform.OS : 'web';
   const v = String(Platform.Version ?? '').replace(/[^0-9.]/g, '').slice(0, 12);
   return v ? `${os} ${v}` : os;
