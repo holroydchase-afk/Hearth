@@ -82,4 +82,15 @@ describe('R15 photo helpers, part 2: look-alikes and blurry photos from small pr
     const looks = await findLookAlikes([...all, photo({ uri: 'file:///p/missing.jpg' })], async (uri) => (uri.includes('missing') ? Promise.reject(new Error('gone')) : preview(uri)));
     expect(looks.lookAlikes.has('file:///p/missing.jpg')).toBe(false);
   });
+
+  it('HELP-DUP-2 a photo whose preview matches one sent in the last 30 days is set aside with "Send them again"', async () => {
+    const [b, c, e, g] = (['b', 'c', 'e', 'g'] as const).map(asset);
+    const first = await findLookAlikes([b!, c!, e!, g!], preview);
+    expect(first.ids.get(b!.uri)).toMatch(/^[0-9a-f]{64}$/);
+    const again = await findLookAlikes([b!, c!, e!, g!], preview, { sentIds: new Set([first.ids.get(b!.uri)!, first.ids.get(c!.uri)!]) });
+    expect([...again.sentBefore].sort()).toEqual([b!.uri, c!.uri].sort());
+    const r = applyHelpers([b!, c!, e!, g!], { looks: again });
+    expect(r.kept).toEqual([e, g]);
+    expect(helperLines(r)).toEqual([{ text: '2 of these you already sent.', button: 'Send them again', reason: 'sentBefore' }]);
+  });
 });

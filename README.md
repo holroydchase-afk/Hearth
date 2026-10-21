@@ -27,7 +27,7 @@ Families with divorces, remarriages and step-relatives don't fit one group chat.
 |---|---|
 | App | Expo SDK 57 (React Native, TypeScript strict), iPhone, Android and web from one codebase |
 | Backend | Supabase (Postgres with row-level security, Edge Functions), US East; Backblaze B2 for encrypted photos |
-| Tests | 558 app tests (Jest), 639 database checks (SQL), web end-to-end tests (Playwright), contract tests that run the same suite against a fake and the real backend |
+| Tests | 596 app tests (Jest), 639 database checks (SQL), web end-to-end tests (Playwright), contract tests that run the same suite against a fake and the real backend |
 | Process | Every change starts with a failing test that names its requirement. Every product decision gets a persona check, one Green or Red per relative type, and CI fails without it. Decisions are logged with what they beat |
 
 **An AI team with lanes.** The repo holds seven specialist agents: a staff PM, a QA engineer, an app engineer, a UI/UX designer who speaks for the grandparents, a privacy and security lead, a marketing partner and a funding analyst. The main Claude session works as chief of staff and routes each request to one lane. Chase sets the goals, makes the calls and owns the merge button.

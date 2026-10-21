@@ -27,9 +27,9 @@ Chase's family is "distributed": divorces, remarriages, step-grandparents, relat
 ## Results so far
 
 - The core flow works end to end on a phone. You sign in with a 6-digit code, pick photos and choose who sees them. Relatives heart and reply, and email notices arrive.
-- 558 app tests, 639 database checks, contract tests against both a fake and the real backend, and web end-to-end tests.
+- 596 app tests, 639 database checks, contract tests against both a fake and the real backend, and web end-to-end tests.
 - Privacy built in from the start: location and camera data stripped on the phone and verified, photos encrypted on the phone, end-to-end encrypted group chat (MLS), and access rules enforced in the database.
 
 ## What's next
 
-Milestone 2, the founder's spouse: faster sending on older phones (native encryption in the app's own build), Photos that open instantly and offline, and the first no-AI photo helpers (catching duplicates, screenshots and blurry shots).
+Milestone 2, the founder's spouse. Built on the first night shift: Photos that open instantly and offline from encrypted copies on the phone, and no-AI photo helpers that leave out repeats, screenshots and look-alikes (each one button from coming back). Still to come: native encryption in the app's own build, and blur detection once it is tuned on real photos.
