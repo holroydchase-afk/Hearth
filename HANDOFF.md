@@ -5,7 +5,8 @@
 - **R4 (part):** `app/src/crypto/aesGcm.ts` picks native, then crypto.subtle, then JavaScript; upload and viewing use the async path. The native module is installed with the first development build (registerNativeAesGcm), not now: Expo Go can't load it.
 - **R5 done:** T8 (RFC 9180 A.2.1 vector passes: our HPKE matches the standard), T9 (QA-3 test pins seed.sql's post dates), T10 (fake chatFetch has the joined-at cutoff, contract test).
 - **R7 done:** root README, case study, iPhone screenshots (`SNAPSHOT_DIR=../docs/portfolio/screens npm run e2e:web`). e2e core-loop now expects no "Seen by". R6 moved to P2 (LG persona, REPLY-11).
-- **Next exact step:** R9 PERF-FEED-1 cold-start timing on the web build, then R10 AI-2/AI-4 specs, then R8 A3 design for privacy review.
+- **R9 done:** cold start 260 ms median (web + fake). **R10 done:** `SPEC-PHOTO-HELPERS.md` + persona check; build is R15.
+- **Next exact step:** R8 A3 design note for privacy review (`docs/architecture/` section: feed cache + encrypted files on disk + keys in expo-secure-store), then build A3 test-first.
 - **Decisions to review:** R3 crops tall or wide photos in the card to fill the frame (the full photo is one tap away). A3 will keep photo keys in the phone keychain (RV-X6).
 - **Blockers:** none. A1 can't be checked on a phone until a development build exists.
 

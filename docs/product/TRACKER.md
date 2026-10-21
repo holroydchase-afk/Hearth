@@ -28,7 +28,8 @@ The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/202
 | R7 | Portfolio pack: root README, screenshots of the core flow (fake names), case study | P1 | M | ☑ Oct 21: `README.md`, `docs/portfolio/CASE-STUDY.md`, `docs/portfolio/screens/` (from `snapshot.spec.js`) |
 | R8 | A3 Photos kept on the phone: the feed and encrypted photo files, keys in the keychain (RV-P4, RV-X6; privacy review first) | P1 | L | ☐ |
 | R9 | PERF-FEED-1 cold-start timing on the web build | P1 | S | ☑ Oct 21: 260 ms median on the web build with the fake backend (`e2e-web/perf.spec.js`); a phone timing comes with A3 |
-| R10 | Specs: AI-2 duplicates, AI-4 screenshots and blurry photos, no model (persona check, grandparent-ux words) | P2 | S | ☐ |
+| R10 | Specs: AI-2 duplicates, AI-4 screenshots and blurry photos, no model (persona check, grandparent-ux words) | P2 | S | ☑ Oct 21 specced: `SPEC-PHOTO-HELPERS.md` (HELP-*). Build is a new row after A3 |
+| R15 | Build the photo helpers (HELP-DUP-1..4, HELP-SHOT-1, HELP-BLUR-1/2, HELP-ALL-1) | P2 | M | ☐ |
 | R11 | Photos header: fewer stacked buttons before the first photo (RV-U3; grandparent-ux sketch first) | P2 | S | ☐ |
 | R12 | Thumbnail sizing from a first guess instead of up to 7 encodes (RV-P5; measure on a phone) | P2 | S | ☐ |
 | R13 | A4 resumable video uploads (after FLAG-7 video stripping; RV-P7) | P2 | L | ☐ |
