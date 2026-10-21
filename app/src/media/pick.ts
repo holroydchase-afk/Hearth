@@ -46,8 +46,9 @@ export async function pickBulk(): Promise<{ assets: PickedAsset[] } | { denied: 
   const assets: PickedAsset[] = r.assets.map((a) => ({
     uri: a.uri, type: a.type ?? null, mimeType: a.mimeType ?? null, width: a.width, height: a.height,
     duration: a.duration ?? null, exif: (a.exif as Record<string, unknown> | null | undefined) ?? null,
+    assetId: a.assetId ?? null,
   }));
-  await addCreationTimes(assets, r.assets.map((a) => a.assetId ?? null));
+  await addLibraryInfo(assets, r.assets.map((a) => a.assetId ?? null));
   return { assets };
 }
 
@@ -56,10 +57,14 @@ export async function pickBulk(): Promise<{ assets: PickedAsset[] } | { denied: 
  * photo library's creation time. Read only for those photos, and only when the Photos access the picker
  * already asked for is there: never a new prompt. Only the number is kept; the library's location and
  * EXIF are dropped here. Any failure (web, no access, a missing asset) leaves the date null.
+ * R15 HELP-SHOT-1: the same read (plus PNGs, the usual screenshot format) says whether it is a screenshot:
+ * iPhone's "screenshot" subtype or Android's "Screenshots" album. Only true/false is kept.
  */
-async function addCreationTimes(assets: PickedAsset[], ids: (string | null)[]): Promise<void> {
-  const undated = assets.map((a, i) => i).filter((i) => ids[i] && !captureInfo({ exif: assets[i]!.exif }));
+async function addLibraryInfo(assets: PickedAsset[], ids: (string | null)[]): Promise<void> {
+  const undated = assets.map((a, i) => i).filter((i) => ids[i] && (!captureInfo({ exif: assets[i]!.exif }) || assets[i]!.mimeType === 'image/png'));
   if (!undated.length) return;
+  let shotsAlbum: Promise<string | null> | null = null;
+  const screenshotsAlbumId = () => (shotsAlbum ??= MediaLibrary.getAlbumAsync('Screenshots').then((a) => a?.id ?? null, () => null));
   try {
     const perm = await MediaLibrary.getPermissionsAsync();
     if (!perm.granted && perm.accessPrivileges !== 'limited') return;
@@ -70,7 +75,9 @@ async function addCreationTimes(assets: PickedAsset[], ids: (string | null)[]): 
     try {
       const info = await MediaLibrary.getAssetInfoAsync(ids[i]!, { shouldDownloadFromNetwork: false });
       const ct = info.creationTime;
-      if (typeof ct === 'number' && Number.isFinite(ct) && ct > 0) assets[i]!.creationTime = ct;
+      if (!captureInfo({ exif: assets[i]!.exif }) && typeof ct === 'number' && Number.isFinite(ct) && ct > 0) assets[i]!.creationTime = ct;
+      if (info.mediaSubtypes?.includes('screenshot')) assets[i]!.screenshot = true;
+      else if (info.albumId && info.albumId === (await screenshotsAlbumId())) assets[i]!.screenshot = true;
     } catch {
       /* leave it undated */
     }

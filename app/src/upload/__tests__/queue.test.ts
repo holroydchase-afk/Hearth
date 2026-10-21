@@ -59,7 +59,7 @@ function wrap(api: HearthApi, hooks: Hook): HearthApi & { calls: Record<string, 
 
 const HANG = () => new Promise<never>(() => {});
 const tick = () => new Promise((r) => setImmediate(r));
-async function until(cond: () => boolean, tries = 200) {
+async function until(cond: () => boolean, tries = 5000) {
   for (let i = 0; i < tries && !cond(); i++) await tick();
   if (!cond()) throw new Error('condition never became true');
 }

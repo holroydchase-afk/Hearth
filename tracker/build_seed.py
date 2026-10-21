@@ -222,9 +222,9 @@ tickets = [
  ("S18", "bug", "app", "Medium", "open", "Photos encrypted in Expo Go before the S17 fix may have guessable keys. Milestone 1 test data only; clear the test bucket before any real family photos go in", []),
  ("S19", "bug", "app", "Medium", "open", "Messenger has no key check (safety numbers): a compromised server could add a hidden phone to a chat (MS4)", []),
  ("S20", "task", "app", "Medium", "open", "Outside review of app/src/messenger/mlsCrypto.ts, our own HPKE and ciphersuite glue around audited libraries (not audited)", []),
- ("T8", "test fix", "app", "Low", "open", "Messenger crypto has no RFC 9180 known-answer vectors, and export is interop-tested in one direction only", []),
- ("T9", "test fix", "ops", "Low", "open", "QA-3 sent_received_test fails when run on 2026-10-19: seed posts dated that day land in its 'since today' window (also on main)", []),
- ("T10", "test fix", "app", "Low", "open", "The fake backend's chatFetch has no joined-at cutoff, so app tests don't cover 'newcomers can't fetch older chat rows' (SQL tests do)", []),
+ ("T8", "test fix", "app", "Low", "fixed", "Messenger crypto has no RFC 9180 known-answer vectors, and export is interop-tested in one direction only", []),
+ ("T9", "test fix", "ops", "Low", "fixed", "QA-3 sent_received_test fails when run on 2026-10-19: seed posts dated that day land in its 'since today' window (also on main)", []),
+ ("T10", "test fix", "app", "Low", "fixed", "The fake backend's chatFetch has no joined-at cutoff, so app tests don't cover 'newcomers can't fetch older chat rows' (SQL tests do)", []),
 ]
 # When each ticket was found and fixed, where it isn't Oct 15.
 DATES = {"S9": ("2026-10-15", "2026-10-16"), "S10": ("2026-10-15", "2026-10-16"), "S12": ("2026-10-15", "2026-10-16"),
@@ -233,7 +233,7 @@ DATES = {"S9": ("2026-10-15", "2026-10-16"), "S10": ("2026-10-15", "2026-10-16")
          "AE-5": ("2026-10-16", "2026-10-16"), "AE-6": ("2026-10-16", None), "AE-7": ("2026-10-16", "2026-10-16"),
          "AE-8": ("2026-10-16", "2026-10-16"), "V1": ("2026-10-16", None), "REPLY-1": ("2026-10-16", None),
          **{t: ("2026-10-18", "2026-10-18") for t in ("PRIV-1", "PRIV-2", "QA-3", "QA-2", "BULK-1F", "T6", "T7")},
-         "S17": ("2026-10-19", "2026-10-19"), **{t: ("2026-10-19", None) for t in ("S18", "S19", "S20", "T8", "T9", "T10")}}
+         "S17": ("2026-10-19", "2026-10-19"), **{t: ("2026-10-19", None) for t in ("S18", "S19", "S20")}, **{t: ("2026-10-19", "2026-10-21") for t in ("T8", "T9", "T10")}}
 # link backend tickets to SQL tests
 for c in sql_cases:
     for t in c["tickets"]:

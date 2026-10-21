@@ -3,12 +3,22 @@
 // words, for the whole batch; the default is the last group used, never a silent Everyone.
 // No per-photo steps; every action is a labeled button.
 import React, { useState } from 'react';
+import { Image, View } from 'react-native';
 import type { Circle } from '../api/HearthApi';
-import { overLimitLine, reviewSummary, skippedVideosLine, type BatchPlan } from '../share/bulk';
+import { overLimitLine, reviewSummary, skippedVideosLine, type BatchPlan, type PickedAsset } from '../share/bulk';
+import type { HelperLine, SetAsideReason } from '../share/helpers';
 import { Button, Card, Choice, Loading, Screen, Txt } from '../ui/kit';
 import { people, photos } from '../ui/format';
 
-export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel, busy }: {
+/** R15 photo helpers: what was set aside, in words, each one button from coming back (HELP-R1, HELP-R3). */
+export interface ReviewHelpers {
+  lines: HelperLine[];
+  setAside: PickedAsset[];
+  onSendToo: (reason: SetAsideReason) => void;
+  onPutBack: (uri: string) => void;
+}
+
+export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel, busy, helpers }: {
   plan: BatchPlan;
   circles: Circle[] | null;
   chosen: string[];
@@ -16,9 +26,11 @@ export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel,
   onSend: () => void;
   onCancel: () => void;
   busy: boolean;
+  helpers?: ReviewHelpers;
 }) {
   // grandparent-ux: with nobody picked yet, the choices are already open (no hidden step).
   const [changing, setChanging] = useState(chosen.length === 0);
+  const [showLeftOut, setShowLeftOut] = useState(false);
   // Everyone first, then the groups (SPEC-GROUPS: 0011 adds a real kind; until then, by name).
   const list = circles ? [...circles].sort((a, b) => Number(b.name === 'Everyone') - Number(a.name === 'Everyone')) : null;
   const names = (list ?? []).filter((g) => chosen.includes(g.circle_id)).map((g) => g.name);
@@ -59,6 +71,30 @@ export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel,
             : null}
         </Card>
       )}
+      {helpers?.lines.length ? (
+        // HELP-ALL-1: every helper line together, under "Send to".
+        <Card>
+          {helpers.lines.map((l) => (
+            <View key={l.text} style={{ gap: 8 }}>
+              <Txt>{l.text}</Txt>
+              {l.button && l.reason ? <Button label={l.button} variant="secondary" onPress={() => helpers.onSendToo(l.reason!)} /> : null}
+            </View>
+          ))}
+          {helpers.setAside.length ? (
+            <Button label={showLeftOut ? 'Hide what we left out' : 'Show what we left out'} variant="secondary" onPress={() => setShowLeftOut((v) => !v)} />
+          ) : null}
+          {showLeftOut ? (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+              {helpers.setAside.map((a, i) => (
+                <View key={a.uri} style={{ width: 120, gap: 6 }}>
+                  <Image source={{ uri: a.uri }} style={{ width: 120, height: 120, borderRadius: 10 }} accessibilityIgnoresInvertColors />
+                  <Button label={`Put back photo ${i + 1}`} text="Put back" variant="secondary" onPress={() => helpers.onPutBack(a.uri)} />
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </Card>
+      ) : null}
       {nothing ? null : (
         <Button label={`Send ${photos(plan.photoCount)}`} onPress={onSend} disabled={!named} busy={busy} />
       )}

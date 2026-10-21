@@ -19,6 +19,8 @@ const DEFAULT_EDGE = MEDIA_POLICY.compression.long_edge;
 export const DISPLAY_LONG_EDGE: number = DEFAULT_EDGE === 'original' ? Number.POSITIVE_INFINITY : DEFAULT_EDGE;
 export const DISPLAY_QUALITY = MEDIA_POLICY.compression.quality;
 export const THUMB_LONG_EDGE = 480;
+/** Small JPEGs carry more bytes per pixel than big ones; the guess is padded so it only skips steps that surely miss. */
+const THUMB_GUESS_MARGIN = 1.5;
 export const THUMB_TARGET_BYTES = MEDIA_POLICY.compression.thumb_target_bytes;
 /** Hard cap for "about 40 KB". */
 export const THUMB_MAX_BYTES = MEDIA_POLICY.compression.thumb_max_bytes;
@@ -89,9 +91,16 @@ export async function processPhoto(src: { uri: string }, deps: PipelineDeps): Pr
   const display = await encode(deps, policy, img, fitLongEdge(img.width, img.height, edge), c.quality);
 
   // Thumbnail: step quality, then size, down until it's about 40 KB (measured after cleaning).
+  // R12 (RV-P5): skip steps the display JPEG already says are too big, so a busy photo isn't encoded 7 times.
   const attempts: [number, number][] = [[THUMB_LONG_EDGE, 0.6], [THUMB_LONG_EDGE, 0.45], [400, 0.4], [320, 0.4], [256, 0.35], [200, 0.3]];
+  const bytesPerPixel = display.bytes.length / (display.width * display.height);
+  const guess = ([edge, q]: [number, number]) => {
+    const s = fitLongEdge(img.width, img.height, edge);
+    return bytesPerPixel * s.width * s.height * (q / c.quality) * THUMB_GUESS_MARGIN;
+  };
+  const first = attempts.findIndex((a) => guess(a) <= c.thumb_target_bytes);
   let thumb: Encoded | null = null;
-  for (const [edge, q] of attempts) {
+  for (const [edge, q] of attempts.slice(first < 0 ? attempts.length - 1 : first)) {
     thumb = await encode(deps, policy, img, fitLongEdge(img.width, img.height, edge), q);
     if (thumb.bytes.length <= c.thumb_target_bytes) break;
   }

@@ -17,7 +17,7 @@ function fakeJpeg(size: number, withExif = false): Uint8Array {
  * Mock manipulator. `oriented` is what the decoder reports AFTER applying EXIF orientation,
  * which is how expo-image-manipulator behaves (it normalizes rotation on load).
  */
-function mockManipulator(oriented: { width: number; height: number }, opts: { thumbBytes?: (q: number, w: number) => number; leaveExif?: boolean } = {}) {
+function mockManipulator(oriented: { width: number; height: number }, opts: { thumbBytes?: (q: number, w: number) => number; displayBytes?: number; leaveExif?: boolean } = {}) {
   const files = new Map<string, Uint8Array>();
   let n = 0;
   const calls: { size: { width: number; height: number }; quality: number }[] = [];
@@ -27,7 +27,7 @@ function mockManipulator(oriented: { width: number; height: number }, opts: { th
       calls.push({ size, quality });
       const uri = `file:///cache/out-${++n}.jpg`;
       const isThumb = Math.max(size.width, size.height) < DISPLAY_LONG_EDGE / 2;
-      const len = isThumb ? (opts.thumbBytes ?? (() => 30_000))(quality, Math.max(size.width, size.height)) : 350_000;
+      const len = isThumb ? (opts.thumbBytes ?? (() => 30_000))(quality, Math.max(size.width, size.height)) : opts.displayBytes ?? 350_000;
       files.set(uri, fakeJpeg(len, !!opts.leaveExif));
       return { uri, width: size.width, height: size.height };
     }),
@@ -99,6 +99,25 @@ describe('processPhoto (BETA-SHARE-2, BETA-SHARE-5)', () => {
     const out = await processPhoto({ uri: 'file:///pick/busy.jpg' }, { manipulator: m, readBytes });
     expect(out.thumb.bytes.length).toBeLessThanOrEqual(THUMB_MAX_BYTES);
     expect(calls.length).toBeGreaterThan(2);
+  });
+
+  // R12 / RV-P5: a busy photo used to be encoded up to 7 times to find a thumbnail size.
+  // The display JPEG's bytes per pixel predict the thumbnail's, so the loop starts near the answer.
+  const busyThumb = (displayBytes: number) => (q: number, edge: number) =>
+    Math.round((displayBytes / (2048 * 1536)) * edge * edge * 0.75 * (q / 0.82) * 1.3);
+
+  it('R12 RV-P5: a busy photo gets its thumbnail in at most 2 encodes, still under 40 KB', async () => {
+    const { m, readBytes, calls } = mockManipulator({ width: 4032, height: 3024 }, { displayBytes: 3_000_000, thumbBytes: busyThumb(3_000_000) });
+    const out = await processPhoto({ uri: 'file:///pick/busy.jpg' }, { manipulator: m, readBytes });
+    expect(calls.length - 1).toBeLessThanOrEqual(2);
+    expect(out.thumb.bytes.length).toBeLessThanOrEqual(40_000);
+  });
+
+  it('R12 RV-P5: a plain photo still gets the sharpest thumbnail (first try, 480 px)', async () => {
+    const { m, readBytes, calls } = mockManipulator({ width: 4032, height: 3024 }, { displayBytes: 300_000, thumbBytes: busyThumb(300_000) });
+    const out = await processPhoto({ uri: 'file:///pick/plain.jpg' }, { manipulator: m, readBytes });
+    expect(calls.length).toBe(2);
+    expect(Math.max(out.thumb.width, out.thumb.height)).toBe(480);
   });
 
   // Was "refuses to continue if the re-encoded file still carries EXIF": that refusal is the

@@ -1,10 +1,12 @@
 // Share: pick → caption → "Who can see it" → Post (BETA-SHARE-1, BETA-AUD-1/2).
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Image, View } from 'react-native';
 import type { Circle } from '../api/HearthApi';
 import { messageFor } from '../errors/messages';
 import { loadLastAudience, saveLastAudience } from '../share/audienceMemory';
-import { planBatch, type BatchPlan } from '../share/bulk';
+import { planBatch, type PickedAsset } from '../share/bulk';
+import { applyHelpers, findLookAlikes, helperLines, type LookResult } from '../share/helpers';
+import { loadSent, recordSent } from '../share/sentBefore';
 import { useApp } from '../state/AppContext';
 import { useNav } from '../state/nav';
 import { Button, Card, Choice, Field, Loading, Notice, Screen, Txt } from '../ui/kit';
@@ -34,9 +36,28 @@ export function ShareScreen() {
   const [caption, setCaption] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  // BETA-BULK-3: a bulk pick waiting on the review screen (dates only; EXIF already dropped).
-  const [plan, setPlan] = useState<BatchPlan | null>(null);
   const userId = app.session?.userId;
+  // BETA-BULK-3: a bulk pick waiting on the review screen (dates only; EXIF already dropped).
+  // R15: the bulk pick as picked; photo helpers set some aside (never deleted), and putBack brings them back.
+  const [picked, setPicked] = useState<PickedAsset[] | null>(null);
+  const [putBack, setPutBack] = useState<Set<string>>(() => new Set());
+  const [looks, setLooks] = useState<LookResult | null>(null);
+  const helped = useMemo(() => (picked ? applyHelpers(picked, { putBack, looks }) : null), [picked, putBack, looks]);
+  const plan = useMemo(() => (helped ? planBatch(helped.kept) : null), [helped]);
+  const setPlan = (assets: PickedAsset[] | null) => { setPicked(assets); setPutBack(new Set()); setLooks(null); };
+  // HELP-DUP-2/3, HELP-BLUR: read small previews after the review screen shows; Send never waits for them.
+  const previewBytes = app.deps.previewBytes;
+  useEffect(() => {
+    if (!picked || !previewBytes) return;
+    let alive = true;
+    const candidates = applyHelpers(picked).kept;
+    void (async () => {
+      const sentIds = userId ? await loadSent(app.deps.kv, userId) : new Set<string>();
+      const r = await findLookAlikes(candidates, previewBytes, { sentIds });
+      if (alive) setLooks(r);
+    })().catch(() => {});
+    return () => { alive = false; };
+  }, [picked, previewBytes]); // eslint-disable-line react-hooks/exhaustive-deps
   const spaceId = app.space?.space_id;
   const canPost = !!app.space?.can_post;
   // Oct 17 decision: "Pick lots of photos" is for parents only, never a relative allowed to post.
@@ -77,7 +98,7 @@ export function ShareScreen() {
     setNotice(null);
     const r = await app.deps.pickBulk();
     if ('denied' in r) setNotice('Hearth needs your OK to see your photos. Tap "Allow" when your phone asks.');
-    else if (r.assets.length) setPlan(planBatch(r.assets));
+    else if (r.assets.length) setPlan(r.assets);
   };
 
   const sendBatch = async () => {
@@ -89,6 +110,8 @@ export function ShareScreen() {
         space: app.space!.space_id, circleIds: chosen,
         posts: plan.posts.map((p) => ({ takenAt: p.takenAt, items: p.items })),
       });
+      // HELP-DUP-2: remember what went, by preview fingerprint, on this phone only.
+      if (looks && helped) await recordSent(app.deps.kv, userId, helped.kept.flatMap((a) => looks.ids.get(a.uri) ?? [])).catch(() => {});
       setPlan(null);
       nav.goPhotos();
     } catch (e) {
@@ -116,10 +139,17 @@ export function ShareScreen() {
     }
   };
 
-  if (plan) {
+  if (plan && helped) {
+    const bringBack = (uris: string[]) => setPutBack((cur) => new Set([...cur, ...uris]));
     return (
       <BatchReview plan={plan} circles={circles} chosen={chosen} onToggle={toggle} busy={busy}
-        onSend={() => void sendBatch()} onCancel={() => setPlan(null)} />
+        onSend={() => void sendBatch()} onCancel={() => setPlan(null)}
+        helpers={{
+          lines: helperLines(helped),
+          setAside: helped.setAside.flatMap((s) => s.items),
+          onSendToo: (reason) => bringBack(helped.setAside.filter((s) => s.reason === reason).flatMap((s) => s.items.map((a) => a.uri))),
+          onPutBack: (uri) => bringBack([uri]),
+        }} />
     );
   }
 

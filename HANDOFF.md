@@ -1,4 +1,24 @@
-# Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
+# Handoff
+
+## Oct 21, night shift 1: freeze lifted, review, ranked list, first fixes (branch claude/project-thread-kzt7by)
+- **Done:** app review (`docs/product/reviews/2026-10-21-app-review.md`); ranked list in `TRACKER.md` "Sequence to milestone 2"; `docs/eng/PERFORMANCE.md` with measured encryption speed; DEC-28, DEC-29 and the speed-architecture persona check. Built test-first: R1 parallel sending (PERF-UP-1..3), R2 no "Seen by", R3 photos fill the card.
+- **R4 (part):** `app/src/crypto/aesGcm.ts` picks native, then crypto.subtle, then JavaScript; upload and viewing use the async path. The native module is installed with the first development build (registerNativeAesGcm), not now: Expo Go can't load it.
+- **R5 done:** T8 (RFC 9180 A.2.1 vector passes: our HPKE matches the standard), T9 (QA-3 test pins seed.sql's post dates), T10 (fake chatFetch has the joined-at cutoff, contract test).
+- **R7 done:** root README, case study, iPhone screenshots (`SNAPSHOT_DIR=../docs/portfolio/screens npm run e2e:web`). e2e core-loop now expects no "Seen by". R6 moved to P2 (LG persona, REPLY-11).
+- **R9 done:** cold start 260 ms median (web + fake). **R10 done:** `SPEC-PHOTO-HELPERS.md` + persona check; build is R15.
+- **R8 done (A3):** photos seen before open from the phone, offline too. `media/cache.ts` keeps ciphertext files (`platform/mediaStore.ts`, cache folder, 400 max) and item keys sealed under a Keychain/Keystore key; `FeedStore.onRefreshed` prunes them, sign-out wipes them. Web keeps nothing. Tests A3-1..6. Docs: 02, 03 "On the phone", 04 former-member row.
+- **R12 done:** thumbnail loop starts from a guess based on the display JPEG (`media/pipeline.ts`, R12 RV-P5 tests).
+- **R15 part 1 done:** `share/helpers.ts` (HELP-R5, DUP-1, SHOT-1), BatchReview lines with "Send them too" and "Show what we left out"/"Put back" (HELP-ALL-1), picker reads library id and screenshot flag (`media/pick.ts`), `media/pixels.ts` (dHash, sharpness, darkness) tested on synthetic pictures.
+- **R14 done:** audit unchanged on expo 57.0.30; one advisory ships (decode-uri-component in expo-router, crafted link could freeze the app). Review RV-X4 corrected.
+- **R15 part 2 done:** look-alikes from a 160 px preview (`media/preview.ts`, jpeg-js 0.4.4 from npm, `pixels.ts`), lines appear after the screen opens; blur built but off (`BLUR_UNDER` null) until tuned. PERF-HELP-1: 30 ms per photo without JIT.
+- **R11 done:** Photos header buttons two to a row (`PhotosScreen.tsx`, `photosHeader.test.tsx`); sketch and persona check in `docs/product/decisions/2026-10-21-photos-header.md`. Portfolio iPhone screenshots refreshed.
+- **R15 DUP-2 done:** "already sent" from a 30-day list of preview fingerprints on the phone (`share/sentBefore.ts`).
+- **R6 dropped** by Chase Oct 21, kept in mind (DEC-30).
+- **Next exact step:** R15 leftovers: blur tuning (Chase's 40 labeled photos), server flags (a migration, Chase deploys). R4 waits on a development build, R13 on FLAG-7. R15 leftovers: DUP-2, server flags, blur tuning (needs Chase's 40 labeled photos). R11 and R6 need a grandparent-ux sketch first.
+- **Decisions to review:** "already sent" compares a fingerprint of the small preview, not the full file (HELP-DUP-2). Photos header buttons two to a row, labels may wrap to two lines (R11). Look-alike lines appear a moment after the review screen opens (Send never waits). R15 helpers are on by default with an in-code switch, not a server flag yet (HELP-R4); Android screenshots come from the "Screenshots" album only. R3 crops tall or wide photos in the card to fill the frame (the full photo is one tap away). A3 keeps photo keys on the phone, sealed under a Keychain/Keystore key (RV-X6); a removed member's offline phone keeps showing kept photos until its next refresh.
+- **Blockers:** none. A1 can't be checked on a phone until a development build exists.
+
+## Earlier: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
 ## Oct 18: anchor A4 White-paper ready, architecture docs started (Chase's ask)
 - Chase: build documentation as we go so it turns into white papers easily, for intelligent, privacy-focused tech readers. Logged as anchor A4 and an ideas-log row in `docs/product/ANCHORS.md`.
