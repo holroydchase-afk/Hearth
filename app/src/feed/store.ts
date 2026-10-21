@@ -31,6 +31,8 @@ export interface FeedStoreOptions {
   pageSize?: number;
   uuid?: () => string;
   inviter?: string | null;
+  /** A3: called with the first page after each successful refresh (MediaCache.prune). */
+  onRefreshed?: (posts: FeedPost[]) => void;
 }
 
 const cacheKey = (user: string, space: string) => `hearth.feedCache.v1.${user}.${space}`;
@@ -93,6 +95,7 @@ export class FeedStore {
       const rows = await this.o.api.getFeed({ space: this.o.spaceId, limit: this.pageSize });
       this.set({ posts: this.overlay(rows), loaded: true, hasMore: rows.length >= this.pageSize, status: 'idle' });
       void this.o.kv.setItem(cacheKey(this.o.userId, this.o.spaceId), JSON.stringify(rows)).catch(() => {});
+      this.o.onRefreshed?.(rows);
     } catch (e) {
       this.set({ status: 'idle' });
       this.notice(e);

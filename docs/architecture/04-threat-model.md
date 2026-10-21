@@ -16,7 +16,7 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 |---|---|---|---|
 | **A relative outside a post's audience** | See a post, or learn it exists | RLS on every table; one visibility predicate (`private.sees_post`) behind RLS, the feed, `sign-media` and notices; not-allowed returns the same `404` as not-found | Built. By design, parents see every post in their family space |
 | **A relative inside the family** | Learn whether another relative looks at posts | No last-seen, login or activity details shown (migration 0004); notices carry no viewing data | Built, except "Seen by N of M" on your own posts (anchor A2 conflict, tracker D4) |
-| **A former member** | Keep access after removal | Access is checked at request time; download URLs expire in 10 minutes; keys aren't cached to disk | Built. **Gap:** photos already saved to their phone stay there |
+| **A former member** | Keep access after removal | Access is checked at request time; download URLs expire in 10 minutes; photos kept for offline viewing (A3) are dropped at the next refresh that no longer lists the post | Built. **Gap:** photos already saved to their phone stay there; a phone kept offline still shows photos it had kept until it next refreshes |
 | **Someone with a leaked link** | Download photos | Presigned URLs expire in 10 minutes and return ciphertext only | Built |
 | **Someone with a forwarded or logged invite link** | Join the family as a relative | Invites are single-use, expire in at most 30 days and can be addressed to one email; the link token is 160 random bits and the typed code is rate limited (S10). Links point at the hosted web build, not at `hearth.family`, which isn't bought: whoever registered it would have received live tokens (migration 0014; `backend/scripts/smoke-check.sh` fails if hosted points there again) | Built. **Gap:** the token sits in the URL path, so the web host's request logs can hold it until it's used or expires; ONB-6 (milestone 2) moves it after `#`. Expo's EAS Hosting is the web host; where it keeps logs is not yet written down |
 | **Storage vendor (B2) breach or insider** | Read photos | Phone-side AES-256-GCM; B2 never sees a key | Built |
@@ -45,4 +45,4 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 6. Messenger: no key verification (a compromised server could add a hidden phone to a chat), and chat metadata is visible to the server ([06-messenger.md](06-messenger.md)).
 
 ---
-Last checked against code: 2026-10-19, a522a3a (plus migrations 0014, 0015 messenger) and 624fc39 (MEDIA-1/2/3 on-phone cleaner, ONB-3/4 invite links)
+Last checked against code: 2026-10-21, A3 kept photo files (former-member row); earlier 2026-10-19, a522a3a (plus migrations 0014, 0015 messenger) and 624fc39 (MEDIA-1/2/3 on-phone cleaner, ONB-3/4 invite links)
