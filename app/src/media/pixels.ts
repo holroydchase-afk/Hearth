@@ -1,6 +1,7 @@
 // R15 photo helpers (SPEC-PHOTO-HELPERS): plain arithmetic on a small grayscale picture, on the phone.
 // No trained model. dHash finds near-duplicates; the variance of the Laplacian scores sharpness.
 // Nothing computed here is sent or stored (HELP-R2).
+import { decode } from 'jpeg-js';
 
 export interface Gray { width: number; height: number; data: Uint8Array }
 
@@ -82,4 +83,12 @@ export function nearDuplicateGroups(items: { hash: Uint8Array; sharpness: number
     groups.push({ keep, setAside: members.filter((i) => i !== keep) });
   }
   return groups;
+}
+
+/** A small JPEG preview as grayscale (Rec. 601 luma). Pure TypeScript, so it runs in Expo Go and on the web. */
+export function grayFromJpeg(bytes: Uint8Array): Gray {
+  const im = decode(bytes, { useTArray: true, formatAsRGBA: false, maxResolutionInMP: 2, maxMemoryUsageInMB: 64 });
+  const data = new Uint8Array(im.width * im.height);
+  for (let i = 0, j = 0; i < data.length; i++, j += 3) data[i] = Math.round(0.299 * im.data[j]! + 0.587 * im.data[j + 1]! + 0.114 * im.data[j + 2]!);
+  return { width: im.width, height: im.height, data };
 }

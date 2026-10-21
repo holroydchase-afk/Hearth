@@ -7,6 +7,7 @@ import { saveLastAudience } from '../../share/audienceMemory';
 import type { PickedAsset } from '../../share/bulk';
 import { expectGrandparentSafe, renderApp, screenWords } from '../../test/renderApp';
 import { planBatch } from '../../share/bulk';
+import { blur, scene, toJpeg } from '../../test/pictures';
 import { BatchReview } from '../BatchReview';
 import { ShareScreen } from '../ShareScreen';
 
@@ -23,13 +24,13 @@ const video = (): PickedAsset => ({ uri: `file:///picked/MOV_${++n}.mov`, type: 
 /** 48 photos from 3 days (20, 18, 10) and 3 videos. */
 const pick48 = () => [...day('2024:07:04', 20), video(), ...day('2024:07:05', 18), video(), video(), ...day('2024:07:06', 10)];
 
-async function openReview(opts: { last?: string[]; assets?: PickedAsset[]; be?: FakeBackend } = {}) {
+async function openReview(opts: { last?: string[]; assets?: PickedAsset[]; be?: FakeBackend; previewBytes?: (uri: string) => Promise<Uint8Array | null>; header?: string } = {}) {
   const kv = memoryKV();
   if (opts.last) await saveLastAudience(kv, FIXTURE.users.chase.id, opts.last);
   const pickBulk = jest.fn(async () => ({ assets: opts.assets ?? pick48() }));
-  const r = await renderApp(<ShareScreen />, { user: 'chase', kv, be: opts.be, deps: { pickBulk } });
+  const r = await renderApp(<ShareScreen />, { user: 'chase', kv, be: opts.be, deps: { pickBulk, previewBytes: opts.previewBytes } });
   fireEvent.press(await screen.findByRole('button', { name: 'Pick up to 100 photos at once' }));
-  await screen.findByText('48 photos from 3 days');
+  await screen.findByText(opts.header ?? '48 photos from 3 days');
   return { ...r, pickBulk, kv };
 }
 
@@ -175,5 +176,15 @@ describe('R15 photo helpers on the review screen (SPEC-PHOTO-HELPERS)', () => {
     await openReview({ last: [FIXTURE.circles.dadSide.id], assets: [...assets, { ...assets[0]!, uri: 'file:///picked/again.jpg' }] });
     expect(screen.getByText("You picked 2 of the same photo. We'll send it once.")).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Send 48 photos' })).toBeTruthy();
+  });
+
+  it('HELP-DUP-3/4 a look-alike is left out once the previews are read; "Send it too" puts it back and the count updates', async () => {
+    const assets = pick48();
+    const pics = new Map([[assets[0]!.uri, toJpeg(scene())], [assets[1]!.uri, toJpeg(blur(scene(), 2))]]);
+    await openReview({ last: [FIXTURE.circles.dadSide.id], assets, previewBytes: async (uri) => pics.get(uri) ?? null, header: '47 photos from 3 days' });
+    expect(await screen.findByText('1 photo looks almost the same as another. We kept the clearest.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Send 47 photos' })).toBeTruthy();
+    fireEvent.press(screen.getByRole('button', { name: 'Send it too' }));
+    expect(await screen.findByRole('button', { name: 'Send 48 photos' })).toBeTruthy();
   });
 });

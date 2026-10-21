@@ -2,7 +2,7 @@
 
 Status: specced Oct 21, 2026 (DEC-29; Chase: "could be specced now"). Owner: staff-pm. Words reviewed by the grandparent-ux lane. Persona check: `docs/product/decisions/2026-10-21-photo-helpers.md`. Build after the M2 speed work (TRACKER R10).
 
-**Build status (Oct 21, TRACKER R15).** Part 1 built: HELP-R1, R3, R5, DUP-1, SHOT-1, ALL-1, plus the dHash, sharpness and darkness arithmetic (`app/src/media/pixels.ts`) tested on synthetic pictures. Part 2 to do: decode the 480 px thumbnail on the phone and wire DUP-3 and BLUR-1/2; DUP-2 (30-day hashes); tune the blur threshold (needs a labeled set of 40 photos from Chase, kept off the repo); HELP-R4 server flags (part 1 has an on/off option in code, on by default). Android screenshots are read from the library's "Screenshots" album; a phone that names that album differently isn't caught.
+**Build status (Oct 21, TRACKER R15).** Built: HELP-R1, R3, R5, DUP-1, DUP-3, DUP-4, SHOT-1, BLUR-2 and ALL-1. Look-alikes and blur use a 160 px preview made on the phone (`app/src/media/preview.ts`) and decoded in TypeScript (jpeg-js 0.4.4); the lines appear a moment after the review screen opens, and Send never waits for them. BLUR-1 is built but off: `BLUR_UNDER` stays null until the threshold is tuned on a labeled set of 40 photos (needs Chase; the photos stay off the repo). Still to do: DUP-2 (30-day repeats), HELP-R4 server flags (an on/off option exists in code, on by default). Android screenshots are read from the library's "Screenshots" album; a phone that names that album differently isn't caught.
 
 ## Why
 

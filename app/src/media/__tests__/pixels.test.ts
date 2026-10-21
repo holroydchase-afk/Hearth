@@ -1,32 +1,6 @@
 // R15 photo helpers (SPEC-PHOTO-HELPERS): plain image arithmetic on a grayscale thumbnail. No model.
-import { dHash64, hamming, isDark, meanLuma, nearDuplicateGroups, sharpness, type Gray } from '../pixels';
-
-/** A w×h grayscale image from a function of (x, y), values 0..255. */
-const img = (w: number, h: number, f: (x: number, y: number) => number): Gray => {
-  const data = new Uint8Array(w * h);
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) data[y * w + x] = Math.max(0, Math.min(255, Math.round(f(x, y))));
-  return { width: w, height: h, data };
-};
-// A "scene": smooth shapes plus fine texture (what blur takes away), so a small change keeps its look.
-const scene = (shift = 0) => img(96, 72, (x, y) => 128 + 70 * Math.sin((x + shift) / 9) * Math.cos(y / 11) + ((((x + shift) >> 1) + (y >> 1)) % 2 ? 30 : -30));
-const other = () => img(96, 72, (x, y) => 128 + 100 * Math.cos(x / 5 + y / 3));
-/** 3×3 box blur, applied n times. */
-const blur = (g: Gray, n = 3): Gray => {
-  let cur = g;
-  for (let k = 0; k < n; k++) {
-    const src = cur;
-    cur = img(src.width, src.height, (x, y) => {
-      let s = 0, c = 0;
-      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-        const xx = x + dx, yy = y + dy;
-        if (xx >= 0 && yy >= 0 && xx < src.width && yy < src.height) { s += src.data[yy * src.width + xx]!; c++; }
-      }
-      return s / c;
-    });
-  }
-  return cur;
-};
-const edges = () => img(96, 72, (x, y) => (((x >> 2) + (y >> 2)) % 2 ? 230 : 25));
+import { blur, dark, edges, img, other, scene, toJpeg } from '../../test/pictures';
+import { dHash64, grayFromJpeg, hamming, isDark, meanLuma, nearDuplicateGroups, sharpness } from '../pixels';
 
 describe('R15 HELP-DUP-3 dHash', () => {
   it('HELP-DUP-3 the same picture hashes the same; a slightly brighter copy stays within 6 bits', () => {
@@ -55,9 +29,16 @@ describe('R15 HELP-BLUR sharpness', () => {
   });
 
   it('HELP-BLUR-2 a dark photo is recognised as dark (mean under 15%) so it is never called blurry', () => {
-    const dark = img(96, 72, (x, y) => 10 + ((x + y) % 7));
-    expect(meanLuma(dark)).toBeLessThan(0.15);
-    expect(isDark(dark)).toBe(true);
+    expect(meanLuma(dark())).toBeLessThan(0.15);
+    expect(isDark(dark())).toBe(true);
     expect(isDark(scene())).toBe(false);
+  });
+});
+
+describe('R15 grayFromJpeg', () => {
+  it('HELP-DUP-3 a JPEG preview decodes on the phone to the same picture (same hash within 2 bits)', () => {
+    const g = grayFromJpeg(toJpeg(scene()));
+    expect([g.width, g.height]).toEqual([96, 72]);
+    expect(hamming(dHash64(g), dHash64(scene()))).toBeLessThanOrEqual(2);
   });
 });

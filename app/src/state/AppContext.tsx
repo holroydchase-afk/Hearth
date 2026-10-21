@@ -23,6 +23,8 @@ export interface AppDeps {
   pickPhotos: (opts: { videos: boolean }) => Promise<{ items: QueueItem[] } | { denied: true }>;
   /** BETA-BULK-1: up to 100 photos with EXIF, read on the phone only (media/pick.ts pickBulk). */
   pickBulk?: () => Promise<{ assets: PickedAsset[] } | { denied: true }>;
+  /** R15 photo helpers: a small JPEG preview of a picked photo, read on the phone only (media/preview.ts). */
+  previewBytes?: (uri: string) => Promise<Uint8Array | null>;
   saveToPhone: (bytes: Uint8Array, name: string) => Promise<'saved' | 'denied'>;
   openUrl: (url: string) => Promise<unknown>;
   /** A3: where viewed photos are kept (ciphertext files + keychain-backed keys). Absent or null: nothing kept (web). */
