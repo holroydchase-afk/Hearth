@@ -27,6 +27,10 @@ function EarlierCard({ g, onOpen }: { g: EarlierGroup; onOpen: () => void }) {
   );
 }
 
+// R11: header buttons two to a row. 150 pt fits the longest words at 17 pt; Bigger text (21 pt) wraps to one a row.
+const ROW = { flexDirection: 'row', flexWrap: 'wrap', gap: 12 } as const;
+const HALF = { flexGrow: 1, flexBasis: 150 } as const;
+
 export function PhotosScreen() {
   const app = useApp();
   const state = useFeed();
@@ -73,18 +77,23 @@ export function PhotosScreen() {
     <View style={{ gap: 12 }}>
       <Txt variant="display" role="header">{`Photos of ${app.space.name}`}</Txt>
       {senders ? <Txt variant="muted">{`Sent by ${senders}`}</Txt> : null}
-      <Button label="Messages" icon={{ sf: 'bubble.left.and.bubble.right', md: 'chat' }} variant="secondary" onPress={() => setMessages(true)} />
-      {hasEvents ? (
-        <Button label="See events" variant="secondary" onPress={() => setEvents({ eventId: null, fromList: true })} />
-      ) : null}
+      {/* R11 (RV-U3): two to a row so the first photo comes sooner; a row wraps with Bigger text. */}
+      <View testID="photos-actions-top" style={ROW}>
+        <Button label="Messages" icon={{ sf: 'bubble.left.and.bubble.right', md: 'chat' }} variant="secondary" style={HALF} onPress={() => setMessages(true)} />
+        {hasEvents ? (
+          <Button label="See events" variant="secondary" style={HALF} onPress={() => setEvents({ eventId: null, fromList: true })} />
+        ) : null}
+      </View>
       {app.space.can_post ? <YourName /> : null}
       <QueueStatus />
       {state.notice ? <Notice text={state.notice} onClose={() => feed.clearNotice()} /> : null}
       {state.loaded ? (
-        <Button label="Check for new photos" variant="secondary" busy={state.status === 'refreshing'} onPress={() => void feed.refresh()} />
-      ) : null}
-      {state.loaded && state.posts.length ? (
-        <Button label="Show photos by the date they were taken" text="Show by date" variant="secondary" onPress={() => setTimeline({ startAt: null })} />
+        <View testID="photos-actions-feed" style={ROW}>
+          <Button label="Check for new photos" variant="secondary" style={HALF} busy={state.status === 'refreshing'} onPress={() => void feed.refresh()} />
+          {state.posts.length ? (
+            <Button label="Show photos by the date they were taken" text="Show by date" variant="secondary" style={HALF} onPress={() => setTimeline({ startAt: null })} />
+          ) : null}
+        </View>
       ) : null}
       {earlier.map((g) => (
         <EarlierCard key={g.authorId} g={g} onOpen={() => setTimeline({ startAt: startOfNextMonth(g.openAt) })} />
