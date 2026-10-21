@@ -46,7 +46,7 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
 });
 
 /** SESS-1..3: one entry for a sender's posts within an hour (feed/sessions.ts). One swipe through all their photos;
- *  the caption, "Seen by", hearts, replies and Delete below are those of the post holding the photo on screen. */
+ *  the caption, hearts, replies and Delete below are those of the post holding the photo on screen. */
 export const SessionCard = memo(function SessionCard({ posts }: { posts: FeedPost[] }) {
   const { feed } = useApp();
   const items = sessionPhotos(posts);
@@ -73,7 +73,8 @@ export const SessionCard = memo(function SessionCard({ posts }: { posts: FeedPos
   );
 });
 
-/** A post's words and actions under its photos: caption, who it went to, "Seen by", hearts, replies, Delete. */
+/** A post's words and actions under its photos: caption, who it went to, hearts, replies, Delete.
+ *  No "Seen by" count (DEC-21, RV-U1): it counts who didn't look (anchor A2). */
 function PostBody({ post, label }: { post: FeedPost; label?: string | null }) {
   const { feed, session } = useApp();
   const { c } = useTheme();
@@ -89,9 +90,6 @@ function PostBody({ post, label }: { post: FeedPost; label?: string | null }) {
       <View style={styles.body}>
         {post.caption ? <Txt>{post.caption}</Txt> : label ? <Txt variant="muted">{label}</Txt> : null}
         <Txt variant="muted" style={{ color: post.audience ? c.ink : c.safe }}>{audience}</Txt>
-        {mine && post.seen_count !== null && post.reach_count !== null ? (
-          <Txt variant="strong">{`Seen by ${post.seen_count} of ${post.reach_count}`}</Txt>
-        ) : null}
         <Hearts post={post} />
         <Comments post={post} mine={mine} />
         {mine ? (

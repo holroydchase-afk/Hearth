@@ -7,6 +7,7 @@ import { saveLastAudience } from '../../share/audienceMemory';
 import type { PickedAsset } from '../../share/bulk';
 import { expectGrandparentSafe, renderApp, screenWords } from '../../test/renderApp';
 import { planBatch } from '../../share/bulk';
+import { blur, other, scene, toJpeg } from '../../test/pictures';
 import { BatchReview } from '../BatchReview';
 import { ShareScreen } from '../ShareScreen';
 
@@ -23,13 +24,13 @@ const video = (): PickedAsset => ({ uri: `file:///picked/MOV_${++n}.mov`, type: 
 /** 48 photos from 3 days (20, 18, 10) and 3 videos. */
 const pick48 = () => [...day('2024:07:04', 20), video(), ...day('2024:07:05', 18), video(), video(), ...day('2024:07:06', 10)];
 
-async function openReview(opts: { last?: string[]; assets?: PickedAsset[]; be?: FakeBackend } = {}) {
+async function openReview(opts: { last?: string[]; assets?: PickedAsset[]; be?: FakeBackend; previewBytes?: (uri: string) => Promise<Uint8Array | null>; header?: string } = {}) {
   const kv = memoryKV();
   if (opts.last) await saveLastAudience(kv, FIXTURE.users.chase.id, opts.last);
   const pickBulk = jest.fn(async () => ({ assets: opts.assets ?? pick48() }));
-  const r = await renderApp(<ShareScreen />, { user: 'chase', kv, be: opts.be, deps: { pickBulk } });
+  const r = await renderApp(<ShareScreen />, { user: 'chase', kv, be: opts.be, deps: { pickBulk, previewBytes: opts.previewBytes } });
   fireEvent.press(await screen.findByRole('button', { name: 'Pick up to 100 photos at once' }));
-  await screen.findByText('48 photos from 3 days');
+  await screen.findByText(opts.header ?? '48 photos from 3 days');
   return { ...r, pickBulk, kv };
 }
 
@@ -142,5 +143,63 @@ describe('BETA-BULK-4 batch progress', () => {
     fireEvent.press(await screen.findByRole('button', { name: 'Send 48 photos' }));
     expect(await screen.findByText('Sending 1 of 48 photos…')).toBeTruthy();
     expect(screen.queryAllByText(/Getting ready/)).toHaveLength(0);
+  });
+});
+
+describe('R15 photo helpers on the review screen (SPEC-PHOTO-HELPERS)', () => {
+  const shot = (): PickedAsset => ({ uri: `file:///picked/Screenshot_${++n}.png`, type: 'image', mimeType: 'image/png', width: 1170, height: 2532, screenshot: true });
+  const withShots = () => [...pick48(), shot(), shot()];
+
+  it('HELP-SHOT-1 screenshots are left out with a line, and "Send them too" brings them back', async () => {
+    await openReview({ last: [FIXTURE.circles.dadSide.id], assets: withShots() });
+    expect(screen.getByText('We left out 2 screenshots.')).toBeTruthy();
+    fireEvent.press(screen.getByRole('button', { name: 'Send them too' }));
+    expect(await screen.findByText('50 photos from 3 days')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Send 50 photos' })).toBeTruthy();
+    expect(screen.queryByText(/We left out/)).toBeNull();
+  });
+
+  it('HELP-ALL-1 "Show what we left out" lists them, each with "Put back"; grandparent-safe', async () => {
+    await openReview({ last: [FIXTURE.circles.dadSide.id], assets: withShots() });
+    fireEvent.press(screen.getByRole('button', { name: 'Show what we left out' }));
+    const back = screen.getAllByRole('button', { name: /^Put back/ });
+    expect(back).toHaveLength(2);
+    expectGrandparentSafe();
+    expect(screenWords()).not.toMatch(/circle|batch|upload|EXIF|metadata|AI|algorithm/i);
+    fireEvent.press(back[0]!);
+    expect(await screen.findByText('49 photos from 3 days')).toBeTruthy();
+    expect(screen.getByText('We left out 1 screenshot.')).toBeTruthy();
+  });
+
+  it('HELP-DUP-1 the same photo picked twice is sent once, said in a plain line', async () => {
+    const assets = pick48().map((a, i) => ({ ...a, assetId: `lib-${i}` }));
+    await openReview({ last: [FIXTURE.circles.dadSide.id], assets: [...assets, { ...assets[0]!, uri: 'file:///picked/again.jpg' }] });
+    expect(screen.getByText("You picked 2 of the same photo. We'll send it once.")).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Send 48 photos' })).toBeTruthy();
+  });
+
+  it('HELP-DUP-3/4 a look-alike is left out once the previews are read; "Send it too" puts it back and the count updates', async () => {
+    const assets = pick48();
+    const pics = new Map([[assets[0]!.uri, toJpeg(scene())], [assets[1]!.uri, toJpeg(blur(scene(), 2))]]);
+    await openReview({ last: [FIXTURE.circles.dadSide.id], assets, previewBytes: async (uri) => pics.get(uri) ?? null, header: '47 photos from 3 days' });
+    expect(await screen.findByText('1 photo looks almost the same as another. We kept the clearest.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Send 47 photos' })).toBeTruthy();
+    fireEvent.press(screen.getByRole('button', { name: 'Send it too' }));
+    expect(await screen.findByRole('button', { name: 'Send 48 photos' })).toBeTruthy();
+  });
+
+  it('HELP-DUP-2 photos sent from this phone show as "already sent" on the next pick, with "Send them again"', async () => {
+    const assets = pick48();
+    const pics = new Map([[assets[0]!.uri, toJpeg(scene())], [assets[1]!.uri, toJpeg(other())]]);
+    const { pickBulk } = await openReview({ last: [FIXTURE.circles.dadSide.id], assets, previewBytes: async (uri) => pics.get(uri) ?? null });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Send 48 photos' }).props.accessibilityState).toMatchObject({ disabled: false }));
+    await new Promise((r) => setTimeout(r, 50)); // the previews finish reading
+    fireEvent.press(screen.getByRole('button', { name: 'Send 48 photos' }));
+    pickBulk.mockResolvedValueOnce({ assets: [assets[0]!, assets[1]!, ...pick48().slice(0, 3)] });
+    fireEvent.press(await screen.findByRole('button', { name: 'Pick up to 100 photos at once' }));
+    expect(await screen.findByText('2 of these you already sent.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Send 3 photos' })).toBeTruthy();
+    fireEvent.press(screen.getByRole('button', { name: 'Send them again' }));
+    expect(await screen.findByRole('button', { name: 'Send 5 photos' })).toBeTruthy();
   });
 });

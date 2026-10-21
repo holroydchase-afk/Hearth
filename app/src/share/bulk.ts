@@ -18,6 +18,10 @@ export interface PickedAsset {
   duration?: number | null;
   exif?: Record<string, unknown> | null;
   creationTime?: number | null;
+  /** The photo library's id, when the picker gives one (HELP-DUP-1). Never sent. */
+  assetId?: string | null;
+  /** The library marks it a screenshot (HELP-SHOT-1). Read on the phone, never sent. */
+  screenshot?: boolean;
 }
 
 export interface PlannedPost {
