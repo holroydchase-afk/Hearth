@@ -7,7 +7,8 @@
 - **R7 done:** root README, case study, iPhone screenshots (`SNAPSHOT_DIR=../docs/portfolio/screens npm run e2e:web`). e2e core-loop now expects no "Seen by". R6 moved to P2 (LG persona, REPLY-11).
 - **R9 done:** cold start 260 ms median (web + fake). **R10 done:** `SPEC-PHOTO-HELPERS.md` + persona check; build is R15.
 - **R8 done (A3):** photos seen before open from the phone, offline too. `media/cache.ts` keeps ciphertext files (`platform/mediaStore.ts`, cache folder, 400 max) and item keys sealed under a Keychain/Keystore key; `FeedStore.onRefreshed` prunes them, sign-out wipes them. Web keeps nothing. Tests A3-1..6. Docs: 02, 03 "On the phone", 04 former-member row.
-- **Next exact step:** R12 thumbnail sizing (RV-P5), then R15 photo helpers, then R14. R11 and R6 need a grandparent-ux sketch first.
+- **R12 done:** thumbnail loop starts from a guess based on the display JPEG (`media/pipeline.ts`, R12 RV-P5 tests).
+- **Next exact step:** R15 photo helpers (HELP-*), then R14. R11 and R6 need a grandparent-ux sketch first.
 - **Decisions to review:** R3 crops tall or wide photos in the card to fill the frame (the full photo is one tap away). A3 keeps photo keys on the phone, sealed under a Keychain/Keystore key (RV-X6); a removed member's offline phone keeps showing kept photos until its next refresh.
 - **Blockers:** none. A1 can't be checked on a phone until a development build exists.
 

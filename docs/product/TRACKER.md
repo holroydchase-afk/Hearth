@@ -31,7 +31,7 @@ The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/202
 | R10 | Specs: AI-2 duplicates, AI-4 screenshots and blurry photos, no model (persona check, grandparent-ux words) | P2 | S | ☑ Oct 21 specced: `SPEC-PHOTO-HELPERS.md` (HELP-*). Build is a new row after A3 |
 | R15 | Build the photo helpers (HELP-DUP-1..4, HELP-SHOT-1, HELP-BLUR-1/2, HELP-ALL-1) | P2 | M | ☐ |
 | R11 | Photos header: fewer stacked buttons before the first photo (RV-U3; grandparent-ux sketch first) | P2 | S | ☐ |
-| R12 | Thumbnail sizing from a first guess instead of up to 7 encodes (RV-P5; measure on a phone) | P2 | S | ☐ |
+| R12 | Thumbnail sizing from a first guess instead of up to 7 encodes (RV-P5; measure on a phone) | P2 | S | ☑ Oct 21: the display JPEG's bytes per pixel pick the first step (padded 1.5×); a busy photo takes 1 to 2 thumbnail encodes instead of up to 7, a plain one still gets the sharpest. Phone timing still to measure |
 | R13 | A4 resumable video uploads (after FLAG-7 video stripping; RV-P7) | P2 | L | ☐ |
 | R14 | npm audit: recheck the Expo CLI build-tool findings after the next Expo patch (RV-X4) | P2 | S | ☐ |
 
