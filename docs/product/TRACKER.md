@@ -1,6 +1,6 @@
 # Hearth tracker: what's next, what's missing, what's pending
 
-The one list of everything open between Chase and Claude. Updated Oct 19, 2026.
+The one list of everything open between Chase and Claude. Updated Oct 21, 2026.
 
 **How it works**
 - Work the **Sequence** top to bottom. One step at a time; nothing new gets built until milestone 1 passes (Chase, Oct 17).
@@ -12,6 +12,27 @@ The one list of everything open between Chase and Claude. Updated Oct 19, 2026.
 ## Goal: milestone 1 ready for testing
 
 Chase uses Hearth end to end in Expo Go on his iPhone, with a test account B on the web build: sign in with a code, post photos, B sees them, B comments and hearts, Chase gets an email notice, 10+ posts over 2 days, nothing lost. Gate: `BETA-SPEC.md` "Milestone gates", row 1.
+
+## Sequence to milestone 2 (review-driven, Oct 21)
+
+The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/2026-10-21-app-review.md`: what blocks M2 (Mom) first, then speed and stability, then G1, then the portfolio. Worked nightly at 2:15am ET until done.
+
+| # | Item | Pri | Cost | Status |
+|---|---|---|---|---|
+| R1 | A2 parallel sending: display and thumbnail together, 2 photos at once, next post prepared during upload (RV-P1, PERF-UP-1..3) | P0 | S | ☑ Oct 21 |
+| R2 | Drop "Seen by N of M" from cards (RV-U1, DEC-21) | P0 | S | ☑ Oct 21 |
+| R3 | Photos fill the card frame, no grey bars on mixed tall and wide posts (RV-U2, UAT 8) | P0 | S | ☑ Oct 21 |
+| R4 | A1 native encryption behind a switch; JavaScript stays in Expo Go; same vectors on both (RV-P2) | P0 | M | ☐ |
+| R5 | Test gaps T9 (date-dependent QA-3 test), T10 (fake chat joined-at cutoff), T8 (RFC 9180 vectors) | P1 | S | ☐ |
+| R6 | Reply readers asked only when the reply box opens, plus a "Write something back" button (RV-P3, RV-U4) | P1 | S | ☐ |
+| R7 | Portfolio pack: root README, screenshots of the core flow (fake names), case study | P1 | M | ☐ |
+| R8 | A3 Photos kept on the phone: the feed and encrypted photo files, keys in the keychain (RV-P4, RV-X6; privacy review first) | P1 | L | ☐ |
+| R9 | PERF-FEED-1 cold-start timing on the web build | P1 | S | ☐ |
+| R10 | Specs: AI-2 duplicates, AI-4 screenshots and blurry photos, no model (persona check, grandparent-ux words) | P2 | S | ☐ |
+| R11 | Photos header: fewer stacked buttons before the first photo (RV-U3; grandparent-ux sketch first) | P2 | S | ☐ |
+| R12 | Thumbnail sizing from a first guess instead of up to 7 encodes (RV-P5; measure on a phone) | P2 | S | ☐ |
+| R13 | A4 resumable video uploads (after FLAG-7 video stripping; RV-P7) | P2 | L | ☐ |
+| R14 | npm audit: recheck the Expo CLI build-tool findings after the next Expo patch (RV-X4) | P2 | S | ☐ |
 
 ## Sequence to milestone 1
 

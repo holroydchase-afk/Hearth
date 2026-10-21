@@ -206,5 +206,19 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** Chase is the only human reviewer, and merge commits keep every thread's branch valid.
 - **Source:** `docs/eng/MERGING.md`
 
+### DEC-28 · Freeze lifted; a review-driven sequence to milestone 2
+- **When / status:** Oct 21 · Decided
+- **Chose:** the Oct 19 build freeze ends now that the app is on Chase's phone. The staff PM, UI/UX, engineering and security lanes reviewed the app from the code, and one ranked list (`TRACKER.md` "Sequence to milestone 2") replaces ad-hoc picks. A recurring 2:15am run works it night after night.
+- **Over:** building the next feature from the ideas log.
+- **Because:** Chase's bar is "a world class, very fast, very stable product". Measuring and ranking first keeps the work on what Mom (M2) will feel.
+- **Source:** `docs/product/reviews/2026-10-21-app-review.md`
+
+### DEC-29 · Speed architecture A1 to A4; no-model photo helpers specced now
+- **When / status:** Oct 21 · Approved (A2 built Oct 21)
+- **Chose:** A1 native encryption in the app's own build, JavaScript in Expo Go; A2 parallel sending and preparing the next post during upload; A3 Photos kept on the phone (encrypted files, keys in the keychain); A4 resumable video uploads. Spec AI-2 duplicates and AI-4 screenshot and blurry-photo filtering, with no model.
+- **Over:** staying all-JavaScript and serial until a native build exists.
+- **Because:** measured: JavaScript encryption takes about 370 ms per photo with no JIT (Hermes's situation), and serial requests waste round trips on weak signal. Expo Go can't load native modules, so A1 ships behind a switch.
+- **Source:** `docs/product/decisions/2026-10-21-speed-architecture.md`, `docs/eng/PERFORMANCE.md`
+
 ---
-Last updated: Oct 19, 2026
+Last updated: Oct 21, 2026

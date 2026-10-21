@@ -25,6 +25,8 @@ import type { KV } from '../platform/kv';
 export const STORAGE_KEY = 'hearth.uploadQueue.v1';
 const MAX_RESTARTS = 3;
 const GRANT_MARGIN_MS = 60_000;
+/** A2: photos of one post sent at once (each sends its display and thumbnail together). */
+export const SEND_CONCURRENCY = 2;
 
 export type JobState = 'draft' | 'uploading' | 'finalizing' | 'published' | 'failed-retryable' | 'failed';
 type ActiveState = 'draft' | 'uploading' | 'finalizing';
@@ -107,7 +109,8 @@ export class UploadQueue {
   private all: Job[] = [];
   private listeners = new Set<() => void>();
   private grants = new Map<string, { grant: UploadGrant; expiresAt: number }>();
-  private prepared = new Map<string, Prepared[]>();
+  /** A2: prepared bytes per job, as a promise so the next post can be prepared while this one sends. */
+  private prepared = new Map<string, Promise<Prepared[]>>();
   private timer: (() => void) | null = null;
   private loop: Promise<void> | null = null;
   private again = false;
@@ -350,6 +353,26 @@ export class UploadQueue {
     await this.save();
   }
 
+  /** Resize, strip and thumbnail every photo of a job once; a failed run is forgotten so a retry starts fresh. */
+  private prepareJob(job: Job): Promise<Prepared[]> {
+    const hit = this.prepared.get(job.id);
+    if (hit) return hit;
+    const p = (async () => {
+      const out: Prepared[] = [];
+      for (const item of job.items) out.push(await this.d.prepare(item));
+      return out;
+    })();
+    this.prepared.set(job.id, p);
+    p.catch(() => { if (this.prepared.get(job.id) === p) this.prepared.delete(job.id); });
+    return p;
+  }
+
+  /** A2: start preparing the next post while this one sends (the phone's image work overlaps the network). */
+  private prepareAhead(current: Job): void {
+    const next = this.mine().find((j) => j.id !== current.id && j.state === 'draft' && !this.prepared.has(j.id));
+    if (next) this.prepareJob(next).catch(() => {});
+  }
+
   private grantFor(job: Job): UploadGrant | null {
     const g = this.grants.get(job.id);
     return g && g.expiresAt - GRANT_MARGIN_MS > this.now() ? g.grant : null;
@@ -377,13 +400,10 @@ export class UploadQueue {
     let grant = this.grantFor(job);
     if (!grant && (job.signing || job.mediaIds)) return this.restart(job);
 
-    let prepared = this.prepared.get(job.id);
-    if (!prepared) {
-      this.step = 'prepare';
-      prepared = [];
-      for (const item of job.items) prepared.push(await this.d.prepare(item));
-      this.prepared.set(job.id, prepared);
-    }
+    this.step = 'prepare';
+    const prepared = await this.prepareJob(job);
+    if (this.stopped) throw new Killed();
+    this.prepareAhead(job);
     if (!grant) {
       job.signing = true;
       await this.save();
@@ -395,16 +415,34 @@ export class UploadQueue {
       job.progress = { done: 0, total: job.items.length };
       await this.save();
     }
-    for (const g of [...grant.items].sort((a, b) => a.item_index - b.item_index)) {
-      if (g.item_index < job.progress.done) continue;
+    // A2: up to SEND_CONCURRENCY photos in flight, each sending its display and thumbnail together.
+    // Progress counts only photos sent in order, so a resume never skips one.
+    this.step = 'send';
+    const order = [...grant.items].sort((a, b) => a.item_index - b.item_index).filter((g) => g.item_index >= job.progress.done);
+    const finished = new Set<number>();
+    let next = 0;
+    let failure: unknown = null;
+    const send = async (g: UploadGrant['items'][number]) => {
       const p = prepared[g.item_index]!;
-      this.step = 'send';
-      await this.d.api.putObject(g.display_put_url, this.encrypt(p.display, g.dek), g.required_headers);
-      await this.d.api.putObject(g.thumb_put_url, this.encrypt(p.thumb, g.dek), g.required_headers);
+      await Promise.all([
+        this.d.api.putObject(g.display_put_url, this.encrypt(p.display, g.dek), g.required_headers),
+        this.d.api.putObject(g.thumb_put_url, this.encrypt(p.thumb, g.dek), g.required_headers),
+      ]);
       if (this.stopped) throw new Killed();
-      job.progress = { done: g.item_index + 1, total: job.items.length };
+      finished.add(g.item_index);
+      let done = job.progress.done;
+      while (finished.has(done)) done += 1;
+      job.progress = { done, total: job.items.length };
       this.emit();
-    }
+    };
+    const worker = async () => {
+      while (failure === null && next < order.length) {
+        const g = order[next++]!;
+        try { await send(g); } catch (e) { failure ??= e; }
+      }
+    };
+    await Promise.all(Array.from({ length: SEND_CONCURRENCY }, worker));
+    if (failure !== null) throw failure;
     job.state = 'finalizing';
     await this.save();
   }

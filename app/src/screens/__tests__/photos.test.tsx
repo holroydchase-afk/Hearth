@@ -33,13 +33,13 @@ describe('Photos screen', () => {
     expect(screen.queryByText('Shared with Dad side')).toBeNull();
   });
 
-  it('BETA-AUD-1 / NOTIFY-6: the author sees who it went to in words, and "Seen by X of Y"', async () => {
+  it('BETA-AUD-1 / RV-U1 (DEC-21): the author sees who it went to in words, and no "Seen by" count', async () => {
     const be = FakeBackend.withFixture();
     const { id } = await seedPost(be, { caption: 'Pumpkins', circles: [dadSide.id] });
     await be.clientFor(FIXTURE.users.jo.id).markSeen(id);
     await renderApp(<PhotosScreen />, { be, user: 'chase' });
     expect(await screen.findByText("Shared with Grandparents – Dad's side · 3 people")).toBeTruthy();
-    expect(screen.getByText('Seen by 1 of 2')).toBeTruthy();
+    expect(screen.queryByText(/Seen by/)).toBeNull();
   });
 
   it('shows "Loading the photos…" with words while it loads', async () => {
