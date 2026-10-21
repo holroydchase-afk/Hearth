@@ -116,7 +116,7 @@ export function PhotoSwipe(props: Props) {
                 onPress={() => { setPos(index); nav.openViewer(items[index]!.postId, items[index]!.index); }}
                 style={{ flex: 1, minHeight: MIN_TARGET, minWidth: MIN_TARGET }}
               >
-                <MediaImage postId={items[index]!.postId} mediaId={item.media_id} fit="contain" style={{ flex: 1 }} />
+                <MediaImage postId={items[index]!.postId} mediaId={item.media_id} fit="cover" style={{ flex: 1 }} />
               </Pressable>
             ) : null}
           </View>
