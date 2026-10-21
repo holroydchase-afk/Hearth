@@ -4,7 +4,8 @@
 - **Done:** app review (`docs/product/reviews/2026-10-21-app-review.md`); ranked list in `TRACKER.md` "Sequence to milestone 2"; `docs/eng/PERFORMANCE.md` with measured encryption speed; DEC-28, DEC-29 and the speed-architecture persona check. Built test-first: R1 parallel sending (PERF-UP-1..3), R2 no "Seen by", R3 photos fill the card.
 - **R4 (part):** `app/src/crypto/aesGcm.ts` picks native, then crypto.subtle, then JavaScript; upload and viewing use the async path. The native module is installed with the first development build (registerNativeAesGcm), not now: Expo Go can't load it.
 - **R5 done:** T8 (RFC 9180 A.2.1 vector passes: our HPKE matches the standard), T9 (QA-3 test pins seed.sql's post dates), T10 (fake chatFetch has the joined-at cutoff, contract test).
-- **Next exact step:** R6 reply box on demand (PostCard Comments: ask replyReaders only when opened), then R7 portfolio pack.
+- **R7 done:** root README, case study, iPhone screenshots (`SNAPSHOT_DIR=../docs/portfolio/screens npm run e2e:web`). e2e core-loop now expects no "Seen by". R6 moved to P2 (LG persona, REPLY-11).
+- **Next exact step:** R9 PERF-FEED-1 cold-start timing on the web build, then R10 AI-2/AI-4 specs, then R8 A3 design for privacy review.
 - **Decisions to review:** R3 crops tall or wide photos in the card to fill the frame (the full photo is one tap away). A3 will keep photo keys in the phone keychain (RV-X6).
 - **Blockers:** none. A1 can't be checked on a phone until a development build exists.
 

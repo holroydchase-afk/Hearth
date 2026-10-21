@@ -24,8 +24,8 @@ The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/202
 | R3 | Photos fill the card frame, no grey bars on mixed tall and wide posts (RV-U2, UAT 8) | P0 | S | ☑ Oct 21 |
 | R4 | A1 native encryption behind a switch; JavaScript stays in Expo Go; same vectors on both (RV-P2) | P0 | M | ◐ Oct 21: provider switch built (web uses crypto.subtle). Installing react-native-quick-crypto 1.1.8 (plus react-native-nitro-modules) waits for the first development build, since Expo Go can't load it |
 | R5 | Test gaps T9 (date-dependent QA-3 test), T10 (fake chat joined-at cutoff), T8 (RFC 9180 vectors) | P1 | S | ☑ Oct 21: our HPKE matches RFC 9180 A.2.1; QA-3 test pins seed dates; fake chat has the joined-at cutoff |
-| R6 | Reply readers asked only when the reply box opens, plus a "Write something back" button (RV-P3, RV-U4) | P1 | S | ☐ |
-| R7 | Portfolio pack: root README, screenshots of the core flow (fake names), case study | P1 | M | ☐ |
+| R6 | Reply readers asked only when the reply box opens, plus a "Write something back" button (RV-P3, RV-U4) | P2 | S | ☐ Moved down Oct 21: hiding the box adds a tap for the least tech-savvy relative (LG) and touches REPLY-11; needs a grandparent-ux sketch first. FlatList windowing already caps the extra calls at about 10 cards |
+| R7 | Portfolio pack: root README, screenshots of the core flow (fake names), case study | P1 | M | ☑ Oct 21: `README.md`, `docs/portfolio/CASE-STUDY.md`, `docs/portfolio/screens/` (from `snapshot.spec.js`) |
 | R8 | A3 Photos kept on the phone: the feed and encrypted photo files, keys in the keychain (RV-P4, RV-X6; privacy review first) | P1 | L | ☐ |
 | R9 | PERF-FEED-1 cold-start timing on the web build | P1 | S | ☐ |
 | R10 | Specs: AI-2 duplicates, AI-4 screenshots and blurry photos, no model (persona check, grandparent-ux words) | P2 | S | ☐ |
