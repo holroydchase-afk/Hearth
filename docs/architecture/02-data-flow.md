@@ -29,7 +29,7 @@ The upload queue survives app restarts and bad signal; each step can be retried 
 
 1. The timeline comes from `get_timeline` / `get_feed`, which return only posts the caller may see. One predicate, `private.sees_post` (migration 0011), decides visibility for RLS, the feed, `sign-media` and notices alike. Parents in a family space see every published post in it.
 2. For each post the app calls `GET sign-media?post_id=…`. The function first checks `can_view_post` as the caller; if that fails it returns `404 not_found`, the same as a post that doesn't exist. It then reads media rows under the caller's RLS, unwraps each key with `MEDIA_KEK`, and returns 10-minute GET URLs and the keys.
-3. The app downloads ciphertext, decrypts it in memory and shows it. Decrypted bytes touch disk only when the person taps "Save to my phone" (`app/src/media/cache.ts`).
+3. The app downloads ciphertext, decrypts it in memory and shows it. Decrypted bytes touch disk only when the person taps "Save to my phone" (`app/src/media/cache.ts`). On iPhone and Android the ciphertext and its item key are kept on the phone (key sealed under a Keychain/Keystore key), so a photo seen before opens with no network call; see [03-encryption-and-keys.md](03-encryption-and-keys.md) "On the phone". A refresh that no longer lists a post drops its kept files and keys.
 
 ## Replies, hearts and notices (Built; push is milestone 2)
 
@@ -50,4 +50,4 @@ Group chat is end-to-end encrypted with MLS: phones seal messages before sending
 - **Gap.** The nightly hard purge (`purge_soft_deleted`, 30 days) is not scheduled by `backend/scripts/deploy.sh`; the worker that deletes queued B2 objects, removes the auth user and builds data exports is not written (`backend/README.md`). Database backups keep deleted rows, including wrapped keys, for Supabase's backup window.
 
 ---
-Last checked against code: 2026-10-19, a522a3a (plus migrations 0014, 0015) and 624fc39 (MEDIA-1/2/3 on-phone cleaner)
+Last checked against code: 2026-10-21, A3 kept photo files (media/cache.ts); earlier 2026-10-19, a522a3a (plus migrations 0014, 0015) and 624fc39 (MEDIA-1/2/3 on-phone cleaner)

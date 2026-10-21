@@ -6,6 +6,7 @@ import { FakeBackend, type FakeState } from '../api/fake/FakeBackend';
 import { SupabaseApi } from '../api/SupabaseApi';
 import { pickBulk, pickPhotos } from '../media/pick';
 import { prepareItem } from '../media/prepare';
+import { fileMediaStore, mediaKeyStore } from '../platform/mediaStore';
 import { saveToPhone } from '../platform/saveToPhone';
 import { secureSessionStorage } from '../platform/secureSession';
 import { asyncStorageKV } from '../platform/storage';
@@ -34,6 +35,8 @@ export function createRuntime(): AppDeps | { error: string } {
     pickBulk: () => pickBulk(),
     saveToPhone,
     openUrl: (u: string) => Linking.openURL(u),
+    // A3: kept photo files on phones only; the web build keeps none.
+    mediaDisk: fileMediaStore && mediaKeyStore ? { store: fileMediaStore, keys: mediaKeyStore } : null,
   };
   if (FAKE_MODE) {
     const be = fakeBackend();
