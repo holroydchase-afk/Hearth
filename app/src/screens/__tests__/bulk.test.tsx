@@ -7,7 +7,7 @@ import { saveLastAudience } from '../../share/audienceMemory';
 import type { PickedAsset } from '../../share/bulk';
 import { expectGrandparentSafe, renderApp, screenWords } from '../../test/renderApp';
 import { planBatch } from '../../share/bulk';
-import { blur, scene, toJpeg } from '../../test/pictures';
+import { blur, other, scene, toJpeg } from '../../test/pictures';
 import { BatchReview } from '../BatchReview';
 import { ShareScreen } from '../ShareScreen';
 
@@ -186,5 +186,20 @@ describe('R15 photo helpers on the review screen (SPEC-PHOTO-HELPERS)', () => {
     expect(screen.getByRole('button', { name: 'Send 47 photos' })).toBeTruthy();
     fireEvent.press(screen.getByRole('button', { name: 'Send it too' }));
     expect(await screen.findByRole('button', { name: 'Send 48 photos' })).toBeTruthy();
+  });
+
+  it('HELP-DUP-2 photos sent from this phone show as "already sent" on the next pick, with "Send them again"', async () => {
+    const assets = pick48();
+    const pics = new Map([[assets[0]!.uri, toJpeg(scene())], [assets[1]!.uri, toJpeg(other())]]);
+    const { pickBulk } = await openReview({ last: [FIXTURE.circles.dadSide.id], assets, previewBytes: async (uri) => pics.get(uri) ?? null });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Send 48 photos' }).props.accessibilityState).toMatchObject({ disabled: false }));
+    await new Promise((r) => setTimeout(r, 50)); // the previews finish reading
+    fireEvent.press(screen.getByRole('button', { name: 'Send 48 photos' }));
+    pickBulk.mockResolvedValueOnce({ assets: [assets[0]!, assets[1]!, ...pick48().slice(0, 3)] });
+    fireEvent.press(await screen.findByRole('button', { name: 'Pick up to 100 photos at once' }));
+    expect(await screen.findByText('2 of these you already sent.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Send 3 photos' })).toBeTruthy();
+    fireEvent.press(screen.getByRole('button', { name: 'Send them again' }));
+    expect(await screen.findByRole('button', { name: 'Send 5 photos' })).toBeTruthy();
   });
 });

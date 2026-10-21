@@ -6,6 +6,7 @@ import { messageFor } from '../errors/messages';
 import { loadLastAudience, saveLastAudience } from '../share/audienceMemory';
 import { planBatch, type PickedAsset } from '../share/bulk';
 import { applyHelpers, findLookAlikes, helperLines, type LookResult } from '../share/helpers';
+import { loadSent, recordSent } from '../share/sentBefore';
 import { useApp } from '../state/AppContext';
 import { useNav } from '../state/nav';
 import { Button, Card, Choice, Field, Loading, Notice, Screen, Txt } from '../ui/kit';
@@ -35,6 +36,7 @@ export function ShareScreen() {
   const [caption, setCaption] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const userId = app.session?.userId;
   // BETA-BULK-3: a bulk pick waiting on the review screen (dates only; EXIF already dropped).
   // R15: the bulk pick as picked; photo helpers set some aside (never deleted), and putBack brings them back.
   const [picked, setPicked] = useState<PickedAsset[] | null>(null);
@@ -43,16 +45,19 @@ export function ShareScreen() {
   const helped = useMemo(() => (picked ? applyHelpers(picked, { putBack, looks }) : null), [picked, putBack, looks]);
   const plan = useMemo(() => (helped ? planBatch(helped.kept) : null), [helped]);
   const setPlan = (assets: PickedAsset[] | null) => { setPicked(assets); setPutBack(new Set()); setLooks(null); };
-  // HELP-DUP-3, HELP-BLUR: read small previews after the review screen shows; Send never waits for them.
+  // HELP-DUP-2/3, HELP-BLUR: read small previews after the review screen shows; Send never waits for them.
   const previewBytes = app.deps.previewBytes;
   useEffect(() => {
     if (!picked || !previewBytes) return;
     let alive = true;
     const candidates = applyHelpers(picked).kept;
-    void findLookAlikes(candidates, previewBytes).then((r) => { if (alive) setLooks(r); }).catch(() => {});
+    void (async () => {
+      const sentIds = userId ? await loadSent(app.deps.kv, userId) : new Set<string>();
+      const r = await findLookAlikes(candidates, previewBytes, { sentIds });
+      if (alive) setLooks(r);
+    })().catch(() => {});
     return () => { alive = false; };
-  }, [picked, previewBytes]);
-  const userId = app.session?.userId;
+  }, [picked, previewBytes]); // eslint-disable-line react-hooks/exhaustive-deps
   const spaceId = app.space?.space_id;
   const canPost = !!app.space?.can_post;
   // Oct 17 decision: "Pick lots of photos" is for parents only, never a relative allowed to post.
@@ -105,6 +110,8 @@ export function ShareScreen() {
         space: app.space!.space_id, circleIds: chosen,
         posts: plan.posts.map((p) => ({ takenAt: p.takenAt, items: p.items })),
       });
+      // HELP-DUP-2: remember what went, by preview fingerprint, on this phone only.
+      if (looks && helped) await recordSent(app.deps.kv, userId, helped.kept.flatMap((a) => looks.ids.get(a.uri) ?? [])).catch(() => {});
       setPlan(null);
       nav.goPhotos();
     } catch (e) {
