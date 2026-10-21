@@ -144,3 +144,36 @@ describe('BETA-BULK-4 batch progress', () => {
     expect(screen.queryAllByText(/Getting ready/)).toHaveLength(0);
   });
 });
+
+describe('R15 photo helpers on the review screen (SPEC-PHOTO-HELPERS)', () => {
+  const shot = (): PickedAsset => ({ uri: `file:///picked/Screenshot_${++n}.png`, type: 'image', mimeType: 'image/png', width: 1170, height: 2532, screenshot: true });
+  const withShots = () => [...pick48(), shot(), shot()];
+
+  it('HELP-SHOT-1 screenshots are left out with a line, and "Send them too" brings them back', async () => {
+    await openReview({ last: [FIXTURE.circles.dadSide.id], assets: withShots() });
+    expect(screen.getByText('We left out 2 screenshots.')).toBeTruthy();
+    fireEvent.press(screen.getByRole('button', { name: 'Send them too' }));
+    expect(await screen.findByText('50 photos from 3 days')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Send 50 photos' })).toBeTruthy();
+    expect(screen.queryByText(/We left out/)).toBeNull();
+  });
+
+  it('HELP-ALL-1 "Show what we left out" lists them, each with "Put back"; grandparent-safe', async () => {
+    await openReview({ last: [FIXTURE.circles.dadSide.id], assets: withShots() });
+    fireEvent.press(screen.getByRole('button', { name: 'Show what we left out' }));
+    const back = screen.getAllByRole('button', { name: /^Put back/ });
+    expect(back).toHaveLength(2);
+    expectGrandparentSafe();
+    expect(screenWords()).not.toMatch(/circle|batch|upload|EXIF|metadata|AI|algorithm/i);
+    fireEvent.press(back[0]!);
+    expect(await screen.findByText('49 photos from 3 days')).toBeTruthy();
+    expect(screen.getByText('We left out 1 screenshot.')).toBeTruthy();
+  });
+
+  it('HELP-DUP-1 the same photo picked twice is sent once, said in a plain line', async () => {
+    const assets = pick48().map((a, i) => ({ ...a, assetId: `lib-${i}` }));
+    await openReview({ last: [FIXTURE.circles.dadSide.id], assets: [...assets, { ...assets[0]!, uri: 'file:///picked/again.jpg' }] });
+    expect(screen.getByText("You picked 2 of the same photo. We'll send it once.")).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Send 48 photos' })).toBeTruthy();
+  });
+});
