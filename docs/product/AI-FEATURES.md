@@ -50,9 +50,9 @@ Status: **Idea** (logged) → **Ready to spec** (decisions made) → **Specced**
 | ID | Feature | What the family sees | Approach | Needs decision B? | Priority | Status |
 |---|---|---|---|---|---|---|
 | AI-1 | **People → group suggestions** on bulk upload | "These 14 photos have Memaw in them. Send to Memaw's house too?" | Phase 1 no-ML, phase 2 on-device face grouping (below) | Phase 2 only | 1 (Chase) | Idea |
-| AI-2 | **Duplicate and near-duplicate catch** | "3 of these look the same. Send just the best one?" | Exact: file hash. Near: perceptual hash (dHash), not a model | No | 2 (Chase) | Idea |
+| AI-2 | **Duplicate and near-duplicate catch** | "3 of these look the same. Send just the best one?" | Exact: file hash. Near: perceptual hash (dHash), not a model | No | 2 (Chase) | Specced (Oct 21, `SPEC-PHOTO-HELPERS.md`) |
 | AI-3 | **Best shot from a burst** | Of 8 near-identical shots, one is pre-picked; tap to swap | On-device sharpness score (no-ML); later eyes-open/smile score | For eyes/smile only | 3 | Idea (Oct 16, ANCHORS) |
-| AI-4 | **Leave out screenshots and blurry shots** in bulk upload | "We left out 6 screenshots and 2 blurry photos. Show them" | Screenshots from photo-library metadata; blur from a sharpness score. No-ML | No | 3 | Idea |
+| AI-4 | **Leave out screenshots and blurry shots** in bulk upload | "We left out 6 screenshots and 2 blurry photos. Show them" | Screenshots from photo-library metadata; blur from a sharpness score. No-ML | No | 3 | Specced (Oct 21, `SPEC-PHOTO-HELPERS.md`) |
 | AI-5 | **Group a bulk upload into occasions** | "Looks like 3 days: Jul 4, Jul 5, Jul 6. Make Jul 4 an event?" | Capture-time gaps, read on the phone before EXIF is stripped. No location (Never build #7). No-ML | No | 4 | Idea; builds on the overnight plan's "one post per day" |
 | AI-6 | **Upright and right-side-up** | A sideways photo arrives upright | Orientation flag already kept (SHARE-5); a model only for scans with no flag | Model part only | 5 | Idea |
 | AI-7 | **Smart onboarding** | Describe the family once, get suggested groups and households | Language model; needs its own privacy review | Yes, and more | Parked | Idea (Oct 16, ANCHORS); conflicts with R6 for now |
