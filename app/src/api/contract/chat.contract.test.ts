@@ -73,6 +73,20 @@ describe.each(factories)('%s messenger contract (MSG)', (_name, factory) => {
     expect((await poster.chatFetch(c, 0)).map((r) => r.kind)).toEqual(['commit', 'message']);
   });
 
+  it('T10 / MSG-3: someone added to a group later can\'t fetch the chat rows sent before they joined', async () => {
+    const c = h.circleIn;
+    expect(await poster.chatStart(c)).toBe(true);
+    await poster.chatSend(c, 'message', 0, b64('before'));
+    const newcomer = (await viewerOut.getSession())!.userId;
+    await new Promise((r) => setTimeout(r, 20)); // the join is strictly later than the old row
+    await poster.placePerson(c, newcomer, 'new');
+    await new Promise((r) => setTimeout(r, 20));
+    await poster.chatSend(c, 'message', 0, b64('after'));
+    const seen = (await viewerOut.chatFetch(c, 0)).map((r) => r.body);
+    expect(seen).toEqual([b64('after')]);
+    expect((await poster.chatFetch(c, 0)).map((r) => r.body)).toEqual([b64('before'), b64('after')]);
+  });
+
   it('MSG-1/AUD-14: a relative\'s list titles a group chat by its people; a parent\'s by its name', async () => {
     const mine = (await viewerIn.chatList(h.spaceId)).find((x) => x.circle_id === h.circleIn);
     expect(mine).toBeDefined();

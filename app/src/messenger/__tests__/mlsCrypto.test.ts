@@ -96,6 +96,9 @@ describe('MSG-4 MLS crypto without WebCrypto', () => {
     expect(dec(await theirs.open(theirPriv, s2.enc, s2.ct, info, aad))).toBe('to theirs');
     const e1 = await ours.exportSecret(kp.publicKey, enc('ctx'), 32, info);
     expect(await theirs.importSecret(theirPriv, enc('ctx'), e1.enc, 32, info)).toEqual(e1.secret);
+    // T8: export interop in the other direction too (theirs exports, ours imports).
+    const e2 = await theirs.exportSecret(theirPub, enc('ctx2'), 32, info);
+    expect(await ours.importSecret(kp.privateKey, enc('ctx2'), e2.enc, 32, info)).toEqual(e2.secret);
     const ikm = enc('derive me please, 32 bytes or so!!');
     const d1 = await ours.deriveKeyPair(ikm); const d2 = await theirs.deriveKeyPair(ikm);
     expect(await ours.exportPublicKey(d1.publicKey)).toEqual(await theirs.exportPublicKey(d2.publicKey));
@@ -107,5 +110,47 @@ describe('MSG-4 MLS crypto without WebCrypto', () => {
     const s = await h.seal(kp.publicKey, enc('secret'), enc('i'));
     s.ct[0] = s.ct[0]! ^ 1;
     await expect(h.open(kp.privateKey, s.enc, s.ct, enc('i'))).rejects.toThrow();
+  });
+});
+
+// T8: RFC 9180 Appendix A.2.1 known-answer vector (DHKEM(X25519, HKDF-SHA256), HKDF-SHA256, ChaCha20Poly1305,
+// base mode), copied from the CFRG test-vectors.json (cfrg/draft-irtf-cfrg-hpke). Checks our own HPKE glue against
+// the standard's numbers, not just against another library.
+describe('T8 HPKE known-answer vector (RFC 9180 A.2.1)', () => {
+  const h = (s: string) => new Uint8Array(Buffer.from(s, 'hex'));
+  const hx = (b: Uint8Array) => Buffer.from(b).toString('hex');
+  const V = {
+    info: '4f6465206f6e2061204772656369616e2055726e',
+    ikmR: '1ac01f181fdf9f352797655161c58b75c656a6cc2716dcb66372da835542e1df',
+    skRm: '8057991eef8f1f1af18f4a9491d16a1ce333f695d4db8e38da75975c4478e0fb',
+    pkRm: '4310ee97d88cc1f088a5576c77ab0cf5c3ac797f3d95139c6c84b5429c59662a',
+    enc: '1afa08d3dec047a643885163f1180476fa7ddb54c6a8029ea33f95796bf2ac4a',
+    aad: '436f756e742d30',
+    ct: '1c5250d8034ec2b784ba2cfd69dbdb8af406cfe3ff938e131f0def8c8b60b4db21993c62ce81883d2dd1b51a28',
+    pt: '4265617574792069732074727574682c20747275746820626561757479',
+    exports: [
+      { ctx: '', value: '4bbd6243b8bb54cec311fac9df81841b6fd61f56538a775e7c80a9f40160606e' },
+      { ctx: '00', value: '8c1df14732580e5501b00f82b10a1647b40713191b7c1240ac80e2b68808ba69' },
+      { ctx: '54657374436f6e74657874', value: '5acb09211139c43b3090489a9da433e8a30ee7188ba8b0a9a1ccf0c229283e53' },
+    ],
+  };
+
+  it('T8: deriving the recipient key pair from ikmR gives skRm and pkRm', async () => {
+    const ours = (await hearthCiphersuite()).hpke;
+    const kp = await ours.deriveKeyPair(h(V.ikmR));
+    expect(hx(await ours.exportPrivateKey(kp.privateKey))).toBe(V.skRm);
+    expect(hx(await ours.exportPublicKey(kp.publicKey))).toBe(V.pkRm);
+  });
+
+  it('T8: opening the first encryption with skRm gives the plaintext', async () => {
+    const ours = (await hearthCiphersuite()).hpke;
+    const sk = await ours.importPrivateKey(h(V.skRm));
+    expect(hx(await ours.open(sk, h(V.enc), h(V.ct), h(V.info), h(V.aad)))).toBe(V.pt);
+  });
+
+  it('T8: the exporter gives the published values', async () => {
+    const ours = (await hearthCiphersuite()).hpke;
+    const sk = await ours.importPrivateKey(h(V.skRm));
+    for (const e of V.exports) expect(hx(await ours.importSecret(sk, h(e.ctx), h(V.enc), 32, h(V.info)))).toBe(e.value);
   });
 });

@@ -69,6 +69,10 @@ begin
     update public.posts set status = 'published' where id = v;
     update public.posts set published_at = '2026-10-19 12:00Z'::timestamptz + (i || ' hours')::interval where id = v;
   end loop;
+  -- T9: seed.sql's own posts are dated now(), so from Oct 19, 2026 on they fell inside the --since window
+  -- (sent 15, not 12). Pin them to an old date so the test reads the same on any day.
+  update public.posts set published_at = '2020-01-01 12:00Z', created_at = '2020-01-01 12:00Z'
+   where id::text not like 'f0000000-%';
   update public.post_audiences set circle_id = '33333333-0000-0000-0000-0000000000a2'
    where post_id = 'f0000000-0000-0000-0000-000000000007';
   insert into public.posts (id, space_id, author_id, caption, status, created_at)
