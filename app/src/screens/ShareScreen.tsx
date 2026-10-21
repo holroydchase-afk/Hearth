@@ -1,10 +1,11 @@
 // Share: pick → caption → "Who can see it" → Post (BETA-SHARE-1, BETA-AUD-1/2).
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Image, View } from 'react-native';
 import type { Circle } from '../api/HearthApi';
 import { messageFor } from '../errors/messages';
 import { loadLastAudience, saveLastAudience } from '../share/audienceMemory';
-import { planBatch, type BatchPlan } from '../share/bulk';
+import { planBatch, type PickedAsset } from '../share/bulk';
+import { applyHelpers, helperLines } from '../share/helpers';
 import { useApp } from '../state/AppContext';
 import { useNav } from '../state/nav';
 import { Button, Card, Choice, Field, Loading, Notice, Screen, Txt } from '../ui/kit';
@@ -35,7 +36,12 @@ export function ShareScreen() {
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   // BETA-BULK-3: a bulk pick waiting on the review screen (dates only; EXIF already dropped).
-  const [plan, setPlan] = useState<BatchPlan | null>(null);
+  // R15: the bulk pick as picked; photo helpers set some aside (never deleted), and putBack brings them back.
+  const [picked, setPicked] = useState<PickedAsset[] | null>(null);
+  const [putBack, setPutBack] = useState<Set<string>>(() => new Set());
+  const helped = useMemo(() => (picked ? applyHelpers(picked, { putBack }) : null), [picked, putBack]);
+  const plan = useMemo(() => (helped ? planBatch(helped.kept) : null), [helped]);
+  const setPlan = (assets: PickedAsset[] | null) => { setPicked(assets); setPutBack(new Set()); };
   const userId = app.session?.userId;
   const spaceId = app.space?.space_id;
   const canPost = !!app.space?.can_post;
@@ -77,7 +83,7 @@ export function ShareScreen() {
     setNotice(null);
     const r = await app.deps.pickBulk();
     if ('denied' in r) setNotice('Hearth needs your OK to see your photos. Tap "Allow" when your phone asks.');
-    else if (r.assets.length) setPlan(planBatch(r.assets));
+    else if (r.assets.length) setPlan(r.assets);
   };
 
   const sendBatch = async () => {
@@ -116,10 +122,17 @@ export function ShareScreen() {
     }
   };
 
-  if (plan) {
+  if (plan && helped) {
+    const bringBack = (uris: string[]) => setPutBack((cur) => new Set([...cur, ...uris]));
     return (
       <BatchReview plan={plan} circles={circles} chosen={chosen} onToggle={toggle} busy={busy}
-        onSend={() => void sendBatch()} onCancel={() => setPlan(null)} />
+        onSend={() => void sendBatch()} onCancel={() => setPlan(null)}
+        helpers={{
+          lines: helperLines(helped),
+          setAside: helped.setAside.flatMap((s) => s.items),
+          onSendToo: (reason) => bringBack(helped.setAside.filter((s) => s.reason === reason).flatMap((s) => s.items.map((a) => a.uri))),
+          onPutBack: (uri) => bringBack([uri]),
+        }} />
     );
   }
 
