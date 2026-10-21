@@ -5,7 +5,7 @@ import type { Circle } from '../api/HearthApi';
 import { messageFor } from '../errors/messages';
 import { loadLastAudience, saveLastAudience } from '../share/audienceMemory';
 import { planBatch, type PickedAsset } from '../share/bulk';
-import { applyHelpers, helperLines } from '../share/helpers';
+import { applyHelpers, findLookAlikes, helperLines, type LookResult } from '../share/helpers';
 import { useApp } from '../state/AppContext';
 import { useNav } from '../state/nav';
 import { Button, Card, Choice, Field, Loading, Notice, Screen, Txt } from '../ui/kit';
@@ -39,9 +39,19 @@ export function ShareScreen() {
   // R15: the bulk pick as picked; photo helpers set some aside (never deleted), and putBack brings them back.
   const [picked, setPicked] = useState<PickedAsset[] | null>(null);
   const [putBack, setPutBack] = useState<Set<string>>(() => new Set());
-  const helped = useMemo(() => (picked ? applyHelpers(picked, { putBack }) : null), [picked, putBack]);
+  const [looks, setLooks] = useState<LookResult | null>(null);
+  const helped = useMemo(() => (picked ? applyHelpers(picked, { putBack, looks }) : null), [picked, putBack, looks]);
   const plan = useMemo(() => (helped ? planBatch(helped.kept) : null), [helped]);
-  const setPlan = (assets: PickedAsset[] | null) => { setPicked(assets); setPutBack(new Set()); };
+  const setPlan = (assets: PickedAsset[] | null) => { setPicked(assets); setPutBack(new Set()); setLooks(null); };
+  // HELP-DUP-3, HELP-BLUR: read small previews after the review screen shows; Send never waits for them.
+  const previewBytes = app.deps.previewBytes;
+  useEffect(() => {
+    if (!picked || !previewBytes) return;
+    let alive = true;
+    const candidates = applyHelpers(picked).kept;
+    void findLookAlikes(candidates, previewBytes).then((r) => { if (alive) setLooks(r); }).catch(() => {});
+    return () => { alive = false; };
+  }, [picked, previewBytes]);
   const userId = app.session?.userId;
   const spaceId = app.space?.space_id;
   const canPost = !!app.space?.can_post;

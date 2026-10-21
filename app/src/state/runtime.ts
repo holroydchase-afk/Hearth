@@ -5,7 +5,10 @@ import { Linking, Platform } from 'react-native';
 import { FakeBackend, type FakeState } from '../api/fake/FakeBackend';
 import { SupabaseApi } from '../api/SupabaseApi';
 import { pickBulk, pickPhotos } from '../media/pick';
+import { expoManipulator } from '../media/expoManipulator';
 import { prepareItem } from '../media/prepare';
+import { makePreviewBytes } from '../media/preview';
+import { readBytes } from '../platform/bytes';
 import { fileMediaStore, mediaKeyStore } from '../platform/mediaStore';
 import { saveToPhone } from '../platform/saveToPhone';
 import { secureSessionStorage } from '../platform/secureSession';
@@ -33,6 +36,7 @@ export function createRuntime(): AppDeps | { error: string } {
     prepare: prepareItem,
     pickPhotos: (opts: { videos: boolean }) => pickPhotos(10, opts),
     pickBulk: () => pickBulk(),
+    previewBytes: makePreviewBytes(expoManipulator, readBytes),
     saveToPhone,
     openUrl: (u: string) => Linking.openURL(u),
     // A3: kept photo files on phones only; the web build keeps none.
