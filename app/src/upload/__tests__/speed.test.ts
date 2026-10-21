@@ -18,7 +18,7 @@ function prepared(): Prepared {
 }
 
 const tick = () => new Promise((r) => setImmediate(r));
-async function until(cond: () => boolean, tries = 400) {
+async function until(cond: () => boolean, tries = 5000) {
   for (let i = 0; i < tries && !cond(); i++) await tick();
   if (!cond()) throw new Error('condition never became true');
 }
@@ -52,7 +52,7 @@ function gatedApi(api: HearthApi) {
 const items = (n: number): QueueItem[] => Array.from({ length: n }, (_, i) => ({ uri: `file:///${i}.jpg`, kind: 'photo' as const }));
 
 async function drain(q: UploadQueue, g: ReturnType<typeof gatedApi>) {
-  for (let i = 0; i < 200 && q.jobs().some((j) => j.state !== 'published'); i++) {
+  for (let i = 0; i < 5000 && q.jobs().some((j) => j.state !== 'published'); i++) {
     await tick();
     g.releaseAll();
   }

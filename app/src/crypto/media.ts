@@ -8,6 +8,7 @@
 // Binding the index and the last flag into the nonce makes reordering, dropping
 // or truncating chunks fail authentication (the STREAM construction).
 import { gcm } from '@noble/ciphers/aes.js';
+import { pickAesGcm, type AesGcm } from './aesGcm';
 import { fromBase64 } from './base64';
 import { randomBytes } from './random';
 
@@ -75,6 +76,54 @@ export function decryptMedia(cipher: Uint8Array, k: Uint8Array | string): Uint8A
     const pt = gcm(key, expected).decrypt(cipher.subarray(start + NONCE, end)); // throws on tamper
     out.set(pt, o);
     o += pt.length;
+  }
+  return out;
+}
+
+/**
+ * A1: the same format as encryptMedia, on the fastest AES-GCM the runtime has (aesGcm.ts).
+ * Byte-for-byte equal to encryptMedia for the same key and random prefix.
+ */
+export async function encryptMediaAsync(
+  plain: Uint8Array,
+  k: Uint8Array | string,
+  o: { aes?: AesGcm; random?: (n: number) => Uint8Array } = {},
+): Promise<Uint8Array> {
+  const key = await (o.aes ?? pickAesGcm()).forKey(keyBytes(k));
+  const prefix = (o.random ?? randomBytes)(7);
+  const chunks = Math.max(1, Math.ceil(plain.length / CHUNK_SIZE));
+  const out = new Uint8Array(encryptedSize(plain.length));
+  let off = 0;
+  for (let i = 0; i < chunks; i++) {
+    const nonce = nonceFor(prefix, i, i === chunks - 1);
+    const ct = await key.encrypt(nonce, plain.subarray(i * CHUNK_SIZE, Math.min(plain.length, (i + 1) * CHUNK_SIZE)));
+    out.set(nonce, off);
+    out.set(ct, off + NONCE);
+    off += NONCE + ct.length;
+  }
+  return out;
+}
+
+/** A1: decryptMedia on the fastest AES-GCM the runtime has. Same checks: order, truncation, tags. */
+export async function decryptMediaAsync(cipher: Uint8Array, k: Uint8Array | string, o: { aes?: AesGcm } = {}): Promise<Uint8Array> {
+  const key = await (o.aes ?? pickAesGcm()).forKey(keyBytes(k));
+  if (cipher.length < OVERHEAD) throw new Error('ciphertext too short');
+  const full = CHUNK_SIZE + OVERHEAD;
+  const total = Math.ceil(cipher.length / full);
+  const out = new Uint8Array(cipher.length - total * OVERHEAD);
+  let prefix: Uint8Array | null = null;
+  let off = 0;
+  for (let i = 0; i < total; i++) {
+    const start = i * full;
+    const end = Math.min(cipher.length, start + full);
+    const nonce = cipher.subarray(start, start + NONCE);
+    if (nonce.length !== NONCE) throw new Error('truncated');
+    prefix ??= nonce.subarray(0, 7);
+    const expected = nonceFor(prefix, i, i === total - 1);
+    for (let j = 0; j < NONCE; j++) if (nonce[j] !== expected[j]) throw new Error('chunk out of order or truncated');
+    const pt = await key.decrypt(expected, cipher.subarray(start + NONCE, end));
+    out.set(pt, off);
+    off += pt.length;
   }
   return out;
 }

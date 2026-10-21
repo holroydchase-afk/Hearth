@@ -22,7 +22,7 @@ The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/202
 | R1 | A2 parallel sending: display and thumbnail together, 2 photos at once, next post prepared during upload (RV-P1, PERF-UP-1..3) | P0 | S | ☑ Oct 21 |
 | R2 | Drop "Seen by N of M" from cards (RV-U1, DEC-21) | P0 | S | ☑ Oct 21 |
 | R3 | Photos fill the card frame, no grey bars on mixed tall and wide posts (RV-U2, UAT 8) | P0 | S | ☑ Oct 21 |
-| R4 | A1 native encryption behind a switch; JavaScript stays in Expo Go; same vectors on both (RV-P2) | P0 | M | ☐ |
+| R4 | A1 native encryption behind a switch; JavaScript stays in Expo Go; same vectors on both (RV-P2) | P0 | M | ◐ Oct 21: provider switch built (web uses crypto.subtle). Installing react-native-quick-crypto 1.1.8 (plus react-native-nitro-modules) waits for the first development build, since Expo Go can't load it |
 | R5 | Test gaps T9 (date-dependent QA-3 test), T10 (fake chat joined-at cutoff), T8 (RFC 9180 vectors) | P1 | S | ☐ |
 | R6 | Reply readers asked only when the reply box opens, plus a "Write something back" button (RV-P3, RV-U4) | P1 | S | ☐ |
 | R7 | Portfolio pack: root README, screenshots of the core flow (fake names), case study | P1 | M | ☐ |

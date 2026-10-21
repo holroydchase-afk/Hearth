@@ -2,7 +2,8 @@
 
 ## Oct 21, night shift 1: freeze lifted, review, ranked list, first fixes (branch claude/project-thread-kzt7by)
 - **Done:** app review (`docs/product/reviews/2026-10-21-app-review.md`); ranked list in `TRACKER.md` "Sequence to milestone 2"; `docs/eng/PERFORMANCE.md` with measured encryption speed; DEC-28, DEC-29 and the speed-architecture persona check. Built test-first: R1 parallel sending (PERF-UP-1..3), R2 no "Seen by", R3 photos fill the card.
-- **Next exact step:** R4 native encryption behind a switch (`app/src/crypto/media.ts`), then R5 test gaps, R6, R7.
+- **R4 (part):** `app/src/crypto/aesGcm.ts` picks native, then crypto.subtle, then JavaScript; upload and viewing use the async path. The native module is installed with the first development build (registerNativeAesGcm), not now: Expo Go can't load it.
+- **Next exact step:** R5 test gaps (T9, T10, T8), then R6, R7.
 - **Decisions to review:** R3 crops tall or wide photos in the card to fill the frame (the full photo is one tap away). A3 will keep photo keys in the phone keychain (RV-X6).
 - **Blockers:** none. A1 can't be checked on a phone until a development build exists.
 
