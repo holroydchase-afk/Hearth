@@ -14,7 +14,7 @@ What is encrypted, with which keys, and who can decrypt it. The short version: *
 
 ## Media format: `aes-256-gcm-chunked-v1` (Built)
 
-Defined in `app/src/crypto/media.ts`, using `@noble/ciphers`.
+Defined in `app/src/crypto/media.ts`. The AES-GCM itself comes from the fastest provider the runtime has (`app/src/crypto/aesGcm.ts`, DEC-29): a native module once the app runs in its own build (Planned: registered at start-up, not installed yet), the browser's `crypto.subtle` on the web build (Built), and `@noble/ciphers` in JavaScript in Expo Go, which has neither (Built). All three produce the same bytes; tests check each against a NIST known-answer vector and against each other.
 
 - Plaintext is split into 64 KiB chunks. Each chunk is sealed with AES-256-GCM and stored as `nonce (12 bytes) ‖ ciphertext ‖ tag (16 bytes)`.
 - The nonce is `file prefix (7 random bytes per file) ‖ chunk index (4 bytes, big-endian) ‖ last flag (1 byte)`. Binding the index and the last-chunk flag into the nonce means reordering, dropping or truncating chunks fails authentication (the STREAM construction).
@@ -56,4 +56,4 @@ Each step makes one more claim true. Order and status live in `docs/product/MARK
 4. **The family vault** (post-beta, opt-in). Keys live only on family devices, with a printed recovery card; Hearth's server can no longer decrypt. This is the only step that would make "end-to-end encrypted" true.
 
 ---
-Last checked against code: 2026-10-19, MS4 randomness fix (plus migration 0015: chat messages under MLS)
+Last checked against code: 2026-10-21, A1 AES-GCM providers (crypto/aesGcm.ts); earlier 2026-10-19, MS4 randomness fix (plus migration 0015: chat messages under MLS)

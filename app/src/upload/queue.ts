@@ -15,7 +15,7 @@
 // sign-media created media rows, those rows can't be re-signed (API.md has no re-sign call),
 // so the job deletes its own unpublished draft and starts over under a fresh p_client_id.
 import { ApiError, isRetryable, type ApiErrorCode, type HearthApi, type UploadGrant, type UploadItemSpec } from '../api/HearthApi';
-import { encryptMedia } from '../crypto/media';
+import { encryptMediaAsync } from '../crypto/media';
 import { uuid as realUuid } from '../crypto/random';
 import { toApiError } from '../errors/messages';
 import { recordProblem } from '../errors/problemLog';
@@ -79,7 +79,8 @@ export interface QueueDeps {
   userId: string;
   /** Media pipeline: resize, strip, thumbnail. Returns plaintext bytes + the sign-media spec. */
   prepare: (item: QueueItem) => Promise<Prepared>;
-  encrypt?: (plain: Uint8Array, dek: string) => Uint8Array;
+  /** A1: defaults to the fastest AES-GCM the runtime has (crypto/aesGcm.ts). */
+  encrypt?: (plain: Uint8Array, dek: string) => Uint8Array | Promise<Uint8Array>;
   now?: () => number;
   setTimer?: (fn: () => void, ms: number) => () => void;
   uuid?: () => string;
@@ -120,13 +121,13 @@ export class UploadQueue {
   private readonly now: () => number;
   private readonly setTimer: (fn: () => void, ms: number) => () => void;
   private readonly newId: () => string;
-  private readonly encrypt: (p: Uint8Array, k: string) => Uint8Array;
+  private readonly encrypt: (p: Uint8Array, k: string) => Uint8Array | Promise<Uint8Array>;
 
   private constructor(private d: QueueDeps) {
     this.now = d.now ?? Date.now;
     this.setTimer = d.setTimer ?? ((fn, ms) => { const t = setTimeout(fn, ms); return () => clearTimeout(t); });
     this.newId = d.uuid ?? realUuid;
-    this.encrypt = d.encrypt ?? ((p, k) => encryptMedia(p, k));
+    this.encrypt = d.encrypt ?? ((p, k) => encryptMediaAsync(p, k));
   }
 
   static async open(d: QueueDeps): Promise<UploadQueue> {
@@ -424,10 +425,8 @@ export class UploadQueue {
     let failure: unknown = null;
     const send = async (g: UploadGrant['items'][number]) => {
       const p = prepared[g.item_index]!;
-      await Promise.all([
-        this.d.api.putObject(g.display_put_url, this.encrypt(p.display, g.dek), g.required_headers),
-        this.d.api.putObject(g.thumb_put_url, this.encrypt(p.thumb, g.dek), g.required_headers),
-      ]);
+      const put = async (url: string, plain: Uint8Array) => this.d.api.putObject(url, await this.encrypt(plain, g.dek), g.required_headers);
+      await Promise.all([put(g.display_put_url, p.display), put(g.thumb_put_url, p.thumb)]);
       if (this.stopped) throw new Killed();
       finished.add(g.item_index);
       let done = job.progress.done;

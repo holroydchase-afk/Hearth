@@ -2,7 +2,7 @@
 // memory, hand <Image> a data: URI. Decrypted bytes never touch disk except "Save to my phone".
 import { ApiError, type HearthApi, type ViewGrant, type ViewGrantItem } from '../api/HearthApi';
 import { toBase64 } from '../crypto/base64';
-import { decryptMedia } from '../crypto/media';
+import { decryptMediaAsync } from '../crypto/media';
 
 const MARGIN_MS = 60_000;
 
@@ -38,7 +38,7 @@ export class MediaCache {
   private async plain(postId: string, mediaId: string, which: 'thumb' | 'display'): Promise<{ bytes: Uint8Array; mime: string }> {
     const it = await this.item(postId, mediaId);
     const cipher = await this.api.getObject(which === 'thumb' ? it.thumb_url : it.display_url);
-    return { bytes: decryptMedia(cipher, it.dek), mime: which === 'thumb' ? 'image/jpeg' : it.mime_type };
+    return { bytes: await decryptMediaAsync(cipher, it.dek), mime: which === 'thumb' ? 'image/jpeg' : it.mime_type };
   }
 
   uri(postId: string, mediaId: string, which: 'thumb' | 'display'): Promise<string> {
