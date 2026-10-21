@@ -220,5 +220,12 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** measured: JavaScript encryption takes about 370 ms per photo with no JIT (Hermes's situation), and serial requests waste round trips on weak signal. Expo Go can't load native modules, so A1 ships behind a switch.
 - **Source:** `docs/product/decisions/2026-10-21-speed-architecture.md`, `docs/eng/PERFORMANCE.md`
 
+### DEC-30 · Drop R6 (hide the reply box behind a button), keep it in mind
+- **When / status:** Oct 21 · Decided by Chase ("yes we can drop R6, but keep it in mind")
+- **Chose:** keep the reply box and its "who will read this" line on every card.
+- **Over:** a "Write something back" button that opens the box and asks the server for readers only then (RV-P3, RV-U4).
+- **Because:** the button adds a tap for the least tech-savvy relative (LG Red), REPLY-11 needs the readers line whenever the box shows, and list windowing already caps the extra server calls at about 10 cards. Revisit if phone timings show the calls hurt.
+- **Source:** `docs/product/reviews/2026-10-21-app-review.md` (RV-P3, RV-U4), TRACKER R6
+
 ---
 Last updated: Oct 21, 2026
