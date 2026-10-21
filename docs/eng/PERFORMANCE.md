@@ -10,7 +10,7 @@ Chase's bar (Oct 21, 2026): "a world class, very fast, very stable product". Mea
 | PERF-UP-2 | Photos of one post upload in parallel, progress counted in order | 2 photos (4 requests) in flight, never more | same | Met (Oct 21) |
 | PERF-UP-3 | The next post is resized and encrypted while this one uploads | Prepared once, during the previous upload | same | Met (Oct 21) |
 | PERF-ENC-1 | Encrypting one 2048 px display photo (about 500 KB) on a phone | Under 150 ms | Provider choice tested in `app/src/crypto/__tests__/aesGcm.test.ts`; phone check once a development build exists (A1) | Not met in Expo Go: about 370 ms on a laptop with the JIT off, likely 1 to 2 s on an older phone |
-| PERF-FEED-1 | Cold start to the first photo on screen | Under 2 s on Wi-Fi, under 1 s from the phone's own copy (A3) | To add: a web-build Playwright timing on the Fake API | Not measured yet |
+| PERF-FEED-1 | Cold start to the first photo on screen | Under 2 s on the web build with the fake backend; under 2 s on a phone over Wi-Fi, under 1 s from the phone's own copy (A3) | `app/e2e-web/perf.spec.js` (median of 3 reloads) | Web + fake: 260 ms median (Oct 21). Phone: not measured yet |
 | PERF-ENC-2/3 | Every AES-GCM provider matches the NIST vector and the JavaScript path byte for byte | Exact | `aesGcm.test.ts` | Met (Oct 21): noble and WebCrypto |
 | PERF-DB-1 | `get_timeline` p95 at family size | Under 5 ms | `backend/tests/perf/` | 2 to 5.5 ms on a 2-CPU box (Oct 17); re-measure on hosted (QA-R3) |
 
