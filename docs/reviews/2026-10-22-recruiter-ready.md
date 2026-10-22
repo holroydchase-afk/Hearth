@@ -67,6 +67,39 @@ P0 blocks showing it. P1 hurts the impression. P2 is polish.
 - **RR-7:** `src/app/+not-found.tsx`: "We couldn't find that page. The link may be old or mistyped. Your photos are safe." and "Go to Photos". In every build, not just the demo.
 - Tests: `demoFrame.test.tsx` (DEMO-6), `notFound.test.tsx` (NF-1), e2e `demo.spec.js` DEMO-6 / NF-1. Re-checked by eye: laptop light, not-found on phone dark.
 
+## Round 1c: hosting build (#41)
+
+- **RR-5:** `bash app/scripts/build-demo.sh` (or `npm run build:demo-site`) exports the demo for `/demo/hearth/` into `app/dist-demo-site/` and copies `index.html` into each tab's folder so a reload works on a static host. `app/app.config.js` adds only `experiments.baseUrl` when `HEARTH_BASE_URL` is set; without it the config is `app.json` unchanged (EAS check 12/12, Expo Go check OK).
+- `app/scripts/serve-static.js` mimics GitHub Pages (no fallback, slash redirect, 404). `e2e-web/site.spec.js` (DEMO-5): a cold load of `/demo/hearth/`, `/photos`, `/share`, `/groups`, `/me`, pictures drawn, no 4xx, links stay under the demo or go to chaseholroyd.com, Grandma's view and Start over stay under the path. 7/7.
+- Still open (RR-15, P2): reloading a full-screen photo's address (`/viewer/<id>`) hits the host's 404.
+
+## Round 1d: one story (#42)
+
+- **RR-4 / RR-12:** README and case study now say 600+ app tests and 800+ database checks (rounded, so they don't go stale with each PR), eight agents, and how to build and run the demo. The README screenshots come from the demo.
+- **RR-9:** `docs/portfolio/screens/` re-shot from the demo by `e2e-web/demo-screens.spec.js` (7 phone screens with the demo bar hidden, plus `laptop-01-demo.png` with it). The old rainbow-gradient shots are gone.
+- **RR-4 (portfolio page):** `docs/portfolio/INTAKE-2026-10-22-demo.md` for Product Studio: host the demo at /demo/hearth/, add "Try the demo", fix "Groups and households" and the test counts, new screenshots. It replaces the INTAKE in PR #36. RR-4 stays open until Product Studio ships it.
+
+## Round 2: re-review (#43)
+
+Re-screenshotted every demo screen with `app/e2e-web/demo-showcase.spec.js` (12 screens × phone and laptop × light and dark × viewport and full page = 96 files, all opened): Photos, by date, Messages, Share empty and filled, posted, full screen, Groups, Me, Grandma Jo's Photos and Help, not found. No console errors, failed requests or sideways scrolling on any of them. Round 1 fixes hold.
+
+New and fixed this round:
+- **RR-17 (P2, new, fixed):** in Grandma's view the demo bar took four lines on a phone (her Bigger text is on). Now "Demo. You're Grandma Jo: you see only what's shared with you." (two lines); the parent's line is "Demo with a made-up family, kept in this browser. You're Sam, a parent." Test: demoBar.test.tsx (75 characters at most).
+- **RR-11 (P1, fixed):** the Groups screen says "To invite someone, use one of the groups below." when the family has no households, and keeps the household words when it does. Test: groupsWords.test.tsx RR-11.
+- **RR-13 (P2, fixed):** `test-all.sh` now fails when any suite that ran failed, and prints `SKIPPED: backend SQL (no local Postgres running)` or `SKIPPED: Deno functions (Deno isn't installed; CI runs them)` instead of passing on Playwright alone. Helper `scripts/lib/suite.sh`, test `scripts/tests/test_all_test.sh` (QA-ALL-1, 7 checks). Run here: 10 passed, 0 failed, 1 skipped (Deno).
+- Portfolio laptop screenshot re-shot with the new bar words.
+
+## Round 3: viewer reload (#44)
+
+- **RR-15 (P2, fixed):** in the demo, a full-screen photo opens at `/viewer?postId=…` (new route `src/app/viewer/index.tsx`, same screen), and `build-demo.sh` gives `viewer/` its own `index.html`, so a reload on a static host keeps the photo open. If a host drops the query, the page goes to Photos instead of an error. The phone app keeps `/viewer/<id>`. Test: `site.spec.js` RR-15 (red before, green after). Assumes GitHub Pages keeps the query string when it adds the trailing slash; the local server does, the live host is unverified.
+
+## Round 4: nightly re-check (Oct 22, 2:15am run)
+
+Fresh eyes on the round 3 branch: Jest 611 passed three times, typecheck clean, demo and web e2e green, and all 96 showcase screenshots opened (phone and laptop, light and dark). No console errors, failed requests or sideways scrolling.
+
+- **RR-18 (P2, new, fixed):** Messages listed "Grandparents – Dad's side, 4 people", while Groups and Share list the same group as 3 people. Both are right: a chat holds the group plus the family's parents (REPLY-10). But nothing said so, and a recruiter comparing screens sees a contradiction. The chat list's privacy line now adds "Parents are in every chat." Test: messages.test.tsx RR-18. Decision to review: the words (grandparent-ux style: short and true for both parents and relatives).
+- **RR-19 (P2, new, fixed):** HANDOFF.md's Oct 21 section held a stale second "next step" naming work that's already done (DUP-2, R11, R6). It's replaced with the true state.
+
 ## Status
 
 | Round | Fixed | New | Left |
@@ -74,3 +107,8 @@ P0 blocks showing it. P1 hurts the impression. P2 is polish.
 | 0 (baseline) | – | RR-1..RR-16 | P0: 5, P1: 7, P2: 4 |
 | 1a (demo mode, #39) | RR-1, RR-2, RR-3, RR-8, RR-9 (in the demo), RR-10, RR-14 | – | P0: RR-4, RR-5. P1: RR-6, RR-7, RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
 | 1b (#40) | RR-6, RR-7 | – | P0: RR-4, RR-5. P1: RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
+| 1c (#41) | RR-5 | – | P0: RR-4. P1: RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
+| 1d (#42) | RR-9, RR-12; RR-4 on Hearth's side | – | P0: RR-4 (waits on Product Studio). P1: RR-11. P2: RR-13, RR-15, RR-16 |
+| 2 (#43) | RR-11, RR-13, RR-17 | RR-17 | P0: RR-4 (waits on Product Studio). P2: RR-15 (viewer reload on a static host), RR-16 (disabled buttons, needs a real user) |
+| 3 (#44) | RR-15 | – | P0: RR-4 (waits on Product Studio: hosting and page fixes). P2: RR-16 (confirm with a real user; nothing to build) |
+| 4 (nightly re-check) | RR-18, RR-19 | RR-18, RR-19 | P0: RR-4 (waits on Product Studio). P2: RR-16 (confirm with a real user; nothing to build) |
