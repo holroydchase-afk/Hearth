@@ -57,4 +57,14 @@ describe('MSG Messages screen', () => {
     fireEvent.press(await screen.findByRole('button', { name: 'Messages' }));
     expect(await screen.findByRole('button', { name: "Open the chat Grandparents – Dad's side" })).toBeTruthy();
   });
+
+  // RR-18 (recruiter-ready re-check, Oct 22): a chat counts the group plus the family's parents (REPLY-10), so
+  // "Grandparents – Dad's side, 4 people" in Messages sat beside "3 people" in Groups and Share with no reason given.
+  it('RR-18 the Messages list says parents are in every chat, so its people count matches what the group shows', async () => {
+    const be = FakeBackend.withFixture({ joIsMember: true });
+    await renderApp(<PhotosScreen />, { be, user: 'chase' });
+    fireEvent.press(await screen.findByRole('button', { name: 'Messages' }));
+    expect(await screen.findByText(/Parents are in every chat\./)).toBeTruthy();
+    expectGrandparentSafe();
+  });
 });

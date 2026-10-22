@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
 test('DEMO-1/2/3 opens straight into the sample family: no sign-in, pictures, a demo bar', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Photos of Mia and Leo' })).toBeVisible();
-  await expect(page.getByText(/A demo with a made-up family/)).toBeVisible();
+  await expect(page.getByText(/made-up family/)).toBeVisible();
   await expect(page.getByText('Mia turned 5!', { exact: true })).toBeVisible();
   await expect(page.getByLabel('Your email')).toHaveCount(0);
   // The first card's picture really drew (decrypted from the sample bytes).

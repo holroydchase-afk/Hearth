@@ -1,0 +1,16 @@
+ok      TDPM-1 all personas Green passes
+ok      TDPM-1 a Red with a Resolution line passes
+ok      TDPM-1 a Red with a Chase override passes
+ok      TDPM-1 a missing persona row fails
+ok      TDPM-1 a value other than Green/Red fails
+ok      TDPM-1 a Red without a Resolution line fails
+ok      TDPM-1 a Resolution that is neither mitigation nor Chase override fails
+ok      TDPM-1 a Why over 15 words fails
+ok      TDPM-1 an empty Why fails
+ok      TDPM-1 a duplicate persona row fails
+ok      TDPM-1 an unknown persona fails
+ok      TDPM-1 a decision with no persona table fails
+ok      TDPM-1 an empty decisions folder fails
+ok      TDPM-1 every decision in docs/product/decisions/ has a full persona check
+
+PERSONA CHECK RESULT: 14 passed, 0 failed
