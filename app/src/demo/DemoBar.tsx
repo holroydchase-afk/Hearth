@@ -27,8 +27,8 @@ export function DemoBar({ be, reload, startOver, open }: {
     <View style={[styles.bar, { backgroundColor: c.accentSoft, borderBottomColor: c.line }]} testID="demo-bar" accessibilityLabel="About this demo">
       <Txt>
         {viewer === 'parent'
-          ? "A demo with a made-up family, kept in this browser. You're Sam, a parent."
-          : "A demo with a made-up family, kept in this browser. You're Grandma Jo: you see only what's shared with you."}
+          ? "Demo with a made-up family, kept in this browser. You're Sam, a parent."
+          : "Demo. You're Grandma Jo: you see only what's shared with you."}
       </Txt>
       <View style={styles.row}>
         <Button
