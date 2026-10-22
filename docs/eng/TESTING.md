@@ -23,7 +23,7 @@
 | Showcase screenshots | Every screen at 390×844 and 1280×800, light and dark, plus console errors (recruiter-ready review) | `cd app && SHOWCASE_DIR=/tmp/shots npm run e2e:web -- showcase.spec.js` |
 | Manual | 12 real-phone cases (M-01…M-12), run by family testers | Logged on the Test Log page |
 
-Run everything: `bash test-all.sh`. It saves results to `e2e/results/` and rebuilds the Test Log data in `tracker/seed/`.
+Run everything: `bash test-all.sh`. It saves results to `e2e/results/` and rebuilds the Test Log data in `tracker/seed/`. It fails if any suite that ran failed, and lists suites it skipped and why (no local Postgres, no Deno) on `SKIPPED:` lines (QA-ALL-1).
 
 ## Test Log page
 - **Test cases:** current status of every case, plus its red→green trail over runs.
