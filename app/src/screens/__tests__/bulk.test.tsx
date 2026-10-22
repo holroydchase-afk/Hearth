@@ -188,6 +188,27 @@ describe('R15 photo helpers on the review screen (SPEC-PHOTO-HELPERS)', () => {
     expect(await screen.findByRole('button', { name: 'Send 48 photos' })).toBeTruthy();
   });
 
+  it('HELP-R4 the family turned both helpers off: nothing is left out and no preview is read', async () => {
+    const be = FakeBackend.withFixture();
+    be.state.spaceFeatures = { [`${FIXTURE.space.id}:photo_helpers_duplicates`]: false, [`${FIXTURE.space.id}:photo_helpers_screens_blur`]: false };
+    const assets = pick48().map((a, i) => ({ ...a, assetId: `lib-${i}` }));
+    const previewBytes = jest.fn(async () => null);
+    await openReview({ be, last: [FIXTURE.circles.dadSide.id], assets: [...assets, { ...assets[0]!, uri: 'file:///picked/again2.jpg' }, shot()], previewBytes, header: '50 photos from 3 days' });
+    await new Promise((r) => setTimeout(r, 50));
+    expect(screen.queryByText(/We left out|same photo|already sent|look almost/)).toBeNull();
+    expect(screen.getByRole('button', { name: 'Send 50 photos' })).toBeTruthy();
+    expect(previewBytes).not.toHaveBeenCalled();
+  });
+
+  it('HELP-R4 Hearth turned the screenshot helper off: screenshots go with the rest, repeats are still sent once', async () => {
+    const be = FakeBackend.withFixture();
+    be.state.featureFlags = { photo_helpers_screens_blur: false };
+    const assets = pick48().map((a, i) => ({ ...a, assetId: `lib-${i}` }));
+    await openReview({ be, last: [FIXTURE.circles.dadSide.id], assets: [...assets, { ...assets[0]!, uri: 'file:///picked/again3.jpg' }, shot()], header: '49 photos from 3 days' });
+    expect(screen.queryByText(/We left out/)).toBeNull();
+    expect(screen.getByText("You picked 2 of the same photo. We'll send it once.")).toBeTruthy();
+  });
+
   it('HELP-DUP-2 photos sent from this phone show as "already sent" on the next pick, with "Send them again"', async () => {
     const assets = pick48();
     const pics = new Map([[assets[0]!.uri, toJpeg(scene())], [assets[1]!.uri, toJpeg(other())]]);

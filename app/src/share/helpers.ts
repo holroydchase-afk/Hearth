@@ -59,23 +59,32 @@ export interface HelperResult {
 
 const isPhoto = (a: PickedAsset) => a.type !== 'video' && a.type !== 'pairedVideo' && !(typeof a.mimeType === 'string' && a.mimeType.startsWith('video/'));
 
-/** on: HELP-R4 off-switch. putBack: uris the person brought back ("Send them too", "Put back"). */
-export function applyHelpers(assets: PickedAsset[], o: { on?: boolean; putBack?: Set<string>; looks?: LookResult | null } = {}): HelperResult {
+/** HELP-R4: which helpers the server has on for me (0016). duplicates = DUP-1..4, screensBlur = SHOT-1, BLUR-1/2. */
+export interface HelperSwitches { duplicates: boolean; screensBlur: boolean }
+export const HELPER_FEATURES = { duplicates: 'photo_helpers_duplicates', screensBlur: 'photo_helpers_screens_blur' } as const;
+export const helperSwitches = (features: readonly string[]): HelperSwitches => ({
+  duplicates: features.includes(HELPER_FEATURES.duplicates),
+  screensBlur: features.includes(HELPER_FEATURES.screensBlur),
+});
+
+/** on: HELP-R4 off-switches (false = all off). putBack: uris the person brought back ("Send them too", "Put back"). */
+export function applyHelpers(assets: PickedAsset[], o: { on?: boolean | HelperSwitches; putBack?: Set<string>; looks?: LookResult | null } = {}): HelperResult {
   const none: HelperResult = { kept: assets, setAside: [], sameTwice: 0 };
-  if (o.on === false || assets.filter(isPhoto).length < HELPERS_MIN_PHOTOS) return none;
+  const on: HelperSwitches = typeof o.on === 'object' ? o.on : { duplicates: o.on !== false, screensBlur: o.on !== false };
+  if ((!on.duplicates && !on.screensBlur) || assets.filter(isPhoto).length < HELPERS_MIN_PHOTOS) return none;
   const seen = new Set<string>();
   const kept: PickedAsset[] = [];
   const aside: Record<SetAsideReason, PickedAsset[]> = { screenshots: [], sentBefore: [], lookAlikes: [], blurry: [] };
   let sameTwice = 0;
   for (const a of assets) {
     const id = a.assetId ? `id:${a.assetId}` : `uri:${a.uri}`;
-    if (isPhoto(a) && seen.has(id)) { sameTwice += 1; continue; }
+    if (on.duplicates && isPhoto(a) && seen.has(id)) { sameTwice += 1; continue; }
     seen.add(id);
     const why: SetAsideReason | null = !isPhoto(a) || o.putBack?.has(a.uri) ? null
-      : a.screenshot ? 'screenshots'
-        : o.looks?.sentBefore.has(a.uri) ? 'sentBefore'
-        : o.looks?.lookAlikes.has(a.uri) ? 'lookAlikes'
-          : o.looks?.blurry.has(a.uri) ? 'blurry' : null;
+      : on.screensBlur && a.screenshot ? 'screenshots'
+        : on.duplicates && o.looks?.sentBefore.has(a.uri) ? 'sentBefore'
+        : on.duplicates && o.looks?.lookAlikes.has(a.uri) ? 'lookAlikes'
+          : on.screensBlur && o.looks?.blurry.has(a.uri) ? 'blurry' : null;
     if (why) aside[why].push(a);
     else kept.push(a);
   }

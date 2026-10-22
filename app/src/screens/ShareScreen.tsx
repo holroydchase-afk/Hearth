@@ -5,7 +5,7 @@ import type { Circle } from '../api/HearthApi';
 import { messageFor } from '../errors/messages';
 import { loadLastAudience, saveLastAudience } from '../share/audienceMemory';
 import { planBatch, type PickedAsset } from '../share/bulk';
-import { applyHelpers, findLookAlikes, helperLines, type LookResult } from '../share/helpers';
+import { applyHelpers, findLookAlikes, helperLines, helperSwitches, type LookResult } from '../share/helpers';
 import { loadSent, recordSent } from '../share/sentBefore';
 import { useApp } from '../state/AppContext';
 import { useNav } from '../state/nav';
@@ -42,22 +42,24 @@ export function ShareScreen() {
   const [picked, setPicked] = useState<PickedAsset[] | null>(null);
   const [putBack, setPutBack] = useState<Set<string>>(() => new Set());
   const [looks, setLooks] = useState<LookResult | null>(null);
-  const helped = useMemo(() => (picked ? applyHelpers(picked, { putBack, looks }) : null), [picked, putBack, looks]);
+  // HELP-R4: the server's off-switches (my_features); off until read, like every feature (FLAG-5).
+  const switches = useMemo(() => helperSwitches(app.features), [app.features]);
+  const helped = useMemo(() => (picked ? applyHelpers(picked, { on: switches, putBack, looks }) : null), [picked, switches, putBack, looks]);
   const plan = useMemo(() => (helped ? planBatch(helped.kept) : null), [helped]);
   const setPlan = (assets: PickedAsset[] | null) => { setPicked(assets); setPutBack(new Set()); setLooks(null); };
   // HELP-DUP-2/3, HELP-BLUR: read small previews after the review screen shows; Send never waits for them.
   const previewBytes = app.deps.previewBytes;
   useEffect(() => {
-    if (!picked || !previewBytes) return;
+    if (!picked || !previewBytes || (!switches.duplicates && !switches.screensBlur)) return;
     let alive = true;
-    const candidates = applyHelpers(picked).kept;
+    const candidates = applyHelpers(picked, { on: switches }).kept;
     void (async () => {
       const sentIds = userId ? await loadSent(app.deps.kv, userId) : new Set<string>();
       const r = await findLookAlikes(candidates, previewBytes, { sentIds });
       if (alive) setLooks(r);
     })().catch(() => {});
     return () => { alive = false; };
-  }, [picked, previewBytes]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [picked, previewBytes, switches]); // eslint-disable-line react-hooks/exhaustive-deps
   const spaceId = app.space?.space_id;
   const canPost = !!app.space?.can_post;
   // Oct 17 decision: "Pick lots of photos" is for parents only, never a relative allowed to post.
