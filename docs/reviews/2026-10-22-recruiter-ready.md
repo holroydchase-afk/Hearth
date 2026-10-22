@@ -79,6 +79,16 @@ P0 blocks showing it. P1 hurts the impression. P2 is polish.
 - **RR-9:** `docs/portfolio/screens/` re-shot from the demo by `e2e-web/demo-screens.spec.js` (7 phone screens with the demo bar hidden, plus `laptop-01-demo.png` with it). The old rainbow-gradient shots are gone.
 - **RR-4 (portfolio page):** `docs/portfolio/INTAKE-2026-10-22-demo.md` for Product Studio: host the demo at /demo/hearth/, add "Try the demo", fix "Groups and households" and the test counts, new screenshots. It replaces the INTAKE in PR #36. RR-4 stays open until Product Studio ships it.
 
+## Round 2: re-review (#43)
+
+Re-screenshotted every demo screen with `app/e2e-web/demo-showcase.spec.js` (12 screens × phone and laptop × light and dark × viewport and full page = 96 files, all opened): Photos, by date, Messages, Share empty and filled, posted, full screen, Groups, Me, Grandma Jo's Photos and Help, not found. No console errors, failed requests or sideways scrolling on any of them. Round 1 fixes hold.
+
+New and fixed this round:
+- **RR-17 (P2, new, fixed):** in Grandma's view the demo bar took four lines on a phone (her Bigger text is on). Now "Demo. You're Grandma Jo: you see only what's shared with you." (two lines); the parent's line is "Demo with a made-up family, kept in this browser. You're Sam, a parent." Test: demoBar.test.tsx (75 characters at most).
+- **RR-11 (P1, fixed):** the Groups screen says "To invite someone, use one of the groups below." when the family has no households, and keeps the household words when it does. Test: groupsWords.test.tsx RR-11.
+- **RR-13 (P2, fixed):** `test-all.sh` now fails when any suite that ran failed, and prints `SKIPPED: backend SQL (no local Postgres running)` or `SKIPPED: Deno functions (Deno isn't installed; CI runs them)` instead of passing on Playwright alone. Helper `scripts/lib/suite.sh`, test `scripts/tests/test_all_test.sh` (QA-ALL-1, 7 checks). Run here: 10 passed, 0 failed, 1 skipped (Deno).
+- Portfolio laptop screenshot re-shot with the new bar words.
+
 ## Status
 
 | Round | Fixed | New | Left |
@@ -88,3 +98,4 @@ P0 blocks showing it. P1 hurts the impression. P2 is polish.
 | 1b (#40) | RR-6, RR-7 | – | P0: RR-4, RR-5. P1: RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
 | 1c (#41) | RR-5 | – | P0: RR-4. P1: RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
 | 1d (#42) | RR-9, RR-12; RR-4 on Hearth's side | – | P0: RR-4 (waits on Product Studio). P1: RR-11. P2: RR-13, RR-15, RR-16 |
+| 2 (#43) | RR-11, RR-13, RR-17 | RR-17 | P0: RR-4 (waits on Product Studio). P2: RR-15 (viewer reload on a static host), RR-16 (disabled buttons, needs a real user) |
