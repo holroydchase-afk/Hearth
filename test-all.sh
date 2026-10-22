@@ -1,17 +1,30 @@
 #!/usr/bin/env bash
 # Run every Hearth automated suite, save results, rebuild Test Log seed data.
+# QA-ALL-1: fails if any suite that ran failed; names suites it had to skip (no Postgres, no Deno).
 set -u
 cd "$(dirname "$0")"
+source scripts/lib/suite.sh
+suite_reset
 mkdir -p e2e/results
-bash scripts/check-agents.sh
-bash scripts/tests/check_persona_checks_test.sh > e2e/results/persona-checks.txt 2>&1 ; tail -1 e2e/results/persona-checks.txt
-bash scripts/check-expo-go.sh
-bash scripts/tests/check_expo_go_test.sh > e2e/results/expo-go.txt 2>&1 ; tail -1 e2e/results/expo-go.txt
-bash scripts/tests/check_logs_test.sh > e2e/results/priv2-logs.txt 2>&1 ; tail -1 e2e/results/priv2-logs.txt
-bash app/scripts/tests/eas_test.sh > e2e/results/app-eas.txt 2>&1 ; tail -1 e2e/results/app-eas.txt
-(cd e2e && npx playwright test) ; P=$?
-(cd backend && bash tests/deploy/deploy_test.sh) > e2e/results/backend-deploy.txt 2>&1 ; tail -1 e2e/results/backend-deploy.txt
-(cd backend && bash tests/run.sh) > e2e/results/backend-sql.txt 2>&1 ; tail -1 e2e/results/backend-sql.txt
-(cd backend && deno test --allow-env --allow-read supabase/functions/sign-media/ supabase/functions/notify/ tests/templates/) > e2e/results/backend-deno.txt 2>&1 ; tail -1 e2e/results/backend-deno.txt
+quiet() { local out=$1; shift; "$@" > "$out" 2>&1; local rc=$?; tail -1 "$out"; return $rc; }
+suite "agent roster" bash scripts/check-agents.sh
+suite "persona checks" quiet e2e/results/persona-checks.txt bash scripts/tests/check_persona_checks_test.sh
+suite "Expo Go SDK" bash scripts/check-expo-go.sh
+suite "Expo Go check test" quiet e2e/results/expo-go.txt bash scripts/tests/check_expo_go_test.sh
+suite "log check" quiet e2e/results/priv2-logs.txt bash scripts/tests/check_logs_test.sh
+suite "test-all helper" quiet e2e/results/test-all.txt bash scripts/tests/test_all_test.sh
+suite "EAS script" quiet e2e/results/app-eas.txt bash app/scripts/tests/eas_test.sh
+suite "prototype e2e" bash -c 'cd e2e && npx playwright test'
+suite "deploy script" quiet e2e/results/backend-deploy.txt bash -c 'cd backend && bash tests/deploy/deploy_test.sh'
+if pg_isready -q 2>/dev/null; then
+  suite "backend SQL" quiet e2e/results/backend-sql.txt bash -c 'cd backend && bash tests/run.sh'
+else
+  suite_skip "backend SQL" "no local Postgres running"
+fi
+if command -v deno >/dev/null 2>&1; then
+  suite "Deno functions" quiet e2e/results/backend-deno.txt bash -c 'cd backend && deno test --allow-env --allow-read supabase/functions/sign-media/ supabase/functions/notify/ tests/templates/'
+else
+  suite_skip "Deno functions" "Deno isn't installed; CI runs them"
+fi
 echo "Rebuild the Test Log data with: python3 tracker/build_seed.py (add a new run entry first)"
-exit $P
+suite_report
