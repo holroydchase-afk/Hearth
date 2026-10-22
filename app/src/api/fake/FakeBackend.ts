@@ -117,6 +117,8 @@ export interface FixtureOptions {
 
 export class FakeBackend {
   private listeners = new Set<() => void>();
+  /** DEMO-1: the demo build seeds pictures asynchronously; app calls wait for it (tests leave it unset). */
+  ready: Promise<void> | null = null;
   constructor(public state: FakeState, private persist?: (s: FakeState) => void) {}
 
   static empty(): FakeState {
@@ -877,6 +879,7 @@ export class FakeApi implements HearthApi {
   }
 
   private async run<T>(f: () => T): Promise<T> {
+    if (this.be.ready) await this.be.ready;
     if (this.opts.latencyMs) await new Promise((r) => setTimeout(r, this.opts.latencyMs));
     else await Promise.resolve();
     return clone(f());
@@ -943,6 +946,7 @@ export class FakeApi implements HearthApi {
   finalizeMedia = (ids: string[]) => this.run(() => this.be.finalizeMedia(this.userId, ids));
   signView = (p: string) => this.run(() => this.be.signView(this.userId, p));
   getObject = async (url: string) => {
+    if (this.be.ready) await this.be.ready;
     if (this.opts.latencyMs) await new Promise((r) => setTimeout(r, this.opts.latencyMs));
     return this.be.getObject(url).slice();
   };

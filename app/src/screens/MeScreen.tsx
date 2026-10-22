@@ -1,4 +1,5 @@
 import React from 'react';
+import { DEMO_MODE } from '../demo/flags';
 import { useApp } from '../state/AppContext';
 import { Card, Screen, Txt } from '../ui/kit';
 import { AppGate } from './AppGate';
@@ -20,10 +21,15 @@ export function MeScreen() {
       <HowToTell />
       <ReplyAudience />
       <Privacy who={app.helper} />
-      <NoticeTiming />
-      <ProblemDetailsCard />
-      <SignOut />
-      <DeleteAccount />
+      {/* DEMO-8: the public demo has no test tools and no way out of the sample family but Start over. */}
+      {DEMO_MODE ? null : (
+        <>
+          <NoticeTiming />
+          <ProblemDetailsCard />
+          <SignOut />
+          <DeleteAccount />
+        </>
+      )}
     </Screen>
   );
 }
