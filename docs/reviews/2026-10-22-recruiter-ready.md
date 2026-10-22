@@ -73,6 +73,12 @@ P0 blocks showing it. P1 hurts the impression. P2 is polish.
 - `app/scripts/serve-static.js` mimics GitHub Pages (no fallback, slash redirect, 404). `e2e-web/site.spec.js` (DEMO-5): a cold load of `/demo/hearth/`, `/photos`, `/share`, `/groups`, `/me`, pictures drawn, no 4xx, links stay under the demo or go to chaseholroyd.com, Grandma's view and Start over stay under the path. 7/7.
 - Still open (RR-15, P2): reloading a full-screen photo's address (`/viewer/<id>`) hits the host's 404.
 
+## Round 1d: one story (#42)
+
+- **RR-4 / RR-12:** README and case study now say 600+ app tests and 800+ database checks (rounded, so they don't go stale with each PR), eight agents, and how to build and run the demo. The README screenshots come from the demo.
+- **RR-9:** `docs/portfolio/screens/` re-shot from the demo by `e2e-web/demo-screens.spec.js` (7 phone screens with the demo bar hidden, plus `laptop-01-demo.png` with it). The old rainbow-gradient shots are gone.
+- **RR-4 (portfolio page):** `docs/portfolio/INTAKE-2026-10-22-demo.md` for Product Studio: host the demo at /demo/hearth/, add "Try the demo", fix "Groups and households" and the test counts, new screenshots. It replaces the INTAKE in PR #36. RR-4 stays open until Product Studio ships it.
+
 ## Status
 
 | Round | Fixed | New | Left |
@@ -81,3 +87,4 @@ P0 blocks showing it. P1 hurts the impression. P2 is polish.
 | 1a (demo mode, #39) | RR-1, RR-2, RR-3, RR-8, RR-9 (in the demo), RR-10, RR-14 | – | P0: RR-4, RR-5. P1: RR-6, RR-7, RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
 | 1b (#40) | RR-6, RR-7 | – | P0: RR-4, RR-5. P1: RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
 | 1c (#41) | RR-5 | – | P0: RR-4. P1: RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
+| 1d (#42) | RR-9, RR-12; RR-4 on Hearth's side | – | P0: RR-4 (waits on Product Studio). P1: RR-11. P2: RR-13, RR-15, RR-16 |
