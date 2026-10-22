@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useMemo } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DemoChrome } from '../demo/DemoChrome';
+import { DEMO_MODE } from '../demo/flags';
 import { useNotificationTaps } from '../notify/push';
 import { AppProvider } from '../state/AppContext';
 import { NavContext, type Nav } from '../state/nav';
@@ -13,7 +14,10 @@ import { Screen, Txt } from '../ui/kit';
 const runtime = createRuntime();
 
 const nav: Nav = {
-  openViewer: (postId, i) => router.push({ pathname: '/viewer/[postId]', params: { postId, i: String(i) } }),
+  // RR-15: the static-hosted demo uses /viewer?postId=… so a reload finds a file.
+  openViewer: (postId, i) => router.push(DEMO_MODE
+    ? { pathname: '/viewer', params: { postId, i: String(i) } }
+    : { pathname: '/viewer/[postId]', params: { postId, i: String(i) } }),
   close: () => (router.canGoBack() ? router.back() : router.replace('/photos')),
   goPhotos: () => router.replace('/photos'),
   goSignIn: () => router.replace('/sign-in'),
