@@ -2,6 +2,7 @@
 const { defineConfig } = require('../../e2e/node_modules/@playwright/test');
 module.exports = defineConfig({
   testDir: '.',
+  testIgnore: /demo\.spec\.js/, // the demo build has its own config (playwright.demo.config.js)
   timeout: 90_000,
   expect: { timeout: 15_000 },
   retries: 0,
