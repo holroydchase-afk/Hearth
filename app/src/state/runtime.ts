@@ -3,6 +3,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { Linking, Platform } from 'react-native';
 import { FakeBackend, type FakeState } from '../api/fake/FakeBackend';
+import { DEMO_MODE } from '../demo/flags';
+import { loadDemoPicture } from '../demo/pictures';
+import { seedDemo } from '../demo/seed';
 import { SupabaseApi } from '../api/SupabaseApi';
 import { pickBulk, pickPhotos } from '../media/pick';
 import { expoManipulator } from '../media/expoManipulator';
@@ -15,18 +18,29 @@ import { secureSessionStorage } from '../platform/secureSession';
 import { asyncStorageKV } from '../platform/storage';
 import type { AppDeps } from './AppContext';
 
-export const FAKE_MODE = process.env.EXPO_PUBLIC_HEARTH_FAKE === '1';
-const FAKE_KEY = 'hearth.fakeBackend.v1';
+export const FAKE_MODE = process.env.EXPO_PUBLIC_HEARTH_FAKE === '1' || DEMO_MODE;
+export const FAKE_KEY = 'hearth.fakeBackend.v1';
 
 function fakeBackend(): FakeBackend {
   const ls = Platform.OS === 'web' ? globalThis.localStorage : undefined;
-  const persist = ls ? (s: FakeState) => { try { ls.setItem(FAKE_KEY, JSON.stringify(s)); } catch { /* full */ } } : undefined;
+  // DEMO-2: nothing is saved until the sample family is complete, so a reload mid-seed starts over.
+  let seeding = DEMO_MODE;
+  const persist = ls ? (s: FakeState) => { if (seeding) return; try { ls.setItem(FAKE_KEY, JSON.stringify(s)); } catch { /* full */ } } : undefined;
   const saved = ls?.getItem(FAKE_KEY);
   if (saved) {
-    try { return new FakeBackend(JSON.parse(saved) as FakeState, persist); } catch { /* reseed */ }
+    try {
+      const state = JSON.parse(saved) as FakeState;
+      seeding = false;
+      return new FakeBackend(state, persist);
+    } catch { /* reseed */ }
   }
-  const be = FakeBackend.withFixture({ joIsMember: false }, persist);
-  be.changed();
+  // DEMO-1/2: the demo opens on a sample family already signed in; the web smoke test starts empty.
+  const be = FakeBackend.withFixture({ joIsMember: DEMO_MODE }, persist);
+  if (DEMO_MODE) {
+    be.ready = seedDemo(be, loadDemoPicture).catch(() => undefined).then(() => { seeding = false; be.changed(); });
+  } else {
+    be.changed();
+  }
   return be;
 }
 

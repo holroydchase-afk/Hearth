@@ -1,0 +1,8 @@
+ok   - QA-ALL-1: the suite helper exists
+ok   - QA-ALL-1: one failing suite makes the run fail
+ok   - QA-ALL-1: the failing suite is named
+ok   - QA-ALL-1: a skipped suite is named with why
+ok   - QA-ALL-1: skips alone don't fail the run (a sandbox without Deno can still pass)
+ok   - QA-ALL-1: the summary counts passed and skipped
+ok   - QA-ALL-1: test-all.sh uses the helper
+TEST-ALL RESULT: 7 passed, 0 failed
