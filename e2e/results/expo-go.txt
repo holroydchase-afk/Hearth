@@ -1,0 +1,8 @@
+ok   - EXPO-4: script exists
+ok   - EXPO-4: passes when Expo Go runs the app's SDK
+ok   - EXPO-4: fails when Expo Go has moved on, naming both versions
+ok   - EXPO-4: fails closed when Expo's answer has no Expo Go version
+ok   - EXPO-4: fails closed with a clear message when Expo can't be reached
+ok   - EXPO-4: CI runs the live check
+ok   - EXPO-4: test-all.sh runs the live check
+# 7 passed, 0 failed
