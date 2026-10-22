@@ -66,6 +66,13 @@ describe('UX-G Groups screen invites (BETA-AUD-19)', () => {
     expect(screen.getAllByText('To invite someone, use their household below.').length).toBeGreaterThan(0);
   });
 
+  it('RR-11 a family of plain groups (no households) is pointed to a group below, never to a household', async () => {
+    await renderApp(<GroupsScreen />, { user: 'chase' });
+    expect(await screen.findByRole('button', { name: "Invite someone to Grandparents – Dad's side" })).toBeTruthy();
+    expect(screen.queryByText(/household/)).toBeNull();
+    expect(screen.getByText('To invite someone, use one of the groups below.')).toBeTruthy();
+  });
+
   it('UX-G5 BETA-AUD-19 the form says whose invite it is and what "all" means for that household', async () => {
     const { be, api } = shapedApi();
     await renderApp(<GroupsScreen />, { be, user: 'chase', deps: { api } });
