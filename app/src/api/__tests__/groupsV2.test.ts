@@ -96,12 +96,22 @@ describe('GRP-15..17 / FLAG-5 FakeBackend rules', () => {
   it('FLAG-5 my_features: all three switches must be on; relatives never get video_posting', async () => {
     const be = chase();
     const chaseApi = be.clientFor(FIXTURE.users.chase.id);
-    expect(await chaseApi.myFeatures(FIXTURE.space.id)).toEqual([]);
+    const HELPERS = ['photo_helpers_duplicates', 'photo_helpers_screens_blur'];
+    expect(await chaseApi.myFeatures(FIXTURE.space.id)).toEqual(HELPERS);
     be.state.featureFlags = { video_posting: true };
-    expect(await chaseApi.myFeatures(FIXTURE.space.id)).toEqual([]);
+    expect(await chaseApi.myFeatures(FIXTURE.space.id)).toEqual(HELPERS);
     be.state.spaceFeatures = { [`${FIXTURE.space.id}:video_posting`]: true };
-    expect(await chaseApi.myFeatures(FIXTURE.space.id)).toEqual(['video_posting']);
+    expect(await chaseApi.myFeatures(FIXTURE.space.id)).toEqual([...HELPERS, 'video_posting']);
     expect(await be.clientFor(FIXTURE.users.jo.id).myFeatures(FIXTURE.space.id)).toEqual([]);
+  });
+
+  it('HELP-R4 photo helpers: on by default for posters; a family row or the global row turns one off', async () => {
+    const be = chase();
+    const chaseApi = be.clientFor(FIXTURE.users.chase.id);
+    be.state.spaceFeatures = { [`${FIXTURE.space.id}:photo_helpers_duplicates`]: false };
+    expect(await chaseApi.myFeatures(FIXTURE.space.id)).toEqual(['photo_helpers_screens_blur']);
+    be.state.featureFlags = { photo_helpers_screens_blur: false };
+    expect(await chaseApi.myFeatures(FIXTURE.space.id)).toEqual([]);
   });
 });
 

@@ -60,6 +60,8 @@ Relatives can't read any group's setting: the column isn't granted to signed-in 
 
 A feature such as video posting is on for someone only when three switches are all on (`private.feature_on`): a global switch per feature (`private.feature_flags`, which no app user can read or write), the family's add-on (`space_features`, which only the family's owner can write: `can(space, 'family_settings')`), and `can(space, capability)` for the person (video posting: `use_video`, parents only). Every switch defaults to off. The app reads its list from `my_features(space)`. The server enforces it: `prepare_media_upload` and the `media_items` insert trigger (so a direct table insert too) refuse an app user's video with `42501 video_posting_off`, and `sign-media` then signs nothing.
 
+**Off-switches (Built, migration 0016).** The photo helpers (`photo_helpers_duplicates`, `photo_helpers_screens_blur`; `SPEC-PHOTO-HELPERS.md` HELP-R4) use the same three switches with the opposite default: a missing global or family row means on (`private.feature_default_on`), and the capability is `post`, so a viewer who can't post never gets them. Hearth's global row is a kill switch; the family's owner can turn either off. The rows hold only on/off: the helpers run on the phone and the server never learns anything about a photo (HELP-R2). The app treats every feature as off until `my_features` answers, so a failed read leaves the helpers off too.
+
 **Event names.** A feed or timeline row carries the event a post was sent to (`event_id`, `event_name`) only for that event's members and the parents; anyone who sees the post through another group gets nulls and never learns the event exists.
 
 ## Who sees a name (Built)
@@ -90,4 +92,4 @@ RLS limits what each family member's app can read. It does not limit Hearth's se
 - **Planned:** event dates (`starts_on`, `ends_on`) exist in the schema but the app doesn't use them yet.
 
 ---
-Last checked against code: 2026-10-19, a522a3a (plus migrations 0013, 0015)
+Last checked against code: 2026-10-22, 10001df (plus migrations 0013, 0015, 0016)

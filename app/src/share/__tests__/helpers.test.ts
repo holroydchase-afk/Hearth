@@ -1,7 +1,7 @@
 // R15 photo helpers, phase 1 (SPEC-PHOTO-HELPERS): rules and the picks that need no pixels.
 import type { PickedAsset } from '../bulk';
 import { blur, dark, edges, other, scene, toJpeg } from '../../test/pictures';
-import { applyHelpers, findLookAlikes, helperLines } from '../helpers';
+import { applyHelpers, findLookAlikes, helperLines, helperSwitches } from '../helpers';
 
 let n = 0;
 const photo = (extra: Partial<PickedAsset> = {}): PickedAsset => ({ uri: `file:///p/IMG_${++n}.jpg`, type: 'image', assetId: `a${n}`, ...extra });
@@ -47,6 +47,37 @@ describe('R15 photo helpers', () => {
   it('HELP-R4 helpers off: everything picked is kept', () => {
     const all = [photo(), photo(), photo(), photo({ screenshot: true })];
     expect(applyHelpers(all, { on: false }).kept).toEqual(all);
+  });
+
+  it('HELP-R4 the server names the helpers that are on: photo_helpers_duplicates and photo_helpers_screens_blur', () => {
+    expect(helperSwitches(['photo_helpers_duplicates', 'photo_helpers_screens_blur', 'video_posting'])).toEqual({ duplicates: true, screensBlur: true });
+    expect(helperSwitches(['photo_helpers_screens_blur'])).toEqual({ duplicates: false, screensBlur: true });
+    expect(helperSwitches([])).toEqual({ duplicates: false, screensBlur: false });
+  });
+
+  it('HELP-R4 duplicates off: repeats, look-alikes and already-sent photos all go; screenshots are still left out', () => {
+    const a = photo();
+    const shot = photo({ screenshot: true });
+    const look = photo();
+    const sent = photo();
+    const all = [a, { ...a, uri: 'file:///p/again.jpg' }, photo(), look, sent, shot];
+    const looks = { lookAlikes: new Set([look.uri]), sentBefore: new Set([sent.uri]), blurry: new Set<string>(), ids: new Map() };
+    const r = applyHelpers(all, { on: { duplicates: false, screensBlur: true }, looks });
+    expect(r.sameTwice).toBe(0);
+    expect(r.kept).toEqual(all.filter((x) => x !== shot));
+    expect(r.setAside).toEqual([{ reason: 'screenshots', items: [shot] }]);
+  });
+
+  it('HELP-R4 screenshots and blur off: screenshots and blurry photos go; repeats are still sent once', () => {
+    const a = photo();
+    const shot = photo({ screenshot: true });
+    const fuzzy = photo();
+    const all = [a, { ...a, uri: 'file:///p/again2.jpg' }, photo(), fuzzy, shot];
+    const looks = { lookAlikes: new Set<string>(), sentBefore: new Set<string>(), blurry: new Set([fuzzy.uri]), ids: new Map() };
+    const r = applyHelpers(all, { on: { duplicates: true, screensBlur: false }, looks });
+    expect(r.sameTwice).toBe(1);
+    expect(r.setAside).toEqual([]);
+    expect(r.kept).toEqual([a, all[2], fuzzy, shot]);
   });
 });
 

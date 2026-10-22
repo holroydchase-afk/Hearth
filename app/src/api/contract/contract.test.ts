@@ -642,8 +642,13 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(tl).toMatchObject({ event_id: e, event_name: name });
     });
 
-    it('FLAG-5 my_features: off by default for everyone (FLAG-1); a list of names', async () => {
-      expect(await poster.myFeatures(h.spaceId)).toEqual([]);
+    it('FLAG-5 my_features: video off by default for everyone (FLAG-1); a list of names', async () => {
+      expect(await poster.myFeatures(h.spaceId)).not.toContain('video_posting');
+      expect(await viewerIn.myFeatures(h.spaceId)).toEqual([]);
+    });
+
+    it('HELP-R4 my_features: the photo helpers are on by default for a poster, never for a viewer', async () => {
+      expect(await poster.myFeatures(h.spaceId)).toEqual(expect.arrayContaining(['photo_helpers_duplicates', 'photo_helpers_screens_blur']));
       expect(await viewerIn.myFeatures(h.spaceId)).toEqual([]);
     });
   });
