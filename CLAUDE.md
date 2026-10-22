@@ -52,6 +52,7 @@ The main Claude session is Chase's **chief of staff**. It doesn't do specialist 
 | `qa-tdd` | Failing tests first, suite runs, Test Log updates |
 | `app-engineer` | Building app/backend changes after the failing test exists |
 | `grandparent-ux` | Hearth's UI/UX designer: design or review any screen, word, notification, email or guide a relative will see |
+| `ux-reviewer` | Studio UX reviewer (from studio-agents): showcase reviews of the portfolio demo for recruiters and hiring managers, visual pass with screenshots, Nielsen and WCAG sweep. Relatives' screens still go to `grandparent-ux` |
 | `privacy-security` | RLS, invites, sign-in, media URLs, keys, logging, vendors, AI, data deletion |
 | `funding-analyst` | Grants, programs, investors, funding metrics |
 | `marketing` | Positioning, messaging, taglines, audiences, channels; logs ideas in `docs/product/MARKETING.md` |
@@ -81,3 +82,22 @@ The main Claude session is Chase's **chief of staff**. It doesn't do specialist 
 7. **PostgREST quirks.** Branch on `error.code`, never on HTTP status (P0002 comes back as 500).
 8. **Versions from the vendor, builds on a phone** (`docs/eng/LESSONS.md`). Look up any SDK, runtime or library version on the vendor's live page; never pick one from memory. A build is ready for Chase only once a phone opened it or `scripts/check-expo-go.sh` passes.
 9. **Persona check before product decisions** (docs/product/PERSONA-CHECK.md).
+
+## Working with Chase
+
+Chase is a full-time dad with limited time. These rules apply to every session.
+
+### Minimize Chase's effort
+- Always optimize for Chase's efficiency.
+- Before sending any reply, check every ask you make of Chase. If you could do it yourself, do it instead of asking.
+- When something truly needs Chase (a purchase, a login, a decision), make it a single step: give the exact link, the exact text to paste, or a one-word question with your recommendation.
+- Never hand Chase a multi-step chore you could shrink to one step, or a copy-and-paste you could avoid by saving the result somewhere you can reach.
+- Pick sensible defaults and keep going instead of asking.
+- If Chase is about to make a mistake (wasted money or time, a risky or irreversible step, a worse option than an obvious alternative), say so plainly and briefly before going along with it.
+
+### Token hygiene
+- Keep memory files short. Store facts and links there, never copies of docs.
+- Split shared docs by topic, one file per area, and read only the section you need.
+- Keep one session per stream of work. Continue it instead of starting a new one.
+- Edit docs directly, re-reading them just before you write.
+- Keep replies short and lead with the answer.

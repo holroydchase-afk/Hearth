@@ -1,4 +1,36 @@
-# Handoff: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
+# Handoff
+
+## Oct 22, power hour (Chase)
+- Merged on Chase's word: #33, #34, #36, the recruiter-ready stack #37 to #45 (no-login demo + fixes), and #32 (on-device opt-in AI, renumbered DEC-28 to DEC-31 because the night shift used DEC-28).
+- Next: Chase pastes `docs/portfolio/INTAKE-2026-10-22-demo.md` into Product Studio; Expo preview key (C2); messenger test MS3.
+
+## Portfolio / public presence
+- **Oct 22:** chaseholroyd.com/family-photos.html already shows Hearth under a placeholder name ("name coming"); Product Studio owns that page. Hearth handed Product Studio an INTAKE block (`docs/portfolio/INTAKE-2026-10-22.md`): refresh the test counts, add three sample-data iPhone screenshots from `docs/portfolio/screens/`, add the encryption and "no Seen by" points.
+- **Oct 22, recruiter-ready sprint v2:** review in `docs/reviews/2026-10-22-recruiter-ready.md` (RR-1..16: 5 P0, 7 P1, 4 P2). Main gap: no no-login sample-data demo. Fix loop builds one (demo build, sample pictures, demo bar, laptop frame) for Product Studio to host at chaseholroyd.com/demo/hearth/. Round 1a done: demo build with a sample family, demo bar, Grandma's view (`npm run export:web:demo`, `npm run e2e:demo`). Round 1b done: laptop frame with a story panel, plain not-found page. Round 1c done: `npm run build:demo-site` builds the demo for chaseholroyd.com/demo/hearth/ (tested on a Pages-like static server). Round 1d done: README and case study agree (600+ app tests, 800+ database checks, eight agents, demo), portfolio screenshots re-shot from the demo, new INTAKE. Round 2 done: every demo screen re-checked (no new P0/P1), RR-11 groups words, RR-13 test-all exit code, RR-17 shorter demo bar. **Exact next step:** RR-4 waits on Product Studio (Chase pastes `docs/portfolio/INTAKE-2026-10-22-demo.md`). Round 3 done: RR-15 (full-screen photo survives a reload on a static host). Left: RR-16 (confirm disabled buttons with a real user; nothing to build). Round 4 (nightly run, Oct 22): fresh re-check found RR-18 (Messages counted parents without saying so; fixed with "Parents are in every chat.") and RR-19 (a stale next-step line in this file; fixed). After Product Studio publishes, open chaseholroyd.com/demo/hearth/ on a phone and a laptop and re-run the review against the live URL.
+- **Don't link publicly:** the expo.app web build (the live app on the family's real backend, sign-in only) or the repo (private until the name is final, then AGPL-3.0 per DEC-7). The public no-login demo is built (`app/scripts/build-demo.sh`) for chaseholroyd.com/demo/hearth/; Product Studio hosts it from `docs/portfolio/INTAKE-2026-10-22-demo.md` (Chase pastes it there), which also fixes the page's households wording and test counts and swaps in screenshots from the demo.
+
+## Oct 22: studio ux-reviewer synced (recruiter-ready sprint)
+- Synced `ux-reviewer` from studio-agents (PR #6 branch `claude/project-thread-wvkxmq`, showcase review mode) with `scripts/sync.sh`; roster row added to `CLAUDE.md`. The rest of `examples/hearth/MIGRATION.md` (swap staff-pm, qa-tdd, privacy-security, app-engineer and marketing for the generic ones, archive funding-analyst) is not done: those Hearth agents carry Hearth-only facts, so it waits for after the Nov 22 beta (TRACKER row R16). Decision to review.
+
+## Oct 21, night shift 1: freeze lifted, review, ranked list, first fixes (branch claude/project-thread-kzt7by)
+- **Done:** app review (`docs/product/reviews/2026-10-21-app-review.md`); ranked list in `TRACKER.md` "Sequence to milestone 2"; `docs/eng/PERFORMANCE.md` with measured encryption speed; DEC-28, DEC-29 and the speed-architecture persona check. Built test-first: R1 parallel sending (PERF-UP-1..3), R2 no "Seen by", R3 photos fill the card.
+- **R4 (part):** `app/src/crypto/aesGcm.ts` picks native, then crypto.subtle, then JavaScript; upload and viewing use the async path. The native module is installed with the first development build (registerNativeAesGcm), not now: Expo Go can't load it.
+- **R5 done:** T8 (RFC 9180 A.2.1 vector passes: our HPKE matches the standard), T9 (QA-3 test pins seed.sql's post dates), T10 (fake chatFetch has the joined-at cutoff, contract test).
+- **R7 done:** root README, case study, iPhone screenshots (`SNAPSHOT_DIR=../docs/portfolio/screens npm run e2e:web`). e2e core-loop now expects no "Seen by". R6 moved to P2 (LG persona, REPLY-11).
+- **R9 done:** cold start 260 ms median (web + fake). **R10 done:** `SPEC-PHOTO-HELPERS.md` + persona check; build is R15.
+- **R8 done (A3):** photos seen before open from the phone, offline too. `media/cache.ts` keeps ciphertext files (`platform/mediaStore.ts`, cache folder, 400 max) and item keys sealed under a Keychain/Keystore key; `FeedStore.onRefreshed` prunes them, sign-out wipes them. Web keeps nothing. Tests A3-1..6. Docs: 02, 03 "On the phone", 04 former-member row.
+- **R12 done:** thumbnail loop starts from a guess based on the display JPEG (`media/pipeline.ts`, R12 RV-P5 tests).
+- **R15 part 1 done:** `share/helpers.ts` (HELP-R5, DUP-1, SHOT-1), BatchReview lines with "Send them too" and "Show what we left out"/"Put back" (HELP-ALL-1), picker reads library id and screenshot flag (`media/pick.ts`), `media/pixels.ts` (dHash, sharpness, darkness) tested on synthetic pictures.
+- **R14 done:** audit unchanged on expo 57.0.30; one advisory ships (decode-uri-component in expo-router, crafted link could freeze the app). Review RV-X4 corrected.
+- **R15 part 2 done:** look-alikes from a 160 px preview (`media/preview.ts`, jpeg-js 0.4.4 from npm, `pixels.ts`), lines appear after the screen opens; blur built but off (`BLUR_UNDER` null) until tuned. PERF-HELP-1: 30 ms per photo without JIT.
+- **R11 done:** Photos header buttons two to a row (`PhotosScreen.tsx`, `photosHeader.test.tsx`); sketch and persona check in `docs/product/decisions/2026-10-21-photos-header.md`. Portfolio iPhone screenshots refreshed.
+- **R15 DUP-2 done:** "already sent" from a 30-day list of preview fingerprints on the phone (`share/sentBefore.ts`).
+- **R6 dropped** by Chase Oct 21, kept in mind (DEC-30).
+- **Next exact step (Oct 21 plan):** everything left is blocked. R15 blur tuning needs Chase's 40 labeled photos; R15 server flags need a migration Chase deploys; R4 needs a development build; R13 needs FLAG-7. The nightly task now runs the recruiter-ready fix loop instead.
+- **Decisions to review:** "already sent" compares a fingerprint of the small preview, not the full file (HELP-DUP-2). Photos header buttons two to a row, labels may wrap to two lines (R11). Look-alike lines appear a moment after the review screen opens (Send never waits). R15 helpers are on by default with an in-code switch, not a server flag yet (HELP-R4); Android screenshots come from the "Screenshots" album only. R3 crops tall or wide photos in the card to fill the frame (the full photo is one tap away). A3 keeps photo keys on the phone, sealed under a Keychain/Keystore key (RV-X6); a removed member's offline phone keeps showing kept photos until its next refresh.
+- **Blockers:** none. A1 can't be checked on a phone until a development build exists.
+
+## Earlier: end of day 2 (Thu Oct 15, 2026, 10:30 pm)
 
 ## Oct 18: anchor A4 White-paper ready, architecture docs started (Chase's ask)
 - Chase: build documentation as we go so it turns into white papers easily, for intelligent, privacy-focused tech readers. Logged as anchor A4 and an ideas-log row in `docs/product/ANCHORS.md`.

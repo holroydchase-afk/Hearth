@@ -34,7 +34,7 @@ staff-pm reading, to confirm when we circle back:
   - *Cost:* the most flexible shape and the most to build. Build order when we get there: AI-2 as the first add-on (no ML), with the permission row, before any face add-on.
 - **"Own server" taken literally** (a family hosting Hearth itself) is a post-milestone-7 question: it would help A3 but costs Chase support time. Logged, not planned.
 
-## Decided: on-device only, opt-in (DEC-28, Oct 19)
+## Decided: on-device only, opt-in (DEC-31, Oct 19)
 
 Chase picked option B on Oct 19 ("Yes I am"). The promise is now: **"AI is off until your family turns it on. Then it runs only on your phones, and your photos never train anyone else's AI."** CF-10, the claims register, STORY and BETA-SPEC are reworded in the same PR. The persona check is `decisions/2026-10-19-ai-on-device-opt-in.md`. Research behind it (zero-knowledge AI options, five features, blockers): https://claude.ai/artifact/NsUEm6y7fVNQtjEVPjPUVn
 
@@ -52,9 +52,9 @@ Status: **Idea** (logged) → **Ready to spec** (decisions made) → **Specced**
 | ID | Feature | What the family sees | Approach | Needs decision B? | Priority | Status |
 |---|---|---|---|---|---|---|
 | AI-1 | **People → group suggestions** on bulk upload | "These 14 photos have Memaw in them. Send to Memaw's house too?" | Phase 1 no-ML, phase 2 on-device face grouping (below) | Phase 2 only | 1 (Chase) | Idea |
-| AI-2 | **Duplicate and near-duplicate catch** | "3 of these look the same. Send just the best one?" | Exact: file hash. Near: perceptual hash (dHash), not a model | No | 2 (Chase) | Idea |
+| AI-2 | **Duplicate and near-duplicate catch** | "3 of these look the same. Send just the best one?" | Exact: file hash. Near: perceptual hash (dHash), not a model | No | 2 (Chase) | Specced (Oct 21, `SPEC-PHOTO-HELPERS.md`) |
 | AI-3 | **Best shot from a burst** | Of 8 near-identical shots, one is pre-picked; tap to swap | On-device sharpness score (no-ML); later eyes-open/smile score | For eyes/smile only | 3 | Idea (Oct 16, ANCHORS) |
-| AI-4 | **Leave out screenshots and blurry shots** in bulk upload | "We left out 6 screenshots and 2 blurry photos. Show them" | Screenshots from photo-library metadata; blur from a sharpness score. No-ML | No | 3 | Idea |
+| AI-4 | **Leave out screenshots and blurry shots** in bulk upload | "We left out 6 screenshots and 2 blurry photos. Show them" | Screenshots from photo-library metadata; blur from a sharpness score. No-ML | No | 3 | Specced (Oct 21, `SPEC-PHOTO-HELPERS.md`) |
 | AI-5 | **Group a bulk upload into occasions** | "Looks like 3 days: Jul 4, Jul 5, Jul 6. Make Jul 4 an event?" | Capture-time gaps, read on the phone before EXIF is stripped. No location (Never build #7). No-ML | No | 4 | Idea; builds on the overnight plan's "one post per day" |
 | AI-6 | **Upright and right-side-up** | A sideways photo arrives upright | Orientation flag already kept (SHARE-5); a model only for scans with no flag | Model part only | 5 | Idea |
 | AI-8 | **A personal model on each phone** (Chase, Oct 19): "explore training their personal mode that lives on their phone but then it'd like need to sync with other relative etc". Build nothing that prevents it | The family's helpers get better at *their* faces and words over time | Start as shared frozen model + private memory (no training). Later: on-phone fine-tuning, synced end-to-end encrypted between a family's parents (MLS) | Yes, and an R2 review | Later | Idea; AI-P0.4 and P0.5 keep it possible |
@@ -111,7 +111,7 @@ Ready Oct 19. Nothing here starts until Chase says go, and milestone 1 comes fir
 | AI-P0.4 | The private memory: an encrypted on-phone store (key in the device keychain) whose rows carry `model_id` and `model_version` | Swap or upgrade a model (or later a personal model, AI-8) by re-running it, with no data migration | Turning an add-on off deletes its rows (test); rows from an old model version are ignored |
 | AI-P0.5 | Sync-ready rows: keyed to family person IDs (never names), each with origin device and `updated_at` | Parent-to-parent sync over the messenger's MLS keys (and AI-8) can be added later without a rewrite. Sync itself is not built | Unit test: merging two copies of a row keeps the newest |
 | AI-P0.6 | Move from Expo Go to an EAS development build when the first native model lands (Phase 2) | On-device models need native code; Expo Go can't load them | Lines up with milestone 2's $99 Apple account (D3 name check first) |
-| AI-P0.7 | `docs/architecture/07-on-device-ai.md`: what runs where, what the private memory holds, what never leaves the phone | Anchor A4, rule 6; TR mitigation in DEC-28 | Written before the first add-on ships |
+| AI-P0.7 | `docs/architecture/07-on-device-ai.md`: what runs where, what the private memory holds, what never leaves the phone | Anchor A4, rule 6; TR mitigation in DEC-31 | Written before the first add-on ships |
 
 **Phases 1 to 4: features, in priority order.**
 

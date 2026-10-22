@@ -90,11 +90,11 @@ test('core loop: share → Jo sees it → Ruth does not → heart → comment �
   await page.getByRole('button', { name: 'Close' }).click();
   await signOut(page, 'Help');
 
-  // 5. Chase sees the heart, the comment and "Seen by 1 of 2", then deletes it.
+  // 5. Chase sees the heart and the comment (no "Seen by" count), then deletes it.
   await signIn(page, 'chase@example.com');
   await expect(page.getByText('1 person loves this')).toBeVisible();
   await expect(page.getByText(/Look at those cheeks!/)).toBeVisible();
-  await expect(page.getByText('Seen by 1 of 2')).toBeVisible();
+  await expect(page.getByText(/Seen by/)).toHaveCount(0); // RV-U1 (DEC-21): no "Seen by" count
   await page.getByRole('button', { name: 'Delete this photo' }).click();
   await page.getByRole('button', { name: 'Yes, delete it' }).click();
   await expect(page.getByText('Pumpkin patch', { exact: true })).toHaveCount(0);

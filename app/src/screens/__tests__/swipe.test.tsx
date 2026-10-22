@@ -173,4 +173,14 @@ describe('SWIPE: a post\'s photos, one at a time in the card', () => {
     expect(await within(ev).findByText('2 of 3')).toBeTruthy();
     expect(within(ev).getByRole('button', { name: "Open Chase's birthday" })).toBeTruthy();
   });
+
+  it('RV-U2 (UAT 8): in the card, every photo fills the frame, so a mix of tall and wide photos shows no grey bars', async () => {
+    const { be, id } = await one({ photos: 2, sizes: [[1536, 2048], [2048, 1536]] });
+    await renderApp(<PhotosScreen />, { be, user: 'jo' });
+    const card = await screen.findByTestId(`post-${id}`);
+    layout(id);
+    const images = within(card).UNSAFE_queryAllByType(MediaImage);
+    expect(images.length).toBeGreaterThan(0);
+    for (const img of images) expect(img.props.fit ?? 'cover').toBe('cover');
+  });
 });

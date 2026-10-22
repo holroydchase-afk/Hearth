@@ -57,7 +57,8 @@ export interface FakeState {
   spaces: Record<string, { id: string; name: string; reply_audience?: ReplyAudience }>;
   members: MemberRow[];
   circles: Record<string, CircleRow>;
-  circleMembers: { circle: string; user: string }[];
+  /** `at`: when they were added (ISO); fixture rows have none and count as always there. */
+  circleMembers: { circle: string; user: string; at?: string }[];
   posts: Record<string, PostRow>;
   media: Record<string, MediaRow>;
   objects: Record<string, string>; // key -> base64 ciphertext
@@ -116,6 +117,8 @@ export interface FixtureOptions {
 
 export class FakeBackend {
   private listeners = new Set<() => void>();
+  /** DEMO-1: the demo build seeds pictures asynchronously; app calls wait for it (tests leave it unset). */
+  ready: Promise<void> | null = null;
   constructor(public state: FakeState, private persist?: (s: FakeState) => void) {}
 
   static empty(): FakeState {
@@ -325,10 +328,18 @@ export class FakeBackend {
     this.changed();
     return id;
   }
+  /** 0015 chat_member_since: parents count from the start; others from when they were added to the group (T10). */
+  private chatSince(circle: string, me: string): string {
+    const c = this.state.circles[circle]!;
+    if (this.isPoster(c.space, me)) return '';
+    const row = this.state.circleMembers.find((x) => x.circle === circle && x.user === me);
+    return row?.at ?? '';
+  }
   chatFetch(user: string | null, circle: string, after: number, limit = 200): ChatRow[] {
     const me = this.chatMe(user, circle);
+    const since = this.chatSince(circle, me);
     return this.chat.rows
-      .filter((r) => r.circle === circle && r.id > after && (!r.recipient || r.recipient === me))
+      .filter((r) => r.circle === circle && r.id > after && r.created_at >= since && (!r.recipient || r.recipient === me))
       .slice(0, Math.min(Math.max(limit, 1), 500))
       .map(({ circle: _c, recipient: _r, ...row }) => row);
   }
@@ -650,7 +661,7 @@ export class FakeBackend {
     const places = [...inv.circles];
     const everyone = Object.values(this.state.circles).find((c) => c.space === inv.space && c.kind === 'everyone' && !c.deleted);
     if (everyone && inv.householdMeansEveryone && inv.circles.some((c) => this.state.circles[c]?.kind === 'household')) places.push(everyone.id);
-    for (const c of places) if (!this.inCircle(c, me)) this.state.circleMembers.push({ circle: c, user: me });
+    for (const c of places) if (!this.inCircle(c, me)) this.state.circleMembers.push({ circle: c, user: me, at: new Date().toISOString() });
     this.changed();
     return inv.space;
   }
@@ -729,7 +740,7 @@ export class FakeBackend {
     this.historyChoice(history);
     if (c.kind === 'everyone') throw new ApiError('23514', 'people join Everyone through an invite');
     if (!this.member(c.space, person)) throw new ApiError('23514', 'not a member of this family');
-    if (!this.inCircle(group, person)) this.state.circleMembers.push({ circle: group, user: person });
+    if (!this.inCircle(group, person)) this.state.circleMembers.push({ circle: group, user: person, at: new Date().toISOString() });
     this.changed();
   }
 
@@ -740,7 +751,7 @@ export class FakeBackend {
     if (t.space !== s.space) throw new ApiError('23514', 'both must be in the same family');
     if (t.kind === 'everyone') throw new ApiError('23514', 'people join Everyone through an invite');
     for (const u of this.circleMemberIds(source)) {
-      if (this.member(t.space, u)?.role === 'viewer' && !this.inCircle(target, u)) this.state.circleMembers.push({ circle: target, user: u });
+      if (this.member(t.space, u)?.role === 'viewer' && !this.inCircle(target, u)) this.state.circleMembers.push({ circle: target, user: u, at: new Date().toISOString() });
     }
     this.changed();
   }
@@ -868,6 +879,7 @@ export class FakeApi implements HearthApi {
   }
 
   private async run<T>(f: () => T): Promise<T> {
+    if (this.be.ready) await this.be.ready;
     if (this.opts.latencyMs) await new Promise((r) => setTimeout(r, this.opts.latencyMs));
     else await Promise.resolve();
     return clone(f());
@@ -934,6 +946,7 @@ export class FakeApi implements HearthApi {
   finalizeMedia = (ids: string[]) => this.run(() => this.be.finalizeMedia(this.userId, ids));
   signView = (p: string) => this.run(() => this.be.signView(this.userId, p));
   getObject = async (url: string) => {
+    if (this.be.ready) await this.be.ready;
     if (this.opts.latencyMs) await new Promise((r) => setTimeout(r, this.opts.latencyMs));
     return this.be.getObject(url).slice();
   };
