@@ -21,7 +21,7 @@ async function setup() {
 describe('DEMO-3 / DEMO-10 demo bar', () => {
   it('DEMO-3 says it is a made-up family, kept in this browser, and who you are', async () => {
     await setup();
-    expect(screen.getByText(/made-up family/)).toBeTruthy();
+    expect(screen.getByText(/made-up family/i)).toBeTruthy();
     expect(screen.getByText(/You're Sam, a parent/)).toBeTruthy();
   });
 
@@ -33,6 +33,8 @@ describe('DEMO-3 / DEMO-10 demo bar', () => {
     screen.unmount();
     render(<DemoBar be={be} reload={reload} startOver={jest.fn()} open={jest.fn()} />);
     expect(screen.getByText(/You're Grandma Jo/)).toBeTruthy();
+    // RR-17: two short lines at most, even with Grandma's Bigger text on.
+    expect(screen.getByText(/You're Grandma Jo/).props.children.length).toBeLessThanOrEqual(75);
     fireEvent.press(screen.getByRole('button', { name: "Back to Sam's view, the parent" }));
     expect(be.state.appSession).toBe(FIXTURE.users.chase.id);
   });

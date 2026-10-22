@@ -8,7 +8,7 @@ for (const tab of ['', 'photos', 'share', 'groups', 'me']) {
     page.on('response', (r) => { if (r.status() >= 400) failed.push(`${r.status()} ${r.url()}`); });
     page.on('pageerror', (e) => failed.push(String(e)));
     await page.goto(`/demo/hearth/${tab}`);
-    await expect(page.getByText(/A demo with a made-up family/)).toBeVisible();
+    await expect(page.getByText(/made-up family/)).toBeVisible();
     if (tab === '' || tab === 'photos') {
       await expect(page.getByText('Mia turned 5!', { exact: true })).toBeVisible();
       await expect.poll(() => page.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth > 0).length)).toBeGreaterThan(0);
