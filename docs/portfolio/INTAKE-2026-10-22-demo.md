@@ -3,11 +3,11 @@ INTAKE for Product Studio (from Hearth, Oct 22, 2026, recruiter-ready sprint). R
 Repo: holroydchase-afk.github.io (portfolio). Page: family-photos.html (`family = product(...)` in tools/build.py). Owner: Product Studio. Keep the placeholder name and "name coming"; the name isn't final.
 
 1. Host the no-login demo at chaseholroyd.com/demo/hearth/ (like demo/role-radar/).
-   - Build it from the Hearth repo (private; add holroydchase-afk/Hearth to the session), on Hearth's main once its PRs #37 to #42 are merged:
+   - Build it from the Hearth repo (private; add holroydchase-afk/Hearth to the session), on Hearth's main once its PRs #37 to #44 are merged:
      cd app && npm ci && bash scripts/build-demo.sh
    - Copy everything in app/dist-demo-site/ into demo/hearth/ in the portfolio repo. It's static (about 4 MB), already built for the /demo/hearth/ path, with a copy of index.html in each tab's folder because Pages has no fallback.
    - What it is: a made-up family ("Mia and Leo", parent "Sam", Grandma Jo…) with drawn sample pictures, kept in the visitor's browser only, no backend, no sign-in. A bar on every screen says so and links back to family-photos.html. On a laptop it shows the app at phone width beside a short guide.
-   - Hearth checked it on a Pages-like local server (no fallback, 404s): app/e2e-web/site.spec.js. Not checked on the live site; please open chaseholroyd.com/demo/hearth/ and /demo/hearth/photos after publishing.
+   - Hearth checked it on a Pages-like local server (no fallback, 404s): app/e2e-web/site.spec.js. Not checked on the live site; please open chaseholroyd.com/demo/hearth/ and /demo/hearth/photos after publishing, open a photo full screen and reload (the address keeps a ?postId=… query; check it survives).
 
 2. Page fixes on family-photos.html (one story with the Hearth README and case study, Oct 22):
    - Add a primary button "Try the demo" → demo/hearth/ (links=[("Try the demo", "demo/hearth/")]).

@@ -89,6 +89,10 @@ New and fixed this round:
 - **RR-13 (P2, fixed):** `test-all.sh` now fails when any suite that ran failed, and prints `SKIPPED: backend SQL (no local Postgres running)` or `SKIPPED: Deno functions (Deno isn't installed; CI runs them)` instead of passing on Playwright alone. Helper `scripts/lib/suite.sh`, test `scripts/tests/test_all_test.sh` (QA-ALL-1, 7 checks). Run here: 10 passed, 0 failed, 1 skipped (Deno).
 - Portfolio laptop screenshot re-shot with the new bar words.
 
+## Round 3: viewer reload (#44)
+
+- **RR-15 (P2, fixed):** in the demo, a full-screen photo opens at `/viewer?postId=…` (new route `src/app/viewer/index.tsx`, same screen), and `build-demo.sh` gives `viewer/` its own `index.html`, so a reload on a static host keeps the photo open. If a host drops the query, the page goes to Photos instead of an error. The phone app keeps `/viewer/<id>`. Test: `site.spec.js` RR-15 (red before, green after). Assumes GitHub Pages keeps the query string when it adds the trailing slash; the local server does, the live host is unverified.
+
 ## Status
 
 | Round | Fixed | New | Left |
@@ -99,3 +103,4 @@ New and fixed this round:
 | 1c (#41) | RR-5 | – | P0: RR-4. P1: RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
 | 1d (#42) | RR-9, RR-12; RR-4 on Hearth's side | – | P0: RR-4 (waits on Product Studio). P1: RR-11. P2: RR-13, RR-15, RR-16 |
 | 2 (#43) | RR-11, RR-13, RR-17 | RR-17 | P0: RR-4 (waits on Product Studio). P2: RR-15 (viewer reload on a static host), RR-16 (disabled buttons, needs a real user) |
+| 3 (#44) | RR-15 | – | P0: RR-4 (waits on Product Studio: hosting and page fixes). P2: RR-16 (confirm with a real user; nothing to build) |

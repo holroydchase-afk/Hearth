@@ -8,7 +8,7 @@ BASE=${1:-/demo/hearth}
 OUT=dist-demo-site
 HEARTH_BASE_URL="$BASE" EXPO_PUBLIC_HEARTH_DEMO=1 npx expo export --platform web --output-dir "$OUT" --clear
 # A static host has no fallback to index.html, so each address a visitor can reload gets its own copy.
-for route in photos share groups me help sign-in; do
+for route in photos share groups me help sign-in viewer; do
   mkdir -p "$OUT/$route"
   cp "$OUT/index.html" "$OUT/$route/index.html"
 done
