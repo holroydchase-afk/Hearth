@@ -33,3 +33,12 @@ test("DEMO-5 Grandma's view and Start over stay inside /demo/hearth/", async ({ 
   await expect(page.getByText(/You're Sam, a parent/)).toBeVisible();
   expect(new URL(page.url()).pathname).toMatch(/^\/demo\/hearth\//);
 });
+
+test('RR-15 reloading an open full-screen photo on the static host keeps the photo open', async ({ page }) => {
+  await page.goto('/demo/hearth/');
+  await page.getByRole('button', { name: /Open photo 1 of/ }).first().click();
+  await expect(page.getByRole('button', { name: 'Save to my phone' })).toBeVisible();
+  const status = (await page.reload()).status();
+  expect(status).toBe(200);
+  await expect(page.getByRole('button', { name: 'Save to my phone' })).toBeVisible();
+});
