@@ -1,6 +1,6 @@
 # Hearth tracker: what's next, what's missing, what's pending
 
-The one list of everything open between Chase and Claude. Updated Oct 19, 2026.
+The one list of everything open between Chase and Claude. Updated Oct 21, 2026.
 
 **How it works**
 - Work the **Sequence** top to bottom. One step at a time; nothing new gets built until milestone 1 passes (Chase, Oct 17).
@@ -12,6 +12,29 @@ The one list of everything open between Chase and Claude. Updated Oct 19, 2026.
 ## Goal: milestone 1 ready for testing
 
 Chase uses Hearth end to end in Expo Go on his iPhone, with a test account B on the web build: sign in with a code, post photos, B sees them, B comments and hearts, Chase gets an email notice, 10+ posts over 2 days, nothing lost. Gate: `BETA-SPEC.md` "Milestone gates", row 1.
+
+## Sequence to milestone 2 (review-driven, Oct 21)
+
+The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/2026-10-21-app-review.md`: what blocks M2 (Danielle) first, then speed and stability, then G1, then the portfolio. Worked nightly at 2:15am ET until done.
+
+| # | Item | Pri | Cost | Status |
+|---|---|---|---|---|
+| R1 | A2 parallel sending: display and thumbnail together, 2 photos at once, next post prepared during upload (RV-P1, PERF-UP-1..3) | P0 | S | ☑ Oct 21 |
+| R2 | Drop "Seen by N of M" from cards (RV-U1, DEC-21) | P0 | S | ☑ Oct 21 |
+| R3 | Photos fill the card frame, no grey bars on mixed tall and wide posts (RV-U2, UAT 8) | P0 | S | ☑ Oct 21 |
+| R4 | A1 native encryption behind a switch; JavaScript stays in Expo Go; same vectors on both (RV-P2) | P0 | M | ◐ Oct 21: provider switch built (web uses crypto.subtle). Installing react-native-quick-crypto 1.1.8 (plus react-native-nitro-modules) waits for the first development build, since Expo Go can't load it |
+| R5 | Test gaps T9 (date-dependent QA-3 test), T10 (fake chat joined-at cutoff), T8 (RFC 9180 vectors) | P1 | S | ☑ Oct 21: our HPKE matches RFC 9180 A.2.1; QA-3 test pins seed dates; fake chat has the joined-at cutoff |
+| R6 | Reply readers asked only when the reply box opens, plus a "Write something back" button (RV-P3, RV-U4) | P2 | S | ✗ Dropped Oct 21 by Chase, kept in mind (DEC-30): the box stays for LG and REPLY-11; revisit if phone timings show the readers calls hurt |
+| R7 | Portfolio pack: root README, screenshots of the core flow (fake names), case study | P1 | M | ☑ Oct 21: `README.md`, `docs/portfolio/CASE-STUDY.md`, `docs/portfolio/screens/` (from `snapshot.spec.js`) |
+| R8 | A3 Photos kept on the phone: the feed and encrypted photo files, keys in the keychain (RV-P4, RV-X6; privacy review first) | P1 | L | ☑ Oct 21: photos seen before open from the phone with no network; ciphertext files plus keys sealed under a Keychain/Keystore key, dropped when a post goes away and wiped at sign-out (A3-1..6). Decision to review: keys kept on the phone (03-encryption-and-keys "On the phone"). Phone timing still to measure |
+| R9 | PERF-FEED-1 cold-start timing on the web build | P1 | S | ☑ Oct 21: 260 ms median on the web build with the fake backend (`e2e-web/perf.spec.js`); a phone timing comes with A3 |
+| R10 | Specs: AI-2 duplicates, AI-4 screenshots and blurry photos, no model (persona check, grandparent-ux words) | P2 | S | ☑ Oct 21 specced: `SPEC-PHOTO-HELPERS.md` (HELP-*). Build is a new row after A3 |
+| R15 | Build the photo helpers (HELP-DUP-1..4, HELP-SHOT-1, HELP-BLUR-1/2, HELP-ALL-1) | P2 | M | ◐ Oct 21: same photo twice sent once, screenshots, look-alikes (clearest kept) and photos already sent in the last 30 days left out, "Show what we left out" with Put back, all one button from coming back. Blur is built but off until tuned. Left: tune blur on 40 labeled photos (needs Chase), server flags (needs a migration) |
+| R11 | Photos header: fewer stacked buttons before the first photo (RV-U3; grandparent-ux sketch first) | P2 | S | ☑ Oct 21: buttons two to a row, wrapping with Bigger text; the first photo shows without scrolling. Sketch and persona check in `decisions/2026-10-21-photos-header.md` (decision to review) |
+| R12 | Thumbnail sizing from a first guess instead of up to 7 encodes (RV-P5; measure on a phone) | P2 | S | ☑ Oct 21: the display JPEG's bytes per pixel pick the first step (padded 1.5×); a busy photo takes 1 to 2 thumbnail encodes instead of up to 7, a plain one still gets the sharpest. Phone timing still to measure |
+| R13 | A4 resumable video uploads (after FLAG-7 video stripping; RV-P7) | P2 | L | ☐ |
+| R16 | Rest of the studio-agents migration (`examples/hearth/MIGRATION.md` in studio-agents): move Hearth facts into docs, swap in the generic agents, archive funding-analyst | P2 | S | ☐ After the Nov 22 beta; `ux-reviewer` synced Oct 22 |
+| R14 | npm audit: recheck the Expo CLI build-tool findings after the next Expo patch (RV-X4) | P2 | S | ☑ Oct 21: still 62 from 5 advisories on expo 57.0.30 (newest SDK 57 patch). One ships: decode-uri-component in expo-router (a crafted link could freeze the app; no data exposed). No forced override; recheck at the SDK 58 move |
 
 ## Sequence to milestone 1
 
@@ -68,7 +91,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 | D3 | Is the name final? Must be answered before buying the domain or the $99 Apple build (`ACCOUNTS.md`) | Decide at the start of milestone 2 | Milestone 2 |
 | D4 | "Seen by" conflicts with A2 Guilt-free: keep, change or drop | Decide before milestone 4 | Milestone 4 |
 | D5 | Is Thanksgiving (Nov 26) still the target for milestones 3–4 | Yes, soft target | Planning only |
-| D6 | AI positioning session (on-device, opt-in); blocks face features only | **Decided: B, on-device only, opt-in** (Chase, Oct 19; DEC-28, `decisions/2026-10-19-ai-on-device-opt-in.md`). Build plan below waits on his go | Nothing; see "On-device AI" |
+| D6 | AI positioning session (on-device, opt-in); blocks face features only | **Decided: B, on-device only, opt-in** (Chase, Oct 19; DEC-31, `decisions/2026-10-19-ai-on-device-opt-in.md`). Build plan below waits on his go | Nothing; see "On-device AI" |
 | D7 | Earlier "personal server" question: did you mean a separate locked store per family, run in the US? Your yes to the family vault may already answer it | Treat the vault as the answer | Nothing today |
 | D8 | Start per-family media keys now, before the first real photos (step 7), or after milestone 1 (then old photos need re-keying) | Before step 7, if staff-pm approves; it's small | Nothing today; cheaper before step 7 |
 | D9 | Push and email notices name the sender ("From Chase on Hearth", BETA-NOTIFY-7) or say nothing about who | Keep names for the beta; add a "hide names" setting later | Milestone 2 |
@@ -103,6 +126,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 - Schedule the nightly hard purge (`purge_soft_deleted`) on the hosted project; `deploy.sh` doesn't today. Found while writing `docs/architecture/02-data-flow.md`.
 - **Inventory of everything Hearth is building** (Chase, Oct 19, "at some point"): one list of screens, backend functions, scripts, docs and accounts, read from the repo. Not started; good fit for the central PM hub (ACT-1).
 - 0012 households-only migration (spec'd in `SPEC-GROUPS.md`, needed before milestone 3).
+- **Text cards in the timeline** (Chase, Oct 20, idea; build freeze, so not built): one reusable card that shows words instead of a photo, for kids' quotes, announcements and event reminders. Sketch: a text-only post (the database may already allow a post with no photos, but the share flow and timeline assume photos; check first), a new `note` row next to `post` and `month` in `app/src/feed/timeline.ts`, and a `TextCard` beside `PostCard` built from `app/src/ui/kit.tsx` (`Card`, `Txt`). Needs staff-pm scope call (outside BETA-SPEC), a persona check and a grandparent-ux pass on the look before any build.
 
 - **Developer edition** (Chase, Oct 19; post-milestone 1, decided by D10). The bet: a developer parent clones Hearth, deploys their own copy with one command, and grows it with Claude. The repo (CLAUDE.md, agents, TDD, `docs/architecture/`) is already most of the kit. Goal: an impressive dev-community contribution, built by product and dev folks for product and dev folks.
   1. Scan the full git history for secrets (and anything family-identifying) before anything goes public.

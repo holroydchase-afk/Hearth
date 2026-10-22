@@ -234,71 +234,76 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
  105 | ok     | invite_preview: the link token works too
  106 | ok     | invite_preview: unknown code is 22023  [22023 invite is invalid or expired]
  107 | ok     | invite_preview over PostgREST: 400 with code 22023
- 108 | ok     | BETA-JOIN-3 expired invite is 22023  [22023 invite is invalid or expired]
- 109 | ok     | BETA-JOIN-3 revoked invite is 22023  [22023 invite is invalid or expired]
- 110 | ok     | BETA-JOIN-3 used-up invite is 22023  [22023 invite is invalid or expired]
- 111 | ok     | BETA-JOIN-3 unknown code is 22023  [22023 invite is invalid or expired]
- 112 | ok     | BETA-JOIN-3 invite addressed to a different email is 22023  [22023 invite is invalid or expired]
- 113 | ok     | BETA-JOIN-3 wrong-email and unknown-code responses are byte-identical (no space data, no hint the code is real)
- 114 | ok     | redeem_invite: the addressed person redeems (case-insensitive) and gets space_id
- 115 | ok     | redeem_invite: ...and lands in the invited circle
- 116 | ok     | redeem_invite: the long link token redeems
- 117 | ok     | BETA-JOIN-4 (S10) 10th failure is still 22023 (failures persist across requests)
- 118 | ok     | BETA-JOIN-4 (S10) 11th attempt by the same account is 54000, even with a valid code
- 119 | ok     | BETA-JOIN-4 (S10) ...and did not join
- 120 | ok     | BETA-JOIN-4 (S10) also 54000 outside PostgREST  [54000 Too many tries. Wait 10 minutes.]
- 121 | ok     | BETA-JOIN-4 (S10) the same IP is limited across accounts (last X-Forwarded-For hop)
- 122 | ok     | BETA-JOIN-4 (S10) a different account on a different IP is not limited
- 123 | ok     | BETA-JOIN-4 (S10) Prefer: tx=rollback (which would erase the failure log) is refused
- 124 | ok     | BETA-JOIN-4 (S10) the window is 10 minutes
- 125 | ok     | BETA-JOIN-4 (S10) invite_preview: 11th anon attempt from one IP is 54000
- 126 | ok     | BETA-JOIN-4 (S10) invite_preview: another IP still works
- 127 | ok     | names: a new account starts with a placeholder name, marked not set
- 128 | ok     | names: my_profile returns the caller's name and whether it is set
- 129 | ok     | BETA-NOTIFY-7: a poster sets the name the family knows him by
- 130 | ok     | BETA-NOTIFY-7: ...trimmed and saved
- 131 | ok     | names: an empty name is 23514  [23514 a name is 1-40 characters, not an email address]
- 132 | ok     | names: an email address is not a name (23514)  [23514 a name is 1-40 characters, not an email address]
- 133 | ok     | names: over 40 characters is 23514  [23514 a name is 1-40 characters, not an email address]
- 134 | ok     | names: angle brackets are refused (23514)  [23514 a name is 1-40 characters, not an email address]
- 135 | ok     | JOIN-1: an invite name that is an email is 23514  [23514 a name is 1-40 characters, not an email address]
- 136 | ok     | BETA-NOTIFY-7: the invite preview names the real sender ("Chase invited you")
- 137 | ok     | setup: June joins
- 138 | ok     | JOIN-1: joining gives her the name Chase typed; she types nothing
- 139 | ok     | setup: Earl sets his own name first
- 140 | ok     | setup: Earl joins
- 141 | ok     | names: an invite never overwrites a name the person chose
- 142 | ok     | names: anon cannot set a name (42501)  [42501 permission denied for function set_my_name]
- 143 | ok     | names: a direct profile update cannot bypass set_my_name (42501)  [42501 permission denied for table profiles]
- 144 | ok     | names: the table itself refuses brackets or line breaks in a name (23514)  [23514 new row for relation "profiles" violates check constraint "profiles_display_name_clean"]
- 145 | ok     | names: an invite can't reuse a family member's name (no "Chase" impersonation, 23514)  [23514 someone in this family already has that name]
- 146 | ok     | rename_circle: the owner renames a group
- 147 | ok     | rename_circle: ...trimmed and saved
- 148 | ok     | rename_circle: a name another group already has is 23514 (not 23505)  [23514 another group already has that name]
- 149 | ok     | rename_circle: an empty name is 23514  [23514 a group name is 1-60 characters]
- 150 | ok     | rename_circle: over 60 characters is 23514  [23514 a group name is 1-60 characters]
- 151 | ok     | rename_circle: a viewer gets not found (P0002), even for her own group  [P0002 not found]
- 152 | ok     | rename_circle: a poster in another space gets not found (P0002)  [P0002 not found]
- 153 | ok     | rename_circle: unknown group is P0002  [P0002 not found]
- 154 | ok     | setup: rename back
- 155 | ok     | BETA-OPS-1: a signed-in member reports an error
- 156 | ok     | BETA-OPS-1: exactly 1 row with app version, OS, screen and error type
- 157 | ok     | BETA-OPS-1: errors before sign-in can be reported too
- 158 | ok     | BETA-OPS-1: free text (a caption) is refused, not stored  [23514 error reports take fixed fields only]
- 159 | ok     | BETA-OPS-1: a URL is refused, not stored  [23514 error reports take fixed fields only]
- 160 | ok     | BETA-OPS-1: an email address is refused, not stored  [23514 error reports take fixed fields only]
- 161 | ok     | BETA-OPS-1: app users cannot read error reports  [42501 permission denied for table client_errors]
- 162 | ok     | setup: 30 reports in an hour
- 163 | ok     | BETA-OPS-1: more than 30 reports an hour from one person is 54000  [54000 too many error reports]
- 164 | ok     | BETA-OPS-1: reports older than 30 days are purged; newer ones stay
- 165 | ok     | BETA-OPS-1: only the server can purge  [42501 permission denied for function purge_client_errors]
- 166 | ok     | RLS: every policy uses (select auth.uid()), never a per-row auth.uid()
- 167 | ok     | RLS: membership helpers are wrapped as once-per-statement (select ...) arrays, not per-row calls
- 168 | ok     | Indexes: every foreign key has an index on its columns
- 169 | ok     | RLS: rewritten posts policy returns exactly the rows can_view_post() allows, for every user
+ 108 | ok     | ONB-3 invite_link_base is the hosted web build's /join/ address
+ 109 | ok     | ONB-3 create_invite: the link starts with the configured invite_link_base
+ 110 | ok     | ONB-3 create_invite: the link never points at hearth.family (not bought, ACCOUNTS.md)
+ 111 | ok     | ONB-4 create_invite: the link path is /join/<token>, the route the app opens (app/src/app/join/[code].tsx)
+ 112 | ok     | ONB-4 invite_preview: the /join/ path segment of the link previews the invite
+ 113 | ok     | BETA-JOIN-3 expired invite is 22023  [22023 invite is invalid or expired]
+ 114 | ok     | BETA-JOIN-3 revoked invite is 22023  [22023 invite is invalid or expired]
+ 115 | ok     | BETA-JOIN-3 used-up invite is 22023  [22023 invite is invalid or expired]
+ 116 | ok     | BETA-JOIN-3 unknown code is 22023  [22023 invite is invalid or expired]
+ 117 | ok     | BETA-JOIN-3 invite addressed to a different email is 22023  [22023 invite is invalid or expired]
+ 118 | ok     | BETA-JOIN-3 wrong-email and unknown-code responses are byte-identical (no space data, no hint the code is real)
+ 119 | ok     | redeem_invite: the addressed person redeems (case-insensitive) and gets space_id
+ 120 | ok     | redeem_invite: ...and lands in the invited circle
+ 121 | ok     | redeem_invite: the long link token redeems
+ 122 | ok     | BETA-JOIN-4 (S10) 10th failure is still 22023 (failures persist across requests)
+ 123 | ok     | BETA-JOIN-4 (S10) 11th attempt by the same account is 54000, even with a valid code
+ 124 | ok     | BETA-JOIN-4 (S10) ...and did not join
+ 125 | ok     | BETA-JOIN-4 (S10) also 54000 outside PostgREST  [54000 Too many tries. Wait 10 minutes.]
+ 126 | ok     | BETA-JOIN-4 (S10) the same IP is limited across accounts (last X-Forwarded-For hop)
+ 127 | ok     | BETA-JOIN-4 (S10) a different account on a different IP is not limited
+ 128 | ok     | BETA-JOIN-4 (S10) Prefer: tx=rollback (which would erase the failure log) is refused
+ 129 | ok     | BETA-JOIN-4 (S10) the window is 10 minutes
+ 130 | ok     | BETA-JOIN-4 (S10) invite_preview: 11th anon attempt from one IP is 54000
+ 131 | ok     | BETA-JOIN-4 (S10) invite_preview: another IP still works
+ 132 | ok     | names: a new account starts with a placeholder name, marked not set
+ 133 | ok     | names: my_profile returns the caller's name and whether it is set
+ 134 | ok     | BETA-NOTIFY-7: a poster sets the name the family knows him by
+ 135 | ok     | BETA-NOTIFY-7: ...trimmed and saved
+ 136 | ok     | names: an empty name is 23514  [23514 a name is 1-40 characters, not an email address]
+ 137 | ok     | names: an email address is not a name (23514)  [23514 a name is 1-40 characters, not an email address]
+ 138 | ok     | names: over 40 characters is 23514  [23514 a name is 1-40 characters, not an email address]
+ 139 | ok     | names: angle brackets are refused (23514)  [23514 a name is 1-40 characters, not an email address]
+ 140 | ok     | JOIN-1: an invite name that is an email is 23514  [23514 a name is 1-40 characters, not an email address]
+ 141 | ok     | BETA-NOTIFY-7: the invite preview names the real sender ("Chase invited you")
+ 142 | ok     | setup: June joins
+ 143 | ok     | JOIN-1: joining gives her the name Chase typed; she types nothing
+ 144 | ok     | setup: Earl sets his own name first
+ 145 | ok     | setup: Earl joins
+ 146 | ok     | names: an invite never overwrites a name the person chose
+ 147 | ok     | names: anon cannot set a name (42501)  [42501 permission denied for function set_my_name]
+ 148 | ok     | names: a direct profile update cannot bypass set_my_name (42501)  [42501 permission denied for table profiles]
+ 149 | ok     | names: the table itself refuses brackets or line breaks in a name (23514)  [23514 new row for relation "profiles" violates check constraint "profiles_display_name_clean"]
+ 150 | ok     | names: an invite can't reuse a family member's name (no "Chase" impersonation, 23514)  [23514 someone in this family already has that name]
+ 151 | ok     | rename_circle: the owner renames a group
+ 152 | ok     | rename_circle: ...trimmed and saved
+ 153 | ok     | rename_circle: a name another group already has is 23514 (not 23505)  [23514 another group already has that name]
+ 154 | ok     | rename_circle: an empty name is 23514  [23514 a group name is 1-60 characters]
+ 155 | ok     | rename_circle: over 60 characters is 23514  [23514 a group name is 1-60 characters]
+ 156 | ok     | rename_circle: a viewer gets not found (P0002), even for her own group  [P0002 not found]
+ 157 | ok     | rename_circle: a poster in another space gets not found (P0002)  [P0002 not found]
+ 158 | ok     | rename_circle: unknown group is P0002  [P0002 not found]
+ 159 | ok     | setup: rename back
+ 160 | ok     | BETA-OPS-1: a signed-in member reports an error
+ 161 | ok     | BETA-OPS-1: exactly 1 row with app version, OS, screen and error type
+ 162 | ok     | BETA-OPS-1: errors before sign-in can be reported too
+ 163 | ok     | BETA-OPS-1: free text (a caption) is refused, not stored  [23514 error reports take fixed fields only]
+ 164 | ok     | BETA-OPS-1: a URL is refused, not stored  [23514 error reports take fixed fields only]
+ 165 | ok     | BETA-OPS-1: an email address is refused, not stored  [23514 error reports take fixed fields only]
+ 166 | ok     | BETA-OPS-1: app users cannot read error reports  [42501 permission denied for table client_errors]
+ 167 | ok     | setup: 30 reports in an hour
+ 168 | ok     | BETA-OPS-1: more than 30 reports an hour from one person is 54000  [54000 too many error reports]
+ 169 | ok     | BETA-OPS-1: reports older than 30 days are purged; newer ones stay
+ 170 | ok     | BETA-OPS-1: only the server can purge  [42501 permission denied for function purge_client_errors]
+ 171 | ok     | RLS: every policy uses (select auth.uid()), never a per-row auth.uid()
+ 172 | ok     | RLS: membership helpers are wrapped as once-per-statement (select ...) arrays, not per-row calls
+ 173 | ok     | Indexes: every foreign key has an index on its columns
+ 174 | ok     | RLS: rewritten posts policy returns exactly the rows can_view_post() allows, for every user
 
 
-API RESULT: 169 passed, 0 failed
+API RESULT: 174 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
  n  | result |                                                              description                                                              
 ----+--------+---------------------------------------------------------------------------------------------------------------------------------------
@@ -504,10 +509,10 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 TIMELINE RESULT: 38 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
-psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('1df981fc-5cc8-4e2e-b18c-bdd42a708d4d'))
-psql:tests/groups_test.sql:886: WARNING:  as danielle: P0002 not found (select public.retire_level('438a2393-3438-4de7-8bff-c5934a67e691'))
-psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('11f4ef27-bfd7-4549-be09-e3d2eb63d9e8'))
-psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = 'dcc92284-4c21-4075-aa24-a6e11caf1a65')
+psql:tests/groups_test.sql:888: WARNING:  as memaw: P0002 not found (select public.retire_level('72e7a1fa-92a6-44bf-a6c0-efdf8624ad51'))
+psql:tests/groups_test.sql:888: WARNING:  as danielle: P0002 not found (select public.retire_level('5827d5ea-bcc1-4c94-a7a2-69898ff27966'))
+psql:tests/groups_test.sql:891: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('cc77c655-675e-4b4f-918a-23c8caf2c3d8'))
+psql:tests/groups_test.sql:1025: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = '75ba7781-2190-4dc9-9709-df0952f43614')
   n  | result |                                                                                  description                                                                                   
 -----+--------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    1 | ok     | BETA-AUD-11 shape: circles.kind exists (everyone | group | household | event)
@@ -604,83 +609,82 @@ psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a comm
   92 | ok     | BETA-AUD-13: an event under a group is 23514  [23514 a event can't go under a group]
   93 | ok     | BETA-AUD-13: an event under an event is 23514  [23514 a event can't go under a event]
   94 | ok     | BETA-AUD-13: linking anything under Everyone is 23514  [23514 a group can't go under a everyone]
-  95 | ok     | BETA-AUD-13: placing a person in a group is 23514 (people go only in households)  [23514 people go only in households]
-  96 | ok     | BETA-AUD-13: placing a person in an event is 23514  [23514 people go only in households]
-  97 | ok     | BETA-AUD-13: linking across two families (spaces) is 23514, even for a parent of both  [23514 both must be in the same family]
-  98 | ok     | BETA-AUD-13: a loop (a container under itself) is 23514  [23514 a household can't go under a household]
-  99 | ok     | BETA-AUD-13: a second Everyone is 23514  [23514 kind must be group, household or event (there is one Everyone)]
- 100 | ok     | BETA-AUD-13: an unknown kind is 23514  [23514 kind must be group, household or event (there is one Everyone)]
- 101 | ok     | privacy item 3: a direct cross-space circle_links insert (even as admin) is refused by trigger (23514)  [23514 both must be in the same family]
- 102 | ok     | privacy item 3: a direct group-under-group insert is refused by link_allowed in a trigger (23514)  [23514 a group can't go under a group]
- 103 | ok     | privacy item 3: a direct circle_people insert into a group is refused (23514)  [23514 people go only in households]
- 104 | ok     | BETA-AUD-13: Gammy calling create_level is P0002  [P0002 not found]
- 105 | ok     | BETA-AUD-13: Gammy calling link_level is P0002  [P0002 not found]
- 106 | ok     | BETA-AUD-13: Gammy calling unlink_level is P0002  [P0002 not found]
- 107 | ok     | BETA-AUD-13: Gammy calling place_person is P0002  [P0002 not found]
- 108 | ok     | BETA-AUD-13: Gammy calling unplace_person is P0002  [P0002 not found]
- 109 | ok     | BETA-AUD-13: after every refused call, links, placements, containers and derived members are unchanged
- 110 | ok     | BETA-AUD-19: link_level with no history is 23514  [23514 choose "all" or "new" for past photos]
- 111 | ok     | BETA-AUD-19: link_level with a made-up history is 23514  [23514 choose "all" or "new" for past photos]
- 112 | ok     | BETA-AUD-19: place_person with no history is 23514  [23514 choose "all" or "new" for past photos]
- 113 | ok     | BETA-AUD-19: create_invite for a relative with no p_history is 23514  [23514 choose "all" or "new" for past photos]
- 114 | ok     | BETA-AUD-19: create_invite with a made-up p_history is 23514  [23514 choose "all" or "new" for past photos]
- 115 | ok     | BETA-AUD-19: an invite names one household, not a group (23514)  [23514 an invite names one household]
- 116 | ok     | BETA-REPLY-12: set_group_replies_shared is dropped
- 117 | ok     | BETA-REPLY-12: circles.replies_shared is dropped
- 118 | ok     | BETA-REPLY-12 / API: my_circles returns kind and parent_ids, and no replies_shared
- 119 | ok     | privacy item 3: app users can't insert, update or delete circle_members (derived by trigger only)
- 120 | ok     | privacy item 3: app users can't write circle_links or circle_people directly (only through the RPCs)
- 121 | ok     | privacy item 5: after Memaw joins Pawpaw and Granny's house, they still don't read the comment she wrote before
- 122 | ok     | privacy item 5: ... and Memaw doesn't read Pawpaw's earlier comment or heart (written for Granny, the sister and the parents)
- 123 | ok     | privacy item 5: a comment Memaw writes after the move reaches Pawpaw and Granny
- 124 | ok     | privacy item 5 / REPLY-11: Memaw's comment box now names the sister, Pawpaw, Granny, Chase and Danielle
- 125 | ok     | BETA-AUD-20: Memaw's house added to the Charleston trip with "Share all past photos": Memaw sees the trip's earlier post
- 126 | ok     | privacy item 5: ... but not the trip comments written before her house was added (Granny's, and even the sister's, whose box never named Memaw)
- 127 | ok     | privacy item 5: Granny's next comment on the trip reaches Memaw (event rule, now that she's in it)
- 128 | ok     | BETA-AUD-20: Grandma Phyllis's house added to the trip with "Only new photos": she can't open its earlier post
- 129 | ok     | BETA-AUD-20: ... and does see the next trip post
- 130 | ok     | privacy item 5 narrowing: once the sister leaves Pawpaw and Granny's house, they stop reading her old comment; Memaw (still her house) keeps it
- 131 | ok     | BETA-AUD-15: Grandma Phyllis removed from her house loses the Danielle's side post in the same transaction
- 132 | ok     | BETA-AUD-15: Gammy's house unlinked from Chase's side: Gammy loses its posts in the same transaction
- 133 | ok     | BETA-AUD-15: Pawpaw and Granny's house unlinked from the birthday event: Granny loses the event post at once
- 134 | ok     | BETA-AUD-15 allowed: everyone else keeps theirs (Grandaddy keeps Chase's side and the birthday; Gammy keeps Everyone)
- 135 | ok     | BETA-AUD-15: Gammy can no longer read the media rows (sign-media refuses new URLs)
- 136 | ok     | privacy item 10: removing Gigi from the family removes her placements and derived memberships
- 137 | ok     | privacy item 10: re-invited with "Share all past photos", Gigi now sees the posts from before her first invite
- 138 | ok     | S-0011-1 setup: the sister's comment box names only Chase and Danielle
- 139 | ok     | S-0011-1 allowed: Memaw's house added to the post: Memaw sees the photo
- 140 | ok     | S-0011-1 excluded: ... but not the sister's comment or heart written before her house was added
- 141 | ok     | S-0011-1 counts: Memaw's feed counts leave them out too (0 hearts, 0 comments)
- 142 | ok     | S-0011-1 allowed: the sister's next comment reaches Memaw; Chase still reads both
- 143 | ok     | S-0011-1: app users can't choose post_audiences.added_at (the time that fixes who reads replies)
- 144 | ok     | S-0011-2 excluded: a relative (Memaw, her own house) and a parent of another family can't retire a container
- 145 | ok     | S-0011-2: Everyone can't be retired
- 146 | ok     | S-0011-2 allowed: Danielle (parent) retires Pawpaw and Granny's house: they lose its posts at once
- 147 | ok     | S-0011-2: the house's posts stay with the parents and the author only (no one else picks them up)
- 148 | ok     | S-0011-2: retiring widens nobody: no (person, post) pair is visible after that wasn't before
- 149 | ok     | S-0011-3 allowed: an invite to an old group with nothing under it still works until 0012 (Aunt Bea joins)
- 150 | ok     | S-0011-3 excluded: once the old group has a household under it, its open invite is refused (Uncle Ray isn't placed straight into the group)
- 151 | ok     | S-0011-3 excluded: an invite whose group was retired is refused (no member who is placed nowhere)
- 152 | ok     | UX-G7: invite_preview refuses an invite to a retired group (22023), as redeem does  [22023 invite is invalid or expired]
- 153 | ok     | UX-G7: invite_preview refuses an invite to an old group that now has households under it (22023)  [22023 invite is invalid or expired]
- 154 | ok     | UX-G7: invite_preview refuses an invite whose household was retired (22023)  [22023 invite is invalid or expired]
- 155 | ok     | UX-G7: over PostgREST the refusal names the inviter in details ("Ask Chase for a new one.")
- 156 | ok     | UX-G7 excluded: an unknown code still names no one (BETA-JOIN-3)
- 157 | ok     | UX-G7 allowed: an invite to a live household still previews ("Chase invited you")
- 158 | ok     | UX-G7: redeem refuses the same retired-household invite (preview and redeem agree)
- 159 | ok     | S-0011-6 setup: Lu ("Only new photos") can't see the older post; Jo (all past photos) can
- 160 | ok     | S-0011-6 allowed: placed again with "Share all past photos", Lu now sees the older post
- 161 | ok     | S-0011-6 excluded: ... but not Jo's comment or heart written while she couldn't see it
- 162 | ok     | S-0011-6 counts: Lu's feed counts leave them out too (0 hearts, 0 comments)
- 163 | ok     | S-0011-6 allowed: Jo's next comment reaches Lu; Chase still reads both
- 164 | ok     | S-0011-7: a parent's direct update can't soft-delete Everyone (23514)  [23514 Everyone stays]
- 165 | ok     | S-0011-7: Everyone (and everything else) is still live after the refused update
- 166 | ok     | S-0011-8: a parent's direct update can't un-retire a retired group or household (23514)  [23514 a retired level stays retired]
- 167 | ok     | S-0011-8: both stay retired after the refused updates
- 168 | ok     | S-0011-8 allowed: a live group is still updatable and stays live
+  95 | ok     | BETA-AUD-13 / GRP-10: placing a person in Everyone is 23514 (Everyone comes from the invite)  [23514 people join Everyone through an invite]
+  96 | ok     | BETA-AUD-13: linking across two families (spaces) is 23514, even for a parent of both  [23514 both must be in the same family]
+  97 | ok     | BETA-AUD-13: a loop (a container under itself) is 23514  [23514 a household can't go under a household]
+  98 | ok     | BETA-AUD-13: a second Everyone is 23514  [23514 kind must be group, household or event (there is one Everyone)]
+  99 | ok     | BETA-AUD-13: an unknown kind is 23514  [23514 kind must be group, household or event (there is one Everyone)]
+ 100 | ok     | privacy item 3: a direct cross-space circle_links insert (even as admin) is refused by trigger (23514)  [23514 both must be in the same family]
+ 101 | ok     | privacy item 3: a direct group-under-group insert is refused by link_allowed in a trigger (23514)  [23514 a group can't go under a group]
+ 102 | ok     | privacy item 3 / GRP-10: a direct circle_people insert into Everyone is refused (23514)  [23514 people go in a live group; Everyone comes from the invite]
+ 103 | ok     | BETA-AUD-13: Gammy calling create_level is P0002  [P0002 not found]
+ 104 | ok     | BETA-AUD-13: Gammy calling link_level is P0002  [P0002 not found]
+ 105 | ok     | BETA-AUD-13: Gammy calling unlink_level is P0002  [P0002 not found]
+ 106 | ok     | BETA-AUD-13: Gammy calling place_person is P0002  [P0002 not found]
+ 107 | ok     | BETA-AUD-13: Gammy calling unplace_person is P0002  [P0002 not found]
+ 108 | ok     | BETA-AUD-13: after every refused call, links, placements, containers and derived members are unchanged
+ 109 | ok     | BETA-AUD-19: link_level with no history is 23514  [23514 choose "all" or "new" for past photos]
+ 110 | ok     | BETA-AUD-19: link_level with a made-up history is 23514  [23514 choose "all" or "new" for past photos]
+ 111 | ok     | BETA-AUD-19: place_person with no history is 23514  [23514 choose "all" or "new" for past photos]
+ 112 | ok     | BETA-AUD-19: create_invite for a relative with no p_history is 23514  [23514 choose "all" or "new" for past photos]
+ 113 | ok     | BETA-AUD-19: create_invite with a made-up p_history is 23514  [23514 choose "all" or "new" for past photos]
+ 114 | ok     | BETA-AUD-19 / GRP-12: an invite that names no group is 23514  [23514 invite must place the person in at least one circle]
+ 115 | ok     | BETA-REPLY-12: set_group_replies_shared is dropped
+ 116 | ok     | BETA-REPLY-12: circles.replies_shared is dropped
+ 117 | ok     | BETA-REPLY-12 / API: my_circles returns kind and parent_ids, and no replies_shared
+ 118 | ok     | privacy item 3: app users can't insert, update or delete circle_members (derived by trigger only)
+ 119 | ok     | privacy item 3: app users can't write circle_links or circle_people directly (only through the RPCs)
+ 120 | ok     | privacy item 5: after Memaw joins Pawpaw and Granny's house, they still don't read the comment she wrote before
+ 121 | ok     | privacy item 5: ... and Memaw doesn't read Pawpaw's earlier comment or heart (written for Granny, the sister and the parents)
+ 122 | ok     | privacy item 5: a comment Memaw writes after the move reaches Pawpaw and Granny
+ 123 | ok     | privacy item 5 / REPLY-11: Memaw's comment box now names the sister, Pawpaw, Granny, Chase and Danielle
+ 124 | ok     | BETA-AUD-20: Memaw's house added to the Charleston trip with "Share all past photos": Memaw sees the trip's earlier post
+ 125 | ok     | privacy item 5: ... but not the trip comments written before her house was added (Granny's, and even the sister's, whose box never named Memaw)
+ 126 | ok     | privacy item 5: Granny's next comment on the trip reaches Memaw (event rule, now that she's in it)
+ 127 | ok     | BETA-AUD-20: Grandma Phyllis's house added to the trip with "Only new photos": she can't open its earlier post
+ 128 | ok     | BETA-AUD-20: ... and does see the next trip post
+ 129 | ok     | privacy item 5 narrowing: once the sister leaves Pawpaw and Granny's house, they stop reading her old comment; Memaw (still her house) keeps it
+ 130 | ok     | BETA-AUD-15: Grandma Phyllis removed from her house loses the Danielle's side post in the same transaction
+ 131 | ok     | BETA-AUD-15: Gammy's house unlinked from Chase's side: Gammy loses its posts in the same transaction
+ 132 | ok     | BETA-AUD-15: Pawpaw and Granny's house unlinked from the birthday event: Granny loses the event post at once
+ 133 | ok     | BETA-AUD-15 allowed: everyone else keeps theirs (Grandaddy keeps Chase's side and the birthday; Gammy keeps Everyone)
+ 134 | ok     | BETA-AUD-15: Gammy can no longer read the media rows (sign-media refuses new URLs)
+ 135 | ok     | privacy item 10: removing Gigi from the family removes her placements and derived memberships
+ 136 | ok     | privacy item 10: re-invited with "Share all past photos", Gigi now sees the posts from before her first invite
+ 137 | ok     | S-0011-1 setup: the sister's comment box names only Chase and Danielle
+ 138 | ok     | S-0011-1 allowed: Memaw's house added to the post: Memaw sees the photo
+ 139 | ok     | S-0011-1 excluded: ... but not the sister's comment or heart written before her house was added
+ 140 | ok     | S-0011-1 counts: Memaw's feed counts leave them out too (0 hearts, 0 comments)
+ 141 | ok     | S-0011-1 allowed: the sister's next comment reaches Memaw; Chase still reads both
+ 142 | ok     | S-0011-1: app users can't choose post_audiences.added_at (the time that fixes who reads replies)
+ 143 | ok     | S-0011-2 excluded: a relative (Memaw, her own house) and a parent of another family can't retire a container
+ 144 | ok     | S-0011-2: Everyone can't be retired
+ 145 | ok     | S-0011-2 allowed: Danielle (parent) retires Pawpaw and Granny's house: they lose its posts at once
+ 146 | ok     | S-0011-2: the house's posts stay with the parents and the author only (no one else picks them up)
+ 147 | ok     | S-0011-2: retiring widens nobody: no (person, post) pair is visible after that wasn't before
+ 148 | ok     | S-0011-3 allowed: an invite to an old group with nothing under it still works until 0012 (Aunt Bea joins)
+ 149 | ok     | S-0011-3 / GRP-12: an invite to a live group that now has a household under it still works (Uncle Ray is placed in it, not in Everyone)
+ 150 | ok     | S-0011-3 excluded: an invite whose group was retired is refused (no member who is placed nowhere)
+ 151 | ok     | UX-G7: invite_preview refuses an invite to a retired group (22023), as redeem does  [22023 invite is invalid or expired]
+ 152 | ok     | UX-G7: invite_preview refuses an invite that was already used (22023)  [22023 invite is invalid or expired]
+ 153 | ok     | UX-G7: invite_preview refuses an invite whose household was retired (22023)  [22023 invite is invalid or expired]
+ 154 | ok     | UX-G7: over PostgREST the refusal names the inviter in details ("Ask Chase for a new one.")
+ 155 | ok     | UX-G7 excluded: an unknown code still names no one (BETA-JOIN-3)
+ 156 | ok     | UX-G7 allowed: an invite to a live household still previews ("Chase invited you")
+ 157 | ok     | UX-G7: redeem refuses the same retired-household invite (preview and redeem agree)
+ 158 | ok     | S-0011-6 setup: Lu ("Only new photos") can't see the older post; Jo (all past photos) can
+ 159 | ok     | S-0011-6 allowed: placed again with "Share all past photos", Lu now sees the older post
+ 160 | ok     | S-0011-6 excluded: ... but not Jo's comment or heart written while she couldn't see it
+ 161 | ok     | S-0011-6 counts: Lu's feed counts leave them out too (0 hearts, 0 comments)
+ 162 | ok     | S-0011-6 allowed: Jo's next comment reaches Lu; Chase still reads both
+ 163 | ok     | S-0011-7: a parent's direct update can't soft-delete Everyone (23514)  [23514 Everyone stays]
+ 164 | ok     | S-0011-7: Everyone (and everything else) is still live after the refused update
+ 165 | ok     | S-0011-8: a parent's direct update can't un-retire a retired group or household (23514)  [23514 a retired level stays retired]
+ 166 | ok     | S-0011-8: both stay retired after the refused updates
+ 167 | ok     | S-0011-8 allowed: a live group is still updatable and stays live
 
 
-GROUPS RESULT: 168 passed, 0 failed
+GROUPS RESULT: 167 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
  n | result |                                                       description                                                       
 ---+--------+-------------------------------------------------------------------------------------------------------------------------
@@ -715,13 +719,200 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 PRIVACY-AUDIT RESULT: 15 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+  n  | result |                                                                                      description                                                                                       
+-----+--------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1 | ok     | GRP-2 shape: circles.comment_mode exists
+   2 | ok     | GRP-7 shape: comment_mode_log exists
+   3 | ok     | GRP-9/11/14 FLAG-1 shape: set_comment_mode, add_people_from, private.feature_on, my_features, private.group_reply_ok exist
+   4 | ok     | GRP-10 shape: place_person takes p_group (any group, not only households)
+   5 | ok     | FLAG shape: feature_flags and space_features exist
+   6 | ok     | GRP-9/11 shape: anon cannot call set_comment_mode or add_people_from
+   7 | ok     | FLAG shape: app users cannot call private.feature_on directly (they use my_features)
+   8 | ok     | GRP-2 every seed circle (Everyone and groups) is Private after 0013
+   9 | ok     | GRP-2 comment_mode_log backfill: exactly one row per existing circle, set_at = circles.created_at, same mode
+  10 | ok     | GRP-11 a parent copies everyone in Chase's side into Chase's birthday
+  11 | ok     | GRP-11 ...and everyone in Danielle's side (Auntie Rachel, in both, does not make it fail)
+  12 | ok     | GRP-11 the birthday holds exactly Pop Joe, Auntie Rachel, Meemaw Susan and Aunt Linda, each once (no parent copied)
+  13 | ok     | GRP-11 copied, not linked: no circle_links row for the birthday
+  14 | ok     | GRP-11 no share-history choice is refused  [23514 choose "all" or "new" for past photos]
+  15 | ok     | GRP-11 a relative calling add_people_from gets "not found"  [P0002 not found]
+  16 | ok     | GRP-11 Uncle Ray, added to Chase's side later, is not in Chase's birthday
+  17 | ok     | GRP-9 a group made with create_level starts Private
+  18 | ok     | GRP-9 an event made with create_level (by either parent) starts Shared on this group's posts
+  19 | ok     | GRP-9 a parent sets Meemaw's to Always shared with set_comment_mode
+  20 | ok     | GRP-9 comment_mode_log has a row for the new group (Private) and one for the change (Always shared, set by Chase)
+  21 | ok     | GRP-9 set_comment_mode refuses a fourth value  [23514 comment setting must be private, on_group_posts or always]
+  22 | ok     | GRP-9 set_comment_mode refuses no value  [23514 comment setting must be private, on_group_posts or always]
+  23 | ok     | GRP-9 Everyone's setting can't be changed (the owner's AUD-10 switch is the one way to open it)  [23514 Everyone's comment setting stays Private (the owner's reply setting opens it)]
+  24 | ok     | GRP-9 Everyone is still Private
+  25 | ok     | GRP-9 a relative calling set_comment_mode gets "not found"  [P0002 not found]
+  26 | ok     | GRP-9 a relative calling create_level gets "not found"  [P0002 not found]
+  27 | ok     | GRP-9 a parent can't change comment_mode with a direct UPDATE (only set_comment_mode)  [42501 permission denied for table circles]
+  28 | ok     | GRP-9 app users can't write comment_mode_log  [42501 permission denied for table comment_mode_log]
+  29 | ok     | GRP-9 Porch is still Private after the refused writes
+  30 | ok     | GRP-10 place_person put people in plain groups (Porch, Meemaw's), and they are members
+  31 | ok     | GRP-10 place_person into an event succeeds
+  32 | ok     | GRP-10 ...and Neighbor Ann is a member of Reunion
+  33 | ok     | GRP-10 placing someone in Everyone is still refused  [23514 people join Everyone through an invite]
+  34 | ok     | GRP-10 no share-history choice is refused  [23514 choose "all" or "new" for past photos]
+  35 | ok     | GRP-10 an unknown share-history choice is refused  [23514 choose "all" or "new" for past photos]
+  36 | ok     | GRP-10 a relative calling place_person gets "not found"  [P0002 not found]
+  37 | ok     | GRP-10 the refused placements left Porch unchanged
+  38 | ok     | GRP-3 Chase, Danielle and Auntie Rachel (Meemaw's, Always shared) read Meemaw's comment on the Everyone post
+  39 | ok     | GRP-3 ...and her heart
+  40 | ok     | GRP-3 everyone else who sees the post (Linda, Joe, Ann, Beth, Ray) does not read her comment
+  41 | ok     | GRP-3 ...nor her heart
+  42 | ok     | GRP-3 reply_readers for Meemaw names exactly Chase, Danielle and Auntie Rachel (got {"Auntie Rachel",Chase,Danielle})
+  43 | ok     | GRP-4 every birthday member reads Pop Joe's comment on a post sent to the birthday
+  44 | ok     | GRP-4 ...and Aunt Linda's
+  45 | ok     | GRP-4 people outside the birthday (who can't see the post) read nothing
+  46 | ok     | GRP-4 reply_readers for Pop Joe on the birthday post names the parents and every other member (got {"Aunt Linda","Auntie Rachel",Chase,Danielle,"Meemaw Susan"})
+  47 | ok     | GRP-5 birthday members Joe and Linda don't read Meemaw's comment on an Everyone-only post
+  48 | ok     | GRP-5 ...unless another rule allows it (Rachel shares the Always-shared Meemaw's)
+  49 | ok     | GRP-5 same for a post sent to another group: Linda (birthday + Danielle's side, both with Meemaw) doesn't read her comment on the Danielle's side post
+  50 | ok     | GRP-5 reply_readers for Meemaw on the Danielle's side post leaves out Aunt Linda (got {"Auntie Rachel",Chase,Danielle})
+  51 | ok     | GRP-6 Rachel (Meemaw's, Always shared) reads Meemaw's comment on a post not sent to Meemaw's
+  52 | ok     | GRP-6 Great-aunt Opal (Meemaw's, can't see that post) reads nothing: get_comments says not found, RLS hides it
+  53 | ok     | GRP-6 ...and can't read Meemaw's heart on a post she can't see
+  54 | ok     | GRP-7 setup: Porch is Private, Linda doesn't read Joe's comment on the Everyone post
+  55 | ok     | GRP-7 setup: a parent switched Porch to Always shared
+  56 | ok     | GRP-7 the comment written while Porch was Private keeps its readers after the switch to Always shared
+  57 | ok     | GRP-7 a comment written after the switch follows Always shared (Linda reads it)
+  58 | ok     | GRP-7 ...and reply_readers for Joe now names Aunt Linda
+  59 | ok     | GRP-7 switching Always shared -> Private hides the earlier comment from the group at once
+  60 | ok     | GRP-7 ...and reply_readers drops Aunt Linda
+  61 | ok     | GRP-8 setup: Cousin Beth is now in Meemaw's
+  62 | ok     | GRP-8 Beth, added to Meemaw's after Meemaw's comment, doesn't read it through the group
+  63 | ok     | GRP-8 ...nor Meemaw's earlier heart
+  64 | ok     | GRP-8 Beth does read Meemaw's next comment, written after Beth joined
+  65 | ok     | EVT-1 a birthday member's feed row for a post to the birthday carries the event's id and name
+  66 | ok     | EVT-1 ...and so does the timeline row
+  67 | ok     | EVT-1 a post sent only to the event carries it too
+  68 | ok     | EVT-1 Neighbor Ann (sees it only through Everyone) gets no event id or name, anywhere in the feed row
+  69 | ok     | EVT-1 ...nor in the timeline row
+  70 | ok     | GRP-12 a parent can name two groups (a group and an event) in one invite
+  71 | ok     | GRP-12 redeeming places Cousin Dee in each named group
+  72 | ok     | GRP-12 ...and NOT in Everyone, because Everyone wasn't named
+  73 | ok     | GRP-12 the legacy direct circle_members path is gone: every membership Dee got is derived from a placement
+  74 | ok     | GRP-12 an invite naming Everyone and Porch puts Cousin Eve in Everyone and in Porch
+  75 | ok     | GRP-12 setup: invite naming Old porch and Meemaw's made
+  76 | ok     | GRP-12 / UX-G7 preview refuses an invite naming a retired group (22023) with the inviter's name
+  77 | ok     | GRP-12 ...and redeem refuses it too (22023); Cousin Fay does not join
+  78 | ok     | GRP-13 my_circles gives a relative nothing (AUD-14)
+  79 | ok     | GRP-13 reading circles, a relative sees only groups they are in
+  80 | ok     | GRP-13 a relative can't read any group's comment setting from circles  [42501 permission denied for table circles]
+  81 | ok     | GRP-13 a relative reads no comment_mode_log rows
+  82 | ok     | GRP-13 feed rows never carry a comment setting for a relative
+  83 | ok     | GRP-14 reply_ok, reply_scope and feed_rows all call private.group_reply_ok and none checks kind household/event
+  84 | ok     | GRP-14 for the 24-row family x post x writer x reader table, get_comments, RLS and reply_ok all give the expected answer (0 wrong)
+  85 | ok     | GRP-14 every person x every comment: get_comments = table RLS = reply_ok (0 disagree)
+  86 | ok     | GRP-14 feed_rows comment and heart counts equal what table RLS shows, for every person x post (0 differ)
+  87 | ok     | GRP-14 reply_scope = 'parents' exactly when reply_readers names only parents and the poster (0 differ)
+  88 | ok     | FLAG-1 with no rows, feature_on(space, 'video_posting') is false (default off)
+  89 | ok     | FLAG-1 ...and my_features doesn't list it
+  90 | ok     | FLAG-2 global on + family on: a parent (owner or adult) gets true
+  91 | ok     | FLAG-2 ...a relative asking for the parents-only capability gets false
+  92 | ok     | FLAG-2 my_features lists video_posting for a parent, not for a relative
+  93 | ok     | FLAG-2 can(space, 'use_video') is true for a parent
+  94 | ok     | FLAG-2 can(space, 'use_video') is false for a relative
+  95 | ok     | FLAG-2 global switch off (family on, parent): false
+  96 | ok     | FLAG-2 family add-on off (global on, parent): false
+  97 | ok     | FLAG-3 the owner can't write the global table  [42501 permission denied for table feature_flags]
+  98 | ok     | FLAG-3 ...nor switch the global video flag on  [42501 permission denied for table feature_flags]
+  99 | ok     | FLAG-3 a relative can't write the global table  [42501 permission denied for table feature_flags]
+ 100 | ok     | FLAG-3 a relative can't write the family add-on  [42501 permission denied for table space_features]
+ 101 | ok     | FLAG-3 ...nor switch it on with an UPDATE (still off)
+ 102 | ok     | FLAG-3 setup: a parent may switch the family add-on
+ 103 | ok     | FLAG-3 the parent's family add-on switch took effect
+ 104 | ok     | FLAG-4 video_posting off: preparing a video upload is refused (42501 video_posting_off)  [42501 video_posting_off]
+ 105 | ok     | FLAG-4 ...photos still upload with the flag off
+ 106 | ok     | FLAG-4 ...and no video row was created
+ 107 | ok     | FLAG-4 with all three switches on, a parent can prepare a video upload
+ 108 | ok     | PRIV-G1 Always -> Private -> Always: a comment hidden by the switch to Private stays hidden when the group is turned back up
+ 109 | ok     | PRIV-G2 a new invite naming only a household places the person there and NOT in Everyone
+ 110 | ok     | PRIV-G2 ...so Cousin Gus does not get Dad's Everyone post in his feed
+ 111 | ok     | PRIV-G4 video_posting off: a direct table insert of a video row is refused (42501)  [42501 video_posting_off]
+ 112 | ok     | PRIV-G4 ...the same direct insert of a photo row is allowed (the refusal is the video switch, not RLS)
+ 113 | ok     | PRIV-G4 ...and no video row was created
+ 114 | ok     | PRIV-G4 ...the refusal says video_posting_off
+ 115 | ok     | PRIV-G5 an adult parent can't add a family add-on row (owner only)  [42501 new row violates row-level security policy for table "space_features"]
+ 116 | ok     | PRIV-G5 ...nor switch video posting on with an UPDATE (still off)
+ 117 | ok     | PRIV-G5 the owner still can
+ 118 | ok     | PRIV-G5 ...and the owner's switch took effect
+
+
+GROUPS-V2 RESULT: 118 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+ n  | result |                                                                                    description                                                                                     
+----+--------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  1 | ok     | MSG-1 a person publishes their phone's signing key and key packages
+  2 | ok     | MSG-1 ...and so does Grandpa
+  3 | ok     | MSG-1 an empty signing key is refused  [23514 signing key must be base64]
+  4 | ok     | MSG-1 a key package that is not base64 is refused  [23514 signing key must be base64]
+  5 | ok     | MSG-1 publishing needs a signed-in person  [42501 not authenticated]
+  6 | ok     | MSG-2 Aunt Jo (not in the group) can't start its chat  [P0002 not found]
+  7 | ok     | MSG-2 ...can't fetch it  [P0002 not found]
+  8 | ok     | MSG-2 ...can't send to it  [P0002 not found]
+  9 | ok     | MSG-2 ...can't read who is in it  [P0002 not found]
+ 10 | ok     | MSG-2 ...can't claim keys through it  [P0002 not found]
+ 11 | ok     | MSG-2 a group that doesn't exist looks the same  [P0002 not found]
+ 12 | ok     | MSG-2 households have no chat (groups and events first)  [P0002 not found]
+ 13 | ok     | MSG-2 ...not even to fetch  [P0002 not found]
+ 14 | ok     | MSG-1 Grandma's chats: Everyone, her group and her event (no household, nothing she isn't in)
+ 15 | ok     | AUD-14 a relative sees a group chat titled by its people (the parent included), never the group's name
+ 16 | ok     | MSG-7 an event chat keeps the event's name
+ 17 | ok     | AUD-14 Blair never sees the grandparents' group
+ 18 | ok     | MSG-2 a family you aren't in is "not found"  [P0002 not found]
+ 19 | ok     | REPLY-10 the parent is in every chat of the family (not households), by its real names
+ 20 | ok     | MSG-1 the first member to open Messages starts the group (true)
+ 21 | ok     | MSG-1 the next one finds it already started (false)
+ 22 | ok     | MSG-1 the roster lists the group's two people plus the parent, with signing keys for those who have opened Messages
+ 23 | ok     | MSG-2 ...and nobody outside it
+ 24 | ok     | MSG-1 Grandma claims one of Grandpa's key packages; Aunt Jo (not in the group) is skipped silently
+ 25 | ok     | MSG-1 a claimed key package is never handed out twice
+ 26 | ok     | MSG-1 Grandpa tops up his key packages
+ 27 | ok     | MSG-1 ...and the new ones are claimable
+ 28 | ok     | MSG-5 Grandma's key change for epoch 0 is accepted
+ 29 | ok     | MSG-5 Grandpa's key change for the same epoch loses (23505), so the group can't split  [23505 duplicate key value violates unique constraint "chat_messages_one_commit_per_epoch"]
+ 30 | ok     | MSG-6 a welcome addressed to Grandpa is accepted
+ 31 | ok     | MSG-6 a welcome to someone outside the group is refused  [23514 that person is not in this group]
+ 32 | ok     | MSG-6 a welcome must name who it is for  [23514 a welcome (and only a welcome) names who it is for]
+ 33 | ok     | MSG-6 ...and only a welcome may name one  [23514 a welcome (and only a welcome) names who it is for]
+ 34 | ok     | MSG-1 unknown kinds are refused  [23514 kind is commit, welcome or message]
+ 35 | ok     | MSG-1 a body that is not base64 is refused  [23514 body must be base64, at most 64 KB]
+ 36 | ok     | MSG-1 a body over 64 KB is refused  [23514 body must be base64, at most 64 KB]
+ 37 | ok     | MSG-1 a sealed message is accepted
+ 38 | ok     | MSG-6 Grandpa fetches the key change, his welcome and the message, in order
+ 39 | ok     | MSG-1 fetching after a cursor returns only newer rows
+ 40 | ok     | MSG-1 each row says who sent it
+ 41 | ok     | MSG-6 Grandma (the sender) does not get Grandpa's welcome back
+ 42 | ok     | PRIV app users can't read the message table directly  [42501 permission denied for table chat_messages]
+ 43 | ok     | PRIV ...nor the key packages  [42501 permission denied for table chat_key_packages]
+ 44 | ok     | PRIV ...nor write to it  [42501 permission denied for table chat_messages]
+ 45 | ok     | MSG-1 Aunt Jo, added now, fetches none of the older rows
+ 46 | ok     | MSG-1 ...but does fetch what comes after
+ 47 | ok     | MSG-3 Grandpa, removed from the group, fetches nothing ("not found")  [P0002 not found]
+ 48 | ok     | MSG-3 ...and can't send  [P0002 not found]
+ 49 | ok     | MSG-3 Grandpa leaves the roster, so the others' phones remove him at the next key change
+ 50 | ok     | MSG-3 ...and his key packages can't be claimed through it
+ 51 | ok     | MSG-7 an event's chat starts like a group's
+ 52 | ok     | MSG-7 an event-mate sends
+ 53 | ok     | MSG-7 ...and the other reads
+ 54 | ok     | MSG-7 someone not at the event gets "not found"  [P0002 not found]
+ 55 | ok     | MSG-8 Grandma signs in on a new phone
+ 56 | ok     | MSG-8 the roster shows her new signing key, so the others swap her phone at the next key change
+ 57 | ok     | MSG-8 ...and only the new phone's key packages are handed out
+
+
+CHAT RESULT: 57 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
 
 Narrowing for Chase (readable before 0011 only through "members see each other's replies"):
      reader     |  kind   |                                 reply_id                                  
 ----------------+---------+---------------------------------------------------------------------------
- Grandma Rivera | comment | d9f67835-3145-4a9d-91f5-87da29096bf5
+ Grandma Rivera | comment | 0bba0df2-74b8-4fd3-9325-e6a22af65e2e
  Grandma Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a2
- Grandpa Rivera | comment | eeece3d1-4707-4d7f-832d-aa0e1eae3b8a
+ Grandpa Rivera | comment | 5951032f-5d25-4e7e-a395-cd293d013d9d
  Grandpa Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a1
 
  n  | result |                                                     description                                                      
@@ -740,6 +931,72 @@ Narrowing for Chase (readable before 0011 only through "members see each other's
 
 
 AUD-16 RESULT: 11 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+ post 
+------
+ 
+(1 row)
+
+              set_config              
+--------------------------------------
+ d1000000-0000-0000-0000-000000000001
+(1 row)
+
+ set_config 
+------------
+ 
+(1 row)
+
+
+GRP-1 differences (should be none):
+ what | reader | item 
+------+--------+------
+
+ n  | result |                                                  description                                                  
+----+--------+---------------------------------------------------------------------------------------------------------------
+  1 | ok     | GRP-1: migration 0013 was applied (circles.comment_mode exists), so the diffs below compare before/after 0013
+  2 | ok     | GRP-1: can_view_post unchanged for every (member, post): 0 changes
+  3 | ok     | GRP-1: can_see_reply unchanged for every (member, comment or heart): 0 changes
+  4 | ok     | GRP-1: reply_ok at each comment's own time unchanged for every (member, comment): 0 changes
+  5 | ok     | GRP-1: reply_readers unchanged for every (member, post): 0 changes
+  6 | ok     | GRP-1 setup: the snapshot includes replies relatives read through a household or event (not only parents)
+  7 | ok     | GRP-2 backfill: household -> always, event -> on_group_posts, group and everyone -> private
+  8 | ok     | GRP-2 comment_mode_log backfill: one row per circle, set_at = circles.created_at
+  9 | ok     | PRIV-G2 0013 marked the invite made before it as "a household means Everyone too"
+ 10 | ok     | GRP-12 an old-style invite made before 0013 naming a household still puts the person in Everyone too
+
+
+GRP-1 RESULT: 10 passed, 0 failed
 ok      setup v2: backend/scripts/family-setup-v2.sql exists
 ok      setup v2 dry run: runs without error
 ok      setup v2 dry run: changes nothing (groups, members, placements, links, audiences, invites identical)
@@ -764,8 +1021,8 @@ ok      SETUP-API: before Chase has an account it says "sign in once in the app"
 ok      SETUP-API: ... and changes nothing
 ok      SETUP-API: fresh setup runs without error
         | Family "Chase's kids" is ready: Everyone, Chase's side, Danielle's side, 7 houses, 2 events.
-        | Test viewer invite (account B): code TCYRPDFZZD, works once until Oct 25, link https://hearth.family/i/064a7f96a34847042d5738ced0c541b813406564
-        | Danielle's poster invite: code ZCA8H8MP4G, works once until Oct 25, only for danielle@example.com, link https://hearth.family/i/731dd32a6fe780c1521b8160c10338996b4642bc
+        | Test viewer invite (account B): code 62NR4YKXXC, works once until Oct 29, link https://thefreighttrains-team-hearth.expo.app/join/bc6efc42517f86fa2e15b9de488a968253d72c5c
+        | Danielle's poster invite: code QQ44NYRXS2, works once until Oct 29, only for danielle@example.com, link https://thefreighttrains-team-hearth.expo.app/join/8683359b6bfe0dba415cb6e791876906a8269822
 ok      SETUP-API: Chase owns one family, named as given (an apostrophe in the name is kept, not a SQL error)
 ok      SETUP-API: one Everyone
 ok      SETUP-API: the set groups are Chase's side and Danielle's side (no v1 groups to retire later)
@@ -777,7 +1034,7 @@ ok      SETUP-API: everything is made as Chase (through the app's RPCs, not as t
 ok      SETUP-API: prints the test viewer's 10-letter invite code
 ok      SETUP-API: prints Danielle's poster invite code when --danielle-email is given
 ok      SETUP-API: Danielle's invite is a poster (adult) invite for her email
-ok      SETUP-API: the test viewer's invite names the Test house and says "all past photos"
+ok      SETUP-API / PRIV-G2: the test viewer's invite names Everyone and the Test house (a new invite adds Everyone only if named) and says "all past photos"
 ok      SETUP-API: says the family is ready
 ok      SETUP-API: one Management API request (got 1)
 ok      SETUP-API: the token goes in the Authorization header
@@ -824,18 +1081,19 @@ ok      QA-3: a visible post with a photo not ready counts as missing, and says 
 SENT-RECEIVED RESULT: 20 passed, 0 failed
 ok      D1 smoke: backend/scripts/smoke-check.sh exists
 ok      D1 smoke: without SUPABASE_ACCESS_TOKEN it stops and names the secret
-        | ok    all 12 migrations applied
+        | ok    all 15 migrations applied
         | ok    RLS is on for every public table
         | ok    cron job hearth-notify
         | ok    cron job hearth-purge-client-errors
+        | ok    invite links open the web build's /join/ screen
         | ok    no IP addresses in Supabase Auth's audit log
         | ok    edge function sign-media is active
         | ok    edge function notify is active
         | ok    all 10 function secrets are set
-        | SMOKE RESULT: 8 ok, 0 failed
+        | SMOKE RESULT: 9 ok, 0 failed
 ok      D1 smoke: a healthy project passes (exit 0)
 ok      D1 smoke: ends with "SMOKE RESULT: N ok, 0 failed"
-ok      D1 smoke: says all 12 local migrations are applied
+ok      D1 smoke: says all 15 local migrations are applied
 ok      D1 smoke: never prints a secret value
 ok      D1 smoke: never prints the token
 ok      D1 smoke: its SQL runs inside a read-only transaction (no write attempted)
@@ -843,7 +1101,8 @@ ok      D1 smoke: only GETs and the read-only query call
 ok      D1 smoke: the token goes in the Authorization header
 ok      D1 smoke: no psql, no unexpected endpoint
 ok      D1 smoke: changes nothing
-ok      D1 smoke: a migration not applied on hosted fails and names it (0012)
+ok      ONB-3 smoke: hosted invite_link_base is checked and reads as ok
+ok      D1 smoke: a migration not applied on hosted fails and names it (0015)
 ok      D1 smoke: a public table without RLS fails and names it
 ok      D1 smoke: a missing cron job fails and names it
 ok      D1 smoke: a missing edge function fails and names it
@@ -851,8 +1110,12 @@ ok      D1 smoke: an edge function that isn't ACTIVE fails
 ok      D1 smoke: a missing function secret fails and names it (MEDIA_KEK)
 ok      D1 smoke: ... and still prints no secret value
 ok      D1 smoke: the leftover placeholder secret is a warning to clean up, not a failure
+ok      ONB-3 smoke: an invite_link_base on hearth.family fails
+ok      ONB-3 smoke: ... and the stored value is never printed
+ok      ONB-4 smoke: an invite_link_base whose path the app doesn't open fails
+ok      ONB-3 smoke: a missing invite_link_base fails
 ok      PRIV-1 smoke: no auth audit table (or no IPs in it) reads as ok
 ok      PRIV-1 smoke: IP addresses in Supabase Auth's audit log are a warning with a count
 ok      PRIV-1 smoke: ... and the address itself is never printed
 
-SMOKE CHECK TEST RESULT: 23 passed, 0 failed
+SMOKE CHECK TEST RESULT: 28 passed, 0 failed

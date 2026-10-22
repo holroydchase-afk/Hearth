@@ -4,6 +4,7 @@ import { AppState, Platform } from 'react-native';
 import type { HearthApi, Session, Space } from '../api/HearthApi';
 import { FeedStore, type FeedState } from '../feed/store';
 import { MediaCache } from '../media/cache';
+import type { MediaStore } from '../media/diskCache';
 import { clearArrivals, recordArrival } from '../notify/latency';
 import { listenForArrivals, registerForPush } from '../notify/push';
 import type { KV } from '../platform/kv';
@@ -22,8 +23,12 @@ export interface AppDeps {
   pickPhotos: (opts: { videos: boolean }) => Promise<{ items: QueueItem[] } | { denied: true }>;
   /** BETA-BULK-1: up to 100 photos with EXIF, read on the phone only (media/pick.ts pickBulk). */
   pickBulk?: () => Promise<{ assets: PickedAsset[] } | { denied: true }>;
+  /** R15 photo helpers: a small JPEG preview of a picked photo, read on the phone only (media/preview.ts). */
+  previewBytes?: (uri: string) => Promise<Uint8Array | null>;
   saveToPhone: (bytes: Uint8Array, name: string) => Promise<'saved' | 'denied'>;
   openUrl: (url: string) => Promise<unknown>;
+  /** A3: where viewed photos are kept (ciphertext files + keychain-backed keys). Absent or null: nothing kept (web). */
+  mediaDisk?: { store: MediaStore; keys: KV } | null;
 }
 
 export type AppStatus = 'loading' | 'signedOut' | 'noSpace' | 'ready';
@@ -123,8 +128,12 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
       return;
     }
     const prefs = await loadPrefs(deps.kv, session.userId, space.role);
-    const feed = new FeedStore({ api: deps.api, kv: deps.kv, userId: session.userId, spaceId: space.space_id, inviter: space.inviter_name });
-    const media = new MediaCache(deps.api);
+    const media = new MediaCache(deps.api, { disk: deps.mediaDisk ? { ...deps.mediaDisk, userId: session.userId } : null });
+    // A3: kept photo files follow the feed: a deleted post or lost access drops its files and keys.
+    const feed = new FeedStore({
+      api: deps.api, kv: deps.kv, userId: session.userId, spaceId: space.space_id, inviter: space.inviter_name,
+      onRefreshed: (posts) => { void media.prune(new Set(posts.flatMap((p) => p.media.map((m) => m.media_id)))); },
+    });
     let queue: UploadQueue | null = null;
     if (space.can_post) {
       queue = await UploadQueue.open({
@@ -182,6 +191,7 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
     unlisten.current = null;
     const who = live.current.session?.userId;
     if (who) await clearArrivals(deps.kv, who);
+    await live.current.media?.clearDisk().catch(() => {});
     await deps.api.signOut().catch(() => {});
     setS(SIGNED_OUT);
   }, [deps.api, deps.kv]);
