@@ -61,9 +61,16 @@ P0 blocks showing it. P1 hurts the impression. P2 is polish.
 - Tests: `src/demo/__tests__/seed.test.ts` (DEMO-1, 2, 3, 10), `demoBar.test.tsx`, `screens/__tests__/demoMe.test.tsx` (DEMO-8), `e2e-web/demo.spec.js` (3 flows, `npm run e2e:demo`).
 - Re-checked by eye: phone light (parent) and dark (Grandma Jo). The bar's buttons wrap to two lines at 390 px; readable, 48 px tall.
 
+## Round 1b: laptop frame and not-found (#40)
+
+- **RR-6:** at 900 px and wider the demo shows the app in a 430 px column beside a panel: "A private photo app for split families", one line on what it does, three things to try, and "Built test-first by Chase Holroyd… The family here is made up." No test counts in the app, so it can't go stale.
+- **RR-7:** `src/app/+not-found.tsx`: "We couldn't find that page. The link may be old or mistyped. Your photos are safe." and "Go to Photos". In every build, not just the demo.
+- Tests: `demoFrame.test.tsx` (DEMO-6), `notFound.test.tsx` (NF-1), e2e `demo.spec.js` DEMO-6 / NF-1. Re-checked by eye: laptop light, not-found on phone dark.
+
 ## Status
 
 | Round | Fixed | New | Left |
 |---|---|---|---|
 | 0 (baseline) | – | RR-1..RR-16 | P0: 5, P1: 7, P2: 4 |
-| 1a (demo mode, PR below #38) | RR-1, RR-2, RR-3, RR-8, RR-9 (in the demo), RR-10, RR-14 | – | P0: RR-4, RR-5. P1: RR-6, RR-7, RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
+| 1a (demo mode, #39) | RR-1, RR-2, RR-3, RR-8, RR-9 (in the demo), RR-10, RR-14 | – | P0: RR-4, RR-5. P1: RR-6, RR-7, RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
+| 1b (#40) | RR-6, RR-7 | – | P0: RR-4, RR-5. P1: RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
