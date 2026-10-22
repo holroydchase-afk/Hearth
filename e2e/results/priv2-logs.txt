@@ -1,0 +1,13 @@
+ok      PRIV-2 flags a bad log call (key)
+ok      PRIV-2 flags a bad log call (url)
+ok      PRIV-2 flags a bad log call (caption)
+ok      PRIV-2 flags a bad log call (message)
+ok      PRIV-2 flags a bad log call (object)
+ok      PRIV-2 flags a bad log call (stringify)
+ok      PRIV-2 flags a bad log call (multiline)
+ok      PRIV-2 flags a bad log call (template)
+ok      PRIV-2 flags a bad log call (stack)
+ok      PRIV-2 passes safe log calls (fixed words, e.name, URL-cut message)
+ok      PRIV-2 app/src and the edge functions log no keys, URLs, captions or raw errors
+
+LOG CHECK RESULT: 11 passed, 0 failed
