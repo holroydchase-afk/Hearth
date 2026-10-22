@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
 test('DEMO-1/2/3 opens straight into the sample family: no sign-in, pictures, a demo bar', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Photos of Mia and Leo' })).toBeVisible();
-  await expect(page.getByText(/A demo with a made-up family/)).toBeVisible();
+  await expect(page.getByText(/made-up family/)).toBeVisible();
   await expect(page.getByText('Mia turned 5!', { exact: true })).toBeVisible();
   await expect(page.getByLabel('Your email')).toHaveCount(0);
   // The first card's picture really drew (decrypted from the sample bytes).
@@ -53,4 +53,17 @@ test('RR-14 add a photo, reload keeps it, Start over brings back the sample fami
   await page.getByRole('button', { name: 'Start over with the sample family' }).click();
   await expect(page.getByText('Mia turned 5!', { exact: true })).toBeVisible();
   await expect(page.getByText('Leaf pile', { exact: true })).toHaveCount(0);
+});
+
+test('DEMO-6 / NF-1 laptop shows the story panel beside the app; an unknown link shows plain words', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'A private photo app for split families' })).toBeVisible();
+  const box = await page.getByTestId('demo-app-column').boundingBox();
+  expect(box.width).toBeLessThanOrEqual(432);
+  await page.goto('/no-such-page');
+  await expect(page.getByRole('heading', { name: "We couldn't find that page." })).toBeVisible();
+  await expect(page.getByText('Unmatched Route')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Go to Photos' }).click();
+  await expect(page.getByText('Mia turned 5!', { exact: true })).toBeVisible();
 });

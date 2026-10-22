@@ -20,14 +20,15 @@ Chase's family is "distributed": divorces, remarriages, step-grandparents, relat
 
 ## How the work runs
 
-- **An agent team with lanes:** staff PM, QA, app engineer, UI/UX designer, privacy and security, marketing and funding. The founder writes goals and makes calls. Agents work one lane at a time, test-first, and open pull requests. Nothing merges without the founder's word.
+- **An agent team with lanes:** staff PM, QA, app engineer, UI/UX designer, UX reviewer for public work, privacy and security, marketing and funding. The founder writes goals and makes calls. Agents work one lane at a time, test-first, and open pull requests. Nothing merges without the founder's word.
 - **Night shift:** before bed, one instruction schedules an unattended 2:15am run. On the first night it reviewed the app from the code, ranked 14 items, and shipped parallel uploads, a fix for the photo framing the founder had reported, and a cipher switch. It also checked the messenger's encryption against the RFC 9180 test vectors.
 - **Decision log:** 30 decisions, each with what it beat and why. That makes the story retellable and reviewable.
 
 ## Results so far
 
 - The core flow works end to end on a phone. You sign in with a 6-digit code, pick photos and choose who sees them. Relatives heart and reply, and email notices arrive.
-- 596 app tests, 639 database checks, contract tests against both a fake and the real backend, and web end-to-end tests.
+- 600+ app tests, 800+ database checks, contract tests against both a fake and the real backend, and web end-to-end tests.
+- A no-login demo with a made-up family shows the core idea in under two minutes: switch to Grandma's view and see only what was shared with her.
 - Privacy built in from the start: location and camera data stripped on the phone and verified, photos encrypted on the phone, end-to-end encrypted group chat (MLS), and access rules enforced in the database.
 
 ## What's next

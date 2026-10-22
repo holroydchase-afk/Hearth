@@ -335,7 +335,8 @@ export function GroupsScreen() {
           ) : invitable(g) ? (
             <Button label={`Invite someone to ${g.name}`} text="Invite someone" variant="secondary" onPress={() => { closeForm(); setAsking(g.circle_id); }} />
           ) : (
-            <Txt variant="muted">To invite someone, use their household below.</Txt>
+            // RR-11: only point to a household when the family has one; plain groups otherwise.
+            <Txt variant="muted">{(circles ?? []).some((o) => o.kind === 'household') ? 'To invite someone, use their household below.' : 'To invite someone, use one of the groups below.'}</Txt>
           )}
         </Card>
       ))}
