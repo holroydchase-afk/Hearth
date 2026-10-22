@@ -13,7 +13,8 @@ import { Button, Card, Field, Loading, Notice, Txt } from '../ui/kit';
 import { useTheme } from '../ui/theme';
 
 const POLL_MS = 10_000;
-const PRIVACY = 'Only the people in this chat can read it. Hearth can’t: messages are locked on your phone before they are sent.';
+// RR-18: parents are in every chat (REPLY-10), so a chat's count can be higher than its group's; say why.
+const PRIVACY = 'Only the people in this chat can read it. Parents are in every chat. Hearth can’t: messages are locked on your phone before they are sent.';
 
 export function MessagesScreen({ onClose }: { onClose: () => void }) {
   const app = useApp();
