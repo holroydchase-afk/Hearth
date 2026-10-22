@@ -1,5 +1,10 @@
 # Handoff
 
+## Portfolio / public presence
+- **Oct 22:** chaseholroyd.com/family-photos.html already shows Hearth under a placeholder name ("name coming"); Product Studio owns that page. Hearth handed Product Studio an INTAKE block (`docs/portfolio/INTAKE-2026-10-22.md`): refresh the test counts, add three sample-data iPhone screenshots from `docs/portfolio/screens/`, add the encryption and "no Seen by" points.
+- **Oct 22, recruiter-ready sprint v2:** review in `docs/reviews/2026-10-22-recruiter-ready.md` (RR-1..16: 5 P0, 7 P1, 4 P2). Main gap: no no-login sample-data demo. Fix loop builds one (demo build, sample pictures, demo bar, laptop frame) for Product Studio to host at chaseholroyd.com/demo/hearth/. **Exact next step:** RR-1..3, RR-8, RR-10 (demo mode) test-first on branch `claude/project-thread-py4kr1-demo`.
+- **Don't link publicly yet:** the web build (it's the live app on the family's real backend, sign-in only, not a demo) or the repo (private until the name is final, then AGPL-3.0 per DEC-7). A public no-login demo needs a sample-data web build on its own URL; not built.
+
 ## Oct 22: studio ux-reviewer synced (recruiter-ready sprint)
 - Synced `ux-reviewer` from studio-agents (PR #6 branch `claude/project-thread-wvkxmq`, showcase review mode) with `scripts/sync.sh`; roster row added to `CLAUDE.md`. The rest of `examples/hearth/MIGRATION.md` (swap staff-pm, qa-tdd, privacy-security, app-engineer and marketing for the generic ones, archive funding-analyst) is not done: those Hearth agents carry Hearth-only facts, so it waits for after the Nov 22 beta (TRACKER row R16). Decision to review.
 
