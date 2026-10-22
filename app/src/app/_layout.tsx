@@ -2,6 +2,7 @@ import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useMemo } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { DemoChrome } from '../demo/DemoChrome';
 import { useNotificationTaps } from '../notify/push';
 import { AppProvider } from '../state/AppContext';
 import { NavContext, type Nav } from '../state/nav';
@@ -30,7 +31,9 @@ export default function RootLayout() {
         <AppProvider deps={runtime}>
           <NavContext.Provider value={nav}>
             <StatusBar style="auto" />
-            <Stack screenOptions={{ headerShown: false }} />
+            <DemoChrome>
+              <Stack screenOptions={{ headerShown: false }} />
+            </DemoChrome>
           </NavContext.Provider>
         </AppProvider>
       </ErrorBoundary>

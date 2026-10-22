@@ -10,7 +10,9 @@
     "test": "jest --ci",
     "typecheck": "tsc --noEmit",
     "export:web:fake": "EXPO_PUBLIC_HEARTH_FAKE=1 expo export --platform web --output-dir dist-fake --clear",
+    "export:web:demo": "EXPO_PUBLIC_HEARTH_DEMO=1 expo export --platform web --output-dir dist-demo --clear",
     "e2e:web": "npm run export:web:fake && PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node ../e2e/node_modules/@playwright/test/cli.js test -c e2e-web/playwright.config.js",
+    "e2e:demo": "npm run export:web:demo && PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node ../e2e/node_modules/@playwright/test/cli.js test -c e2e-web/playwright.demo.config.js",
     "test:contract:real": "bash scripts/contract-real.sh",
     "eas": "bash scripts/eas.sh"
   },

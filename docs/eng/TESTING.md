@@ -18,6 +18,8 @@
 | Media signing | 5 tests: signed URLs, denial, metadata check | `cd backend && deno test --allow-env supabase/functions/sign-media/` |
 | Privacy audit | PRIV-1: no raw IP addresses kept (`backend/tests/privacy_audit_test.sql`, in `run.sh`); PRIV-2: no log line carries a key, URL, caption, email or raw error | `bash scripts/tests/check_logs_test.sh` |
 | Hosted checks (read only) | QA-3 sent vs received; D1 smoke check (migrations, RLS, cron, functions, secret names). Tested locally with a stubbed API in `run.sh` | `bash backend/scripts/sent-vs-received.sh ...`, `bash backend/scripts/smoke-check.sh` |
+| Public demo | DEMO-1..3, DEMO-10, RR-14: the no-login sample-data build opens on the sample family, Grandma Jo's view, add / reload / start over | `cd app && npm run e2e:demo` |
+| Showcase screenshots | Every screen at 390×844 and 1280×800, light and dark, plus console errors (recruiter-ready review) | `cd app && SHOWCASE_DIR=/tmp/shots npm run e2e:web -- showcase.spec.js` |
 | Manual | 12 real-phone cases (M-01…M-12), run by family testers | Logged on the Test Log page |
 
 Run everything: `bash test-all.sh`. It saves results to `e2e/results/` and rebuilds the Test Log data in `tracker/seed/`.

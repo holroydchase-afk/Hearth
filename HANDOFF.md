@@ -2,7 +2,7 @@
 
 ## Portfolio / public presence
 - **Oct 22:** chaseholroyd.com/family-photos.html already shows Hearth under a placeholder name ("name coming"); Product Studio owns that page. Hearth handed Product Studio an INTAKE block (`docs/portfolio/INTAKE-2026-10-22.md`): refresh the test counts, add three sample-data iPhone screenshots from `docs/portfolio/screens/`, add the encryption and "no Seen by" points.
-- **Oct 22, recruiter-ready sprint v2:** review in `docs/reviews/2026-10-22-recruiter-ready.md` (RR-1..16: 5 P0, 7 P1, 4 P2). Main gap: no no-login sample-data demo. Fix loop builds one (demo build, sample pictures, demo bar, laptop frame) for Product Studio to host at chaseholroyd.com/demo/hearth/. **Exact next step:** RR-1..3, RR-8, RR-10 (demo mode) test-first on branch `claude/project-thread-py4kr1-demo`.
+- **Oct 22, recruiter-ready sprint v2:** review in `docs/reviews/2026-10-22-recruiter-ready.md` (RR-1..16: 5 P0, 7 P1, 4 P2). Main gap: no no-login sample-data demo. Fix loop builds one (demo build, sample pictures, demo bar, laptop frame) for Product Studio to host at chaseholroyd.com/demo/hearth/. Round 1a done: demo build with a sample family, demo bar, Grandma's view (`npm run export:web:demo`, `npm run e2e:demo`). **Exact next step:** RR-6 laptop frame and RR-7 not-found page, then RR-5 (base path `/demo/hearth`, static hosting), then RR-4/RR-9/RR-12 (story, screenshots, new INTAKE).
 - **Don't link publicly yet:** the web build (it's the live app on the family's real backend, sign-in only, not a demo) or the repo (private until the name is final, then AGPL-3.0 per DEC-7). A public no-login demo needs a sample-data web build on its own URL; not built.
 
 ## Oct 22: studio ux-reviewer synced (recruiter-ready sprint)

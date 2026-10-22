@@ -53,8 +53,17 @@ P0 blocks showing it. P1 hurts the impression. P2 is polish.
 4. **Sample pictures** are flat illustrations drawn by `app/scripts/make-demo-pictures.py` (pumpkins, beach, cake…), not stock photos: no licensing, no people.
 5. **RR-11** (household words on the Groups screen) needs a grandparent-ux pass; left for the next round rather than guessed.
 
+## Round 1a: what changed
+
+- **Demo build** (`npm run export:web:demo`, `EXPO_PUBLIC_HEARTH_DEMO=1`): opens on Photos as "Sam", a parent, with 7 sample posts over 24 days (8 drawn pictures in `app/public/demo-pictures/`, hearts and replies from the grandparents). Pictures are encrypted into the fake backend the same way an upload is, so the viewer path is the real one. Saved in the browser only after the family is complete.
+- **Demo bar** on every screen: "A demo with a made-up family, kept in this browser. You're Sam, a parent." with Grandma's view / Parent's view, Start over (clears only `hearth.*` keys; the portfolio origin hosts other demos) and Portfolio (chaseholroyd.com/family-photos.html).
+- **Me screen in the demo** hides notice timing, problem details, sign out and delete account.
+- Tests: `src/demo/__tests__/seed.test.ts` (DEMO-1, 2, 3, 10), `demoBar.test.tsx`, `screens/__tests__/demoMe.test.tsx` (DEMO-8), `e2e-web/demo.spec.js` (3 flows, `npm run e2e:demo`).
+- Re-checked by eye: phone light (parent) and dark (Grandma Jo). The bar's buttons wrap to two lines at 390 px; readable, 48 px tall.
+
 ## Status
 
 | Round | Fixed | New | Left |
 |---|---|---|---|
 | 0 (baseline) | – | RR-1..RR-16 | P0: 5, P1: 7, P2: 4 |
+| 1a (demo mode, PR below #38) | RR-1, RR-2, RR-3, RR-8, RR-9 (in the demo), RR-10, RR-14 | – | P0: RR-4, RR-5. P1: RR-6, RR-7, RR-9 (portfolio screenshots), RR-11, RR-12. P2: RR-13, RR-15, RR-16 |
