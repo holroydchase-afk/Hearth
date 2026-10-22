@@ -5,10 +5,12 @@
 Built by Chase Holroyd, a product manager, as a working proof of concept: one person, a $20/month AI plan, and a team of Claude agents, test-first from day one.
 
 <p>
-  <img src="docs/portfolio/screens/iphone-02-share.png" width="200" alt="Share screen: pick photos, write a caption, pick who sees it">
-  <img src="docs/portfolio/screens/iphone-03-photos-poster.png" width="200" alt="Photos screen as the parent who posted">
-  <img src="docs/portfolio/screens/iphone-08-photos-grandparent.png" width="200" alt="Photos screen as a grandparent: big text, worded buttons">
+  <img src="docs/portfolio/screens/iphone-02-share.png" width="200" alt="Share screen: a picked photo, a caption, and the group that will see it">
+  <img src="docs/portfolio/screens/iphone-03-posted.png" width="200" alt="Photos screen as the parent: the new post says who it was shared with">
+  <img src="docs/portfolio/screens/iphone-05-grandparent.png" width="200" alt="Photos screen as a grandparent: bigger text, worded buttons, only what was shared with her">
 </p>
+
+<sub>Screens from the demo: a made-up family and drawn sample pictures.</sub>
 
 ## The problem
 
@@ -27,10 +29,10 @@ Families with divorces, remarriages and step-relatives don't fit one group chat.
 |---|---|
 | App | Expo SDK 57 (React Native, TypeScript strict), iPhone, Android and web from one codebase |
 | Backend | Supabase (Postgres with row-level security, Edge Functions), US East; Backblaze B2 for encrypted photos |
-| Tests | 596 app tests (Jest), 639 database checks (SQL), web end-to-end tests (Playwright), contract tests that run the same suite against a fake and the real backend |
+| Tests | 600+ app tests (Jest), 800+ database checks (SQL), web end-to-end tests (Playwright), contract tests that run the same suite against a fake and the real backend |
 | Process | Every change starts with a failing test that names its requirement. Every product decision gets a persona check, one Green or Red per relative type, and CI fails without it. Decisions are logged with what they beat |
 
-**An AI team with lanes.** The repo holds seven specialist agents: a staff PM, a QA engineer, an app engineer, a UI/UX designer who speaks for the grandparents, a privacy and security lead, a marketing partner and a funding analyst. The main Claude session works as chief of staff and routes each request to one lane. Chase sets the goals, makes the calls and owns the merge button.
+**An AI team with lanes.** The repo holds eight specialist agents: a staff PM, a QA engineer, an app engineer, a UI/UX designer who speaks for the grandparents, a UX reviewer for anything shown publicly, a privacy and security lead, a marketing partner and a funding analyst. The main Claude session works as chief of staff and routes each request to one lane. Chase sets the goals, makes the calls and owns the merge button.
 
 **Measured, not guessed.** `docs/eng/PERFORMANCE.md` holds speed budgets with tests that fail when one is missed. For example, JavaScript encryption measured about 370 ms per photo on a phone-like runtime, which led to parallel uploads and a switch to native or browser crypto wherever the runtime has it.
 
@@ -48,7 +50,7 @@ cd backend && bash tests/run.sh         # database tests (local Postgres 16)
 bash test-all.sh                        # everything
 ```
 
-The web build runs on a built-in fake backend, so you can try it with no accounts: `cd app && EXPO_PUBLIC_HEARTH_FAKE=1 npx expo start --web`.
+**Try the demo, no accounts:** `cd app && npm run build:demo-site` builds the public demo (a made-up family with sample pictures, kept in the browser, no backend) into `app/dist-demo-site/`, for chaseholroyd.com/demo/hearth/. To click through it locally: `npm run export:web:demo && node scripts/serve-dist.js dist-demo 8090`, then open http://127.0.0.1:8090. On a laptop it shows the app at phone width beside a short guide; "Grandma's view" shows that each photo reaches only the people it was shared with.
 
 ## Status
 
