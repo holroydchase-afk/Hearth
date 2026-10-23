@@ -4,6 +4,7 @@
 - Merged on Chase's word: #33, #34, #36, the recruiter-ready stack #37 to #45 (no-login demo + fixes), and #32 (on-device opt-in AI, renumbered DEC-28 to DEC-31 because the night shift used DEC-28).
 - Oct 23: `EXPO_PUBLIC_SUPABASE_ANON_KEY` saved in Expo's preview environment (Chase's "ok 3"; both public settings now live there, so `eas update --environment preview` needs no export step). Published main 3cd7eb7 to the preview channel (group 80906a4a); the standing Expo Go link serves it.
 - Oct 23: D1, D2, D5, D7, D9 decided (DEC-32 to DEC-36, persona check `decisions/2026-10-23-notice-sender-names.md`).
+- Oct 23: name check: Fridge Door is taken ("Fridge Door: Kids Drawings" app and several FridgeDoor products), so it's dropped. MARKETING.md shortlist updated; Front Room and Homeplace are next to re-check. Name final: still no.
 - Chase pasted the demo INTAKE into Product Studio (Oct 22). Next: messenger test MS3.
 
 ## Portfolio / public presence
