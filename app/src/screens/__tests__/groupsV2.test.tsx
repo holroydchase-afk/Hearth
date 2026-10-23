@@ -2,6 +2,7 @@
 // confirmation (GRP-17) and inviting to several groups (GRP-18). Written first: red until the screen catches up.
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';
+import { ApiError } from '../../api/HearthApi';
 import { FIXTURE, FakeBackend } from '../../api/fake/FakeBackend';
 import { expectGrandparentSafe, renderApp, screenWords } from '../../test/renderApp';
 import { GroupsScreen } from '../GroupsScreen';
@@ -91,6 +92,25 @@ describe('GRP-15 New group (parents only)', () => {
     const g = findGroup(be, 'Beach week')!;
     expect(g.kind).toBe('event');
     expect(g.comment_mode).toBe('on_group_posts');
+  });
+
+  it('HARD-1 a lost signal halfway through "Make the group" never makes a second group on the retry', async () => {
+    const { be, api, createLevel } = await openNew();
+    fireEvent.changeText(screen.getByLabelText('Name of the group'), 'Cousins');
+    fireEvent.press(screen.getByRole('checkbox', { name: 'Grandma Jo' }));
+    fireEvent.press(screen.getByRole('checkbox', { name: 'Nana Ruth' }));
+    fireEvent.press(screen.getByRole('radio', { name: 'Only new photos' }));
+    let fails = 1;
+    jest.spyOn(api, 'placePerson').mockImplementation(async (g, u, h) => {
+      if (u === FIXTURE.users.ruth.id && fails-- > 0) throw new ApiError('NETWORK');
+      be.placePerson(FIXTURE.users.chase.id, g, u, h);
+    });
+    fireEvent.press(screen.getByRole('button', { name: 'Make the group' }));
+    await screen.findByText(/signal|connection|internet/i);
+    fireEvent.press(screen.getByRole('button', { name: 'Make the group' }));
+    await waitFor(() => expect(membersOf(be, findGroup(be, 'Cousins')!.id)).toEqual(['Grandma Jo', 'Nana Ruth']));
+    expect(Object.values(be.state.circles).filter((c) => c.name === 'Cousins' && !c.deleted)).toHaveLength(1);
+    expect(createLevel).toHaveBeenCalledTimes(1);
   });
 
   it('GRP-15 relatives never see group management or comment settings, even one allowed to post', async () => {

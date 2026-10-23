@@ -70,6 +70,24 @@ describe('Share screen', () => {
     expect(await screen.findByText("You can't do that here.")).toBeTruthy();
   });
 
+  it('HARD-2 picking more than 10 says plainly how many were left out', async () => {
+    const many = Array.from({ length: 12 }, (_, i) => ({ uri: `file:///pick/${i}.jpg`, kind: 'photo' as const, width: 4032, height: 3024 }));
+    await renderApp(<ShareScreen />, { user: 'chase', deps: { pickPhotos: jest.fn(async () => ({ items: many })) } });
+    fireEvent.press(await screen.findByRole('button', { name: 'Pick photos from your phone' }));
+    expect(await screen.findByText('10 photos picked')).toBeTruthy();
+    expect(screen.getByText(/10 at a time.*2 photos were left out/)).toBeTruthy();
+  });
+
+  it('HARD-3 no group to send to is said in words, not a dead end', async () => {
+    const be = FakeBackend.withFixture();
+    const api = be.clientFor(null, { trackAppSession: true });
+    jest.spyOn(api, 'myCircles').mockResolvedValue([]);
+    await renderApp(<ShareScreen />, { be, user: 'chase', deps: { api } });
+    expect(await screen.findByText(/no group to send to yet/i)).toBeTruthy();
+    expect(screen.queryByText('Pick who should see it.')).toBeNull();
+    expectGrandparentSafe();
+  });
+
   it('is grandparent-safe', async () => {
     await renderApp(<ShareScreen />, { user: 'chase' });
     fireEvent.press(await screen.findByRole('button', { name: 'Pick photos from your phone' }));
