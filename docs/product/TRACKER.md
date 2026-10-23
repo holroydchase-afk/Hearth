@@ -87,15 +87,15 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 
 | # | Question | Claude's pick | Blocks |
 |---|---|---|---|
-| D1 | How to meet "auto criteria green 3× on hosted": wipe and run the full suites on hosted before you sign in (needs `SUPABASE_DB_URL`), or count CI's 3 green runs on a real Supabase stack plus a read-only smoke check on hosted | CI runs plus hosted smoke check; no extra secret, nothing wiped | M1 gate wording (before step 4) |
-| D2 | Refresh the staff-pm agent (milestones, "groups" wording, a not-doing list, files it owns), as a PR you review | Yes, after milestone 1 | Nothing today |
+| D1 | How to meet "auto criteria green 3× on hosted": wipe and run the full suites on hosted before you sign in (needs `SUPABASE_DB_URL`), or count CI's 3 green runs on a real Supabase stack plus a read-only smoke check on hosted | **Decided: CI runs plus hosted smoke check** (Chase, Oct 23; DEC-32) | M1 gate wording (before step 4) |
+| D2 | Refresh the staff-pm agent (milestones, "groups" wording, a not-doing list, files it owns), as a PR you review | **Decided: yes, after milestone 1** (Chase, Oct 23; DEC-33) | Nothing today |
 | D3 | Is the name final? Must be answered before buying the domain or the $99 Apple build (`ACCOUNTS.md`) | Decide at the start of milestone 2 | Milestone 2 |
 | D4 | "Seen by" conflicts with A2 Guilt-free: keep, change or drop | Decide before milestone 4 | Milestone 4 |
-| D5 | Is Thanksgiving (Nov 26) still the target for milestones 3–4 | Yes, soft target | Planning only |
+| D5 | Is Thanksgiving (Nov 26) still the target for milestones 3–4 | **Decided: yes, soft target** (Chase, Oct 23; DEC-34) | Planning only |
 | D6 | AI positioning session (on-device, opt-in); blocks face features only | **Decided: B, on-device only, opt-in** (Chase, Oct 19; DEC-31, `decisions/2026-10-19-ai-on-device-opt-in.md`). Build plan below waits on his go | Nothing; see "On-device AI" |
-| D7 | Earlier "personal server" question: did you mean a separate locked store per family, run in the US? Your yes to the family vault may already answer it | Treat the vault as the answer | Nothing today |
+| D7 | Earlier "personal server" question: did you mean a separate locked store per family, run in the US? Your yes to the family vault may already answer it | **Decided: family vault for now; a personal server is a maybe** (Chase, Oct 23; DEC-35) | Nothing today |
 | D8 | Start per-family media keys now, before the first real photos (step 7), or after milestone 1 (then old photos need re-keying) | Before step 7, if staff-pm approves; it's small | Nothing today; cheaper before step 7 |
-| D9 | Push and email notices name the sender ("From Chase on Hearth", BETA-NOTIFY-7) or say nothing about who | Keep names for the beta; add a "hide names" setting later | Milestone 2 |
+| D9 | Push and email notices name the sender ("From Chase on Hearth", BETA-NOTIFY-7) or say nothing about who | **Decided: keep names for the beta; "hide names" setting later** (Chase, Oct 23; DEC-36) | Milestone 2 |
 | D10 | Open-source the repo, and under which license? Options: AGPL-3.0, MIT, personal/family-only (PolyForm Noncommercial, not OSI open source), or AGPL plus a paid commercial license. MIT can't also be limited to personal and family use. Sentry (FSL) and PostHog (MIT + paid `ee`) sell to companies; Signal, Ente and Immich use AGPL. See "Developer edition" below | **Decided: AGPL-3.0** (Chase, Oct 19; `decisions/2026-10-19-license-agpl.md`); the name stays Chase's (trademark), and a contributor agreement once outside PRs arrive keeps dual licensing open. Repo goes public only after D3 (name final) | Developer edition |
 | D11 | Text message codes as the primary, default way to get a sign-in code (email as fallback). Needs an SMS provider and US carrier registration, which can take weeks | Keep email for milestones 1 and 2; staff-pm specs texts, and you start carrier registration early so it's ready for the grandparents (milestone 3+) | Grandparent milestones |
 | D12 | Other sign-in options, including Sign in with Apple | Explore after milestone 1; Apple needs the $99 account and a final name | Nothing today |
@@ -114,6 +114,8 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 
 ## Waiting on Claude, later (not milestone 1)
 
+- A "hide names" setting for push and email notices (DEC-36), after the beta.
+- Refresh the staff-pm agent as a reviewed PR (DEC-33), after milestone 1.
 - Milestone 2 build: push on a real iPhone build (NOTIFY-3), Resend domain and SPF/DKIM after the name is final, invite links.
 - Spec the duplicate catcher: now step AI-2 under "On-device AI" above.
 - grandparent-ux review of the family vault ideas before any vault spec (post-beta).
