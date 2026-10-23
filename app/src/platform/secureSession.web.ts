@@ -1,6 +1,4 @@
-// Web is a test harness only; keep the session in localStorage.
-export const secureSessionStorage = {
-  getItem: async (k: string) => globalThis.localStorage?.getItem(k) ?? null,
-  setItem: async (k: string, v: string) => { globalThis.localStorage?.setItem(k, v); },
-  removeItem: async (k: string) => { globalThis.localStorage?.removeItem(k); },
-};
+// Web is a test harness only; keep the session in localStorage (in memory when the browser blocks it, HARD-7).
+import { webKV } from './webStorage';
+
+export const secureSessionStorage = webKV();

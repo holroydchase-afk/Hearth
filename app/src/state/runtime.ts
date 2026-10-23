@@ -16,17 +16,19 @@ import { fileMediaStore, mediaKeyStore } from '../platform/mediaStore';
 import { saveToPhone } from '../platform/saveToPhone';
 import { secureSessionStorage } from '../platform/secureSession';
 import { asyncStorageKV } from '../platform/storage';
+import { webStorage } from '../platform/webStorage';
 import type { AppDeps } from './AppContext';
 
 export const FAKE_MODE = process.env.EXPO_PUBLIC_HEARTH_FAKE === '1' || DEMO_MODE;
 export const FAKE_KEY = 'hearth.fakeBackend.v1';
 
 function fakeBackend(): FakeBackend {
-  const ls = Platform.OS === 'web' ? globalThis.localStorage : undefined;
+  const ls = Platform.OS === 'web' ? webStorage() : undefined;
   // DEMO-2: nothing is saved until the sample family is complete, so a reload mid-seed starts over.
   let seeding = DEMO_MODE;
   const persist = ls ? (s: FakeState) => { if (seeding) return; try { ls.setItem(FAKE_KEY, JSON.stringify(s)); } catch { /* full */ } } : undefined;
-  const saved = ls?.getItem(FAKE_KEY);
+  let saved: string | null | undefined;
+  try { saved = ls?.getItem(FAKE_KEY); } catch { /* blocked: start fresh */ }
   if (saved) {
     try {
       const state = JSON.parse(saved) as FakeState;

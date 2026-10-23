@@ -6,6 +6,7 @@ import type { FakeBackend } from '../api/fake/FakeBackend';
 import { DemoBar } from './DemoBar';
 import { DemoFrame } from './DemoFrame';
 import { DEMO_MODE } from './flags';
+import { webStorage } from '../platform/webStorage';
 import { demoKeysToClear } from './seed';
 
 const BASE = (process.env.EXPO_BASE_URL ?? '').replace(/\/$/, '');
@@ -13,7 +14,8 @@ const goPhotos = () => window.location.assign(`${BASE}/photos`);
 
 function startOver() {
   try {
-    const ls = window.localStorage;
+    const ls = webStorage();
+    if (!ls) throw new Error('storage blocked');
     const keys = Array.from({ length: ls.length }, (_, i) => ls.key(i)).filter((k): k is string => k != null);
     for (const k of demoKeysToClear(keys)) ls.removeItem(k);
   } catch { /* storage blocked: the reload still starts a fresh family in memory */ }

@@ -14,6 +14,7 @@ export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: (email: str
   const [msg, setMsg] = useState<string | null>(null);
   // BETA-JOIN-2: a minute between codes (the mailer allows only a few an hour), said in words.
   const [waitUntil, setWaitUntil] = useState(0);
+  const [sentTo, setSentTo] = useState<string | null>(null); // HARD-5: the minute counts for the address it was sent to
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (waitUntil <= Date.now()) return;
@@ -27,6 +28,7 @@ export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: (email: str
     setMsg(null);
     try {
       await deps.api.sendCode(email.trim());
+      setSentTo(email.trim().toLowerCase());
       setStep('code');
       setCode('');
       setNow(Date.now());
@@ -52,6 +54,7 @@ export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: (email: str
   };
 
   const suggestion = suggestEmail(email);
+  const mustWait = waitLeft > 0 && sentTo === email.trim().toLowerCase();
 
   if (step === 'email') {
     return (
@@ -64,7 +67,8 @@ export function EmailCodeFlow({ onSignedIn, inviter }: { onSignedIn: (email: str
           </>
         ) : null}
         {msg ? <Notice text={msg} /> : null}
-        <Button label="Send me a code" busy={busy} disabled={!email.includes('@')} onPress={() => void send()} />
+        <Button label="Send me a code" busy={busy} disabled={!email.includes('@') || mustWait} onPress={() => void send()} />
+        {mustWait ? <Txt variant="muted">{`You can ask for a new code in ${waitLeft} seconds.`}</Txt> : null}
       </>
     );
   }

@@ -1,5 +1,10 @@
 # Handoff
 
+## Oct 23, night shift 3: harden existing features (branch claude/project-thread-kzt7by-harden, draft PR)
+- **Done, test-first:** review `docs/reviews/2026-10-23-harden.md` (6 fixed: 0 P0, 3 P1, 3 P2; HARD-6 checked out fine). P1s: a lost signal while making a group no longer makes a duplicate on retry (HARD-1); Share says plainly when there's no group to send to (HARD-3); the demo opens when a browser blocks storage (HARD-7, `app/src/platform/webStorage.ts`, architecture 03 updated).
+- **Tests (3 green runs):** app 626 + 1 skipped, typecheck clean, web e2e 4, demo e2e 9 + 44 screenshots (no console errors, no visual change).
+- **Next exact step:** Chase reviews and says "merge" (MERGING.md). Nothing to deploy; publish to Expo Go only on Chase's word.
+
 ## Oct 22–23, power hour (Chase)
 - Merged on Chase's word: #33, #34, #36, the recruiter-ready stack #37 to #45 (no-login demo + fixes), and #32 (on-device opt-in AI, renumbered DEC-28 to DEC-31 because the night shift used DEC-28).
 - Oct 23: `EXPO_PUBLIC_SUPABASE_ANON_KEY` saved in Expo's preview environment (Chase's "ok 3"; both public settings now live there, so `eas update --environment preview` needs no export step). Published main 3cd7eb7 to the preview channel (group 80906a4a); the standing Expo Go link serves it.

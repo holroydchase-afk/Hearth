@@ -55,6 +55,14 @@ describe('BETA-JOIN-8: typing an invite code (links can open in a browser, or Ta
     expect(nav.goJoin).toHaveBeenCalledWith('GRANDMAJ23');
   });
 
+  it('HARD-4 pasting the whole invite link opens that invite, keeping the link token exactly', async () => {
+    const { nav } = await renderApp(<AppGate />, { user: null, waitReady: false });
+    fireEvent.press(await screen.findByRole('button', { name: 'I have an invite code' }));
+    fireEvent.changeText(screen.getByLabelText('Invite code'), ' https://thefreighttrains-team-hearth.expo.app/join/aB3dE9xYz12QwErTy7 ');
+    fireEvent.press(screen.getByRole('button', { name: 'Open the invite' }));
+    expect(nav.goJoin).toHaveBeenCalledWith('aB3dE9xYz12QwErTy7');
+  });
+
   it('BETA-JOIN-8: the invite card shows the code to read out, in two easy halves', async () => {
     await renderApp(<GroupsScreen />, { user: 'chase' });
     fireEvent.press(await screen.findByRole('button', { name: "Invite someone to Grandparents – Dad's side" }));
@@ -89,6 +97,16 @@ describe('sign in: waiting for the code (BETA-JOIN-2)', () => {
 });
 
 describe('sign in: email typos (June types "yaho.com")', () => {
+  it('HARD-5 going back to the email step does not skip the minute for the same address', async () => {
+    await renderApp(<SignInScreen />, { user: null });
+    await toCodeStep();
+    fireEvent.press(screen.getByRole('button', { name: 'Use a different email' }));
+    expect(screen.getByRole('button', { name: 'Send me a code' }).props.accessibilityState).toMatchObject({ disabled: true });
+    expect(screen.getByText(/new code in \d+ seconds/)).toBeTruthy();
+    fireEvent.changeText(screen.getByLabelText('Your email'), 'ruth@example.com');
+    expect(screen.getByRole('button', { name: 'Send me a code' }).props.accessibilityState).toMatchObject({ disabled: false });
+  });
+
   it('JOIN-2: suggests the likely email and never changes it on its own', async () => {
     await renderApp(<SignInScreen />, { user: null });
     fireEvent.changeText(await screen.findByLabelText('Your email'), 'june@yaho.com');

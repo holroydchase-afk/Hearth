@@ -67,3 +67,17 @@ test('DEMO-6 / NF-1 laptop shows the story panel beside the app; an unknown link
   await page.getByRole('button', { name: 'Go to Photos' }).click();
   await expect(page.getByText('Mia turned 5!', { exact: true })).toBeVisible();
 });
+
+test('HARD-7 storage blocked (private window, strict cookie settings): the demo still opens with the sample family', async ({ page }) => {
+  await page.addInitScript(() => {
+    const deny = () => { throw new DOMException('The operation is insecure.', 'SecurityError'); };
+    Object.defineProperty(window, 'localStorage', { configurable: true, get: deny });
+    Object.defineProperty(window, 'sessionStorage', { configurable: true, get: deny });
+  });
+  const mine = [];
+  page.on('pageerror', (e) => mine.push(String(e)));
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Photos of Mia and Leo' })).toBeVisible();
+  await expect(page.getByText('Mia turned 5!', { exact: true })).toBeVisible();
+  expect(mine).toEqual([]);
+});
