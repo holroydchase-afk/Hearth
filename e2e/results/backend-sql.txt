@@ -509,10 +509,10 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 TIMELINE RESULT: 38 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
-psql:tests/groups_test.sql:888: WARNING:  as memaw: P0002 not found (select public.retire_level('72e7a1fa-92a6-44bf-a6c0-efdf8624ad51'))
-psql:tests/groups_test.sql:888: WARNING:  as danielle: P0002 not found (select public.retire_level('5827d5ea-bcc1-4c94-a7a2-69898ff27966'))
-psql:tests/groups_test.sql:891: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('cc77c655-675e-4b4f-918a-23c8caf2c3d8'))
-psql:tests/groups_test.sql:1025: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = '75ba7781-2190-4dc9-9709-df0952f43614')
+psql:tests/groups_test.sql:888: WARNING:  as memaw: P0002 not found (select public.retire_level('8257b09c-bd7d-40b7-bf74-7fe834822c48'))
+psql:tests/groups_test.sql:888: WARNING:  as danielle: P0002 not found (select public.retire_level('d4e230ca-3581-41f7-a9ad-bc4666a80d79'))
+psql:tests/groups_test.sql:891: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('17703199-2f4d-4136-b2a9-ac5265711a6c'))
+psql:tests/groups_test.sql:1025: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = 'bb6b4d5b-b357-4e6b-b4c2-93e14bbcca09')
   n  | result |                                                                                  description                                                                                   
 -----+--------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    1 | ok     | BETA-AUD-11 shape: circles.kind exists (everyone | group | household | event)
@@ -906,13 +906,32 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 
 CHAT RESULT: 57 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
+ n  | result |                                                               description                                                               
+----+--------+-----------------------------------------------------------------------------------------------------------------------------------------
+  1 | ok     | HELP-R4 with no family rows, a parent gets both photo helpers (default on)
+  2 | ok     | HELP-R4 ...and video_posting stays off by default (FLAG-1 unchanged)
+  3 | ok     | HELP-R4 a viewer who can't post gets no photo helpers (never shown to viewers)
+  4 | ok     | HELP-R4 ...a relative the family lets post gets them
+  5 | ok     | HELP-R4 a family you aren't in lists nothing
+  6 | ok     | HELP-R4 the owner turns the look-alike helper off for the family
+  7 | ok     | HELP-R4 ...it's off; the screenshot helper stays on
+  8 | ok     | HELP-R4 ...and back on
+  9 | ok     | HELP-R4 ...both on again
+ 10 | ok     | HELP-R4 a relative can't switch a family helper (FLAG-3)  [42501 new row violates row-level security policy for table "space_features"]
+ 11 | ok     | HELP-R4 the global switch off turns the screenshot helper off for every family
+ 12 | ok     | HELP-R4 ...and an app user can't turn it back on  [42501 permission denied for table feature_flags]
+ 13 | ok     | HELP-R4 both helpers have a global row (the kill switch exists)
+
+
+HELPERS RESULT: 13 passed, 0 failed
+psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
 
 Narrowing for Chase (readable before 0011 only through "members see each other's replies"):
      reader     |  kind   |                                 reply_id                                  
 ----------------+---------+---------------------------------------------------------------------------
- Grandma Rivera | comment | 0bba0df2-74b8-4fd3-9325-e6a22af65e2e
+ Grandma Rivera | comment | 110efdee-8cca-4d2c-8676-68ca2e130995
  Grandma Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a2
- Grandpa Rivera | comment | 5951032f-5d25-4e7e-a395-cd293d013d9d
+ Grandpa Rivera | comment | 078d59b4-f603-4dde-8714-b23f68b91e6d
  Grandpa Rivera | heart   | 55555555-0000-0000-0000-0000000000a1/a0000000-0000-0000-0000-0000000000a1
 
  n  | result |                                                     description                                                      
@@ -1021,8 +1040,8 @@ ok      SETUP-API: before Chase has an account it says "sign in once in the app"
 ok      SETUP-API: ... and changes nothing
 ok      SETUP-API: fresh setup runs without error
         | Family "Chase's kids" is ready: Everyone, Chase's side, Danielle's side, 7 houses, 2 events.
-        | Test viewer invite (account B): code 62NR4YKXXC, works once until Oct 29, link https://thefreighttrains-team-hearth.expo.app/join/bc6efc42517f86fa2e15b9de488a968253d72c5c
-        | Danielle's poster invite: code QQ44NYRXS2, works once until Oct 29, only for danielle@example.com, link https://thefreighttrains-team-hearth.expo.app/join/8683359b6bfe0dba415cb6e791876906a8269822
+        | Test viewer invite (account B): code NW9AENKGJB, works once until Oct 29, link https://thefreighttrains-team-hearth.expo.app/join/894eccb2132ad073b47eae812b4fe097211ad754
+        | Danielle's poster invite: code KKPA2G7SNQ, works once until Oct 29, only for danielle@example.com, link https://thefreighttrains-team-hearth.expo.app/join/6b8e49bb523ce130420728075dd35542ab843c03
 ok      SETUP-API: Chase owns one family, named as given (an apostrophe in the name is kept, not a SQL error)
 ok      SETUP-API: one Everyone
 ok      SETUP-API: the set groups are Chase's side and Danielle's side (no v1 groups to retire later)
@@ -1081,7 +1100,7 @@ ok      QA-3: a visible post with a photo not ready counts as missing, and says 
 SENT-RECEIVED RESULT: 20 passed, 0 failed
 ok      D1 smoke: backend/scripts/smoke-check.sh exists
 ok      D1 smoke: without SUPABASE_ACCESS_TOKEN it stops and names the secret
-        | ok    all 15 migrations applied
+        | ok    all 16 migrations applied
         | ok    RLS is on for every public table
         | ok    cron job hearth-notify
         | ok    cron job hearth-purge-client-errors
@@ -1093,7 +1112,7 @@ ok      D1 smoke: without SUPABASE_ACCESS_TOKEN it stops and names the secret
         | SMOKE RESULT: 9 ok, 0 failed
 ok      D1 smoke: a healthy project passes (exit 0)
 ok      D1 smoke: ends with "SMOKE RESULT: N ok, 0 failed"
-ok      D1 smoke: says all 15 local migrations are applied
+ok      D1 smoke: says all 16 local migrations are applied
 ok      D1 smoke: never prints a secret value
 ok      D1 smoke: never prints the token
 ok      D1 smoke: its SQL runs inside a read-only transaction (no write attempted)
@@ -1102,7 +1121,7 @@ ok      D1 smoke: the token goes in the Authorization header
 ok      D1 smoke: no psql, no unexpected endpoint
 ok      D1 smoke: changes nothing
 ok      ONB-3 smoke: hosted invite_link_base is checked and reads as ok
-ok      D1 smoke: a migration not applied on hosted fails and names it (0015)
+ok      D1 smoke: a migration not applied on hosted fails and names it (0016)
 ok      D1 smoke: a public table without RLS fails and names it
 ok      D1 smoke: a missing cron job fails and names it
 ok      D1 smoke: a missing edge function fails and names it

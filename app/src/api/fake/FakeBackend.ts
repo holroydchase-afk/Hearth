@@ -87,8 +87,12 @@ export interface FakeState {
 /** 0013: a new circle's comment setting by kind (households stay 'always'). */
 const defaultMode = (k: CircleKind | undefined): CommentMode => (k === 'household' ? 'always' : k === 'event' ? 'on_group_posts' : 'private');
 const MODES: CommentMode[] = ['private', 'on_group_posts', 'always'];
-/** private.feature_capability: who may use each feature (parents only to start). */
-const FEATURE_CAPABILITY: Record<string, 'use_video'> = { video_posting: 'use_video' };
+/** private.feature_capability: who may use each feature (parents only to start; the fake's posters are the parents). */
+const FEATURE_CAPABILITY: Record<string, 'use_video' | 'post'> = {
+  video_posting: 'use_video', photo_helpers_duplicates: 'post', photo_helpers_screens_blur: 'post',
+};
+/** private.feature_default_on (0016): a missing row means off for add-ons, on for off-switches (HELP-R4). */
+const FEATURE_DEFAULT_ON = new Set(['photo_helpers_duplicates', 'photo_helpers_screens_blur']);
 
 const U = (n: number) => `00000000-0000-4000-8000-${n.toString(16).padStart(12, '0')}`;
 export const FIXTURE = {
@@ -766,11 +770,13 @@ export class FakeBackend {
       .map((m) => ({ user_id: m.user, name: this.state.users[m.user]?.name ?? '?', role: m.role }));
   }
 
-  /** private.feature_on for each known feature: global switch AND family add-on AND can(capability). */
+  /** private.feature_on for each known feature: global switch AND family switch AND can(capability); a missing row is the default. */
   myFeatures(user: string | null, space: string): string[] {
     const me = this.requireUser(user);
-    return Object.keys(FEATURE_CAPABILITY).filter((f) =>
-      !!this.state.featureFlags?.[f] && !!this.state.spaceFeatures?.[`${space}:${f}`] && this.isPoster(space, me)).sort();
+    return Object.keys(FEATURE_CAPABILITY).filter((f) => {
+      const def = FEATURE_DEFAULT_ON.has(f);
+      return (this.state.featureFlags?.[f] ?? def) && (this.state.spaceFeatures?.[`${space}:${f}`] ?? def) && this.isPoster(space, me);
+    }).sort();
   }
 
   // ---------------- sign-media ----------------
