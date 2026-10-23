@@ -143,9 +143,9 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Source:** migration 0006, `docs/architecture/01-system-overview.md`
 
 ### DEC-18 · AI off by default, every feature behind an off-switch
-- **When / status:** Oct 17 and Oct 18 · Decided
+- **When / status:** Oct 17 and Oct 18 · Decided; "over a paid AI tier" replaced by DEC-37
 - **Chose:** each AI feature is a family add-on a parent turns on, with a Hearth-wide kill switch and per-role permission. Any in-picture analysis runs on the phone only. Nothing on family media is ever used for training.
-- **Over:** AI on for everyone, or a paid AI tier.
+- **Over:** AI on for everyone, or a paid AI tier. *(The paid-tier part is replaced by DEC-37, Oct 23.)*
 - **Because:** "no AI on our kids' photos" is a reason families pick Hearth. Small quiet helpers (bulk-upload audience suggestions, duplicates) are welcome only if they can be switched off and never act without asking.
 - **Source:** `docs/product/AI-FEATURES.md`, `/mnt/project-files/plans/v1-groups-plan.md`
 
@@ -156,6 +156,14 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** Chase's top AI asks (people → group suggestions, duplicates) need in-picture analysis, and on-device keeps the photo on the phone (A3). The wording leaves room for a personal model that learns only on a family's own phones (AI-8), which Chase wants kept possible.
 - **Trade-off:** "No AI at all" was easier for a tech reader to check, so a CI allowlist for ML libraries (AI-P0.1) comes first. Face features still need privacy-security and a legal read (Illinois BIPA) before they're built.
 - **Source:** `docs/product/decisions/2026-10-19-ai-on-device-opt-in.md`, TRACKER D6
+
+### DEC-37 · Free, open base; AI is a paid subscription
+- **When / status:** Oct 23 · Decided; the gate is built in AI-P0.2. Replaces DEC-18's "over a paid AI tier"
+- **Chose:** Chase: "I want the base to be free and open and the ai to be paid." Every AI feature, built or planned, checks a separate AI subscription for the family, apart from the storage plan (CF-26) and the vault. Defaults Claude picked, open to Chase: the no-model photo helpers stay free, and AI code stays open source (AGPL). The subscription is sold on Hearth's hosted service, and self-hosters run it free.
+- **Over:** AI free inside the family plan; AI code in a closed module (open core).
+- **Because:** the base (posting, groups, the co-parent link, grandparents) is the wedge and must spread without a paywall. AI is the clearest extra a parent will pay for. Keeping the AI code open keeps the AGPL and developer-edition story simple and lets a tech reader check the on-device promise.
+- **Trade-off:** on-device AI costs Hearth almost nothing to run, so the price buys convenience, updates and model downloads, not compute. A self-hoster gets AI free. Apple and Google require their in-app purchase for this subscription.
+- **Source:** `docs/product/decisions/2026-10-23-ai-paid-tier.md`, `AI-FEATURES.md` AI-R8 and AI-P0.2
 
 ## Sharing and the people model
 
@@ -268,4 +276,4 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Source:** `docs/product/decisions/2026-10-23-notice-sender-names.md`, TRACKER D9
 
 ---
-Last updated: Oct 23, 2026 (DEC-36)
+Last updated: Oct 23, 2026 (DEC-37)
