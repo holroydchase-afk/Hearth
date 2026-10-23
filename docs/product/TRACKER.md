@@ -148,6 +148,7 @@ The plan with priorities and refactors is `AI-FEATURES.md` "Build plan". Milesto
 | AI-0 | Say "go" to start Phase 0 (refactors AI-P0.1 to P0.7, no AI shipped) | Chase | ☐ |
 | AI-1 | privacy-security plus a legal read on face laws (BIPA) before any face work (Phase 3) | Claude | ☐ |
 | AI-2 | Spec Phase 1 (duplicates, best shot, screenshots) with BETA IDs and a persona check | Claude | ☐ |
+| AI-3 | Paid AI gate (DEC-37): AI features check a separate AI subscription; built in AI-P0.2. Chase to confirm two defaults: no-model helpers stay free, AI code stays open | Chase | ☐ |
 
 ## Running
 
