@@ -1,6 +1,6 @@
 # Hearth tracker: what's next, what's missing, what's pending
 
-The one list of everything open between Chase and Claude. Updated Oct 21, 2026.
+The one list of everything open between Chase and Claude. Updated Oct 22, 2026.
 
 **How it works**
 - Work the **Sequence** top to bottom. One step at a time; nothing new gets built until milestone 1 passes (Chase, Oct 17).
@@ -29,10 +29,11 @@ The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/202
 | R8 | A3 Photos kept on the phone: the feed and encrypted photo files, keys in the keychain (RV-P4, RV-X6; privacy review first) | P1 | L | ☑ Oct 21: photos seen before open from the phone with no network; ciphertext files plus keys sealed under a Keychain/Keystore key, dropped when a post goes away and wiped at sign-out (A3-1..6). Decision to review: keys kept on the phone (03-encryption-and-keys "On the phone"). Phone timing still to measure |
 | R9 | PERF-FEED-1 cold-start timing on the web build | P1 | S | ☑ Oct 21: 260 ms median on the web build with the fake backend (`e2e-web/perf.spec.js`); a phone timing comes with A3 |
 | R10 | Specs: AI-2 duplicates, AI-4 screenshots and blurry photos, no model (persona check, grandparent-ux words) | P2 | S | ☑ Oct 21 specced: `SPEC-PHOTO-HELPERS.md` (HELP-*). Build is a new row after A3 |
-| R15 | Build the photo helpers (HELP-DUP-1..4, HELP-SHOT-1, HELP-BLUR-1/2, HELP-ALL-1) | P2 | M | ◐ Oct 21: same photo twice sent once, screenshots, look-alikes (clearest kept) and photos already sent in the last 30 days left out, "Show what we left out" with Put back, all one button from coming back. Blur is built but off until tuned. Left: tune blur on 40 labeled photos (needs Chase), server flags (needs a migration) |
+| R15 | Build the photo helpers (HELP-DUP-1..4, HELP-SHOT-1, HELP-BLUR-1/2, HELP-ALL-1) | P2 | M | ◐ Oct 21: same photo twice sent once, screenshots, look-alikes (clearest kept) and photos already sent in the last 30 days left out, "Show what we left out" with Put back, all one button from coming back. Blur is built but off until tuned. Oct 22: server off-switches built (migration 0016, HELP-R4; deploy waits on Chase's word). Left: tune blur on 40 labeled photos (needs Chase), R17 |
 | R11 | Photos header: fewer stacked buttons before the first photo (RV-U3; grandparent-ux sketch first) | P2 | S | ☑ Oct 21: buttons two to a row, wrapping with Bigger text; the first photo shows without scrolling. Sketch and persona check in `decisions/2026-10-21-photos-header.md` (decision to review) |
 | R12 | Thumbnail sizing from a first guess instead of up to 7 encodes (RV-P5; measure on a phone) | P2 | S | ☑ Oct 21: the display JPEG's bytes per pixel pick the first step (padded 1.5×); a busy photo takes 1 to 2 thumbnail encodes instead of up to 7, a plain one still gets the sharpest. Phone timing still to measure |
 | R13 | A4 resumable video uploads (after FLAG-7 video stripping; RV-P7) | P2 | L | ☐ |
+| R17 | A "Photo helpers" on/off switch for the family's owner on a screen (today it's a database row). grandparent-ux words and a persona check first | P2 | S | ☐ |
 | R16 | Rest of the studio-agents migration (`examples/hearth/MIGRATION.md` in studio-agents): move Hearth facts into docs, swap in the generic agents, archive funding-analyst | P2 | S | ☐ After the Nov 22 beta; `ux-reviewer` synced Oct 22 |
 | R14 | npm audit: recheck the Expo CLI build-tool findings after the next Expo patch (RV-X4) | P2 | S | ☑ Oct 21: still 62 from 5 advisories on expo 57.0.30 (newest SDK 57 patch). One ships: decode-uri-component in expo-router (a crafted link could freeze the app; no data exposed). No forced override; recheck at the SDK 58 move |
 
