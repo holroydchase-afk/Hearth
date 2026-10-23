@@ -235,5 +235,37 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** the button adds a tap for the least tech-savvy relative (LG Red), REPLY-11 needs the readers line whenever the box shows, and list windowing already caps the extra server calls at about 10 cards. Revisit if phone timings show the calls hurt.
 - **Source:** `docs/product/reviews/2026-10-21-app-review.md` (RV-P3, RV-U4), TRACKER R6
 
+### DEC-32 · M1 "green 3× on hosted" means CI's 3 green runs plus a read-only hosted smoke check (D1)
+- **When / status:** Oct 23 · Decided by Chase (power hour)
+- **Chose:** count CI's three green runs on a real Supabase stack, plus `smoke-check.sh` read-only against hosted.
+- **Over:** wiping hosted and running the full suites there (needs `SUPABASE_DB_URL`).
+- **Because:** no extra secret, nothing wiped, and the same suites already run on a real stack in CI.
+- **Source:** TRACKER D1
+
+### DEC-33 · Refresh the staff-pm agent after milestone 1 (D2)
+- **When / status:** Oct 23 · Decided by Chase (power hour); work waits on M1
+- **Chose:** a reviewed PR that updates staff-pm for the milestones, "groups" wording, a not-doing list and the files it owns, once milestone 1 is behind us.
+- **Over:** refreshing it now, mid-milestone.
+- **Source:** TRACKER D2
+
+### DEC-34 · Thanksgiving (Nov 26) stays a soft target for milestones 3 and 4 (D5)
+- **When / status:** Oct 23 · Decided by Chase (power hour)
+- **Chose:** keep it as a planning target, not a gate.
+- **Because:** Hearth is a proof of concept first; dates guide the order of work, they don't force shortcuts.
+- **Source:** TRACKER D5
+
+### DEC-35 · The family vault answers the "personal server" question, for now (D7)
+- **When / status:** Oct 23 · Decided by Chase ("I don't think we will go with personal server but maybe. I like family vault for now.")
+- **Chose:** the family vault (end-to-end encrypted, a later, higher tier; DEC-16) is the plan for a family that wants its own locked store.
+- **Over:** a separate personal server per family, run in the US. Not ruled out: Chase said "maybe", so it stays in the ideas log.
+- **Source:** TRACKER D7, `docs/product/ANCHORS.md` ideas log
+
+### DEC-36 · Notices name the sender for the beta; "hide names" later (D9)
+- **When / status:** Oct 23 · Decided by Chase (power hour)
+- **Chose:** keep "From Chase on Hearth" (BETA-NOTIFY-7) in push and email; add a "hide names" setting after the beta.
+- **Over:** notices that say nothing about who sent them.
+- **Because:** a known name is what makes a grandparent trust and open the notice (LG, GG). Notices never carry captions, photos or the audience.
+- **Source:** `docs/product/decisions/2026-10-23-notice-sender-names.md`, TRACKER D9
+
 ---
-Last updated: Oct 22, 2026 (DEC-31)
+Last updated: Oct 23, 2026 (DEC-36)

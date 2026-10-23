@@ -1,8 +1,10 @@
 # Handoff
 
-## Oct 22, power hour (Chase)
+## Oct 22–23, power hour (Chase)
 - Merged on Chase's word: #33, #34, #36, the recruiter-ready stack #37 to #45 (no-login demo + fixes), and #32 (on-device opt-in AI, renumbered DEC-28 to DEC-31 because the night shift used DEC-28).
-- Next: Chase pastes `docs/portfolio/INTAKE-2026-10-22-demo.md` into Product Studio; Expo preview key (C2); messenger test MS3.
+- Oct 23: `EXPO_PUBLIC_SUPABASE_ANON_KEY` saved in Expo's preview environment (Chase's "ok 3"; both public settings now live there, so `eas update --environment preview` needs no export step). Published main 3cd7eb7 to the preview channel (group 80906a4a); the standing Expo Go link serves it.
+- Oct 23: D1, D2, D5, D7, D9 decided (DEC-32 to DEC-36, persona check `decisions/2026-10-23-notice-sender-names.md`).
+- Chase pasted the demo INTAKE into Product Studio (Oct 22). Next: messenger test MS3.
 
 ## Portfolio / public presence
 - **Oct 22:** chaseholroyd.com/family-photos.html already shows Hearth under a placeholder name ("name coming"); Product Studio owns that page. Hearth handed Product Studio an INTAKE block (`docs/portfolio/INTAKE-2026-10-22.md`): refresh the test counts, add three sample-data iPhone screenshots from `docs/portfolio/screens/`, add the encryption and "no Seen by" points.
