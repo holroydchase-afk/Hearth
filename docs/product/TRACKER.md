@@ -91,7 +91,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 | D3 | Is the name final? Must be answered before buying the domain or the $99 Apple build (`ACCOUNTS.md`) | Decide at the start of milestone 2 | Milestone 2 |
 | D4 | "Seen by" conflicts with A2 Guilt-free: keep, change or drop | Decide before milestone 4 | Milestone 4 |
 | D5 | Is Thanksgiving (Nov 26) still the target for milestones 3–4 | Yes, soft target | Planning only |
-| D6 | AI positioning session (on-device, opt-in); blocks face features only | After the beta | Face features |
+| D6 | AI positioning session (on-device, opt-in); blocks face features only | **Decided: B, on-device only, opt-in** (Chase, Oct 19; DEC-31, `decisions/2026-10-19-ai-on-device-opt-in.md`). Build plan below waits on his go | Nothing; see "On-device AI" |
 | D7 | Earlier "personal server" question: did you mean a separate locked store per family, run in the US? Your yes to the family vault may already answer it | Treat the vault as the answer | Nothing today |
 | D8 | Start per-family media keys now, before the first real photos (step 7), or after milestone 1 (then old photos need re-keying) | Before step 7, if staff-pm approves; it's small | Nothing today; cheaper before step 7 |
 | D9 | Push and email notices name the sender ("From Chase on Hearth", BETA-NOTIFY-7) or say nothing about who | Keep names for the beta; add a "hide names" setting later | Milestone 2 |
@@ -114,7 +114,7 @@ What stops milestone 1 from being testable today. Each line names its sequence s
 ## Waiting on Claude, later (not milestone 1)
 
 - Milestone 2 build: push on a real iPhone build (NOTIFY-3), Resend domain and SPF/DKIM after the name is final, invite links.
-- Spec the duplicate catcher (first AI add-on, no ML) when milestone 1 is behind us (`AI-FEATURES.md`).
+- Spec the duplicate catcher: now step AI-2 under "On-device AI" above.
 - grandparent-ux review of the family vault ideas before any vault spec (post-beta).
 - QA-R4 (high, Oct 18): browser tests in CI (`npm run e2e:web` in `.github/workflows/ci.yml`), after milestone 1 unless Chase pulls it forward.
 - **Privacy path** (marketing thread, Oct 17). Chase's stance: the family vault is a later, higher tier, rolled out slowly; the steps below come first. Post-milestone 1 unless Chase pulls them forward.
@@ -135,6 +135,16 @@ What stops milestone 1 from being testable today. Each line names its sequence s
   4. "Fix this with Claude": a bug report or change request opens a Claude Code session on *their* repo. Claude reads code and error reports, never photos, captions or names (rule 2); privacy-security reviews the data flow.
   5. Make the repo public, only after D3 says the name is final (a public repo bakes the name into every fork and link).
   - **Not doing yet:** a paid hosted plan (milestone 7 decides costs), a contributor agreement until outside PRs exist, forums or a Discord, a plugin system, an outside security review (milestone 7).
+
+## On-device AI (D6 decided; waiting on Chase's go)
+
+The plan with priorities and refactors is `AI-FEATURES.md` "Build plan". Milestone 1 comes first.
+
+| # | Step | Owner | Status |
+|---|---|---|---|
+| AI-0 | Say "go" to start Phase 0 (refactors AI-P0.1 to P0.7, no AI shipped) | Chase | ☐ |
+| AI-1 | privacy-security plus a legal read on face laws (BIPA) before any face work (Phase 3) | Claude | ☐ |
+| AI-2 | Spec Phase 1 (duplicates, best shot, screenshots) with BETA IDs and a persona check | Claude | ☐ |
 
 ## Running
 

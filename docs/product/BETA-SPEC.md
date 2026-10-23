@@ -167,7 +167,7 @@ The test passes when 4 of 5 testers pass. Log each attempt on the Test Log with 
 1. **Grandma A comments without Grandpa B seeing, on a post shared to both sides.** No criterion: comments go to the whole post audience. REPLY-6 only makes this honest. Waits on Chase (ANCHORS conflicts table). STORY.md's Problems table calls this "Beta (backend tested)", which overstates it.
 2. **"Viewers never see ... that other groups exist"** (STORY.md). No criterion, and comments and heart counts from the other side show that other groups exist. Same decision as 1.
 3. **Video** (stepmom, dad, in-laws). SHARE-6 is deferred, so no active criterion.
-4. **"No AI training, face scanning, or ads, in writing."** No criterion until the privacy policy (PS-3, M3).
+4. **"No AI training or ads, in writing; AI only on the phone and only if a parent turns it on"** (DEC-31 retired "no face scanning"). No criterion until the privacy policy (PS-3, M3).
 5. **Earl never installs an app.** NOTIFY-5 covers notices only; viewing without the app is CF-18, v1.0.
 6. **Relatives judging each other's engagement** (A2). NOTIFY-6 conflicts with it; waits on Chase.
 
