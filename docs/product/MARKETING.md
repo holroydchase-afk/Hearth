@@ -132,6 +132,20 @@ Oct 19: none of these beat Fridge Door. Front Room is the closest on warmth, but
 - Honest risk: it may read as playful rather than secure to privacy-aware parents, and a grandparent may think it needs a smart fridge. Fix in the first line of the guide and store listing: "Fridge Door is a private photo app. No smart fridge needed."
 - Checks before Chase commits: (1) USPTO Trademark Search for FRIDGE DOOR, FRIDGEDOOR, ON THE FRIDGE in classes 9, 42, 45, plus TSDR status of serial 77925527; (2) App Store and Google Play search on a phone; (3) RDAP or a registrar lookup for fridgedoor.family, .com, .app (don't buy); (4) a lawyer's look before milestone 7. Then Chase sets "Name final: yes" in ACCOUNTS.md and the rename (about an afternoon) happens **before** the domain, the first store build or telling relatives.
 
+### Five more, Kinfolk style (Oct 23, 2026; not adopted)
+
+Chase: "give me 5 more considering this convo and other names like kinfolk." Plain family words a WV grandparent already says. Web search only (Oct 23); App Store, USPTO and domains unverified.
+
+| Name | Icon label | Conflict (web search) | Notes |
+|---|---|---|---|
+| **Our Folks** | 9, fits | No app found | "Chase put 2 new photos of Mia in Our Folks." How Appalachians say family. Generic, so harder to find in a store search |
+| **Porch Swing** | 11, fits | No app found | Slow, no pressure (A1, A2). Easy icon. "On the Porch Swing" reads a little odd in a notice |
+| **Sunday Supper** | 13, may cut off | No app found | The weekly gathering. Warm, but long |
+| **Homecoming** | 10, fits | No family photo app; several school and event apps, Homecoming Magazine (faith and family), a health app | WV church and family homecomings. Crowded word |
+| **Kith** | 4, fits | No app found; Kith is a big streetwear brand | From "kith and kin". Short, but less familiar to grandparents |
+
+Ruled out while searching: Kindred (Kindred Prints photo books, Kindred Family Hub), Holler (a 2026 kids' calling device whose app lets relatives call), Kinship (Kinsy, Kinbox, KinPatch crowd the "Kin" start). Kinfolk itself: still no app found; the magazine brand is the risk.
+
 ## Competition and moat (DRAFT, Oct 17, 2026)
 
 Internal only. Never public copy. Every competitor fact below is as of Oct 17, 2026, mostly from search results. family-album.com and its help center didn't load from here, so FamilyAlbum facts come from search snippets of their own pages. Re-verify before any comparison is used.
@@ -193,6 +207,7 @@ For Chase's "Signal-level privacy" idea. Internal only. Each step makes one more
 
 | Date | Idea (Chase's words) | Serves | Status | Notes |
 |---|---|---|---|---|
+| Oct 23 | "Give me 5 more considering this convo and other names like kinfolk" | All; CH-3 | Open: Chase decides | Our Folks, Porch Swing, Sunday Supper, Homecoming, Kith (see "Five more, Kinfolk style"). Chase is still deciding |
 | Oct 23 | "I thought fridgedoor or fridge door was taken" | All; CH-3 | Open: Chase decides | Right. "Fridge Door: Kids Drawings" (App Store), FridgeDoor chore app, a FridgeDoor planner and NZ service; .com and .app taken. Fridge Door dropped. Next: re-check Front Room and Homeplace |
 | Oct 19 | "Come up with three new ones that are similar" (to Fridge Door, Mantel, Hearth) | All; CH-3 | Open: Chase decides | Front Room, Windowsill, Icebox (see "Three more" in the Oct 19 shortlist). None beats Fridge Door. Run the persona check (PERSONA-CHECK.md) before Chase locks any name |
 | Oct 19 | Naming shortlist: "Fridge Door, Mantel, Hearth" | All; CH-3 | Open: Chase decides | See "Name shortlist (Oct 19)". Draft pick Fridge Door ("Chase put 2 new photos of Mia on the Fridge Door"; preschool art on the fridge). Mantel stays dropped (Mantel: Family Album, same pitch; Chase's own "or however you spell mantle" shows the spelling trap, and "Mantle" is a crypto network). Hearth now has three family-app namesakes. Backup Hearthlight if a lawyer clears the root. Objection: may read as playful, not secure. Nothing bought; USPTO and domain checks unverified |
