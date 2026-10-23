@@ -149,6 +149,14 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** "no AI on our kids' photos" is a reason families pick Hearth. Small quiet helpers (bulk-upload audience suggestions, duplicates) are welcome only if they can be switched off and never act without asking.
 - **Source:** `docs/product/AI-FEATURES.md`, `/mnt/project-files/plans/v1-groups-plan.md`
 
+### DEC-31 · AI positioning: on-device only, opt-in (option B)
+- **When / status:** Oct 19 · Decided; build waits on Chase's go (`AI-FEATURES.md` "Build plan")
+- **Chose:** the public promise moves from "no face scanning, tagging or ML of any kind" (CF-10) to "AI is off until your family turns it on. Then it runs only on your phones, and your photos never train anyone else's AI."
+- **Over:** A, no ML anywhere (loses duplicates, best shot, people suggestions); C, server-side AI under a no-training contract (breaks Never build #3 and the simple story).
+- **Because:** Chase's top AI asks (people → group suggestions, duplicates) need in-picture analysis, and on-device keeps the photo on the phone (A3). The wording leaves room for a personal model that learns only on a family's own phones (AI-8), which Chase wants kept possible.
+- **Trade-off:** "No AI at all" was easier for a tech reader to check, so a CI allowlist for ML libraries (AI-P0.1) comes first. Face features still need privacy-security and a legal read (Illinois BIPA) before they're built.
+- **Source:** `docs/product/decisions/2026-10-19-ai-on-device-opt-in.md`, TRACKER D6
+
 ## Sharing and the people model
 
 ### DEC-19 · Plain groups, no required family shape
@@ -228,4 +236,4 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Source:** `docs/product/reviews/2026-10-21-app-review.md` (RV-P3, RV-U4), TRACKER R6
 
 ---
-Last updated: Oct 21, 2026
+Last updated: Oct 22, 2026 (DEC-31)

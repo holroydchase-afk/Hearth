@@ -11,7 +11,7 @@ These come from the anchors and the "Never build" list, not from taste.
 | # | Rule | Source |
 |---|---|---|
 | R1 | **The photo never leaves the phone for AI.** Any model runs on the device. No cloud vision API, no server-side ML. | Never build #3, A3, CLAUDE.md rule 2 |
-| R2 | **No model learns from family photos.** Use off-the-shelf models as shipped; nothing is trained or fine-tuned on user content, on the phone or anywhere else. | Never build #2, claims register |
+| R2 | **No shared model learns from family photos.** Use off-the-shelf models as shipped; Hearth and its vendors never train or fine-tune on user content. Naming a face adds a row to the phone's private memory; it is not training. A personal model that learns only on a family's own phones (AI-8) is an open idea that R2 does not rule out; it needs its own persona check and privacy-security review first. | Never build #2, claims register, Chase Oct 19 |
 | R3 | **Suggest, never act on audience.** AI may pre-fill a choice; a person confirms it. Sending a photo to the wrong group is a P0 (wrong audience), so no feature silently widens who sees a photo. | A1, BETA-SPEC P0 definition |
 | R4 | **Off unless a parent turns it on** for their family space (see Control model), and the words say plainly what happens: "Hearth looks at faces on this phone only. Nothing is sent anywhere." | A1, grandparent-ux rules |
 | R5 | **Nothing that measures people.** No "who's in the most photos", no ranking relatives, no resurfacing old photos uninvited. | A2, Never build #8 |
@@ -34,14 +34,16 @@ staff-pm reading, to confirm when we circle back:
   - *Cost:* the most flexible shape and the most to build. Build order when we get there: AI-2 as the first add-on (no ML), with the permission row, before any face add-on.
 - **"Own server" taken literally** (a family hosting Hearth itself) is a post-milestone-7 question: it would help A3 but costs Chase support time. Logged, not planned.
 
-## Blocking decision: the AI positioning session
+## Decided: on-device only, opt-in (DEC-31, Oct 19)
 
-Today's promises forbid all of this as written:
+Chase picked option B on Oct 19 ("Yes I am"). The promise is now: **"AI is off until your family turns it on. Then it runs only on your phones, and your photos never train anyone else's AI."** CF-10, the claims register, STORY and BETA-SPEC are reworded in the same PR. The persona check is `decisions/2026-10-19-ai-on-device-opt-in.md`. Research behind it (zero-knowledge AI options, five features, blockers): https://claude.ai/artifact/NsUEm6y7fVNQtjEVPjPUVn
+
+What the old promises said, for the record:
 - **CF-10** (`docs/product/CORE-FEATURES.md`): "no face scanning, tagging or ML of any kind", enforced by a CI grep for ML/vision dependencies.
 - **Claims register** (`docs/product/MARKETING.md`): "No ads, no AI training, **no face scanning**, no trackers" is marked true today.
 - **Never build #3** only bans face recognition *on our servers*, so on-device is open there.
 
-The agenda already exists in `docs/product/ANCHORS.md` ("AI positioning session"). staff-pm recommends **option B: on-device only, opt-in**. If Chase picks B: reword CF-10, change the claim to something like "Hearth never sends your photos to AI, and no computer program learns from them", and have `privacy-security` and `marketing` sign off before any face item (AI-1 phase 2) is built. Items marked **no-ML** below don't need this decision.
+Still true after B: `privacy-security` signs off, with a legal read on face laws (Illinois BIPA, Texas, Washington; Apple was sued in Illinois over its on-device People album), before any face item (AI-1 phase 2) is built. Also found Oct 19: the "CI grep" CF-10 names does not exist; AI-P0.1 builds it.
 
 ## Tracker
 
@@ -55,6 +57,7 @@ Status: **Idea** (logged) → **Ready to spec** (decisions made) → **Specced**
 | AI-4 | **Leave out screenshots and blurry shots** in bulk upload | "We left out 6 screenshots and 2 blurry photos. Show them" | Screenshots from photo-library metadata; blur from a sharpness score. No-ML | No | 3 | Specced (Oct 21, `SPEC-PHOTO-HELPERS.md`) |
 | AI-5 | **Group a bulk upload into occasions** | "Looks like 3 days: Jul 4, Jul 5, Jul 6. Make Jul 4 an event?" | Capture-time gaps, read on the phone before EXIF is stripped. No location (Never build #7). No-ML | No | 4 | Idea; builds on the overnight plan's "one post per day" |
 | AI-6 | **Upright and right-side-up** | A sideways photo arrives upright | Orientation flag already kept (SHARE-5); a model only for scans with no flag | Model part only | 5 | Idea |
+| AI-8 | **A personal model on each phone** (Chase, Oct 19): "explore training their personal mode that lives on their phone but then it'd like need to sync with other relative etc". Build nothing that prevents it | The family's helpers get better at *their* faces and words over time | Start as shared frozen model + private memory (no training). Later: on-phone fine-tuning, synced end-to-end encrypted between a family's parents (MLS) | Yes, and an R2 review | Later | Idea; AI-P0.4 and P0.5 keep it possible |
 | AI-7 | **Smart onboarding** | Describe the family once, get suggested groups and households | Language model; needs its own privacy review | Yes, and more | Parked | Idea (Oct 16, ANCHORS); conflicts with R6 for now |
 
 ### Not doing (with reasons)
@@ -93,6 +96,32 @@ Chase's ask, broken into two phases so the useful part doesn't wait on the face 
 - **Exact duplicates:** hash each picked file on the phone; skip any file already queued or already posted by this person (store the hash with the upload queue item, not on the server as metadata until `privacy-security` agrees). Ties to SHARE-4's "no duplicate post" rule.
 - **Near duplicates:** a 64-bit perceptual hash (dHash) per photo, compared within one batch. A small distance means "looks the same". Plain image math, no model, so CF-10 stays true.
 - **What the family sees:** one line on the review screen with a "Show them" button; the default keeps the sharpest one (AI-3's score) and sets the rest aside, never deletes them from the phone.
+
+## Build plan (waiting on Chase's go)
+
+Ready Oct 19. Nothing here starts until Chase says go, and milestone 1 comes first (FREEZE, Oct 19). Each step is test-first with its ID in the test names; each feature gets a staff-pm spec with BETA IDs and a persona check before code.
+
+**Phase 0: refactors that make every later step cheap and keep AI-8 possible.** No AI ships in this phase.
+
+| ID | Refactor | Why | Done when |
+|---|---|---|---|
+| AI-P0.1 | `scripts/check-ai-deps.sh` in CI and `test-all.sh`: fails on any ML or vision package not on an allowlist that records each one's license and reviewer; the backend allowlist is empty | CF-10 names a CI grep that doesn't exist; a tech reader (TR) must be able to check the promise | Test adds a fake `onnxruntime` dependency and the check fails |
+| AI-P0.2 | Register AI add-ons in the existing feature system (0013: `feature_flags`, `space_features`, `feature_on`): one feature per AI item, a new `use_ai` capability, parents only by default | The add-on and per-role model Chase chose Oct 17 is already half built for video | `feature_on(space, 'ai_duplicates')` is false for a viewer and for a family that hasn't added it |
+| AI-P0.3 | An analyzer hook in `app/src/media/pipeline.ts`: analyzers run on the picked original (before EXIF is stripped) and write only to the private memory. The upload payload type can't carry their results | Every AI item needs the pixels and capture time once, on the phone; the type stops results leaking into a post | Test: an upload with analyzers on sends byte-identical `UploadItemSpec` to one with them off |
+| AI-P0.4 | The private memory: an encrypted on-phone store (key in the device keychain) whose rows carry `model_id` and `model_version` | Swap or upgrade a model (or later a personal model, AI-8) by re-running it, with no data migration | Turning an add-on off deletes its rows (test); rows from an old model version are ignored |
+| AI-P0.5 | Sync-ready rows: keyed to family person IDs (never names), each with origin device and `updated_at` | Parent-to-parent sync over the messenger's MLS keys (and AI-8) can be added later without a rewrite. Sync itself is not built | Unit test: merging two copies of a row keeps the newest |
+| AI-P0.6 | Move from Expo Go to an EAS development build when the first native model lands (Phase 2) | On-device models need native code; Expo Go can't load them | Lines up with milestone 2's $99 Apple account (D3 name check first) |
+| AI-P0.7 | `docs/architecture/07-on-device-ai.md`: what runs where, what the private memory holds, what never leaves the phone | Anchor A4, rule 6; TR mitigation in DEC-31 | Written before the first add-on ships |
+
+**Phases 1 to 4: features, in priority order.**
+
+| Phase | Items | Needs | Runs in Expo Go? |
+|---|---|---|---|
+| 1 | AI-2 duplicate catch ("twin catcher"), AI-3 best shot (sharpness only), AI-4 screenshots and blurry shots | P0.1 to P0.4 | Yes, no ML |
+| 2 | AI-5 occasions (time gaps), plus private "things" labels from the phone's built-in labeler (Apple Vision, ML Kit) | P0.6; privacy-security confirms ML Kit sends no usage data | No, dev build |
+| 3 | AI-1 phase 1 (tap "Who's in these?" → group suggestions), then AI-1 phase 2 (faces) | Phase 2 face work: privacy-security and legal read, a face model with a commercial-use license (InsightFace weights are non-commercial; OpenCV Zoo SFace is a candidate), measured on the oldest parent phone | Phase 1 yes; faces no |
+| 4 | On-device search ("Memaw at the beach"); end-to-end encrypted memory sync between a family's parents | Phase 3; MLS from the messenger | No |
+| Later | AI-8 personal model; AI-7 onboarding | Their own reviews | No |
 
 ## Handoffs (when an item moves to "Ready to spec")
 
