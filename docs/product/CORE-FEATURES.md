@@ -82,6 +82,7 @@ Owner: staff-pm. Written Oct 15, 2026. Beta scope and its tests stay in `docs/pr
 
 | ID | Feature | Free | Family ($4.99/mo or $39.99/yr) | Phase |
 |---|---|---|---|---|
+| CF-31 | **AI subscription** (DEC-37, Oct 23): every feature that runs an AI model, on the phone only, sold separately from the family plan; relatives never pay; no-model photo helpers stay free; self-hosters run it free | — | AI add-on | Later (first AI feature, `AI-FEATURES.md` Phase 2) |
 | CF-26 | **Family plan via in-app purchase** (StoreKit / Play Billing, one subscription covers the space and its co-parent link) | — | ✓ | **v1.0** |
 | | Photos | Unlimited | Unlimited | v1.0 |
 | | Video | 10/month, ≤60 s | Unlimited, ≤3 min | v1.0 |
