@@ -11,7 +11,7 @@ import type { KV } from '../platform/kv';
 import type { PickedAsset } from '../share/bulk';
 import { BigTextContext } from '../ui/theme';
 import { UploadQueue, type Job, type Prepared, type QueueItem } from '../upload/queue';
-import { defaultPrefs, loadPrefs, savePrefs, serverPrefs, type Prefs } from './prefs';
+import { defaultPrefs, loadPrefs, savePrefs, serverPrefs, type NotifyChoice, type Prefs } from './prefs';
 
 export interface AppDeps {
   api: HearthApi;
@@ -47,6 +47,7 @@ export interface AppValue {
   /** FLAG-5: features the server has on for me in this family (my_features). Empty until read, or if the read fails. */
   features: string[];
   setPrefs: (p: Partial<Prefs>) => void;
+  saveNotify: (notify: NotifyChoice) => Promise<boolean>;
   /** Re-read session + spaces (after sign-in or joining). */
   reload: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -178,12 +179,25 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
     setS((cur) => {
       const prefs = { ...cur.prefs, ...p };
       if (cur.session) void savePrefs(deps.kv, cur.session.userId, prefs);
-      if (cur.space && p.notify && p.notify !== cur.prefs.notify) {
-        deps.api.setNotificationPrefs(cur.space.space_id, serverPrefs(p.notify)).catch(() => {});
-      }
       return { ...cur, prefs };
     });
-  }, [deps.kv, deps.api]);
+  }, [deps.kv]);
+
+  // HARD-11: how to be told is only "Saved" once the server has it; otherwise it goes back to what is set.
+  const saveNotify = useCallback(async (notify: NotifyChoice): Promise<boolean> => {
+    const cur = live.current;
+    const before = cur.prefs.notify;
+    if (notify === before) return true;
+    setPrefs({ notify });
+    if (!cur.space) return true;
+    try {
+      await deps.api.setNotificationPrefs(cur.space.space_id, serverPrefs(notify));
+      return true;
+    } catch {
+      setPrefs({ notify: before });
+      return false;
+    }
+  }, [deps.api, setPrefs]);
 
   const signOut = useCallback(async () => {
     live.current.queue?.stop();
@@ -201,9 +215,10 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
     deps,
     helper: s.space ? (s.space.role === 'owner' ? null : s.space.inviter_name) : null,
     setPrefs,
+    saveNotify,
     reload: load,
     signOut,
-  }), [s, deps, setPrefs, load, signOut]);
+  }), [s, deps, setPrefs, saveNotify, load, signOut]);
 
   return (
     <Ctx.Provider value={value}>
