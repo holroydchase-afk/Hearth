@@ -41,6 +41,8 @@ export class FeedStore {
   private state: FeedState = { posts: [], status: 'idle', loaded: false, hasMore: false, notice: null, comments: {}, drafts: {}, opened: {} };
   private listeners = new Set<() => void>();
   private pendingHearts = new Map<string, { i_hearted: boolean; heart_count: number }>();
+  private heartSeq = new Map<string, number>();
+  private heartQueue = new Map<string, Promise<void>>();
   private deleting = new Set<string>();
   private seen = new Set<string>();
   private readonly pageSize: number;
@@ -146,15 +148,26 @@ export class FeedStore {
     const guess = { i_hearted: !p.i_hearted, heart_count: Math.max(0, p.heart_count + (p.i_hearted ? -1 : 1)) };
     this.pendingHearts.set(id, guess);
     this.patchPost(id, guess);
-    try {
-      const real = await this.o.api.toggleHeart(id);
-      this.pendingHearts.delete(id);
-      this.patchPost(id, { i_hearted: real.i_hearted, heart_count: real.heart_count });
-    } catch (e) {
-      this.pendingHearts.delete(id);
-      this.patchPost(id, before);
-      this.notice(e);
-    }
+    // HARD-9: a quick double tap goes to the server in order, and only the newest tap's answer is shown.
+    const seq = (this.heartSeq.get(id) ?? 0) + 1;
+    this.heartSeq.set(id, seq);
+    const latest = () => this.heartSeq.get(id) === seq;
+    const run = (this.heartQueue.get(id) ?? Promise.resolve()).then(async () => {
+      try {
+        const real = await this.o.api.toggleHeart(id);
+        if (!latest()) return;
+        this.pendingHearts.delete(id);
+        this.patchPost(id, { i_hearted: real.i_hearted, heart_count: real.heart_count });
+      } catch (e) {
+        if (latest()) {
+          this.pendingHearts.delete(id);
+          this.patchPost(id, before);
+        }
+        this.notice(e);
+      }
+    });
+    this.heartQueue.set(id, run);
+    await run;
   }
 
   async loadComments(id: string): Promise<void> {
