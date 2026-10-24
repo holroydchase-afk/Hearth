@@ -17,17 +17,28 @@ export function JoinScreen({ code }: { code: string }) {
   const [msg, setMsg] = useState<string | null>(null);
   const [triedEmail, setTriedEmail] = useState<string | null>(null);
   const started = useRef(false);
+  // HARD-10: with no signal nothing retries on its own, so say so and offer Try again.
+  const [retry, setRetry] = useState<(() => void) | null>(null);
+  const offline = (e: unknown, again: () => void) => {
+    if (!isApiError(e) || e.code !== 'NETWORK') return false;
+    setMsg('No internet right now. When you have signal, tap Try again.');
+    setRetry(() => again);
+    setStep('bad');
+    return true;
+  };
 
   const inviterOf = (c: string): Promise<string | null> =>
     app.deps.api.invitePreview(c).then((p) => p.inviter_name || null, (e: unknown) => (isApiError(e) ? e.inviter ?? null : null));
 
   const redeem = async (inviter: string | null, email: string | null = null) => {
     setStep('joining');
+    setRetry(null);
     try {
       await app.deps.api.redeemInvite(code);
       await app.reload();
       nav.goPhotos();
     } catch (e) {
+      if (offline(e, () => void redeem(inviter, email))) return;
       // Already in the family (tapped the link twice): just show the photos.
       const spaces = await app.deps.api.mySpaces().catch(() => []);
       if (isApiError(e) && e.code === '22023' && spaces.length > 0) {
@@ -52,10 +63,20 @@ export function JoinScreen({ code }: { code: string }) {
       void redeem(null);
       return;
     }
+    check();
+  }, [app.status]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function check() {
+    setStep('checking');
+    setRetry(null);
     app.deps.api.invitePreview(code)
       .then((p) => { setPreview(p); setStep('preview'); })
-      .catch((e) => { setMsg(messageFor(e, { action: 'join', inviter: isApiError(e) ? e.inviter : null })); setStep('bad'); });
-  }, [app.status]); // eslint-disable-line react-hooks/exhaustive-deps
+      .catch((e) => {
+        if (offline(e, check)) return;
+        setMsg(messageFor(e, { action: 'join', inviter: isApiError(e) ? e.inviter : null }));
+        setStep('bad');
+      });
+  }
 
   const who = preview?.inviter_name ?? null;
 
@@ -87,9 +108,9 @@ export function JoinScreen({ code }: { code: string }) {
       {step === 'bad' && msg && !triedEmail ? (
         <Card>
           <Txt variant="title">{msg}</Txt>
-          <Txt>That's okay, it happens.</Txt>
+          {retry ? <Button label="Try again" onPress={retry} /> : <Txt>That's okay, it happens.</Txt>}
           {/* UX-G9: signed in, she still needs a way on (Photos; with no family yet it offers the code entry). */}
-          {app.session ? <Button label="Go to Photos" onPress={nav.goPhotos} /> : <Button label="I already have Hearth. Sign in." text="Sign in" variant="secondary" onPress={nav.goSignIn} />}
+          {retry ? null : app.session ? <Button label="Go to Photos" onPress={nav.goPhotos} /> : <Button label="I already have Hearth. Sign in." text="Sign in" variant="secondary" onPress={nav.goSignIn} />}
         </Card>
       ) : null}
     </Screen>
