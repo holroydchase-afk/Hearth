@@ -27,8 +27,8 @@ const CHOICES: { id: NotifyChoice; title: string; saved: string }[] = [
 ];
 
 export function HowToTell() {
-  const { prefs, setPrefs } = useApp();
-  const [saved, setSaved] = useState<string | null>(null);
+  const { prefs, saveNotify } = useApp();
+  const [saved, setSaved] = useState<{ text: string; good: boolean } | null>(null);
   return (
     <Card>
       <Txt variant="title" role="header">How should we tell you about new photos?</Txt>
@@ -39,10 +39,15 @@ export function HowToTell() {
           label={c.title}
           title={c.title}
           checked={prefs.notify === c.id}
-          onPress={() => { setPrefs({ notify: c.id }); setSaved(c.saved); }}
+          onPress={() => {
+            setSaved(null);
+            void saveNotify(c.id).then((ok) => setSaved(ok
+              ? { text: c.saved, good: true }
+              : { text: "Didn't save. Check your signal, then tap your choice again.", good: false }));
+          }}
         />
       ))}
-      {saved ? <Notice text={saved} tone="good" /> : null}
+      {saved ? <Notice text={saved.text} tone={saved.good ? 'good' : 'info'} /> : null}
     </Card>
   );
 }

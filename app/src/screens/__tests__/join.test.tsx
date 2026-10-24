@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';
+import { ApiError } from '../../api/HearthApi';
 import { FIXTURE, FakeBackend } from '../../api/fake/FakeBackend';
 import { seedPost } from '../../test/seed';
 import { expectGrandparentSafe, renderApp } from '../../test/renderApp';
@@ -31,6 +32,29 @@ describe('Join (BETA-JOIN-1, -3)', () => {
     await waitFor(() => expect(nav.goPhotos).toHaveBeenCalled());
     const feed = await be.clientFor(FIXTURE.users.jo.id).getFeed({ space: FIXTURE.space.id });
     expect(feed.map((p) => p.caption)).toEqual(['For the grandparents']);
+  });
+
+  it('HARD-10 no signal while opening the invite: an honest message and a Try again that works', async () => {
+    const be = await fresh();
+    const api = be.clientFor(null, { trackAppSession: true });
+    jest.spyOn(api, 'invitePreview').mockRejectedValueOnce(new ApiError('NETWORK'));
+    await renderApp(<JoinScreen code={FIXTURE.invites.jo} />, { be, user: null, deps: { api } });
+    expect(await screen.findByText(/No internet right now/)).toBeTruthy();
+    expect(screen.queryByText(/keep trying/)).toBeNull(); // nothing retries on its own here
+    fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('Chase invited you to see the family photos.')).toBeTruthy();
+  });
+
+  it('HARD-10 no signal while joining after sign-in: Try again joins', async () => {
+    const be = await fresh();
+    const api = be.clientFor(null, { trackAppSession: true });
+    jest.spyOn(api, 'redeemInvite').mockRejectedValueOnce(new ApiError('NETWORK'));
+    const { nav } = await renderApp(<JoinScreen code={FIXTURE.invites.jo} />, { be, user: null, deps: { api } });
+    fireEvent.press(await screen.findByRole('button', { name: 'See the photos' }));
+    await typeEmailAndCode('123456');
+    expect(await screen.findByText(/No internet right now/)).toBeTruthy();
+    fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
+    await waitFor(() => expect(nav.goPhotos).toHaveBeenCalled());
   });
 
   it('a wrong code shows the plain message and lets her try again', async () => {
