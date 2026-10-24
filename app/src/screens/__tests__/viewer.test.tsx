@@ -1,8 +1,9 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';
 import { FakeBackend } from '../../api/fake/FakeBackend';
 import { seedPost } from '../../test/seed';
 import { expectGrandparentSafe, renderApp } from '../../test/renderApp';
+import { useApp } from '../../state/AppContext';
 import { ViewerScreen } from '../ViewerScreen';
 
 async function setup() {
@@ -28,6 +29,20 @@ describe('Full-screen viewer (BETA-SEE-3, BETA-SEE-5, UXG-08..10)', () => {
     expect(screen.queryByRole('button', { name: 'Next photo' })).toBeNull(); // hidden on the last
     fireEvent.press(screen.getByRole('button', { name: 'Back to the previous photo' }));
     expect(await screen.findByText('Photo 2 of 3')).toBeTruthy();
+  });
+
+  it('HARD-8 a new post arriving while you look never swaps the photo on screen', async () => {
+    const { be, newer } = await setup();
+    let app: ReturnType<typeof useApp> | null = null;
+    const Grab = () => { app = useApp(); return null; };
+    await renderApp(<><Grab /><ViewerScreen postId={newer.id} index={0} /></>, { be, user: 'jo' });
+    fireEvent.press(await screen.findByRole('button', { name: 'Next photo' }));
+    expect(await screen.findByText('Photo 2 of 3')).toBeTruthy();
+    await seedPost(be, { caption: 'Brand new', photos: 1 });
+    await act(async () => { await app!.feed!.refresh(); });
+    expect(await screen.findByText('Photo 3 of 4')).toBeTruthy();
+    expect(screen.getByText('Two at the lake')).toBeTruthy();
+    expect(screen.queryByText('Brand new')).toBeNull();
   });
 
   it('Close goes back to the same place in the photos', async () => {

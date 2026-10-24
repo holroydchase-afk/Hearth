@@ -105,6 +105,34 @@ describe('BETA-REPLY-1 optimistic hearts', () => {
     expect(s.getState().notice).toBe("No internet right now. We'll keep trying.");
   });
 
+  it('HARD-9 a quick double tap sends in order, never flickers back, and ends where the server is', async () => {
+    const be = FakeBackend.withFixture();
+    const [id] = await seed(be, 1);
+    const api = be.clientFor(jo.id);
+    const real = be.clientFor(jo.id);
+    const gate = deferred<void>();
+    let calls = 0;
+    jest.spyOn(api, 'toggleHeart').mockImplementation(async (pid) => {
+      calls += 1;
+      if (calls === 1) await gate.promise;
+      return real.toggleHeart(pid);
+    });
+    const s = make(api);
+    await s.refresh();
+    const t1 = s.toggleHeart(id!);
+    const t2 = s.toggleHeart(id!);
+    expect(s.getState().posts[0]).toMatchObject({ i_hearted: false, heart_count: 0 });
+    await Promise.resolve();
+    expect(calls).toBe(1); // the second waits for the first
+    gate.resolve();
+    await t1;
+    expect(s.getState().posts[0]).toMatchObject({ i_hearted: false }); // no flicker back to the first answer
+    await t2;
+    expect(calls).toBe(2);
+    expect(s.getState().posts[0]).toMatchObject({ i_hearted: false, heart_count: 0 });
+    expect((await real.getFeed({ space: SPACE }))[0]).toMatchObject({ i_hearted: false, heart_count: 0 });
+  });
+
   it('keeps the optimistic heart if a refresh lands while it is in flight', async () => {
     const be = FakeBackend.withFixture();
     const [id] = await seed(be, 1);
