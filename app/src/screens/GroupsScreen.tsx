@@ -33,6 +33,7 @@ interface NewGroup {
   history: ShareHistory | null;
   need: 'name' | 'history' | null;
   busy: boolean;
+  made?: string; // HARD-1: the group id once made, so a retry after a lost signal only finishes adding people
 }
 const NEW_GROUP: NewGroup = { name: '', event: false, ticked: [], copied: [], mode: 'private', history: null, need: null, busy: false };
 
@@ -101,7 +102,8 @@ export function GroupsScreen() {
     if (!draft.history) { edit({ need: 'history' }); return; }
     edit({ busy: true, need: null });
     try {
-      const id = await app.deps.api.createLevel(app.space!.space_id, draft.event ? 'event' : 'group', name);
+      const id = draft.made ?? await app.deps.api.createLevel(app.space!.space_id, draft.event ? 'event' : 'group', name);
+      edit({ made: id });
       if (draft.mode !== (draft.event ? 'on_group_posts' : 'private')) await app.deps.api.setCommentMode(id, draft.mode);
       for (const u of draft.ticked) await app.deps.api.placePerson(id, u, draft.history);
       setDraft(null);
