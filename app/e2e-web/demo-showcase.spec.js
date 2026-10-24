@@ -3,11 +3,13 @@
 //   SHOWCASE_DIR=/tmp/shots npm run e2e:demo -- demo-showcase.spec.js
 // Every demo screen at 390 × 844 and 1280 × 800, light and dark, viewport and full page;
 // console errors, failed requests and sideways scrolling go to SHOWCASE_DIR/console.json.
+// SHOWCASE_BASE=https://chaseholroyd.com/demo/hearth/ runs the same sweep against the published demo (read only).
 const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('../../e2e/node_modules/@playwright/test');
 
 const DIR = process.env.SHOWCASE_DIR;
+const BASE = (process.env.SHOWCASE_BASE || 'http://127.0.0.1:8090/').replace(/\/?$/, '/');
 const PICTURE = path.join(__dirname, '..', 'public', 'demo-pictures', 'snow.jpg');
 const SIZES = [
   { name: 'phone', width: 390, height: 844, touch: true },
@@ -19,7 +21,7 @@ for (const size of SIZES) {
   for (const scheme of ['light', 'dark']) {
     test(`demo showcase ${size.name} ${scheme}`, async ({ browser }) => {
       test.skip(!DIR, 'set SHOWCASE_DIR to take showcase screenshots');
-      const ctx = await browser.newContext({ baseURL: 'http://127.0.0.1:8090', viewport: { width: size.width, height: size.height }, hasTouch: size.touch, colorScheme: scheme });
+      const ctx = await browser.newContext({ baseURL: BASE, viewport: { width: size.width, height: size.height }, hasTouch: size.touch, colorScheme: scheme });
       const page = await ctx.newPage();
       const tag = `${size.name}-${scheme}`;
       page.on('console', (m) => { if (m.type() === 'error') problems.push({ tag, url: page.url(), text: m.text() }); });
@@ -36,15 +38,15 @@ for (const size of SIZES) {
         await page.screenshot({ path: `${base}-full.png`, fullPage: true });
       };
 
-      await page.goto('/');
+      await page.goto('');
       await expect(page.getByText('Pumpkin patch day', { exact: true })).toBeVisible();
       await shot('photos');
       await page.getByRole('button', { name: 'Show photos by the date they were taken' }).click();
       await shot('by-date');
-      await page.goto('/photos');
+      await page.goto('photos');
       await page.getByRole('button', { name: 'Messages' }).click();
       await shot('messages');
-      await page.goto('/share');
+      await page.goto('share');
       await shot('share-empty');
       const chooser = page.waitForEvent('filechooser');
       await page.getByRole('button', { name: 'Pick photos from your phone' }).click();
@@ -67,9 +69,9 @@ for (const size of SIZES) {
       await shot('grandparent');
       await page.getByRole('tab', { name: 'Help' }).click();
       await shot('grandparent-help');
-      await page.goto('/no-such-page');
+      await page.goto('no-such-page');
       await shot('not-found');
-      await page.goto('/');
+      await page.goto('');
       await page.getByRole('button', { name: 'Start over with the sample family' }).click();
       await expect(page.getByText(/You're Sam, a parent/)).toBeVisible();
       await ctx.close();

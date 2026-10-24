@@ -12,6 +12,8 @@ Built by Chase Holroyd, a product manager, as a working proof of concept: one pe
 
 <sub>Screens from the demo: a made-up family and drawn sample pictures.</sub>
 
+**Try it, no sign-in:** [chaseholroyd.com/demo/hearth](https://chaseholroyd.com/demo/hearth/). It's a made-up family kept only in your browser. On a phone it's the app itself; on a laptop a short guide sits beside it. Tap "Grandma's view" to see that each photo reaches only the people it was shared with.
+
 ## The problem
 
 Families with divorces, remarriages and step-relatives don't fit one group chat. A parent wants Grandma on one side to see the school photos without the other household's relatives seeing everything too. Many grandparents won't join Facebook, and they lose photos in long text threads. The tools that exist were designed for one tidy family, or they make money from attention and data.

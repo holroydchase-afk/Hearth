@@ -23,10 +23,12 @@ export function ViewerScreen({ postId, index }: { postId: string; index: number 
     [state.posts],
   );
   const start = entries.findIndex((e) => e.post.post_id === postId && e.i === index);
-  const [pos, setPos] = useState<number | null>(null);
+  // HARD-8: remember WHICH photo is on screen, not its place in the list, so a new post arriving never swaps it.
+  const [at, setAt] = useState<{ postId: string; i: number } | null>(null);
+  const pos = at ? entries.findIndex((e) => e.post.post_id === at.postId && e.i === at.i) : null;
   const [msg, setMsg] = useState<{ text: string; good: boolean } | null>(null);
   const [saving, setSaving] = useState(false);
-  const cur = pos ?? (start >= 0 ? start : null);
+  const cur = pos === null ? (start >= 0 ? start : null) : pos >= 0 ? pos : null;
 
   // Opened from a notice before the post was in the cache: fetch once.
   const asked = useRef(false);
@@ -48,8 +50,9 @@ export function ViewerScreen({ postId, index }: { postId: string; index: number 
   }, [entry?.media.media_id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const go = (to: number | null) => {
-    if (to === null) return;
-    setPos(to);
+    const e = to === null ? undefined : entries[to];
+    if (!e) return;
+    setAt({ postId: e.post.post_id, i: e.i });
     setMsg(null);
   };
   const swipe = useRef(PanResponder.create({
@@ -88,7 +91,7 @@ export function ViewerScreen({ postId, index }: { postId: string; index: number 
         {entry ? <Txt variant="muted">{`Photo ${cur! + 1} of ${entries.length}`}</Txt> : null}
       </View>
       {!entry ? (
-        state.loaded && state.status === 'idle' && asked.current ? (
+        state.loaded && state.status === 'idle' && (asked.current || pos === -1) ? (
           <View style={styles.pad}><Txt variant="title">This was removed.</Txt></View>
         ) : (
           <Loading words="Loading the photo…" />
