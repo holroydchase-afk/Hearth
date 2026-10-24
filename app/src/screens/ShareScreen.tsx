@@ -92,7 +92,12 @@ export function ShareScreen() {
     setNotice(null);
     const r = await app.deps.pickPhotos({ videos });
     if ('denied' in r) setNotice('Hearth needs your OK to see your photos. Tap "Allow" when your phone asks.');
-    else setItems((cur) => [...cur, ...r.items].slice(0, MAX));
+    else {
+      // HARD-2: never drop photos silently; say how many were left out.
+      const left = items.length + r.items.length - MAX;
+      setItems((cur) => [...cur, ...r.items].slice(0, MAX));
+      if (left > 0) setNotice(`You can send ${MAX} at a time, so ${photos(left)} ${left === 1 ? 'was' : 'were'} left out.${isParent && app.deps.pickBulk ? ' For more, use "Pick lots of photos".' : ''}`);
+    }
   };
 
   const pickMany = async () => {
@@ -205,7 +210,9 @@ export function ShareScreen() {
           />
           </React.Fragment>
         ))}
-        {chosen.length === 0 ? <Txt variant="strong">Pick who should see it.</Txt> : (
+        {circles?.length === 0 && !notice ? (
+          <Txt variant="strong">{isParent ? 'There is no group to send to yet. Make one on the Groups tab.' : `There is no group to send to yet. Ask ${app.helper ?? 'a parent'} to add you to one.`}</Txt>
+        ) : chosen.length === 0 ? <Txt variant="strong">Pick who should see it.</Txt> : (
           <Txt>{chosenCircles.some((g) => g.kind === 'everyone')
             ? 'Everyone in the family will see these.'
             : `Only ${chosenCircles.map((g) => g.name).join(' and ')} will see these.`}</Txt>

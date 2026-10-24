@@ -156,6 +156,7 @@ The plan with priorities and refactors is `AI-FEATURES.md` "Build plan". Milesto
 
 ## Done (latest first)
 
+- Oct 23 (night shift 3, hardening): HARD-1..5 and HARD-7 fixed test-first (`docs/reviews/2026-10-23-harden.md`): no duplicate group on a retry, Share says when photos were left out or there's no group, a pasted invite link works, the code minute holds after going back, the demo opens with browser storage blocked. Draft PR, not merged.
 - Oct 19: messenger merged (PR #29) and migration 0015 deployed. Open PR #20's still-true items folded in here and in ACCOUNTS.md (QA-R1 and QA-R2 were already done: account B exists, keys live Oct 18).
 - Oct 19: decision log started (`DECISION-LOG.md`, DEC-1 to DEC-27): each decision, why, and what it beat. Answered D-items above move there.
 - Oct 19: native look built (PR #30): system fonts, Apple colors on iPhone and Material 3 on Android, the phone's own tab bar, native buttons and switches, DS-1..DS-9 tests. The old look is saved in `docs/design/versions/`. Still to confirm on a phone in UAT: the tab bar and the gray buttons.
