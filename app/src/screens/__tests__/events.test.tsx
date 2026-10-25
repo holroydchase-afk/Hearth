@@ -51,9 +51,9 @@ describe('EVT-3 later event posts in Photos', () => {
   it('EVT-3 Chase (Oct 18): later posts show as ordinary cards in Photos, no update line; the event card still opens all of them', async () => {
     const { be } = await family();
     await renderApp(<PhotosScreen />, { be, user: 'jo' });
-    // SESS-1 (Oct 18): Candles and Presents (same sender, same groups, minutes apart) are one entry of 3 photos.
+    // MOMENT-7 (Oct 24): Candles and Presents are each their own ordinary card.
     expect(await screen.findByText('Candles')).toBeTruthy();
-    expect(screen.getByText('3 photos')).toBeTruthy();
+    expect(screen.getByText('Presents')).toBeTruthy();
     expect(screen.queryByText(`3 new photos in ${BDAY}`)).toBeNull();
     fireEvent.press(screen.getByRole('button', { name: `Open ${BDAY}` }));
     expect(await screen.findByRole('header', { name: BDAY })).toBeTruthy();
@@ -69,9 +69,9 @@ describe('EVT-3 later event posts in Photos', () => {
   it('EVT-3 / EVT-4 a relative who sees the posts only through another group gets ordinary cards and never the event\'s name', async () => {
     const { be } = await family();
     await renderApp(<PhotosScreen />, { be, user: 'ruth' });
-    // SESS-1 (Oct 18): to her all four are ordinary posts from Chase minutes apart: one entry of 5 photos.
-    expect(await screen.findByText('5 photos')).toBeTruthy();
-    expect(screen.getByText('Cake')).toBeTruthy();
+    // MOMENT-7 (Oct 24): to her all four are ordinary posts from Chase, one card each.
+    expect(await screen.findByText('Cake')).toBeTruthy();
+    expect(screen.getAllByTestId(/^post-/)).toHaveLength(4);
     expect(screen.queryByTestId(/^event-card-/)).toBeNull();
     expect(screenWords()).not.toContain('birthday');
     expect(screen.queryByRole('button', { name: 'See events' })).toBeNull();
