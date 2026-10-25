@@ -73,6 +73,23 @@ describe('SupabaseApi RPC wiring (API.md names and args)', () => {
     const c = mockClient({ data: { i_hearted: true, heart_count: 3 }, error: null });
     expect(await make(c).toggleHeart('P')).toEqual({ i_hearted: true, heart_count: 3 });
   });
+
+  it('REACT-1 set_reaction and reaction_summary use API.md names; a server before 0017 falls back to a heart', async () => {
+    const c = mockClient({ data: [{ my_reaction: '😂', heart_count: 2, counts: { '😂': 2 } }], error: null });
+    expect(await make(c).setReaction('P', '😂')).toEqual({ my_reaction: '😂', heart_count: 2, counts: { '😂': 2 } });
+    expect(c.rpc).toHaveBeenLastCalledWith('set_reaction', { p_post: 'P', p_emoji: '😂' });
+    await make(c).reactionSummary(['P']);
+    expect(c.rpc).toHaveBeenLastCalledWith('reaction_summary', { p_posts: ['P'] });
+
+    const old = mockClient();
+    old.rpc.mockImplementation(async (name: string) =>
+      name === 'set_reaction' ? { data: null, error: { code: 'PGRST202', message: 'not found' } } : { data: { i_hearted: true, heart_count: 1 }, error: null });
+    expect(await make(old).setReaction('P', '😂')).toEqual({ my_reaction: '❤️', heart_count: 1, counts: { '❤️': 1 } });
+    expect(old.rpc).toHaveBeenLastCalledWith('toggle_heart', { p_post: 'P' });
+
+    const denied = mockClient({ data: null, error: { code: '42501', message: 'no' } });
+    await expect(make(denied).setReaction('P', '❤️')).rejects.toMatchObject({ code: '42501' });
+  });
 });
 
 describe('SupabaseApi auth: 6-digit email code, no passwords, no magic links', () => {

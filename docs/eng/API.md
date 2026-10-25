@@ -36,7 +36,9 @@ Any change requires a contract-test update first; the contract tests live in `ap
 
 | `publish_post` | `p_post` | void | All media must be `ready`. Idempotent: publishing an already published post is a no-op. |
 | `delete_post` | `p_post` | void | Author only. Soft delete; the post vanishes from every feed immediately, and media is queued for purge. Idempotent. |
-| `toggle_heart` | `p_post` | `{i_hearted, heart_count}` | Viewers allowed |
+| `toggle_heart` | `p_post` | `{i_hearted, heart_count}` | Viewers allowed. Kept for app builds before 0017; it adds or takes back a ❤️. |
+| `set_reaction` (0017) | `p_post, p_emoji text` | `{my_reaction text \| null, heart_count int, counts jsonb}` | REACT-1..6. `p_emoji` is `❤️`, `😂` or `👍`, else `22023`. One reaction per person per post: the same one again takes it back, another switches (an update, so no second notice). Not visible: `P0002`; viewer replies off: `42501`. `counts` is `{"❤️": 2, "😂": 1}` over the reactions the caller may read (reply rules below); `heart_count` is their sum. |
+| `reaction_summary` (0017) | `p_posts uuid[]` (first 100 used) | `[{post_id, my_reaction text \| null, counts jsonb}]` | REACT-2. The app calls it after each feed page. Posts the caller can't see are left out. `get_feed`'s `heart_count` counts every kind and `i_hearted` means "I reacted", unchanged. An app on a server without it (`PGRST202`) shows hearts only. |
 | `add_comment` | `p_client_id, p_post, p_body` | `{comment_id, created_at}` | Body is 1–500 characters after trim. Idempotent on `p_client_id`. |
 | `get_comments` | `p_post, p_limit = 50` | `[{comment_id, author_id, author_name, body, created_at}]` | Oldest first |
 | `mark_seen` | `p_post` | void | Idempotent; feeds "Seen by" |

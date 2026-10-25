@@ -40,8 +40,8 @@ describe('MOMENT-7 one card per upload, even within an hour', () => {
     const dockCard = screen.getByTestId(`post-${dock}`);
     expect(within(dockCard).queryByText(/Look at her go/)).toBeNull();
     fireEvent.press(within(dockCard).getByRole('button', { name: 'Love it' }));
-    await waitFor(() => expect(be.state.hearts).toEqual([{ post: dock, user: FIXTURE.users.jo.id }]));
-    expect(await within(dockCard).findByText('1 person loves this')).toBeTruthy();
+    await waitFor(() => expect(be.state.hearts).toEqual([{ post: dock, user: FIXTURE.users.jo.id, emoji: '❤️' }]));
+    expect(await within(dockCard).findByText('❤️ 1')).toBeTruthy();
   });
 
   it('MOMENT-7 a reply written from a card goes to that card\'s post', async () => {

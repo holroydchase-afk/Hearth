@@ -84,7 +84,7 @@ test('core loop: share → Jo sees it → Ruth does not → heart → comment �
   // 4. Grandma Jo hearts it and writes back.
   await signIn(page, 'jo@example.com');
   await page.getByRole('button', { name: 'Love it' }).click();
-  await expect(page.getByText('1 person loves this')).toBeVisible();
+  await expect(page.getByText('❤️ 1')).toBeVisible();
   await page.getByLabel('Write something back to Chase').fill('Look at those cheeks!');
   await page.getByRole('button', { name: 'Send' }).click();
   await expect(page.getByText(/^Sent\. .+ will read it\.$/)).toBeVisible(); // BETA-REPLY-6/11: names the readers (AUD-8 default: the parents)
@@ -97,7 +97,7 @@ test('core loop: share → Jo sees it → Ruth does not → heart → comment �
 
   // 5. Chase sees the heart and the comment (no "Seen by" count), then deletes it.
   await signIn(page, 'chase@example.com');
-  await expect(page.getByText('1 person loves this')).toBeVisible();
+  await expect(page.getByText('❤️ 1')).toBeVisible();
   await expect(page.getByText(/Look at those cheeks!/)).toBeVisible();
   await expect(page.getByText(/Seen by/)).toHaveCount(0); // RV-U1 (DEC-21): no "Seen by" count
   await page.getByRole('button', { name: 'More for this photo' }).click();
