@@ -17,7 +17,7 @@ import type {
   NotificationPrefs,
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
-  HeartState, InvitePreview, MediaKind, MediaStatus, Role, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
+  HeartState, InvitePreview, Reaction, ReactionCounts, ReactionState, ReactionSummary, MediaKind, MediaStatus, Role, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
   TimelineArgs, TimelinePost, TimelineYear,
   ChatKind, ChatMember, ChatRow, ChatRowKind, ChatSummary, ClaimedKeyPackage,
 } from '../types';
@@ -62,7 +62,8 @@ export interface FakeState {
   posts: Record<string, PostRow>;
   media: Record<string, MediaRow>;
   objects: Record<string, string>; // key -> base64 ciphertext
-  hearts: { post: string; user: string }[];
+  /** One reaction per person per post; no emoji means ❤️ (rows from before 0017). */
+  hearts: { post: string; user: string; emoji?: string }[];
   comments: Record<string, CommentRec>;
   seen: { post: string; user: string }[];
   pushTokens?: Record<string, { user: string; platform: PushPlatform }>;
@@ -550,6 +551,49 @@ export class FakeBackend {
     return { i_hearted: i < 0, heart_count: this.state.hearts.filter((h) => h.post === post && this.canSeeReply(me, p, h.user)).length };
   }
 
+  /** REACT-1..4, like set_reaction (0017). */
+  setReaction(user: string | null, post: string, emoji: Reaction): ReactionState {
+    const me = this.requireUser(user);
+    if (!(['❤️', '😂', '👍'] as string[]).includes(emoji)) throw new ApiError('22023', 'unknown reaction');
+    const p = this.visiblePost(me, post);
+    if (p.status !== 'published') throw new ApiError('P0002', 'not found');
+    const i = this.state.hearts.findIndex((h) => h.post === post && h.user === me);
+    const had = i >= 0 ? (this.state.hearts[i]!.emoji ?? '❤️') : null;
+    if (had === emoji) this.state.hearts.splice(i, 1);
+    else if (had) this.state.hearts[i] = { post, user: me, emoji };
+    else this.state.hearts.push({ post, user: me, emoji });
+    this.changed();
+    const s = this.reactionsOf(me, p);
+    return { my_reaction: s.my_reaction, heart_count: Object.values(s.counts).reduce((a, b) => a + (b ?? 0), 0), counts: s.counts };
+  }
+
+  reactionSummary(user: string | null, posts: string[]): ReactionSummary[] {
+    const me = this.requireUser(user);
+    const out: ReactionSummary[] = [];
+    for (const id of posts.slice(0, 100)) {
+      let p: PostRow;
+      try {
+        p = this.visiblePost(me, id);
+      } catch {
+        continue;
+      }
+      if (p.status === 'published' && !p.deleted) out.push({ post_id: id, ...this.reactionsOf(me, p) });
+    }
+    return out;
+  }
+
+  private reactionsOf(me: string, p: PostRow): { my_reaction: Reaction | null; counts: ReactionCounts } {
+    const counts: ReactionCounts = {};
+    let mine: Reaction | null = null;
+    for (const h of this.state.hearts) {
+      if (h.post !== p.id) continue;
+      const e = (h.emoji ?? '❤️') as Reaction;
+      if (h.user === me) mine = e;
+      if (this.canSeeReply(me, p, h.user)) counts[e] = (counts[e] ?? 0) + 1;
+    }
+    return { my_reaction: mine, counts };
+  }
+
   addComment(user: string | null, a: AddCommentArgs): { comment_id: string; created_at: string } {
     const me = this.requireUser(user);
     const existing = Object.values(this.state.comments).find((c) => c.author === me && c.client_id === a.clientId);
@@ -933,6 +977,8 @@ export class FakeApi implements HearthApi {
   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
   deletePost = (p: string) => this.run(() => this.be.deletePost(this.userId, p));
   toggleHeart = (p: string) => this.run(() => this.be.toggleHeart(this.userId, p));
+  setReaction = (p: string, emoji: Reaction) => this.run(() => this.be.setReaction(this.userId, p, emoji));
+  reactionSummary = (posts: string[]) => this.run(() => this.be.reactionSummary(this.userId, posts));
   addComment = (a: AddCommentArgs) => this.run(() => this.be.addComment(this.userId, a));
   getComments = (p: string, limit?: number) => this.run(() => this.be.getComments(this.userId, p, limit));
   markSeen = (p: string) => this.run(() => this.be.markSeen(this.userId, p));

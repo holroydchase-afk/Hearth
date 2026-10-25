@@ -10,7 +10,7 @@ import type {
   NotificationPrefs,
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost, FinalizeResult,
-  HeartState, InvitePreview, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
+  HeartState, InvitePreview, Reaction, ReactionState, ReactionSummary, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
   TimelineArgs, TimelinePost, TimelineYear,
   ChatMember, ChatRow, ChatRowKind, ChatSummary, ClaimedKeyPackage,
 } from './types';
@@ -126,6 +126,20 @@ export class SupabaseApi implements HearthApi {
   publishPost = (p: string) => this.rpc<void>('publish_post', { p_post: p });
   deletePost = (p: string) => this.rpc<void>('delete_post', { p_post: p });
   toggleHeart = (p: string) => this.rpc<unknown>('toggle_heart', { p_post: p }).then((d) => one<HeartState>(d));
+  /** REACT-1. A server before 0017 has no set_reaction: any reaction is a heart there. */
+  setReaction = async (p: string, emoji: Reaction): Promise<ReactionState> => {
+    const res = (await this.o.client.rpc('set_reaction', { p_post: p, p_emoji: emoji }).then((r) => r, (e) => ({ data: null, error: e }))) as
+      { data: unknown; error: { code?: string } | null };
+    if (res.error?.code === 'PGRST202') {
+      const h = await this.toggleHeart(p);
+      return { my_reaction: h.i_hearted ? '❤️' : null, heart_count: h.heart_count, counts: h.heart_count ? { '❤️': h.heart_count } : {} };
+    }
+    if (res.error) throw toApiError(res.error);
+    const r = one<ReactionState>(res.data);
+    return { ...r, counts: r.counts ?? {} };
+  };
+  reactionSummary = (posts: string[]) =>
+    this.rpc<ReactionSummary[] | null>('reaction_summary', { p_posts: posts }).then((d) => d ?? []);
   addComment = (a: AddCommentArgs) =>
     this.rpc<unknown>('add_comment', { p_client_id: a.clientId, p_post: a.post, p_body: a.body }).then((d) => one<{ comment_id: string; created_at: string }>(d));
   getComments = (p: string, limit = 50) => this.rpc<CommentRow[]>('get_comments', { p_post: p, p_limit: limit }).then((d) => d ?? []);

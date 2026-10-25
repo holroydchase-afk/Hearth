@@ -71,8 +71,13 @@ export interface FeedPost {
   caption: string | null;
   published_at: string;
   media: FeedMedia[];
+  /** Every reaction you may see (0017: Love, Haha and Like all count). */
   heart_count: number;
+  /** You reacted, with any of the three. */
   i_hearted: boolean;
+  /** REACT (0017): filled in by reaction_summary after the page loads; absent on an older server. */
+  my_reaction?: Reaction | null;
+  reaction_counts?: ReactionCounts;
   comment_count: number;
   /** Non-null only for the author. */
   audience: AudienceCircle[] | null;
@@ -131,6 +136,23 @@ export interface TimelineYear {
 export interface HeartState {
   i_hearted: boolean;
   heart_count: number;
+}
+
+/** REACT-1 (0017): the three reactions, in the order the card shows them. */
+export const REACTIONS = ['❤️', '😂', '👍'] as const;
+export type Reaction = (typeof REACTIONS)[number];
+export type ReactionCounts = Partial<Record<Reaction, number>>;
+
+export interface ReactionState {
+  my_reaction: Reaction | null;
+  heart_count: number;
+  counts: ReactionCounts;
+}
+
+export interface ReactionSummary {
+  post_id: string;
+  my_reaction: Reaction | null;
+  counts: ReactionCounts;
 }
 
 export interface AddCommentArgs {

@@ -1,5 +1,5 @@
 // Feed cache with keyset pagination + optimistic hearts and comments (BETA-REPLY-1/2, B6, SEE-2).
-import { ApiError, type HearthApi } from '../../api/HearthApi';
+import { ApiError, type HearthApi, type ReactionState } from '../../api/HearthApi';
 import { FakeBackend, FIXTURE } from '../../api/fake/FakeBackend';
 import { seedPost } from '../../test/seed';
 import { memoryKV } from '../../platform/kv';
@@ -77,18 +77,19 @@ describe('BETA-SEE-2 cached first page', () => {
   });
 });
 
+// REACT-1 (0017): toggleHeart is Love through set_reaction, so these watch setReaction.
 describe('BETA-REPLY-1 optimistic hearts', () => {
   it('flips at once, then matches the server', async () => {
     const be = FakeBackend.withFixture();
     const [id] = await seed(be, 1);
     const api = be.clientFor(jo.id);
-    const d = deferred<{ i_hearted: boolean; heart_count: number }>();
-    jest.spyOn(api, 'toggleHeart').mockImplementationOnce(() => d.promise);
+    const d = deferred<ReactionState>();
+    jest.spyOn(api, 'setReaction').mockImplementationOnce(() => d.promise);
     const s = make(api);
     await s.refresh();
     const p = s.toggleHeart(id!);
     expect(s.getState().posts[0]).toMatchObject({ i_hearted: true, heart_count: 1 });
-    d.resolve({ i_hearted: true, heart_count: 4 });
+    d.resolve({ my_reaction: '❤️', heart_count: 4, counts: { '❤️': 4 } });
     await p;
     expect(s.getState().posts[0]).toMatchObject({ i_hearted: true, heart_count: 4 });
   });
@@ -97,7 +98,7 @@ describe('BETA-REPLY-1 optimistic hearts', () => {
     const be = FakeBackend.withFixture();
     const [id] = await seed(be, 1);
     const api = be.clientFor(jo.id);
-    jest.spyOn(api, 'toggleHeart').mockRejectedValueOnce(new ApiError('NETWORK'));
+    jest.spyOn(api, 'setReaction').mockRejectedValueOnce(new ApiError('NETWORK'));
     const s = make(api);
     await s.refresh();
     await s.toggleHeart(id!);
@@ -112,10 +113,10 @@ describe('BETA-REPLY-1 optimistic hearts', () => {
     const real = be.clientFor(jo.id);
     const gate = deferred<void>();
     let calls = 0;
-    jest.spyOn(api, 'toggleHeart').mockImplementation(async (pid) => {
+    jest.spyOn(api, 'setReaction').mockImplementation(async (pid, emoji) => {
       calls += 1;
       if (calls === 1) await gate.promise;
-      return real.toggleHeart(pid);
+      return real.setReaction(pid, emoji);
     });
     const s = make(api);
     await s.refresh();
@@ -137,14 +138,14 @@ describe('BETA-REPLY-1 optimistic hearts', () => {
     const be = FakeBackend.withFixture();
     const [id] = await seed(be, 1);
     const api = be.clientFor(jo.id);
-    const d = deferred<{ i_hearted: boolean; heart_count: number }>();
-    jest.spyOn(api, 'toggleHeart').mockImplementationOnce(() => d.promise);
+    const d = deferred<ReactionState>();
+    jest.spyOn(api, 'setReaction').mockImplementationOnce(() => d.promise);
     const s = make(api);
     await s.refresh();
     const p = s.toggleHeart(id!);
     await s.refresh();
     expect(s.getState().posts[0]).toMatchObject({ i_hearted: true });
-    d.resolve({ i_hearted: true, heart_count: 1 });
+    d.resolve({ my_reaction: '❤️', heart_count: 1, counts: { '❤️': 1 } });
     await p;
   });
 });

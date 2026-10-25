@@ -1,9 +1,14 @@
 # Handoff
 
-## Oct 24: moment cards in Photos (branch claude/project-thread-d16zyx, draft PR)
+## Oct 25: Love, Haha, Like and Comment reactions (branch claude/project-thread-d16zyx, draft PR)
+- **Why:** Chase, Oct 25: "I want the love, haha, like, comment. Just emojis/icons, no label." New scope under the Polish Freeze, on his explicit word; icon-only overrides DS-3 (DEC-38, persona check `decisions/2026-10-25-reactions.md`).
+- **Built, test-first:** migration 0017 (`set_reaction`, `reaction_summary`; `backend/tests/reactions_test.sql`, REACT-1..6), `HearthApi.setReaction` / `reactionSummary` (Fake, Supabase with a hearts-only fallback before 0017, contract tests), the store's `react()`, and the card row ❤️ 😂 👍 💬 with per-kind counts (REACT-7..9 in `moments.test.tsx`).
+- **Next exact step:** Chase says "merge"; then deploy 0017 and publish to Expo Go on his word.
+
+## Oct 24: moment cards in Photos (merged, PR #54)
 - **Why:** Chase saw the old stacked card on Oct 24. The Oct 19 thread had only made a prototype (`prototype/moments.html`) and then waited on questions, so nothing reached the app.
 - **Built, test-first (MOMENT-1..8, `app/src/screens/__tests__/moments.test.tsx`):** one compact card per upload, with a photo collage (`PhotoCollage.tsx`), a Love and Comment row, the newest comment, a one-row reply box (DEC-30 kept), and More for "Who can see this" and Delete. Uploads within an hour are separate cards (SESS-1..3 retired; `feed/sessions.ts` is kept unused until Chase confirms). The SWIPE tests now cover the swipe in the event timeline.
-- **Next exact step:** Chase reviews and says "merge". Publishing to Expo Go and rebuilding the demo and portfolio screenshots wait on his word.
+- **Next exact step:** merged Oct 25. Publishing to Expo Go and rebuilding the demo and portfolio screenshots wait on his word.
 
 ## Oct 24, night shift 4: recruiter-share readiness, hardening round 2 (branch claude/project-thread-kzt7by-ready, draft PR)
 - **Recruiter check:** the published demo works end to end, live, on phone and laptop, and matches the repo build. The README and case study now link it, and the case study's decision count is right (RD-1, RD-2). It's ready to send.

@@ -1,7 +1,7 @@
 import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
-import { Modal, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { FeedPost } from '../api/HearthApi';
+import { REACTIONS, type FeedPost, type Reaction } from '../api/HearthApi';
 import type { CommentView } from '../feed/store';
 import { useApp, useFeed } from '../state/AppContext';
 import { Button, Card, Confirm, Txt } from '../ui/kit';
@@ -10,10 +10,13 @@ import { MIN_TARGET, fontFamily, useTheme } from '../ui/theme';
 import { PhotoCollage } from './PhotoCollage';
 
 /** MOMENT-1..8 (UAT 9): one upload as one compact card, like a standard photo feed. Who and when, the caption,
- *  a photo collage, one row with Love and Comment, the newest comment, and the reply box as one row with Send
+ *  a photo collage, one row of Love, Haha, Like and Comment icons (REACT-7), the newest comment, and the reply box as one row with Send
  *  beside it (DEC-30 keeps the box on the card). Older comments, who can see it and Delete are one worded tap
  *  away (See all, More), so the card no longer stacks full-width rows.
  *  Prototype: prototype/moments.html. No "Seen by" count (DEC-21, RV-U1): it counts who didn't look (A2). */
+const LABEL: Record<Reaction, string> = { '❤️': 'Love it', '😂': 'Haha', '👍': 'Like it' };
+const WORD: Record<Reaction, string> = { '❤️': 'love', '😂': 'haha', '👍': 'like' };
+
 export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
   const { feed, session } = useApp();
   const state = useFeed();
@@ -34,7 +37,10 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
   const list: CommentView[] = state.comments[post.post_id] ?? [];
   const newest = list[list.length - 1];
   const nComments = Math.max(list.length, post.comment_count);
-  const n = post.heart_count;
+  // REACT-2: my reaction and each kind's count, most first; hearts only until reaction_summary answers.
+  const mineNow = post.my_reaction !== undefined ? post.my_reaction : post.i_hearted ? '❤️' : null;
+  const counts = post.reaction_counts ?? (post.heart_count ? { '❤️': post.heart_count } : {});
+  const kinds = REACTIONS.map((e) => [e, counts[e] ?? 0] as const).filter(([, k]) => k > 0).sort((a, b) => b[1] - a[1]);
   const many = ready.length > 1;
   const these = many ? `these ${ready.length} photos` : 'this photo';
   // MOMENT-1: the sender sees which groups it went to, by name.
@@ -61,25 +67,25 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
       </View>
       {post.caption ? <Txt style={styles.caption}>{post.caption}</Txt> : null}
       <PhotoCollage postId={post.post_id} media={ready} />
-      {n > 0 ? <Txt variant="muted" style={styles.summary}>{`${n} ${n === 1 ? 'person loves' : 'people love'} this`}</Txt> : null}
+      {kinds.length ? (
+        <View testID={`reactions-${post.post_id}`} accessible accessibilityLabel={kinds.map(([e, k]) => `${k} ${WORD[e]}`).join(', ')} style={styles.summary}>
+          <Txt variant="muted">{kinds.map(([e, k]) => `${e} ${k}`).join('   ')}</Txt>
+        </View>
+      ) : null}
+      {/* REACT-7 (Chase, Oct 25): icons only, no words under them (his call over DS-3); each keeps its spoken label. */}
       <View testID={`actions-${post.post_id}`} style={[styles.actions, { borderColor: c.line }]}>
-        <Button
-          label="Love it"
-          text="Love"
-          icon={post.i_hearted ? { sf: 'heart.fill', md: 'favorite' } : { sf: 'heart', md: 'favorite_border' }}
-          selected={post.i_hearted}
-          variant="quiet"
-          style={{ flex: 1 }}
-          onPress={() => void feed?.toggleHeart(post.post_id)}
-        />
-        <Button
-          label="Write a comment"
-          text="Comment"
-          icon={{ sf: 'bubble.left', md: 'chat_bubble_outline' }}
-          variant="quiet"
-          style={{ flex: 1 }}
-          onPress={() => box.current?.focus()}
-        />
+        {REACTIONS.map((e) => (
+          <Button
+            key={e}
+            label={LABEL[e]}
+            text={<Text style={styles.emoji}>{e}</Text>}
+            selected={mineNow === e}
+            variant="quiet"
+            style={{ flex: 1 }}
+            onPress={() => void feed?.react(post.post_id, e)}
+          />
+        ))}
+        <Button label="Write a comment" text={<Text style={styles.emoji}>💬</Text>} variant="quiet" style={{ flex: 1 }} onPress={() => box.current?.focus()} />
       </View>
       <View style={[styles.newest, { borderColor: c.line }]}>
         {newest ? <CommentList post={post} list={[newest]} /> : null}
@@ -254,6 +260,7 @@ const styles = StyleSheet.create({
   more: { paddingHorizontal: 10 },
   caption: { paddingHorizontal: 14, paddingBottom: 12 },
   summary: { paddingHorizontal: 14, paddingTop: 10 },
+  emoji: { fontSize: 24, lineHeight: 30, textAlign: 'center' },
   actions: { flexDirection: 'row', gap: 8, marginHorizontal: 8, marginTop: 6, paddingVertical: 4, borderTopWidth: StyleSheet.hairlineWidth },
   newest: { borderTopWidth: StyleSheet.hairlineWidth, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 14, gap: 8 },
   seeAll: { alignSelf: 'flex-start', paddingHorizontal: 0 },
