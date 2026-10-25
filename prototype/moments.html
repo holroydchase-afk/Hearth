@@ -1,0 +1,428 @@
+<title>Hearth Moments Feed</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one phone-width column of moment cards (iOS inset-grouped look), endless scroll, sheets slide up from the bottom. */
+:root {
+  /* Apple system colors from app/src/ui/theme.ts (iOS light), so the prototype matches the app. */
+  --bg: #F2F2F7; --surface: #FFFFFF; --ink: #000000; --muted: #6C6C70; --line: #C6C6C8;
+  --accent: #0040DD; --accent-ink: #FFFFFF; --accent-soft: #E5ECFC; --fill: #EFEFF0;
+  --love: #D70015; --love-soft: #FDE7EA; --danger: #D70015; --photo: #E5E5EA; --scrim: rgba(0,0,0,0.4);
+  --viewer: #000000; --viewer-ink: #FFFFFF;
+  --font: -apple-system, system-ui, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --base: 17px; --line-h: 1.3;
+  --target: 48px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #000000; --surface: #1C1C1E; --ink: #FFFFFF; --muted: #AEAEB2; --line: #38383A;
+  --accent: #409CFF; --accent-ink: #000000; --accent-soft: #0B2447; --fill: #2C2C2E;
+  --love: #FF6961; --love-soft: #3A1517; --danger: #FF6961; --photo: #2C2C2E; --scrim: rgba(0,0,0,0.6);
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #000000; --surface: #1C1C1E; --ink: #FFFFFF; --muted: #AEAEB2; --line: #38383A;
+  --accent: #409CFF; --accent-ink: #000000; --accent-soft: #0B2447; --fill: #2C2C2E;
+  --love: #FF6961; --love-soft: #3A1517; --danger: #FF6961; --photo: #2C2C2E; --scrim: rgba(0,0,0,0.6);
+  color-scheme: dark }
+:root.big { --base: 21px; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: var(--base); line-height: var(--line-h);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 96px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.col { max-width: 430px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.muted { color: var(--muted); }
+.strong { font-weight: 600; }
+svg.i { width: 24px; height: 24px; flex: none; }
+
+/* Prototype strip (not part of the app) */
+.proto { margin-top: 12px; border: 1px dashed var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.proto-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.proto b { font-weight: 600; }
+.toggle { min-height: 40px; padding: 0 14px; border-radius: 20px; background: var(--fill); color: var(--accent); font-weight: 600; }
+.toggle[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.proto ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+
+/* Screen header */
+header.top { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+h1 { font-size: calc(var(--base) * 1.65); line-height: 1.2; margin: 0; font-weight: 700; text-wrap: balance; }
+.chips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.chip { min-height: 64px; border-radius: 12px; background: var(--fill); color: var(--accent); font-weight: 600;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 4px; }
+.uptodate { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.linkbtn { color: var(--accent); font-weight: 600; min-height: var(--target); padding: 0 4px; }
+
+/* Moment card */
+.moment { background: var(--surface); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+.event-band { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px 6px 16px; background: var(--accent-soft); flex-wrap: wrap; }
+.event-band .name { font-weight: 600; min-width: 0; }
+.m-head { display: flex; align-items: center; gap: 12px; padding: 12px 8px 12px 16px; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; flex: none; }
+.who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.who .sub { color: var(--muted); }
+.more { min-width: var(--target); min-height: var(--target); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--accent); border-radius: 12px; padding: 0 6px; }
+.more span { font-size: var(--base); line-height: 1; }
+.caption { padding: 0 16px 12px; }
+
+/* Collage: every photo fills its tile (cropped a little), the whole photo shows when tapped */
+.collage { display: grid; gap: 2px; background: var(--surface); }
+.tile { position: relative; background: var(--photo); overflow: hidden; min-height: var(--target); }
+.tile canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.tile .plus { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,0.5); color: #fff; font-size: calc(var(--base) * 1.65); font-weight: 700; }
+.c1 .tile { aspect-ratio: var(--ar, 4/5); max-width: 100%; }
+.c2 { grid-template-columns: 1fr 1fr; } .c2 .tile { aspect-ratio: 4/5; }
+.c3 { grid-template-columns: 1fr 1fr; } .c3 .tile:first-child { grid-column: 1 / -1; aspect-ratio: 16/10; } .c3 .tile { aspect-ratio: 1; }
+.c4 { grid-template-columns: 1fr 1fr 1fr; } .c4 .tile:first-child { grid-column: 1 / -1; aspect-ratio: 16/10; } .c4 .tile { aspect-ratio: 1; }
+
+.summary { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 0 12px 0 16px; flex-wrap: wrap; color: var(--muted); }
+.summary .emo { letter-spacing: -2px; margin-right: 6px; }
+.actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); border-top: 1px solid var(--line); margin: 0 8px; padding: 4px 0; }
+:root.big .actions { grid-template-columns: 1fr 1fr; }
+.act { min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 10px; color: var(--muted); font-weight: 600; padding: 4px 2px; }
+.act[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); }
+.act.love[aria-pressed="true"] { color: var(--love); background: var(--love-soft); }
+.act .e { font-size: 24px; line-height: 24px; height: 24px; }
+.comments { border-top: 1px solid var(--line); padding: 10px 16px 6px; display: flex; flex-direction: column; gap: 4px; }
+.comments p { margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.comments .linkbtn { align-self: flex-start; padding: 0; }
+
+.loading { text-align: center; padding: 16px; color: var(--muted); }
+.older { min-height: var(--target); border-radius: 12px; background: var(--fill); color: var(--accent); font-weight: 600; }
+
+/* Sheets */
+.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 20; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { background: var(--surface); width: 100%; max-width: 460px; max-height: 92vh; border-radius: 14px 14px 0 0; display: flex; flex-direction: column;
+  padding: 8px max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); gap: 12px; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 52px; }
+.sheet-head h2 { font-size: calc(var(--base) * 1.3); margin: 0; }
+.sheet-list { overflow-y: auto; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.cmt { display: flex; gap: 10px; }
+.cmt .avatar { width: 36px; height: 36px; font-size: 15px; }
+.cmt .bubble { background: var(--fill); border-radius: 14px; padding: 8px 12px; min-width: 0; }
+textarea { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; width: 100%; min-height: 72px; resize: vertical; }
+.primary { min-height: var(--target); border-radius: 12px; background: var(--accent); color: var(--accent-ink); font-weight: 600; width: 100%; }
+.primary:disabled { opacity: 0.45; cursor: default; }
+.secondary { min-height: var(--target); border-radius: 12px; background: var(--fill); color: var(--accent); font-weight: 600; width: 100%; }
+.danger { min-height: var(--target); border-radius: 12px; background: var(--fill); color: var(--danger); font-weight: 600; width: 100%; }
+.menu { display: flex; flex-direction: column; gap: 8px; }
+.info { background: var(--fill); border-radius: 12px; padding: 12px; }
+
+/* Full-screen viewer: the whole photo, never cropped */
+.viewer { position: fixed; inset: 0; background: var(--viewer); color: var(--viewer-ink); z-index: 30; display: flex; flex-direction: column;
+  padding: env(safe-area-inset-top, 0px) max(12px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+.v-top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 56px; gap: 8px; }
+.v-top > :first-child { justify-self: start; }
+.v-btn { min-height: var(--target); padding: 0 16px; border-radius: 24px; background: #2C2C2E; color: #fff; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+.v-btn:disabled { visibility: hidden; }
+.v-photo { flex: 1; position: relative; min-height: 0; }
+.v-photo canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.v-bottom { display: flex; justify-content: space-between; gap: 12px; padding-top: 8px; }
+@media (prefers-reduced-motion: no-preference) { .sheet { animation: up .22s ease-out; } @keyframes up { from { transform: translateY(40px); opacity: .6; } } }
+</style>
+
+<div class="col">
+  <section class="proto" aria-label="About this prototype">
+    <div class="proto-row">
+      <b>Prototype · try tapping everything</b>
+      <button class="toggle" id="bigBtn" aria-pressed="false">Bigger text</button>
+    </div>
+    <details>
+      <summary class="strong">What changed from today's card</summary>
+      <ul>
+        <li>A moment is one compact card: name, when and who it went to, then photos, then one row of reactions.</li>
+        <li>Several photos show as a collage with "+4", so you see the whole moment at once. Tap any photo to see it whole and swipe or use Back and Next.</li>
+        <li>Photos fill their space (no grey bars). Nothing is cut off in the full-screen view.</li>
+        <li>Love, Haha, Like and Comment sit in one row, each with its word under it.</li>
+        <li>Only the newest comment shows. Writing one opens its own screen that says who will read it.</li>
+        <li>Delete and "Who can see this" moved behind a worded More button.</li>
+        <li>"Seen by" is gone, as you decided. Older moments load as you scroll.</li>
+      </ul>
+    </details>
+  </section>
+
+  <header class="top">
+    <h1>Photos of Mia and Leo</h1>
+    <div class="chips">
+      <button class="chip" data-toast="Messages would open here."><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Messages</button>
+      <button class="chip" data-toast="Events would open here."><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Events</button>
+      <button class="chip" data-toast="Photos by date would open here."><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>By date</button>
+    </div>
+    <div class="uptodate"><span class="muted" id="upd">Up to date</span><button class="linkbtn" id="checkBtn">Check for new photos</button></div>
+  </header>
+
+  <main id="feed" class="col" aria-label="Moments"></main>
+  <div id="more" class="loading" aria-live="polite">Loading older photos…</div>
+  <button class="older" id="olderBtn" hidden>Show older photos</button>
+</div>
+
+<div id="layer"></div>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const $ = (s, el = document) => el.querySelector(s);
+  const h = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // People (Chase's family; ranking in docs/product/PERSONA-CHECK.md)
+  const P = {
+    Chase: '#3A6FD8', Danielle: '#B4489A', Kate: '#2E8B6E', Gigi: '#C0392B', Scott: '#8E5A2B', Susan: '#6A4FB3', Margaret: '#1F7A8C', John: '#7A7A2E', You: '#3A6FD8',
+  };
+  const avatar = (n, cls = '') => `<span class="avatar ${cls}" style="background:${P[n] || '#666'}" aria-hidden="true">${n[0]}</span>`;
+
+  // Fake photos: painted scenes in the photo's real shape (w/h). Each scene is a seed.
+  const SCENES = {
+    pumpkins: ['#F6C27A', '#8FB65A', '#E8761E'], beach: ['#8EC9F0', '#F0D9A0', '#2A8FC7'], cake: ['#F7D6E0', '#FFF4E8', '#E05A8A'],
+    park: ['#A9D6F5', '#6DAF4F', '#F2C230'], snow: ['#CFE3F2', '#F7FAFC', '#C0392B'], kitchen: ['#F3E2C7', '#C99B6D', '#4A90C2'], dusk: ['#F29E6D', '#5B4A7A', '#FFD27A'],
+  };
+  function paint(canvas, scene, seed, w, hgt, fit) {
+    const box = canvas.getBoundingClientRect();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.max(1, Math.round(box.width * dpr)); canvas.height = Math.max(1, Math.round(box.height * dpr));
+    const ctx = canvas.getContext('2d');
+    const [sky, ground, pop] = SCENES[scene];
+    // Where the photo sits: cover (feed tiles) or contain (viewer).
+    const cw = canvas.width, ch = canvas.height, ar = w / hgt;
+    let pw, ph;
+    if ((fit === 'cover') === (cw / ch > ar)) { pw = cw; ph = cw / ar; } else { ph = ch; pw = ch * ar; }
+    const ox = (cw - pw) / 2, oy = (ch - ph) / 2;
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.save(); ctx.beginPath(); ctx.rect(ox, oy, pw, ph); ctx.clip();
+    let r = seed * 9301 + 49297; const rnd = () => ((r = (r * 9301 + 49297) % 233280) / 233280);
+    const g = ctx.createLinearGradient(0, oy, 0, oy + ph); g.addColorStop(0, sky); g.addColorStop(1, '#ffffff'); ctx.fillStyle = g; ctx.fillRect(ox, oy, pw, ph);
+    ctx.fillStyle = ground; ctx.beginPath(); ctx.moveTo(ox, oy + ph * 0.62);
+    for (let x = 0; x <= 1.001; x += 0.1) ctx.lineTo(ox + pw * x, oy + ph * (0.58 + 0.08 * Math.sin(x * 6 + seed)));
+    ctx.lineTo(ox + pw, oy + ph); ctx.lineTo(ox, oy + ph); ctx.fill();
+    ctx.fillStyle = 'rgba(255,240,180,0.9)'; ctx.beginPath(); ctx.arc(ox + pw * (0.2 + rnd() * 0.6), oy + ph * 0.18, Math.min(pw, ph) * 0.08, 0, 7); ctx.fill();
+    for (let i = 0; i < 7; i++) { ctx.fillStyle = i % 2 ? pop : 'rgba(0,0,0,0.12)'; const rr = Math.min(pw, ph) * (0.04 + rnd() * 0.07);
+      ctx.beginPath(); ctx.arc(ox + pw * rnd(), oy + ph * (0.66 + rnd() * 0.3), rr, 0, 7); ctx.fill(); }
+    // Two little people, so it reads as "the kids".
+    for (const [x, s] of [[0.42, 1], [0.58, 0.8]]) { const bx = ox + pw * x, by = oy + ph * 0.72, u = Math.min(pw, ph) * 0.07 * s;
+      ctx.fillStyle = '#F2C9A5'; ctx.beginPath(); ctx.arc(bx, by - u * 2.3, u * 0.7, 0, 7); ctx.fill();
+      ctx.fillStyle = pop; ctx.fillRect(bx - u * 0.7, by - u * 1.6, u * 1.4, u * 2); }
+    ctx.restore();
+  }
+
+  // Sample moments. A moment = one person's upload (or uploads within an hour) to the same groups.
+  const shapes = { L: [4032, 3024], P: [3024, 4032], S: [3000, 3000], W: [4032, 2268] };
+  const photos = (scene, list) => list.split('').map((k, i) => ({ scene, seed: i + scene.length, w: shapes[k][0], h: shapes[k][1] }));
+  let moments = [
+    { by: 'Chase', when: '12 minutes ago', to: "Everyone", cap: 'Pumpkin patch with Mia and Leo 🎃', photos: photos('pumpkins', 'LPPSLLWPP'),
+      react: { love: 3, haha: 1, like: 0 }, comments: [['Gigi', 'Look at those cheeks!! Leo is getting so big.'], ['Scott', 'Mia picked the biggest one of course']] },
+    { by: 'Danielle', when: 'Yesterday at 6:40 PM', to: "Grandparents – Mom's side", cap: 'First time making pancakes by herself', photos: photos('kitchen', 'P'),
+      react: { love: 4, haha: 0, like: 1 }, comments: [['Susan', 'A chef already! Save me one.']] },
+    { by: 'Chase', when: 'Sat, Oct 17', to: 'Everyone', event: "Leo's 5th birthday", eventCount: 42, cap: 'Blowing out the candles', photos: photos('cake', 'LP'),
+      react: { love: 6, haha: 2, like: 1 }, comments: [['Margaret', 'Happy birthday sweet boy!'], ['Gigi', 'Wish we could have been there'], ['John', 'Five! Where does the time go']] },
+    { by: 'Kate', when: 'Fri, Oct 16', to: 'Cousins', cap: 'Park day with the cousins', photos: photos('park', 'LLP'),
+      react: { love: 2, haha: 0, like: 2 }, comments: [] },
+    { by: 'Chase', when: 'Wed, Oct 14', to: "Grandparents – Dad's side", cap: '', photos: photos('dusk', 'W'),
+      react: { love: 1, haha: 0, like: 0 }, comments: [] },
+  ];
+  const older = [
+    { by: 'Danielle', when: 'Sun, Oct 11', to: 'Everyone', cap: 'Beach weekend', photos: photos('beach', 'LPLP'), react: { love: 5, haha: 0, like: 0 }, comments: [['Scott', 'Wish I was there!']] },
+    { by: 'Chase', when: 'Sat, Oct 3', to: 'Everyone', cap: 'Mia lost her first tooth', photos: photos('kitchen', 'S'), react: { love: 7, haha: 3, like: 0 }, comments: [['Gigi', 'The tooth fairy is coming!']] },
+    { by: 'Kate', when: 'Mon, Sep 28', to: 'Cousins', cap: '', photos: photos('park', 'PPLLPP'), react: { love: 2, haha: 0, like: 1 }, comments: [] },
+    { by: 'Chase', when: 'Last winter', to: 'Everyone', cap: 'Snow day!', photos: photos('snow', 'LP'), react: { love: 4, haha: 1, like: 0 }, comments: [] },
+  ];
+  moments.forEach((m, i) => { m.id = 'm' + i; m.mine = m.by === 'Chase'; m.my = null; });
+
+  const feed = $('#feed');
+  const reactSum = (m) => m.react.love + m.react.haha + m.react.like;
+  const photoWord = (n) => (n === 1 ? '1 photo' : `${n} photos`);
+
+  function collageHTML(m) {
+    const n = m.photos.length;
+    const shown = Math.min(n, 4);
+    const cls = 'c' + shown;
+    // One photo: keep its shape, clamped between 4:5 (tall) and 1.91:1 (wide), like Instagram.
+    const one = n === 1 ? `style="--ar:${Math.max(0.8, Math.min(1.91, m.photos[0].w / m.photos[0].h))}"` : '';
+    let html = `<div class="collage ${cls}" ${one}>`;
+    for (let i = 0; i < shown; i++) {
+      const extra = i === shown - 1 && n > shown ? n - shown : 0;
+      html += `<button class="tile" data-open="${i}" aria-label="Open photo ${i + 1} of ${n} full screen${extra ? `, and ${extra} more` : ''}">
+        <canvas data-photo="${i}" aria-hidden="true"></canvas>${extra ? `<span class="plus" aria-hidden="true">+${extra}</span>` : ''}</button>`;
+    }
+    return html + '</div>';
+  }
+
+  function summaryHTML(m) {
+    const t = reactSum(m), c = m.comments.length;
+    if (!t && !c) return '';
+    const emo = [m.react.love && '❤️', m.react.haha && '😂', m.react.like && '👍'].filter(Boolean).join('');
+    const left = t ? `<span><span class="emo" aria-hidden="true">${emo}</span>${t === 1 ? '1 person reacted' : `${t} people reacted`}</span>` : '<span></span>';
+    const right = c ? `<button class="linkbtn" data-cmt>${c === 1 ? '1 comment' : `${c} comments`}</button>` : '';
+    return `<div class="summary">${left}${right}</div>`;
+  }
+
+  function momentHTML(m) {
+    const last = m.comments[m.comments.length - 1];
+    return `<article class="moment" id="${m.id}" aria-label="${esc(m.by)}'s moment, ${photoWord(m.photos.length)}">
+      ${m.event ? `<div class="event-band"><span class="name">📅 ${esc(m.event)}</span><button class="linkbtn" data-toast="The event would open with all ${m.eventCount} photos.">See all ${m.eventCount} photos</button></div>` : ''}
+      <div class="m-head">${avatar(m.by)}
+        <div class="who"><span><span class="strong">${esc(m.by)}</span> <span class="sub">to ${esc(m.to)}</span></span><span class="sub">${esc(m.when)}</span></div>
+        <button class="more" data-more aria-label="More for ${esc(m.by)}'s moment">
+          <svg class="i" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg><span>More</span></button>
+      </div>
+      ${m.cap ? `<div class="caption">${esc(m.cap)}</div>` : ''}
+      ${collageHTML(m)}
+      ${summaryHTML(m)}
+      <div class="actions" role="group" aria-label="React to this moment">
+        <button class="act love" data-r="love" aria-pressed="${m.my === 'love'}"><span class="e" aria-hidden="true">${m.my === 'love' ? '❤️' : '🤍'}</span>Love</button>
+        <button class="act" data-r="haha" aria-pressed="${m.my === 'haha'}"><span class="e" aria-hidden="true">😂</span>Haha</button>
+        <button class="act" data-r="like" aria-pressed="${m.my === 'like'}"><span class="e" aria-hidden="true">👍</span>Like</button>
+        <button class="act" data-cmt><span class="e" aria-hidden="true">💬</span>Comment</button>
+      </div>
+      ${last ? `<div class="comments"><p><span class="strong">${esc(last[0])}</span> ${esc(last[1])}</p>
+        ${m.comments.length > 1 ? `<button class="linkbtn" data-cmt>See all ${m.comments.length} comments</button>` : ''}</div>` : ''}
+    </article>`;
+  }
+
+  function paintMoment(m, el) {
+    el.querySelectorAll('canvas[data-photo]').forEach((cv) => { const p = m.photos[+cv.dataset.photo]; paint(cv, p.scene, p.seed, p.w, p.h, 'cover'); });
+  }
+  function render(m) {
+    const old = document.getElementById(m.id);
+    const el = h(momentHTML(m));
+    old ? old.replaceWith(el) : feed.appendChild(el);
+    requestAnimationFrame(() => paintMoment(m, el));
+    return el;
+  }
+  moments.forEach(render);
+
+  // Reactions: one per person; tapping yours again takes it back.
+  feed.addEventListener('click', (e) => {
+    const card = e.target.closest('.moment'); if (!card) return;
+    const m = moments.find((x) => x.id === card.id);
+    const r = e.target.closest('[data-r]'), open = e.target.closest('[data-open]');
+    if (r) {
+      const k = r.dataset.r;
+      if (m.my) m.react[m.my]--;
+      m.my = m.my === k ? null : k;
+      if (m.my) m.react[m.my]++;
+      render(m); document.querySelector(`#${m.id} [data-r="${k}"]`).focus();
+    } else if (e.target.closest('[data-cmt]')) commentsSheet(m);
+    else if (e.target.closest('[data-more]')) moreSheet(m);
+    else if (open) viewer(m, +open.dataset.open);
+  });
+
+  // Sheets
+  const layer = $('#layer');
+  let lastFocus = null;
+  function openLayer(el) { lastFocus = document.activeElement; layer.replaceChildren(el); document.body.style.overflow = 'hidden'; (el.querySelector('[data-first]') || el.querySelector('button')).focus(); }
+  function closeLayer() { layer.replaceChildren(); document.body.style.overflow = ''; lastFocus && lastFocus.focus && lastFocus.focus(); }
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && layer.firstChild) closeLayer(); });
+
+  function readers(m) {
+    const map = { Everyone: 'Chase, Danielle, Gigi, Scott, Susan, Margaret and John', "Grandparents – Mom's side": 'Chase, Danielle, Susan and John',
+      "Grandparents – Dad's side": 'Chase, Danielle, Gigi and Scott', Cousins: 'Kate, Chase, Danielle and the cousins' };
+    return map[m.to] || 'The family this was shared with';
+  }
+
+  function commentsSheet(m) {
+    const el = h(`<div class="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="Comments">
+      <div class="sheet-head"><h2>Comments</h2><button class="secondary" style="width:auto;padding:0 16px" data-close data-first>Close</button></div>
+      <div class="sheet-list">${m.comments.length ? m.comments.map(([n, t]) => `<div class="cmt">${avatar(n)}<div class="bubble"><div class="strong">${esc(n)}</div>${esc(t)}</div></div>`).join('')
+        : `<p class="muted" style="margin:0">No comments yet. Say something to ${esc(m.by)}.</p>`}</div>
+      <label for="cmtBox" class="strong">Write something back${m.mine ? '' : ' to ' + esc(m.by)}</label>
+      <textarea id="cmtBox" maxlength="500" placeholder="Write something back"></textarea>
+      <div class="muted">${esc(readers(m))} will read this.</div>
+      <button class="primary" id="sendBtn" disabled>Send</button>
+    </div></div>`);
+    const box = $('#cmtBox', el), send = $('#sendBtn', el);
+    box.addEventListener('input', () => { send.disabled = !box.value.trim(); });
+    send.addEventListener('click', () => { m.comments.push(['You', box.value.trim()]); render(m); closeLayer(); toast(`Sent. ${readers(m)} will read it.`); });
+    el.addEventListener('click', (e) => { if (e.target === el || e.target.closest('[data-close]')) closeLayer(); });
+    openLayer(el);
+  }
+
+  function moreSheet(m) {
+    const el = h(`<div class="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="More">
+      <div class="sheet-head"><h2>${esc(m.by)}'s moment</h2></div>
+      <div class="info"><div class="strong">Who can see this</div>${esc(readers(m))}.</div>
+      <div class="menu">
+        <button class="secondary" data-first data-toast="All ${m.photos.length} would save to your phone's photos.">Save ${m.photos.length === 1 ? 'this photo' : `all ${m.photos.length} photos`} to my phone</button>
+        ${m.mine ? `<button class="danger" data-del>Delete this moment</button>` : ''}
+        <button class="secondary" data-close>Cancel</button>
+      </div></div></div>`);
+    el.addEventListener('click', (e) => {
+      if (e.target === el || e.target.closest('[data-close]')) closeLayer();
+      else if (e.target.closest('[data-toast]')) { closeLayer(); toast(e.target.closest('[data-toast]').dataset.toast); }
+      else if (e.target.closest('[data-del]')) confirmDelete(m);
+    });
+    openLayer(el);
+  }
+
+  function confirmDelete(m) {
+    const n = m.photos.length;
+    const el = h(`<div class="scrim" style="align-items:center"><div class="sheet" style="border-radius:14px;margin:16px" role="alertdialog" aria-modal="true" aria-label="Delete for everyone?">
+      <h2 style="margin:8px 0 0;font-size:calc(var(--base)*1.3)">Delete ${n === 1 ? 'this photo' : `these ${n} photos`} for everyone?</h2>
+      <p style="margin:0">${n === 1 ? 'It' : 'They'} will be gone from everyone's phone. This can't be undone.</p>
+      <button class="danger" data-yes>Yes, delete ${n === 1 ? 'it' : 'them'}</button><button class="secondary" data-first data-close>No, keep ${n === 1 ? 'it' : 'them'}</button></div></div>`);
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('[data-close]')) closeLayer();
+      else if (e.target.closest('[data-yes]')) { moments = moments.filter((x) => x !== m); document.getElementById(m.id).remove(); closeLayer(); toast('Deleted.'); }
+    });
+    openLayer(el);
+  }
+
+  // Full-screen viewer: whole photo, swipe or Back / Next.
+  function viewer(m, i) {
+    const n = m.photos.length;
+    const el = h(`<div class="viewer" role="dialog" aria-modal="true" aria-label="Photo viewer">
+      <div class="v-top"><button class="v-btn" data-close data-first>✕ Close</button><span class="strong" aria-live="polite" id="vpos"></span><span style="width:96px"></span></div>
+      <div class="v-photo"><canvas aria-hidden="true"></canvas></div>
+      ${m.cap ? `<div style="padding:8px 4px 0">${esc(m.cap)}</div>` : ''}
+      <div class="v-bottom"><button class="v-btn" data-prev>◀ Back</button><button class="v-btn" data-next>Next ▶</button></div></div>`);
+    const cv = $('canvas', el);
+    const show = () => {
+      const p = m.photos[i]; paint(cv, p.scene, p.seed, p.w, p.h, 'contain');
+      $('#vpos', el).textContent = `${i + 1} of ${n}`;
+      $('[data-prev]', el).disabled = i === 0; $('[data-next]', el).disabled = i === n - 1;
+    };
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('[data-close]')) closeLayer();
+      else if (e.target.closest('[data-prev]') && i > 0) { i--; show(); }
+      else if (e.target.closest('[data-next]') && i < n - 1) { i++; show(); }
+    });
+    let sx = null;
+    el.addEventListener('pointerdown', (e) => { sx = e.clientX; });
+    el.addEventListener('pointerup', (e) => { if (sx === null) return; const dx = e.clientX - sx; sx = null;
+      if (dx < -50 && i < n - 1) { i++; show(); } else if (dx > 50 && i > 0) { i--; show(); } });
+    openLayer(el); requestAnimationFrame(show);
+  }
+
+  // Toast
+  function toast(text) {
+    const t = h(`<div role="status" style="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:40;background:var(--ink);color:var(--surface);padding:12px 16px;border-radius:12px;max-width:calc(100% - 32px)">${esc(text)}</div>`);
+    document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
+  }
+  document.addEventListener('click', (e) => { const b = e.target.closest('header [data-toast], .event-band [data-toast]'); if (b) toast(b.dataset.toast); });
+
+  // Endless scroll: older moments load as you near the bottom; a worded button is the fallback (no gesture-only actions).
+  const moreEl = $('#more'), olderBtn = $('#olderBtn');
+  let loading = false;
+  function loadOlder() {
+    if (loading) return; if (!older.length) { moreEl.textContent = "That's everything. You're all caught up."; olderBtn.hidden = true; return; }
+    loading = true; moreEl.textContent = 'Loading older photos…';
+    setTimeout(() => {
+      older.splice(0, 2).forEach((m) => { m.id = 'm' + moments.length; m.mine = m.by === 'Chase'; m.my = null; moments.push(m); render(m); });
+      loading = false; moreEl.textContent = older.length ? '' : "That's everything. You're all caught up."; olderBtn.hidden = !older.length;
+    }, 700);
+  }
+  olderBtn.addEventListener('click', loadOlder);
+  olderBtn.hidden = false; moreEl.textContent = '';
+  if ('IntersectionObserver' in window) new IntersectionObserver((es) => es.some((x) => x.isIntersecting) && loadOlder(), { rootMargin: '400px' }).observe(olderBtn);
+
+  $('#checkBtn').addEventListener('click', () => { $('#upd').textContent = 'Checking…'; setTimeout(() => { $('#upd').textContent = 'Up to date. Nothing new since 12 minutes ago.'; }, 600); });
+
+  // Bigger text (the app's own setting) so you can see the card hold up at 21 pt.
+  const bigBtn = $('#bigBtn');
+  try { if (localStorage.getItem('hearth-proto-big') === '1') { root.classList.add('big'); bigBtn.setAttribute('aria-pressed', 'true'); } } catch (_) {}
+  bigBtn.addEventListener('click', () => {
+    const on = root.classList.toggle('big'); bigBtn.setAttribute('aria-pressed', String(on));
+    try { localStorage.setItem('hearth-proto-big', on ? '1' : '0'); } catch (_) {}
+    moments.forEach((m) => { const el = document.getElementById(m.id); el && paintMoment(m, el); });
+  });
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => moments.forEach((m) => { const el = document.getElementById(m.id); el && paintMoment(m, el); }), 120); });
+})();
+</script>

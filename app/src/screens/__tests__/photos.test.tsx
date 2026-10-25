@@ -21,7 +21,8 @@ describe('Photos screen', () => {
     await renderApp(<PhotosScreen />, { be, user: 'jo' });
     expect(await screen.findByText('Shared with Dad side')).toBeTruthy();
     expect(screen.queryByText('Shared with Mom side')).toBeNull();
-    expect(screen.getByText('Shared with you')).toBeTruthy();
+    fireEvent.press(screen.getByRole('button', { name: 'More for this photo' })); // MOMENT-6: who can see it is under More
+    expect(await screen.findByText('Shared with you')).toBeTruthy();
     expect(screen.getByRole('header', { name: 'Photos of Mia and Leo' })).toBeTruthy();
     expect(screen.queryByText(/Seen by/)).toBeNull();
   });
@@ -38,6 +39,8 @@ describe('Photos screen', () => {
     const { id } = await seedPost(be, { caption: 'Pumpkins', circles: [dadSide.id] });
     await be.clientFor(FIXTURE.users.jo.id).markSeen(id);
     await renderApp(<PhotosScreen />, { be, user: 'chase' });
+    expect(await screen.findByText(/to Grandparents – Dad's side/)).toBeTruthy(); // MOMENT-1: on the card
+    fireEvent.press(screen.getByRole('button', { name: 'More for this photo' }));
     expect(await screen.findByText("Shared with Grandparents – Dad's side · 3 people")).toBeTruthy();
     expect(screen.queryByText(/Seen by/)).toBeNull();
   });
@@ -55,11 +58,11 @@ describe('Photos screen', () => {
     await renderApp(<PhotosScreen />, { be, user: 'jo' });
     const heart = await screen.findByRole('button', { name: 'Love it' });
     fireEvent.press(heart);
-    expect(await screen.findByText('You love this')).toBeTruthy();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Love it' }).props.accessibilityState.selected).toBe(true));
     await waitFor(() => expect(be.state.hearts).toHaveLength(1));
     expect(screen.getByText('1 person loves this')).toBeTruthy();
     fireEvent.press(screen.getByRole('button', { name: 'Love it' }));
-    expect(await screen.findByText('Love it')).toBeTruthy();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Love it' }).props.accessibilityState.selected).toBe(false));
     await waitFor(() => expect(be.state.hearts).toHaveLength(0));
   });
 
@@ -69,7 +72,7 @@ describe('Photos screen', () => {
     const box = await screen.findByLabelText('Write something back to Chase');
     fireEvent.changeText(box, 'So cute!');
     fireEvent.press(screen.getByRole('button', { name: 'Send' }));
-    expect(await screen.findByText(/So cute!/)).toBeTruthy();
+    expect((await screen.findAllByText(/So cute!/)).length).toBeGreaterThan(0);
     expect(await screen.findByText(/^Sent\. .+ will read it\.$/)).toBeTruthy(); // REPLY-11: names, not a scope
     await waitFor(() => expect(Object.values(be.state.comments)).toHaveLength(1));
   });
@@ -123,13 +126,15 @@ describe('Photos screen', () => {
     const be = await twoPosts();
     await renderApp(<PhotosScreen />, { be, user: 'chase' });
     const card = await screen.findByTestId(`post-${Object.values(be.state.posts).find((p) => p.caption === 'Shared with Dad side')!.id}`);
-    fireEvent.press(within(card).getByRole('button', { name: 'Delete this photo' }));
-    expect(screen.getByText('Delete this photo for everyone?')).toBeTruthy();
+    fireEvent.press(within(card).getByRole('button', { name: 'More for this photo' }));
+    fireEvent.press(await screen.findByRole('button', { name: 'Delete this photo' }));
+    expect(await screen.findByText('Delete this photo for everyone?')).toBeTruthy();
     fireEvent.press(screen.getByRole('button', { name: 'No, keep it' }));
     expect(screen.queryByText('Delete this photo for everyone?')).toBeNull();
     expect(screen.getByText('Shared with Dad side')).toBeTruthy();
-    fireEvent.press(within(card).getByRole('button', { name: 'Delete this photo' }));
-    fireEvent.press(screen.getByRole('button', { name: 'Yes, delete it' }));
+    fireEvent.press(within(card).getByRole('button', { name: 'More for this photo' }));
+    fireEvent.press(await screen.findByRole('button', { name: 'Delete this photo' }));
+    fireEvent.press(await screen.findByRole('button', { name: 'Yes, delete it' }));
     await waitFor(() => expect(screen.queryByText('Shared with Dad side')).toBeNull());
     expect(await be.clientFor(FIXTURE.users.jo.id).getFeed({ space: FIXTURE.space.id })).toHaveLength(0);
   });
@@ -138,6 +143,8 @@ describe('Photos screen', () => {
     const be = await twoPosts();
     await renderApp(<PhotosScreen />, { be, user: 'jo' });
     await screen.findByText('Shared with Dad side');
+    fireEvent.press(screen.getByRole('button', { name: 'More for this photo' }));
+    await screen.findByText('Who can see this');
     expect(screen.queryByRole('button', { name: 'Delete this photo' })).toBeNull();
   });
 

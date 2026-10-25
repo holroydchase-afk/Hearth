@@ -1,5 +1,10 @@
 # Handoff
 
+## Oct 24: moment cards in Photos (branch claude/project-thread-d16zyx, draft PR)
+- **Why:** Chase saw the old stacked card on Oct 24. The Oct 19 thread had only made a prototype (`prototype/moments.html`) and then waited on questions, so nothing reached the app.
+- **Built, test-first (MOMENT-1..8, `app/src/screens/__tests__/moments.test.tsx`):** one compact card per upload, with a photo collage (`PhotoCollage.tsx`), a Love and Comment row, the newest comment, a one-row reply box (DEC-30 kept), and More for "Who can see this" and Delete. Uploads within an hour are separate cards (SESS-1..3 retired; `feed/sessions.ts` is kept unused until Chase confirms). The SWIPE tests now cover the swipe in the event timeline.
+- **Next exact step:** Chase reviews and says "merge". Publishing to Expo Go and rebuilding the demo and portfolio screenshots wait on his word.
+
 ## Oct 24, night shift 4: recruiter-share readiness, hardening round 2 (branch claude/project-thread-kzt7by-ready, draft PR)
 - **Recruiter check:** the published demo works end to end, live, on phone and laptop, and matches the repo build. The README and case study now link it, and the case study's decision count is right (RD-1, RD-2). It's ready to send.
 - **Fixed test-first:** HARD-8 (full screen kept the same photo when a new post arrived), HARD-9 (a double tap on Love it), HARD-10 (no signal while joining: honest words and Try again), HARD-11 ("Saved" only once the server has her notice choice). Review: `docs/reviews/2026-10-24-share-ready.md`.

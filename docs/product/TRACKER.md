@@ -1,6 +1,6 @@
 # Hearth tracker: what's next, what's missing, what's pending
 
-The one list of everything open between Chase and Claude. Updated Oct 22, 2026.
+The one list of everything open between Chase and Claude. Updated Oct 24, 2026.
 
 **How it works**
 - Work the **Sequence** top to bottom. One step at a time; nothing new gets built until milestone 1 passes (Chase, Oct 17).
@@ -34,6 +34,7 @@ The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/202
 | R12 | Thumbnail sizing from a first guess instead of up to 7 encodes (RV-P5; measure on a phone) | P2 | S | ☑ Oct 21: the display JPEG's bytes per pixel pick the first step (padded 1.5×); a busy photo takes 1 to 2 thumbnail encodes instead of up to 7, a plain one still gets the sharpest. Phone timing still to measure |
 | R13 | A4 resumable video uploads (after FLAG-7 video stripping; RV-P7) | P2 | L | ☐ |
 | R17 | A "Photo helpers" on/off switch for the family's owner on a screen (today it's a database row). grandparent-ux words and a persona check first | P2 | S | ☐ |
+| R18 | Moment cards: one compact card per upload (collage, one Love and Comment row, one-row reply box, More for who-sees-it and Delete), UAT 8-9 (MOMENT-1..8) | P1 | M | ◐ Oct 24: built test-first in a draft PR; decision to review in `decisions/2026-10-24-moment-cards.md` (uploads within an hour no longer merge). Publish to Expo Go and rebuild the demo on Chase's word |
 | R16 | Rest of the studio-agents migration (`examples/hearth/MIGRATION.md` in studio-agents): move Hearth facts into docs, swap in the generic agents, archive funding-analyst | P2 | S | ☐ After the Nov 22 beta; `ux-reviewer` synced Oct 22 |
 | R14 | npm audit: recheck the Expo CLI build-tool findings after the next Expo patch (RV-X4) | P2 | S | ☑ Oct 21: still 62 from 5 advisories on expo 57.0.30 (newest SDK 57 patch). One ships: decode-uri-component in expo-router (a crafted link could freeze the app; no data exposed). No forced override; recheck at the SDK 58 move |
 

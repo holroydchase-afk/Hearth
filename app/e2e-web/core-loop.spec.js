@@ -49,7 +49,10 @@ test('core loop: share → Jo sees it → Ruth does not → heart → comment �
   await page.getByRole('checkbox', { name: "Grandparents – Dad's side, 2 people" }).click(); // Jo hasn't joined yet
   await page.getByRole('button', { name: 'Post' }).click();
   await expect(page.getByText('Pumpkin patch', { exact: true })).toBeVisible();
+  await expect(page.getByText(/to Grandparents – Dad's side/)).toBeVisible(); // MOMENT-1: on the card
+  await page.getByRole('button', { name: 'More for this photo' }).click(); // MOMENT-6: the full words are under More
   await expect(page.getByText("Shared with Grandparents – Dad's side · 2 people")).toBeVisible();
+  await page.getByRole('button', { name: 'Close this menu' }).click();
 
   // BETA-SHARE-2/3/5 on the real pipeline: stored bytes are ciphertext; inside, a 2048 px JPEG with no EXIF.
   const stored = await storedDisplayHeader(page, 'Pumpkin patch');
@@ -66,7 +69,9 @@ test('core loop: share → Jo sees it → Ruth does not → heart → comment �
   await page.getByLabel('6-number code').fill('123456');
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByText('Pumpkin patch', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'More for this photo' }).click();
   await expect(page.getByText('Shared with you')).toBeVisible();
+  await page.getByRole('button', { name: 'Close this menu' }).click();
   await expect(page.getByRole('tab')).toHaveText([/Photos/, /Help/]); // no Share tab for viewers
   await signOut(page, 'Help');
 
@@ -79,7 +84,7 @@ test('core loop: share → Jo sees it → Ruth does not → heart → comment �
   // 4. Grandma Jo hearts it and writes back.
   await signIn(page, 'jo@example.com');
   await page.getByRole('button', { name: 'Love it' }).click();
-  await expect(page.getByText('You love this')).toBeVisible();
+  await expect(page.getByText('1 person loves this')).toBeVisible();
   await page.getByLabel('Write something back to Chase').fill('Look at those cheeks!');
   await page.getByRole('button', { name: 'Send' }).click();
   await expect(page.getByText(/^Sent\. .+ will read it\.$/)).toBeVisible(); // BETA-REPLY-6/11: names the readers (AUD-8 default: the parents)
@@ -95,6 +100,7 @@ test('core loop: share → Jo sees it → Ruth does not → heart → comment �
   await expect(page.getByText('1 person loves this')).toBeVisible();
   await expect(page.getByText(/Look at those cheeks!/)).toBeVisible();
   await expect(page.getByText(/Seen by/)).toHaveCount(0); // RV-U1 (DEC-21): no "Seen by" count
+  await page.getByRole('button', { name: 'More for this photo' }).click();
   await page.getByRole('button', { name: 'Delete this photo' }).click();
   await page.getByRole('button', { name: 'Yes, delete it' }).click();
   await expect(page.getByText('Pumpkin patch', { exact: true })).toHaveCount(0);
