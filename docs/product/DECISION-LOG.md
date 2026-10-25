@@ -275,5 +275,12 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** a known name is what makes a grandparent trust and open the notice (LG, GG). Notices never carry captions, photos or the audience.
 - **Source:** `docs/product/decisions/2026-10-23-notice-sender-names.md`, TRACKER D9
 
+### DEC-38 · Love, Haha, Like and Comment as icons with no words (REACT-7)
+- **When / status:** Oct 25 · Decided by Chase (thread "Moments feed redesign")
+- **Chose:** four icon-only buttons on each moment (❤️ 😂 👍 💬), one reaction per person, counts per kind.
+- **Over:** one worded Love button and a worded Comment button (MOMENT-3), which DS-3 and rule 3 asked for.
+- **Because:** Chase wants the row to look like the photo apps relatives already use. Screen readers still hear each name; the LG and FA Reds are his override.
+- **Source:** `docs/product/decisions/2026-10-25-reactions.md`, PR for migration 0017
+
 ---
-Last updated: Oct 23, 2026 (DEC-37)
+Last updated: Oct 25, 2026 (DEC-38)
