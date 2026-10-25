@@ -151,6 +151,24 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
     });
   });
 
+  describe('REACT-1..4 Love, Haha, Like (0017)', () => {
+    it('REACT-1 one reaction each: the same one takes it back, another switches', async () => {
+      const id = await publishedPost();
+      expect(await viewerIn.setReaction(id, '😂')).toEqual({ my_reaction: '😂', heart_count: 1, counts: { '😂': 1 } });
+      expect(await viewerIn.setReaction(id, '👍')).toEqual({ my_reaction: '👍', heart_count: 1, counts: { '👍': 1 } });
+      expect(await poster.setReaction(id, '❤️')).toEqual({ my_reaction: '❤️', heart_count: 2, counts: { '👍': 1, '❤️': 1 } });
+      expect(await viewerIn.reactionSummary([id])).toEqual([{ post_id: id, my_reaction: '👍', counts: { '👍': 1, '❤️': 1 } }]);
+      expect((await viewerIn.getFeed({ space: h.spaceId })).find((p) => p.post_id === id)).toMatchObject({ i_hearted: true, heart_count: 2 });
+      expect(await viewerIn.setReaction(id, '👍')).toEqual({ my_reaction: null, heart_count: 1, counts: { '❤️': 1 } });
+    });
+    it('REACT-3/4 other emoji are refused (22023); a post you can\'t see is not found and left out', async () => {
+      const id = await publishedPost();
+      expect(await code(viewerIn.setReaction(id, '🔥' as never))).toBe('22023');
+      expect(await code(viewerOut.setReaction(id, '❤️'))).toBe('P0002');
+      expect(await viewerOut.reactionSummary([id])).toEqual([]);
+    });
+  });
+
   describe('BETA-REPLY-2 comments', () => {
     it('trimmed body must be 1–500 characters (23514)', async () => {
       const id = await publishedPost();

@@ -6,7 +6,7 @@ import type {
   NotificationPrefs,
   PushPlatform,
   AddCommentArgs, Circle, CommentRow, CreateInviteArgs, CreatePostArgs, FeedArgs, FeedPost,
-  FinalizeResult, HeartState, InvitePreview, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
+  FinalizeResult, HeartState, InvitePreview, Reaction, ReactionState, ReactionSummary, Session, Space, UploadGrant, UploadItemSpec, ViewGrant,
   TimelineArgs, TimelinePost, TimelineYear,
   ChatMember, ChatRow, ChatRowKind, ChatSummary, ClaimedKeyPackage,
 } from './types';
@@ -72,6 +72,10 @@ export interface HearthApi {
   publishPost(post: string): Promise<void>;
   deletePost(post: string): Promise<void>;
   toggleHeart(post: string): Promise<HeartState>;
+  /** REACT-1: the same reaction again takes it back; another switches to it. */
+  setReaction(post: string, emoji: Reaction): Promise<ReactionState>;
+  /** REACT-2: my reaction and per-kind counts; posts I can't see are left out. */
+  reactionSummary(posts: string[]): Promise<ReactionSummary[]>;
   addComment(args: AddCommentArgs): Promise<{ comment_id: string; created_at: string }>;
   getComments(post: string, limit?: number): Promise<CommentRow[]>;
   markSeen(post: string): Promise<void>;

@@ -4,7 +4,7 @@
 // worded tap away. Prototype: prototype/moments.html. Written first.
 import { fireEvent, screen, waitFor, within } from '@testing-library/react-native';
 import React from 'react';
-import { StyleSheet, TextInput } from 'react-native';
+import { StyleSheet, Text, TextInput } from 'react-native';
 import { FIXTURE, FakeBackend } from '../../api/fake/FakeBackend';
 import { seedPost } from '../../test/seed';
 import { expectGrandparentSafe, renderApp } from '../../test/renderApp';
@@ -63,20 +63,51 @@ describe('MOMENT: one compact card per upload', () => {
     expect(flat(tile.props.style).aspectRatio).toBe(0.8);
   });
 
-  it('MOMENT-3 Love it and Comment sit side by side in one row, each with its word', async () => {
+  it('REACT-7 (Chase, Oct 25) Love, Haha, Like and Comment sit in one row as icons only, each labeled for screen readers', async () => {
     const { be, id } = await one();
     await renderApp(<PhotosScreen />, { be, user: 'jo' });
     const card = await screen.findByTestId(`post-${id}`);
     const row = within(card).getByTestId(`actions-${id}`);
     expect(flat(row.props.style).flexDirection).toBe('row');
-    expect(within(row).getByRole('button', { name: 'Love it' })).toBeTruthy();
-    expect(within(row).getByRole('button', { name: 'Write a comment' })).toBeTruthy();
-    expect(within(row).getByText('Love')).toBeTruthy();
-    expect(within(row).getByText('Comment')).toBeTruthy();
-    fireEvent.press(within(row).getByRole('button', { name: 'Love it' }));
-    await waitFor(() => expect(be.state.hearts).toHaveLength(1));
-    expect(await within(card).findByText('1 person loves this')).toBeTruthy();
-    expect(within(row).getByRole('button', { name: 'Love it' }).props.accessibilityState.selected).toBe(true);
+    const names = within(row).getAllByRole('button').map((b) => b.props.accessibilityLabel);
+    expect(names).toEqual(['Love it', 'Haha', 'Like it', 'Write a comment']);
+    // no words under the icons: only the four emoji show
+    const shown = within(row).UNSAFE_queryAllByType(Text).map((t) => String(t.props.children)).join(' ');
+    expect(shown).toBe('❤️ 😂 👍 💬');
+  });
+
+  it('REACT-8 tapping Haha picks it, Love switches to Love, tapping Love again takes it back', async () => {
+    const { be, id } = await one();
+    await renderApp(<PhotosScreen />, { be, user: 'jo' });
+    const card = await screen.findByTestId(`post-${id}`);
+    const row = within(card).getByTestId(`actions-${id}`);
+    const btn = (name: string) => within(row).getByRole('button', { name });
+    fireEvent.press(btn('Haha'));
+    await waitFor(() => expect(be.state.hearts).toEqual([{ post: id, user: FIXTURE.users.jo.id, emoji: '😂' }]));
+    expect(btn('Haha').props.accessibilityState.selected).toBe(true);
+    expect(await within(card).findByText('😂 1')).toBeTruthy();
+    fireEvent.press(btn('Love it'));
+    await waitFor(() => expect(be.state.hearts).toEqual([{ post: id, user: FIXTURE.users.jo.id, emoji: '❤️' }]));
+    expect(btn('Love it').props.accessibilityState.selected).toBe(true);
+    expect(btn('Haha').props.accessibilityState.selected).toBe(false);
+    expect(await within(card).findByText('❤️ 1')).toBeTruthy();
+    fireEvent.press(btn('Love it'));
+    await waitFor(() => expect(be.state.hearts).toHaveLength(0));
+    expect(btn('Love it').props.accessibilityState.selected).toBe(false);
+    expect(within(card).queryByTestId(`reactions-${id}`)).toBeNull();
+  });
+
+  it('REACT-9 the card counts each kind from everyone, most first, and reads it out in words', async () => {
+    const { be, id } = await one();
+    await be.clientFor(FIXTURE.users.alex.id).setReaction(id, '😂');
+    await be.clientFor(FIXTURE.users.chase.id).setReaction(id, '😂');
+    await be.clientFor(FIXTURE.users.jo.id).setReaction(id, '❤️');
+    await renderApp(<PhotosScreen />, { be, user: 'jo' });
+    const card = await screen.findByTestId(`post-${id}`);
+    const line = await within(card).findByTestId(`reactions-${id}`);
+    expect(await within(line).findByText('😂 2   ❤️ 1')).toBeTruthy();
+    expect(line.props.accessibilityLabel).toBe('2 haha, 1 love');
+    expect(within(card).getByRole('button', { name: 'Love it' }).props.accessibilityState.selected).toBe(true);
   });
 
   it('MOMENT-4 the reply box is one row with Send beside it, says who will read it, and no Delete sits on the card', async () => {

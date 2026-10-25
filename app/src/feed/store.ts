@@ -1,6 +1,6 @@
 // Feed cache: keyset pagination over get_feed, a per-user cached first page for instant opens,
 // and optimistic hearts, comments and deletes. Framework-free; React reads it through useFeed().
-import type { CommentRow, FeedPost, HearthApi } from '../api/HearthApi';
+import type { CommentRow, FeedPost, HearthApi, Reaction, ReactionCounts } from '../api/HearthApi';
 import { uuid as realUuid } from '../crypto/random';
 import { messageFor } from '../errors/messages';
 import type { KV } from '../platform/kv';
@@ -40,7 +40,7 @@ const cacheKey = (user: string, space: string) => `hearth.feedCache.v1.${user}.$
 export class FeedStore {
   private state: FeedState = { posts: [], status: 'idle', loaded: false, hasMore: false, notice: null, comments: {}, drafts: {}, opened: {} };
   private listeners = new Set<() => void>();
-  private pendingHearts = new Map<string, { i_hearted: boolean; heart_count: number }>();
+  private pendingHearts = new Map<string, Pick<FeedPost, 'i_hearted' | 'heart_count' | 'my_reaction' | 'reaction_counts'>>();
   private heartSeq = new Map<string, number>();
   private heartQueue = new Map<string, Promise<void>>();
   private deleting = new Set<string>();
@@ -96,8 +96,9 @@ export class FeedStore {
     try {
       const rows = await this.o.api.getFeed({ space: this.o.spaceId, limit: this.pageSize });
       this.set({ posts: this.overlay(rows), loaded: true, hasMore: rows.length >= this.pageSize, status: 'idle' });
-      void this.o.kv.setItem(cacheKey(this.o.userId, this.o.spaceId), JSON.stringify(rows)).catch(() => {});
       this.o.onRefreshed?.(rows);
+      const withReactions = await this.addReactions(rows);
+      void this.o.kv.setItem(cacheKey(this.o.userId, this.o.spaceId), JSON.stringify(withReactions)).catch(() => {});
     } catch (e) {
       this.set({ status: 'idle' });
       this.notice(e);
@@ -116,9 +117,28 @@ export class FeedStore {
         hasMore: rows.length >= this.pageSize,
         status: 'idle',
       });
+      await this.addReactions(rows);
     } catch (e) {
       this.set({ status: 'idle' });
       this.notice(e);
+    }
+  }
+
+  /** REACT-2: which reaction is mine and how many of each, laid onto posts already showing. An older server
+   *  (no reaction_summary) or a failed call leaves the hearts-only view. */
+  private async addReactions(rows: FeedPost[]): Promise<FeedPost[]> {
+    if (!rows.length) return rows;
+    try {
+      const sums = new Map((await this.o.api.reactionSummary(rows.map((r) => r.post_id))).map((s) => [s.post_id, s]));
+      for (const [id, s] of sums) {
+        if (!this.pendingHearts.has(id)) this.patchPost(id, { my_reaction: s.my_reaction, reaction_counts: s.counts });
+      }
+      return rows.map((r) => {
+        const s = sums.get(r.post_id);
+        return s ? { ...r, my_reaction: s.my_reaction, reaction_counts: s.counts } : r;
+      });
+    } catch {
+      return rows;
     }
   }
 
@@ -139,13 +159,25 @@ export class FeedStore {
   adopt(post: FeedPost): void {
     if (this.find(post.post_id)) return;
     this.set({ opened: { ...this.state.opened, [post.post_id]: post } });
+    void this.addReactions([post]);
   }
 
-  async toggleHeart(id: string): Promise<void> {
+  toggleHeart(id: string): Promise<void> {
+    return this.react(id, '❤️');
+  }
+
+  /** REACT-1: tap a reaction; the same one again takes it back, another switches to it. Shows at once. */
+  async react(id: string, emoji: Reaction): Promise<void> {
     const p = this.find(id);
     if (!p) return;
-    const before = { i_hearted: p.i_hearted, heart_count: p.heart_count };
-    const guess = { i_hearted: !p.i_hearted, heart_count: Math.max(0, p.heart_count + (p.i_hearted ? -1 : 1)) };
+    const before = { i_hearted: p.i_hearted, heart_count: p.heart_count, my_reaction: p.my_reaction, reaction_counts: p.reaction_counts };
+    const had: Reaction | null = p.my_reaction !== undefined ? p.my_reaction : p.i_hearted ? '❤️' : null;
+    const now = had === emoji ? null : emoji;
+    const counts: ReactionCounts = { ...(p.reaction_counts ?? (p.heart_count ? { '❤️': p.heart_count } : {})) };
+    if (had) counts[had] = Math.max(0, (counts[had] ?? 1) - 1);
+    if (now) counts[now] = (counts[now] ?? 0) + 1;
+    for (const k of Object.keys(counts) as Reaction[]) if (!counts[k]) delete counts[k];
+    const guess = { i_hearted: !!now, heart_count: Math.max(0, p.heart_count + (now ? 1 : 0) - (had ? 1 : 0)), my_reaction: now, reaction_counts: counts };
     this.pendingHearts.set(id, guess);
     this.patchPost(id, guess);
     // HARD-9: a quick double tap goes to the server in order, and only the newest tap's answer is shown.
@@ -154,10 +186,10 @@ export class FeedStore {
     const latest = () => this.heartSeq.get(id) === seq;
     const run = (this.heartQueue.get(id) ?? Promise.resolve()).then(async () => {
       try {
-        const real = await this.o.api.toggleHeart(id);
+        const real = await this.o.api.setReaction(id, emoji);
         if (!latest()) return;
         this.pendingHearts.delete(id);
-        this.patchPost(id, { i_hearted: real.i_hearted, heart_count: real.heart_count });
+        this.patchPost(id, { i_hearted: !!real.my_reaction, heart_count: real.heart_count, my_reaction: real.my_reaction, reaction_counts: real.counts });
       } catch (e) {
         if (latest()) {
           this.pendingHearts.delete(id);
