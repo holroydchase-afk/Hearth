@@ -12,7 +12,15 @@ elif ! JSON=$(curl -sS --fail --max-time 20 "$URL" 2>/dev/null); then
   echo "Expo Go check: could not reach $URL, so we can't tell whether Expo Go still runs our SDK." >&2; exit 1
 fi
 APP=$(python3 -I -c "import json,re; print(re.search(r'(\d+)\.', json.load(open('app/package.json'))['dependencies']['expo']).group(1))")
-GO=$(printf '%s' "$JSON" | python3 -I -c "import json,sys; v=json.load(sys.stdin).get('expoGoSdkVersion') or ''; print(v.split('.')[0])" 2>/dev/null)
+# EXPO-5: expoGoSdkVersion can lag the App Store (Oct 26 2026: phones ran 58, it said 57), so the newest
+# released SDK with an iPhone Expo Go client counts too.
+GO=$(printf '%s' "$JSON" | python3 -I -c "
+import json, sys
+d = json.load(sys.stdin); d = d.get('data', d)
+majors = [int(v.split('.')[0]) for v in [d.get('expoGoSdkVersion') or ''] if v]
+majors += [int(k.split('.')[0]) for k, s in (d.get('sdkVersions') or {}).items()
+           if isinstance(s, dict) and s.get('iosClientVersion') and not s.get('beta')]
+print(max(majors) if majors else '')" 2>/dev/null)
 if [[ -z $GO ]]; then echo "Expo Go check: Expo's answer has no expoGoSdkVersion; check expo.dev/go by hand." >&2; exit 1; fi
 if [[ $APP != "$GO" ]]; then
   echo "Expo Go check FAILED: the app is on SDK $APP, but the App Store's Expo Go runs only SDK $GO." >&2

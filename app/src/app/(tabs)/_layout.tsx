@@ -48,7 +48,11 @@ export default function TabsLayout() {
         <HearthTabBar
           role={role}
           current={props.state.routes[props.state.index]!.name as TabName}
-          onNavigate={(t) => props.navigation.navigate(t)}
+          onNavigate={(t) => {
+            // SDK 58: the tab bar gets navigateToTab(routeKey) instead of navigation.
+            const key = props.state.routes.find((r) => r.name === t)?.key;
+            if (key) props.navigateToTab(key);
+          }}
         />
       )}
     >

@@ -78,7 +78,7 @@ export function EventsScreen({ posts, view, hasMore, loadingMore, onLoadMore, on
           </View>
         }
         ListEmptyComponent={<Txt variant="muted">No events yet.</Txt>}
-        ListFooterComponent={more}
+        ListFooterComponent={more ?? undefined}
         contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 32 }}
         removeClippedSubviews={false}
       />
@@ -156,7 +156,7 @@ function EventTimeline({ posts, fromList, more, onOpen, onClose }: {
           </View>
         }
         ListEmptyComponent={<Txt variant="muted">No photos here yet.</Txt>}
-        ListFooterComponent={more as React.ReactElement | null}
+        ListFooterComponent={(more as React.ReactElement | null) ?? undefined}
         contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 32 }}
         removeClippedSubviews={false}
       />

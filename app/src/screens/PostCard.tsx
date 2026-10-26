@@ -1,5 +1,5 @@
 import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TextInput, type TextInputInstance, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { REACTIONS, type FeedPost, type Reaction } from '../api/HearthApi';
 import type { CommentView } from '../feed/store';
@@ -24,7 +24,7 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
   const ready = post.media.filter((m) => m.status === 'ready');
   const mine = post.author_id === session?.userId;
   const [sheet, setSheet] = useState<'comments' | 'more' | 'delete' | null>(null);
-  const box = useRef<TextInput>(null);
+  const box = useRef<TextInputInstance>(null);
 
   useEffect(() => {
     feed?.markSeen(post);
@@ -186,7 +186,7 @@ function CommentList({ post, list }: { post: FeedPost; list: CommentView[] }) {
 
 /** DEC-30: the reply box stays on every card with its "who will read this" line (no extra tap for LG),
  *  now as one row: the box with Send beside it (MOMENT-4). */
-const ReplyBox = forwardRef<TextInput, { post: FeedPost; mine: boolean }>(function ReplyBox({ post, mine }, ref) {
+const ReplyBox = forwardRef<TextInputInstance, { post: FeedPost; mine: boolean }>(function ReplyBox({ post, mine }, ref) {
   const { feed, session, deps } = useApp();
   const { c, t, os } = useTheme();
   // REPLY-11 (0011): the server names exactly who will read my reply; until it answers (or on an older
