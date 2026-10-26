@@ -15,6 +15,11 @@ APP_MAJOR=$(python3 -I -c "import json,re; print(re.search(r'(\d+)\.', json.load
 echo "{\"expoGoSdkVersion\": \"$APP_MAJOR.0.0\"}" > "$T/same.json"
 echo "{\"expoGoSdkVersion\": \"$((APP_MAJOR + 1)).0.0\"}" > "$T/newer.json"
 echo '{"sdkVersions": {}}' > "$T/missing.json"
+# EXPO-5 (Oct 26 2026): Expo Go on the App Store moved to SDK 58 while expoGoSdkVersion still said 57.
+# A newer SDK that is released (not beta) with an iOS Expo Go client counts as what phones run.
+N=$((APP_MAJOR + 1))
+echo "{\"expoGoSdkVersion\": \"$APP_MAJOR.0.0\", \"sdkVersions\": {\"$N.0.0\": {\"iosClientVersion\": \"$N.0.7\"}}}" > "$T/stale.json"
+echo "{\"expoGoSdkVersion\": \"$APP_MAJOR.0.0\", \"sdkVersions\": {\"$N.0.0\": {\"beta\": true, \"iosClientVersion\": \"$N.0.0\"}}}" > "$T/beta.json"
 
 check "EXPO-4: script exists" "[[ -f scripts/check-expo-go.sh ]]"
 
@@ -23,6 +28,12 @@ check "EXPO-4: passes when Expo Go runs the app's SDK" "(( rc == 0 )) && grep -q
 
 EXPO_VERSIONS_FILE="$T/newer.json" bash scripts/check-expo-go.sh >"$T/out" 2>&1; rc=$?
 check "EXPO-4: fails when Expo Go has moved on, naming both versions" "(( rc != 0 )) && grep -q \"SDK $APP_MAJOR\" '$T/out' && grep -q \"SDK $((APP_MAJOR + 1))\" '$T/out'"
+
+EXPO_VERSIONS_FILE="$T/stale.json" bash scripts/check-expo-go.sh >"$T/out" 2>&1; rc=$?
+check "EXPO-5: fails when a newer released SDK has an iPhone Expo Go, even if expoGoSdkVersion lags" "(( rc != 0 )) && grep -q \"SDK $N\" '$T/out'"
+
+EXPO_VERSIONS_FILE="$T/beta.json" bash scripts/check-expo-go.sh >"$T/out" 2>&1; rc=$?
+check "EXPO-5: a newer SDK still in beta doesn't count" "(( rc == 0 ))"
 
 EXPO_VERSIONS_FILE="$T/missing.json" bash scripts/check-expo-go.sh >"$T/out" 2>&1; rc=$?
 check "EXPO-4: fails closed when Expo's answer has no Expo Go version" "(( rc != 0 ))"

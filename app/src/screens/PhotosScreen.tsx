@@ -116,12 +116,12 @@ export function PhotosScreen() {
         data={rows}
         keyExtractor={(r) => r.key}
         renderItem={renderRow}
-        ListHeaderComponent={header}
-        ListEmptyComponent={empty}
+        ListHeaderComponent={header ?? undefined}
+        ListEmptyComponent={empty ?? undefined}
         ListFooterComponent={
           state.hasMore ? (
             <Button label="Show older photos" variant="secondary" busy={state.status === 'loadingMore'} onPress={() => void feed.loadMore()} />
-          ) : null
+          ) : undefined
         }
         onEndReached={() => void feed.loadMore()}
         onEndReachedThreshold={0.5}

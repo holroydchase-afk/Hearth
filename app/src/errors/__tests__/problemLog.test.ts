@@ -58,7 +58,7 @@ describe('DBG-1 on-device problem log', () => {
       appVersion: pkg.version,
       updateId: expect.any(String),
       platform: expect.stringMatching(/^(ios|android|web)/),
-      expoSdk: '57',
+      expoSdk: require('../../../package.json').dependencies.expo.match(/(\d+)\./)[1], // the app's Expo SDK major
     });
   });
 

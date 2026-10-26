@@ -1,5 +1,10 @@
 # Handoff
 
+## Oct 26: SDK 58 (branch claude/project-thread-d16zyx, PR)
+- **Why:** Chase's Expo Go moved to SDK 58, so the SDK 57 reactions update wouldn't open ("No launchable updates"). The Expo Go check missed it because Expo's `expoGoSdkVersion` lagged (LESSONS.md, Oct 26).
+- **Done:** expo 58.0.19, React Native 0.88, jest-expo 58, jest 30; `app/.npmrc` keeps legacy peer deps until the tests move to @testing-library/react-native 14. Check fixed (EXPO-5). 0017 and the Oct 25 reactions are already on the server.
+- **Next exact step:** Chase says "merge, publish"; then he opens the standing Expo Go link.
+
 ## Oct 25: Love, Haha, Like and Comment reactions (branch claude/project-thread-d16zyx, draft PR)
 - **Why:** Chase, Oct 25: "I want the love, haha, like, comment. Just emojis/icons, no label." New scope under the Polish Freeze, on his explicit word; icon-only overrides DS-3 (DEC-38, persona check `decisions/2026-10-25-reactions.md`).
 - **Built, test-first:** migration 0017 (`set_reaction`, `reaction_summary`; `backend/tests/reactions_test.sql`, REACT-1..6), `HearthApi.setReaction` / `reactionSummary` (Fake, Supabase with a hearts-only fallback before 0017, contract tests), the store's `react()`, and the card row ❤️ 😂 👍 💬 with per-kind counts (REACT-7..9 in `moments.test.tsx`).
