@@ -134,7 +134,7 @@ export function TimelineScreen({ startAt, onClose }: { startAt: string | null; o
         ListFooterComponent={
           state.hasMore ? (
             <Button label="Show older photos" variant="secondary" busy={state.status === 'loadingMore'} onPress={() => void store.loadMore()} />
-          ) : null
+          ) : undefined
         }
         onEndReached={() => void store.loadMore()}
         onEndReachedThreshold={0.5}
