@@ -1,5 +1,10 @@
 # Handoff
 
+## Oct 26: UI review of the Photos screen (ux-reviewer, review only)
+- Score 5/10 (baseline 2/10), from Chase's phone screenshot plus the web demo at 390 and 1280. Ranked fixes: `/mnt/project-files/reviews/2026-10-26-photos-screen-review.md`.
+- Chase's call: auto-refresh plus pull-to-refresh instead of "Check for new photos"; common system icons (sort, refresh) with a word under them. Top fix: clear the header so the first photo is above the fold.
+- **Parked (Polish Freeze):** filter Photos by group (Chase, Oct 26). Sort stays in scope as the existing "Show by date".
+
 ## Oct 26: SDK 58 (branch claude/project-thread-d16zyx, PR)
 - **Why:** Chase's Expo Go moved to SDK 58, so the SDK 57 reactions update wouldn't open ("No launchable updates"). The Expo Go check missed it because Expo's `expoGoSdkVersion` lagged (LESSONS.md, Oct 26).
 - **Done:** expo 58.0.19, React Native 0.88, jest-expo 58, jest 30; `app/.npmrc` keeps legacy peer deps until the tests move to @testing-library/react-native 14. Check fixed (EXPO-5). 0017 and the Oct 25 reactions are already on the server.
