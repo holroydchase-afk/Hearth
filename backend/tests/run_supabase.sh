@@ -18,4 +18,7 @@ done
 echo "== tests/setup_api_test.sh (fresh db reset)" >&2
 $SB db reset --local >&2
 SETUP_TEST_DB_URL=$DB_URL bash tests/setup_api_test.sh || STATUS=1
+# RELAY-1..9: the shared messenger library's relay template on the real stack (one transaction, rolled back)
+echo "== ../packages/messenger/relay/test.sql" >&2
+psql "$DB_URL" -v ON_ERROR_STOP=1 -X -q -f ../packages/messenger/relay/test.sql >/dev/null || STATUS=1
 exit $STATUS

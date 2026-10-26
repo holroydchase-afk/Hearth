@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 26: the messenger is now a shared library (branch claude/project-thread-tzgzk8, PR)
+- **Why:** Chase, Oct 26: "proceed. Build the library" so Crew Clock can use it too (STU-DEC-1, DEC-39). He asked for it directly, so this goes ahead under the Polish Freeze, with no change to what users see.
+- **Done:** `packages/messenger` (`@holroyd/messenger`): the engine and noble-only ciphersuite behind Relay, Roster and Store, plus `relay/supabase.sql` (0015 without Hearth; each product writes `private.messenger_people`). **License: AGPL-3.0-or-later, copyright Chase Holroyd**: `packages/messenger/LICENSE`, plus SPDX headers on every file. Hearth's `app/src/messenger/client.ts` and `mlsCrypto.ts` are now thin adapters. Storage keys are unchanged, so phones keep their chats. Wiring: the app links the library with `file:../packages/messenger`; `app/metro.config.js` (watchFolders, nodeModulesPaths), `preserveSymlinks` in tsconfig, and Jest `roots` and `modulePaths`.
+- **Tests:** PKG-1..6 (engine on test fakes, run in the app suite), RELAY-1..9 (`packages/messenger/relay/test.sql`, run by `backend/tests/run.sh` and `run_supabase.sh`), all MSG tests unchanged. The iOS bundle compiles with the library inside.
+- **Next exact step:** Chase says "merge". Then he pastes the Product Studio and Crew Clock prompts from the thread "Built-in messenger". No deploy is needed (no migration change).
+
 ## Oct 26: SDK 58 (branch claude/project-thread-d16zyx, PR)
 - **Why:** Chase's Expo Go moved to SDK 58, so the SDK 57 reactions update wouldn't open ("No launchable updates"). The Expo Go check missed it because Expo's `expoGoSdkVersion` lagged (LESSONS.md, Oct 26).
 - **Done:** expo 58.0.19, React Native 0.88, jest-expo 58, jest 30; `app/.npmrc` keeps legacy peer deps until the tests move to @testing-library/react-native 14. Check fixed (EXPO-5). 0017 and the Oct 25 reactions are already on the server.
