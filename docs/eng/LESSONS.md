@@ -2,6 +2,16 @@
 
 One entry per post mortem, newest first. Each entry gives what happened, why, and the rule or guard that now prevents it. Every agent follows the rules here.
 
+## Oct 26, 2026: Expo Go moved to SDK 58 and our guard didn't notice
+
+**What happened.** On Oct 25 we published the reactions update (SDK 57). Chase's Expo Go had updated to SDK 58, and it said "Failed to launch embedded or launchable update: No launchable updates found in database". We lost an evening to a republish and a cache theory before Chase saw the SDK himself. PR for this entry moves the app to SDK 58 (expo 58.0.19, React Native 0.88, checked on npm Oct 26).
+
+**Why.** `scripts/check-expo-go.sh` trusted `expoGoSdkVersion` from api.expo.dev, which still said 57 while the API's own `sdkVersions` already listed 58 as released with iOS Expo Go 58.0.7. The publish therefore passed the guard. The error message names no SDK, so it didn't point at the cause.
+
+**Rules from now on.**
+1. The guard (EXPO-5) now counts the newest released SDK that has an iPhone Expo Go, not just `expoGoSdkVersion`.
+2. When Expo Go says "No launchable updates", check the SDK first: ask Chase what Expo Go's Settings or Profile screen says, or compare `npm view expo dist-tags.latest` with `app/package.json`.
+
 ## Oct 18, 2026: Hearth wouldn't open in Expo Go (SDK 54 vs 57)
 
 Full post mortem (Claude Doc): https://claude.ai/code/artifact/730d2640-da97-4612-a22a-86abd9493f84
