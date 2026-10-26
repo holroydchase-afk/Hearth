@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.15",
+    "@holroyd/messenger": "file:../packages/messenger",
     "@noble/ciphers": "2.1.1",
     "@noble/curves": "2.0.1",
     "@noble/hashes": "2.0.1",
@@ -79,6 +80,13 @@
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@noble/.*|@supabase/.*|ts-mls|@hpke/.*)"
     ],
-    "testTimeout": 15000
+    "testTimeout": 15000,
+    "roots": [
+      "<rootDir>",
+      "<rootDir>/../packages/messenger"
+    ],
+    "modulePaths": [
+      "<rootDir>/node_modules"
+    ]
   }
 }
