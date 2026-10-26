@@ -17,3 +17,10 @@ export function andList(names: string[]): string {
   if (u.length <= 1) return u[0] ?? '';
   return `${u.slice(0, -1).join(', ')} and ${u[u.length - 1]}`;
 }
+
+/** UI-27: the avatar letter. Skips a leading "The" ("The Holroyds" → "H"); "?" when there's no name. */
+export function initialOf(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  const word = words.length > 1 && words[0]?.toLowerCase() === 'the' ? words[1] : words[0];
+  return word ? word.slice(0, 1).toUpperCase() : '?';
+}

@@ -5,7 +5,7 @@ import { REACTIONS, type FeedPost, type Reaction } from '../api/HearthApi';
 import type { CommentView } from '../feed/store';
 import { useApp, useFeed } from '../state/AppContext';
 import { Button, Card, Confirm, Txt } from '../ui/kit';
-import { andList, people, shortDate } from '../ui/format';
+import { andList, initialOf, people, shortDate } from '../ui/format';
 import { MIN_TARGET, fontFamily, useTheme } from '../ui/theme';
 import { PhotoCollage } from './PhotoCollage';
 
@@ -50,7 +50,7 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
     <Card testID={`post-${post.post_id}`} style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
       <View style={styles.head}>
         <View style={[styles.avatar, { backgroundColor: c.accentSoft }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-          <Txt variant="strong" style={{ color: c.accent }}>{post.author_name.slice(0, 1).toUpperCase()}</Txt>
+          <Txt variant="strong" style={{ color: c.accent }}>{initialOf(post.author_name)}</Txt>
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
           <Txt variant="strong">{post.author_name}</Txt>

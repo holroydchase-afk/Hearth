@@ -282,5 +282,12 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** Chase wants the row to look like the photo apps relatives already use. Screen readers still hear each name; the LG and FA Reds are his override.
 - **Source:** `docs/product/decisions/2026-10-25-reactions.md`, PR for migration 0017
 
+### DEC-39 · Photos refresh on their own; sort uses the system icon (UI-26)
+- **When / status:** Oct 26 · Decided by Chase (thread "Review latest build UI")
+- **Chose:** no "Check for new photos" button (auto-refresh on open and return, plus pull-down); "By date" with the system sort icon beside Messages in one row.
+- **Over:** a worded refresh button and two header rows (R11).
+- **Because:** Chase didn't understand the refresh button and wants common system icons where they're universal. The first photo comes a row sooner.
+- **Source:** `docs/product/decisions/2026-10-26-photos-refresh-sort.md`
+
 ---
-Last updated: Oct 25, 2026 (DEC-38)
+Last updated: Oct 26, 2026 (DEC-39)
