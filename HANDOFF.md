@@ -1,9 +1,11 @@
 # Handoff
 
-## Oct 26: UI review of the Photos screen (ux-reviewer, review only)
-- Score 5/10 (baseline 2/10), from Chase's phone screenshot plus the web demo at 390 and 1280. Ranked fixes: `/mnt/project-files/reviews/2026-10-26-photos-screen-review.md`.
-- Chase's call: auto-refresh plus pull-to-refresh instead of "Check for new photos"; common system icons (sort, refresh) with a word under them. Top fix: clear the header so the first photo is above the fold.
-- **Parked (Polish Freeze):** filter Photos by group (Chase, Oct 26). Sort stays in scope as the existing "Show by date".
+## Oct 26: Photos screen UI review and fixes (branch claude/project-thread-vhp0f2, PR)
+- ux-reviewer on Chase's phone screenshot plus the web demo at 390 and 1280: 5/10 → 6/10. Review: `docs/reviews/2026-10-26-photos-screen.md`.
+- Built test-first: UI-26 no "Check for new photos" button (auto-refresh on open and return, plus pull-down), "By date" with the system sort icon beside Messages in one row (DEC-39); UI-27 avatar letter skips "The".
+- The gear in Chase's screenshot is Expo Go's developer button, not ours.
+- **Parked (Polish Freeze):** filter Photos by group (Chase, Oct 26).
+- Next: publish to Expo Go after merge (Chase's word). Next gap: tall cards from the always-open reply box (DEC-30 keeps it).
 
 ## Oct 26: SDK 58 (branch claude/project-thread-d16zyx, PR)
 - **Why:** Chase's Expo Go moved to SDK 58, so the SDK 57 reactions update wouldn't open ("No launchable updates"). The Expo Go check missed it because Expo's `expoGoSdkVersion` lagged (LESSONS.md, Oct 26).
