@@ -48,6 +48,26 @@ jobs:
       - run: bash scripts/tests/check_expo_go_test.sh
       - run: bash scripts/check-expo-go.sh
 
+  # STARTER-* (docs/supabase-starter/): the reusable Supabase pieces, on plain Postgres. The invite SQL runs
+  # on top of the studio template it extends (studio-agents PR #11, pinned by commit).
+  supabase-starter:
+    name: Supabase starter (invites, deploy, smoke check)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          repository: holroydchase-afk/studio-agents
+          ref: 5a903000543367c0e936e3f7ad9ad3d4712ca0af
+          path: studio-agents
+      - name: Postgres (preinstalled on the runner)
+        run: sudo systemctl start postgresql && sudo -u postgres createuser -s "$USER"
+      - run: bash docs/supabase-starter/tests/scripts_test.sh
+      - run: bash docs/supabase-starter/tests/run-with-template.sh studio-agents/templates/supabase
+
   # ---------------------------------------------------------------------------
   # Backend on a REAL local Supabase stack (S16): Postgres + GoTrue + PostgREST + Kong.
   # ---------------------------------------------------------------------------
