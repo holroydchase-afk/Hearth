@@ -21,6 +21,16 @@ if pg_isready -q 2>/dev/null; then
 else
   suite_skip "backend SQL" "no local Postgres running"
 fi
+if pg_isready -q 2>/dev/null; then
+  suite "Supabase starter scripts" quiet e2e/results/starter-scripts.txt bash docs/supabase-starter/tests/scripts_test.sh
+else
+  suite_skip "Supabase starter scripts" "no local Postgres running"
+fi
+if [ -n "${STUDIO_SUPABASE_TEMPLATE:-}" ] && pg_isready -q 2>/dev/null; then
+  suite "Supabase starter invites" quiet e2e/results/starter-invites.txt bash docs/supabase-starter/tests/run-with-template.sh "$STUDIO_SUPABASE_TEMPLATE"
+else
+  suite_skip "Supabase starter invites" "set STUDIO_SUPABASE_TEMPLATE to studio-agents/templates/supabase; CI runs it"
+fi
 if command -v deno >/dev/null 2>&1; then
   suite "Deno functions" quiet e2e/results/backend-deno.txt bash -c 'cd backend && deno test --allow-env --allow-read supabase/functions/sign-media/ supabase/functions/notify/ tests/templates/'
 else

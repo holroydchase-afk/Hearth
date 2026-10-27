@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 27: Supabase starter pieces for the studio (branch claude/project-thread-0hdj2z, PR)
+- **Why:** Chase, Oct 27, asked to work through the reuse list one item at a time ("Let's go"). That's new scope under the Polish Freeze, on his explicit word. This is Hearth's half of pm-tools `docs/intakes/hearth-supabase-starter.md` (Crew Clock needs Supabase next).
+- **Built, test-first:** `docs/supabase-starter/` holds invite codes on the studio template's orgs (STARTER-INV-1..7, 25 checks) and token-only `deploy.sh` and `smoke-check.sh` with no Hearth defaults (STARTER-DEPLOY-1..5, STARTER-SMOKE-1..2, 17 checks). There's a new CI job `supabase-starter` (studio-agents pinned at 5a90300, PR #11). Hearth's own backend is unchanged.
+- **Also from the list:** the other gaps (ACCOUNTS template, architecture skeleton, check-agents and check-logs scripts) went to Product Studio as an INTAKE. The photo privacy library and the other Expo-only pieces are skipped: STACK.md says to extract only once a second product needs something.
+- **Next exact step:** Chase says "merge". Then Product Studio copies the four files into studio-agents `templates/supabase/` (see the folder's README).
+
 ## Oct 26: SDK 58 (branch claude/project-thread-d16zyx, PR)
 - **Why:** Chase's Expo Go moved to SDK 58, so the SDK 57 reactions update wouldn't open ("No launchable updates"). The Expo Go check missed it because Expo's `expoGoSdkVersion` lagged (LESSONS.md, Oct 26).
 - **Done:** expo 58.0.19, React Native 0.88, jest-expo 58, jest 30; `app/.npmrc` keeps legacy peer deps until the tests move to @testing-library/react-native 14. Check fixed (EXPO-5). 0017 and the Oct 25 reactions are already on the server.
