@@ -1,5 +1,13 @@
 # Handoff
 
+## Parked (Polish Freeze)
+- **Post titles and captions (CAP-*, TRACKER R21).** Plan only: `docs/product/SPEC-CAPTIONS.md`, persona check `docs/product/decisions/2026-10-27-post-titles-captions.md`. Build when Chase says "lift Polish Freeze" or "go captions".
+
+## Oct 27: plan for post titles and captions (branch claude/project-thread-095lsp, PR)
+- **Why:** Chase, Oct 27: "the poster should be able to have a social media type post describing the set of pictures. Similar to Instagram and Facebook." The Polish Freeze is on, so this is a plan, not a build.
+- **Planned:** an optional 80-character title plus today's caption for the whole set, folded with Read more, changeable by the sender from More (no notice, comments kept), one title for a bulk send; no per-photo captions, mentions, hashtags, links or AI help (AI-FEATURES R6). Words stay out of every notice and log. Migration 0018 sketched, size M.
+- **Next exact step:** Chase answers CAP-D1..D4 (Claude's picks are in the spec) and says "merge"; the build waits for the freeze to lift.
+
 ## Oct 27: Supabase starter pieces for the studio (branch claude/project-thread-0hdj2z, PR)
 - **Why:** Chase, Oct 27, asked to work through the reuse list one item at a time ("Let's go"). That's new scope under the Polish Freeze, on his explicit word. This is Hearth's half of pm-tools `docs/intakes/hearth-supabase-starter.md` (Crew Clock needs Supabase next).
 - **Built, test-first:** `docs/supabase-starter/` holds invite codes on the studio template's orgs (STARTER-INV-1..7, 25 checks) and token-only `deploy.sh` and `smoke-check.sh` with no Hearth defaults (STARTER-DEPLOY-1..5, STARTER-SMOKE-1..2, 17 checks). There's a new CI job `supabase-starter` (studio-agents pinned at 5a90300, PR #11). Hearth's own backend is unchanged.
