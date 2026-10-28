@@ -18,6 +18,8 @@ export interface DemoPicture { display: Uint8Array; thumb: Uint8Array; width: nu
 type Who = 'jo' | 'ruth' | 'earl' | 'alex';
 export interface DemoPost {
   caption: string;
+  /** CAP-12: an optional title on a few moments. */
+  title?: string;
   pictures: string[];
   to: 'everyone' | 'dadSide' | 'momSide';
   daysAgo: number;
@@ -27,7 +29,7 @@ export interface DemoPost {
 
 /** Oldest first. Grandma Jo is on Dad's side, so she never sees the Mom's-side posts (DEMO-10). */
 export const DEMO_POSTS: DemoPost[] = [
-  { caption: 'Beach weekend. Found these on my phone from August', pictures: ['beach'], to: 'everyone', daysAgo: 24,
+  { title: 'Beach weekend', caption: 'Found these on my phone from August', pictures: ['beach'], to: 'everyone', daysAgo: 24,
     hearts: ['jo', 'ruth', 'earl'], replies: [{ who: 'ruth', body: 'Look at that sky!' }] },
   { caption: 'First day of second grade. Leo wanted the front seat', pictures: ['bus'], to: 'everyone', daysAgo: 19,
     hearts: ['jo', 'ruth', 'earl', 'alex'], replies: [{ who: 'jo', body: 'So grown up! Tell him Grandma is proud.' }] },
@@ -36,7 +38,7 @@ export const DEMO_POSTS: DemoPost[] = [
   { caption: "Mia's sunflowers are taller than she is", pictures: ['sunflowers'], to: 'momSide', daysAgo: 12,
     hearts: ['ruth'], replies: [{ who: 'ruth', body: 'Your grandpa would love that garden.' }] },
   { caption: 'Canoe day at the lake', pictures: ['lake'], to: 'momSide', daysAgo: 9, hearts: ['ruth'], replies: [] },
-  { caption: 'Mia turned 5!', pictures: ['cake', 'sunflowers'], to: 'everyone', daysAgo: 6,
+  { title: "Mia's 5th birthday", caption: 'Mia turned 5!', pictures: ['cake', 'sunflowers'], to: 'everyone', daysAgo: 6,
     hearts: ['jo', 'ruth', 'earl', 'alex'], replies: [{ who: 'jo', body: 'Happy birthday, sweet girl!' }, { who: 'ruth', body: 'Five already!' }] },
   { caption: 'Pumpkin patch day', pictures: ['pumpkins'], to: 'dadSide', daysAgo: 2,
     hearts: ['jo'], replies: [{ who: 'jo', body: 'Save me one for a pie!' }] },
@@ -63,7 +65,7 @@ export async function seedDemo(be: FakeBackend, load: (name: string) => Promise<
     } catch {
       continue; // a picture that didn't load skips its post; the rest of the family still shows
     }
-    const post = be.createPost(parent, { clientId: `demo-${n}`, space: F.space.id, caption: p.caption, circleIds: [F.circles[p.to].id] });
+    const post = be.createPost(parent, { clientId: `demo-${n}`, space: F.space.id, caption: p.caption, title: p.title ?? null, circleIds: [F.circles[p.to].id] });
     const grant = be.signUpload(parent, post, pics.map((pic) => ({
       kind: 'photo', mime_type: 'image/jpeg', width: pic.width, height: pic.height, byte_size: 0, thumb_byte_size: 0, exif_stripped: true,
     })));

@@ -38,6 +38,8 @@ interface PostRow {
   deleted: boolean; circles: string[]; client_id: string; created_at: string; published_at: string | null;
   /** 0010: capture time read on the phone; batch id/size of a bulk pick. */
   taken_at?: string | null; batch_id?: string | null; batch_size?: number | null;
+  /** 0019 (CAP-1): optional title, null when blank. */
+  title?: string | null;
 }
 interface MediaRow {
   id: string; post: string; position: number; kind: MediaKind; mime: string; width: number; height: number;
@@ -469,6 +471,7 @@ export class FakeBackend {
         author_id: p.author,
         author_name: this.state.users[p.author]?.name ?? '',
         caption: p.caption,
+        title: p.title ?? null,
         published_at: p.published_at!,
         media: Object.values(this.state.media).filter((m) => m.post === p.id).sort((x, y) => x.position - y.position)
           .map((m) => ({ media_id: m.id, kind: m.kind, width: m.width, height: m.height, duration_ms: m.duration_ms, status: m.status })),
@@ -501,12 +504,14 @@ export class FakeBackend {
     if (!this.member(a.space, me)) throw new ApiError('42501', 'not a member');
     if (!this.isPoster(a.space, me)) throw new ApiError('42501', 'viewers cannot post');
     if (!a.circleIds.length) throw new ApiError('23514', 'at least one circle');
+    const title = a.title?.trim() || null;
+    if (title && [...title].length > 80) throw new ApiError('23514', 'a title is 80 characters at most');
     if (a.circleIds.some((c) => this.state.circles[c]?.space !== a.space || this.state.circles[c]?.deleted)) throw new ApiError('23514', 'circle not in space');
     const id = uuid();
     this.state.posts[id] = {
       id, space: a.space, author: me, caption: a.caption?.trim() || null, status: 'draft', deleted: false,
       circles: [...new Set(a.circleIds)], client_id: a.clientId, created_at: this.now(), published_at: null,
-      taken_at: a.takenAt ? new Date(a.takenAt).toISOString() : null, batch_id: a.batchId ?? null, batch_size: a.batchSize ?? null,
+      taken_at: a.takenAt ? new Date(a.takenAt).toISOString() : null, batch_id: a.batchId ?? null, batch_size: a.batchSize ?? null, title,
     };
     this.changed();
     return id;

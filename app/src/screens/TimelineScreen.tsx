@@ -169,6 +169,7 @@ function TimelineCard({ post, onOpen }: { post: TimelinePost; onOpen: () => void
         {ready.length > SHOW_INLINE && !all ? (
           <Button label={`Show all ${photos(ready.length)}`} variant="secondary" onPress={() => setAll(true)} />
         ) : null}
+        {post.title ? <Txt variant="title" role="header">{post.title}</Txt> : null}
         {post.caption ? <Txt>{post.caption}</Txt> : null}
         <Button label={`Open ${post.author_name}'s post to love it or write back`} text="Open this post" variant="secondary" onPress={onOpen} />
       </View>

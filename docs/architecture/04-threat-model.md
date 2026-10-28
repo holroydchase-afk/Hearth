@@ -6,7 +6,7 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 
 1. Photos of children, and their capture dates.
 2. Who is in the family and how it is split (sides, households, who sees whom).
-3. Words: captions, comments, names.
+3. Words: titles, captions, comments, names.
 4. Behavior: who opened what, when, from where.
 5. Account identifiers: emails, push tokens, IP addresses.
 
@@ -45,4 +45,4 @@ What Hearth defends, against whom, and where the defense stops today. Written to
 6. Messenger: no key verification (a compromised server could add a hidden phone to a chat), and chat metadata is visible to the server ([06-messenger.md](06-messenger.md)).
 
 ---
-Last checked against code: 2026-10-21, A3 kept photo files (former-member row); earlier 2026-10-19, a522a3a (plus migrations 0014, 0015 messenger) and 624fc39 (MEDIA-1/2/3 on-phone cleaner, ONB-3/4 invite links)
+Last checked against code: 2026-10-28, post titles (migration 0019); earlier 2026-10-21, A3 kept photo files (former-member row); earlier 2026-10-19, a522a3a (plus migrations 0014, 0015 messenger) and 624fc39 (MEDIA-1/2/3 on-phone cleaner, ONB-3/4 invite links)

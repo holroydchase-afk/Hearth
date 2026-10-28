@@ -91,6 +91,8 @@ export interface FeedPost {
    *  Older servers omit it. */
   event_id?: string | null;
   event_name?: string | null;
+  /** 0019 (CAP-3): the set's optional title, 80 characters at most. Older servers omit it. */
+  title?: string | null;
 }
 
 export interface FeedArgs {
@@ -110,6 +112,8 @@ export interface CreatePostArgs {
   /** BETA-BULK-6: posts from one bulk pick share a batch id; size = number of posts in the batch (1-100). Both or neither. */
   batchId?: string | null;
   batchSize?: number | null;
+  /** 0019 (CAP-1): optional title for the whole set, 80 characters at most; blank means none. */
+  title?: string | null;
 }
 
 /** get_timeline (migration 0010, BETA-TIME-2): keyset on (sort_at, post_id). */
