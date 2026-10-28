@@ -34,6 +34,7 @@ export function ShareScreen() {
   const [chosen, setChosen] = useState<string[]>([]);
   const [items, setItems] = useState<QueueItem[]>([]);
   const [caption, setCaption] = useState('');
+  const [title, setTitle] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const userId = app.session?.userId;
@@ -135,9 +136,10 @@ export function ShareScreen() {
     setBusy(true);
     try {
       await saveLastAudience(app.deps.kv, userId, chosen);
-      await app.queue.enqueue({ space: app.space!.space_id, caption: caption.trim() || null, circleIds: chosen, items });
+      await app.queue.enqueue({ space: app.space!.space_id, caption: caption.trim() || null, title: title.trim() || null, circleIds: chosen, items });
       setItems([]);
       setCaption('');
+      setTitle('');
       nav.goPhotos();
     } catch (e) {
       setNotice(messageFor(e, { inviter: app.helper, action: 'post' }));
@@ -184,6 +186,8 @@ export function ShareScreen() {
         </View>
       </Card>
 
+      {/* CAP-1: optional, shown (CAP-D4), 80 characters; nothing asks for it (CAP-R1). */}
+      <Field label="Title (optional)" placeholder="Give it a name, like Lily's 5th birthday" value={title} onChangeText={setTitle} maxLength={80} />
       <Field label="What's happening?" placeholder="Say what's happening (Grandma will see this)" value={caption} onChangeText={setCaption} multiline maxLength={2000} />
 
       <Card>

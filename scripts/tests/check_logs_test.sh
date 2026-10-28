@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# PRIV-2: tests for scripts/check-logs.mjs (never log keys, URLs, captions; CLAUDE.md rule 2).
+# PRIV-2: tests for scripts/check-logs.mjs (never log keys, URLs, captions or titles (CAP-R3); CLAUDE.md rule 2).
 set -u
 cd "$(dirname "$0")/../.."
 pass=0; fail=0
 ok()  { echo "ok      $1"; pass=$((pass+1)); }
 bad() { echo "NOT OK  $1"; fail=$((fail+1)); }
 F=scripts/tests/fixtures/logs
-for f in key url caption message object stringify multiline template stack; do
+for f in key url caption title message object stringify multiline template stack; do
   out=$(node scripts/check-logs.mjs "$F/bad/$f.ts"); rc=$?
   [ $rc -ne 0 ] && echo "$out" | grep -q "bad/$f.ts:" && ok "PRIV-2 flags a bad log call ($f)" || bad "PRIV-2 flags a bad log call ($f)  [rc=$rc: $out]"
 done
