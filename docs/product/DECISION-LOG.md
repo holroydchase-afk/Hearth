@@ -283,7 +283,7 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Source:** `docs/product/decisions/2026-10-25-reactions.md`, PR for migration 0017
 
 ### DEC-39 · Post titles and captions: one set of words per post, editable, encrypted later (CAP-D1..D4)
-- **When / status:** Oct 28 · Decided by Chase ("picks ok"); build parked under the Polish Freeze
+- **When / status:** Oct 28 · Decided by Chase ("picks ok"); not built yet (freezes lifted Oct 28)
 - **Chose:** an optional title and caption for the whole set (CAP-D1); the sender can change them after posting (CAP-D2); the words stay plaintext until the family vault (CAP-D3); the Title box shows, marked optional (CAP-D4).
 - **Over:** a caption per photo; delete and repost (BETA-SPEC); encrypting the words now; a hidden "Add a title" button.
 - **Because:** per-photo boxes turn a 48-photo send into 48 questions for LG; reposting loses comments; encrypting now blocks caption search; a labeled box is easier to skip than a button to find.
