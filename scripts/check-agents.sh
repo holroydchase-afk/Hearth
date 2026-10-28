@@ -10,5 +10,7 @@ done
 for name in $(grep -o '^| `[a-z0-9-]*` |' CLAUDE.md | tr -d '|` '); do
   [ -f ".claude/agents/$name.md" ] || { echo "CLAUDE.md roster lists '$name' but .claude/agents/$name.md doesn't exist"; fail=1; }
 done
+# AGENTS-2: each studio agent carries its Hearth notes, matching docs/eng/AGENT-NOTES.md.
+bash scripts/sync-agents.sh --check || fail=1
 [ $fail -eq 0 ] && echo "Agent roster OK ($(ls .claude/agents/*.md | wc -l) agents)"
 exit $fail

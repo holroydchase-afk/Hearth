@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 28: Hearth moved onto the generic studio agents (TRACKER R16, branch claude/project-thread-0hdj2z, PR)
+- **Why:** Chase, Oct 28: "go over the generic agent updates". This pulls R16 forward from after the beta. It's process only, with no app change, so it fits the Polish Freeze.
+- **Done:** synced from studio-agents main (2f27166): staff-pm, qa-tdd, engineer (replaces app-engineer), privacy-security, positioning (replaces marketing), ux-reviewer and architect (new). grandparent-ux stays Hearth's own. funding-analyst is archived in `docs/archive/agents/`. On Chase's ask ("the strongest agents, don't lose anything, combine and build"), each agent is the studio text plus a built-in "Hearth notes" section generated from `docs/eng/AGENT-NOTES.md` by the new `scripts/sync-agents.sh` (AGENTS-1..3, `scripts/tests/sync_agents_test.sh`). `check-agents.sh` now fails on drift. All the old Hearth agents are kept whole in `docs/archive/agents/`. The CLAUDE.md roster and the live references are updated.
+- **Give-back:** an INTAKE asks Product Studio to add the persona check and the crypto bar to the generic staff-pm and privacy-security (`/mnt/project-files/portfolio/INTAKE-2026-10-28-agent-giveback.md`).
+- **Next exact step:** Chase says "merge".
+
 ## Oct 27: Supabase starter pieces for the studio (branch claude/project-thread-0hdj2z, PR)
 - **Why:** Chase, Oct 27, asked to work through the reuse list one item at a time ("Let's go"). That's new scope under the Polish Freeze, on his explicit word. This is Hearth's half of pm-tools `docs/intakes/hearth-supabase-starter.md` (Crew Clock needs Supabase next).
 - **Built, test-first:** `docs/supabase-starter/` holds invite codes on the studio template's orgs (STARTER-INV-1..7, 25 checks) and token-only `deploy.sh` and `smoke-check.sh` with no Hearth defaults (STARTER-DEPLOY-1..5, STARTER-SMOKE-1..2, 17 checks). There's a new CI job `supabase-starter` (studio-agents pinned at 5a90300, PR #11). Hearth's own backend is unchanged.
