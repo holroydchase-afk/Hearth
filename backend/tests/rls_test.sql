@@ -72,7 +72,7 @@ select tests.ok((select count(*) from circles where space_id = :space_a) = 1,  '
 select tests.throws(format('insert into comments (post_id, author_id, body) values (%L, %L, %L)', :p_a_gp, :gma_chen, 'hi'),
                     'Mom-side grandma cannot comment on a post she cannot see', 'row-level security');
 select tests.throws(format('insert into reactions (post_id, user_id, emoji) values (%L, %L, %L)', :p_a_gp, :gma_chen, '👍'),
-                    'Mom-side grandma cannot react to a post she cannot see', 'row-level security');
+                    'Mom-side grandma cannot react to a post she cannot see (HARD-12: no direct writes at all since 0018)', 'permission denied');
 reset role;
 
 -- ======================================================================
@@ -88,10 +88,11 @@ select tests.ok(not exists (select 1 from circles where space_id = :space_b),  '
 select tests.ok(not exists (select 1 from circles where id = :c_a_co),         'Dad-side grandma cannot see the Co-parent circle exists');
 select tests.lives(format('insert into comments (post_id, author_id, body) values (%L, %L, %L)', :p_a_gp, :gma_riv, 'So proud!'),
                    'Viewer can comment on a visible post');
-select tests.lives(format('update reactions set emoji = %L where post_id = %L and user_id = %L', '😍', :p_a_gp, :gma_riv),
-                   'Viewer can change own reaction');
-select tests.throws(format('insert into reactions (post_id, user_id, emoji) values (%L, %L, %L)', :p_a_gp, :gma_riv, '👍'),
-                    'One reaction per person per post', 'duplicate key');
+-- HARD-12 (0018): a viewer changes her reaction with set_reaction (tests/reactions_test.sql), never the table.
+select tests.lives(format('select public.set_reaction(%L, %L)', :p_a_gp, '👍'),
+                   'Viewer can change own reaction (set_reaction)');
+select tests.ok((select count(*) = 1 from reactions where post_id = :p_a_gp and user_id = :gma_riv),
+                'One reaction per person per post');
 select tests.throws(format('insert into posts (space_id, author_id, caption) values (%L, %L, %L)', :space_a, :gma_riv, 'x'),
                     'Viewer cannot post when viewers_can_post = false', 'row-level security');
 select tests.throws(format('select public.create_post(gen_random_uuid(), %L::uuid, %L, array[%L]::uuid[])', :space_a, 'x', :c_a_all),
