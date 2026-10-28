@@ -1,5 +1,10 @@
 # Handoff
 
+## Oct 28, release M1.1 phase 7: reusable blocks (branch claude/project-thread-kzt7by-rel6, draft PR, stacked on phase 6)
+- **Lesson written:** `docs/eng/LESSONS.md` Oct 28 (every proof runs in CI; a flaky test is a finding; heavy RPCs plan with JIT off).
+- **Give-back (INTAKE only, per STACK.md: no extraction until a second product needs it):** `docs/portfolio/INTAKE-2026-10-28-reusable-blocks.md` (also in the project files) offers Product Studio the jest-expo fetch snippet, the Supabase JIT rule and the CI rule for studio-agents and pm-tools.
+- **Next exact step:** Chase merges #63-#68 in order, says "deploy 0018 and 0019", then pastes the two Oct 28 INTAKEs to Product Studio.
+
 ## Oct 28, release M1.1 phase 6: demo (branch claude/project-thread-kzt7by-rel5, draft PR, stacked on phase 5)
 - **Live today (verified 08:00 UTC):** chaseholroyd.com/demo/hearth/ answers, passes the showcase sweep at phone and laptop width with no console errors (the not-found page's 404 is expected), first card in about 2.1 s. It's the older build: two-line bar, no titles.
 - **New build:** `app/dist-demo-site` from this branch passes `npm run e2e:site` 8/8 on a Pages-like host; first card in about 1.2 s; titles and the new bar and laptop frame show.
