@@ -74,7 +74,8 @@ describe.each(factories)('%s messenger contract (MSG)', (_name, factory) => {
   });
 
   it('T10 / MSG-3: someone added to a group later can\'t fetch the chat rows sent before they joined', async () => {
-    const c = h.circleIn;
+    // REAL-1: a fresh group, since the real harness keeps one database (circleIn's chat is already started).
+    const c = await poster.createLevel(h.spaceId, 'group', `T10 ${Date.now()}`);
     expect(await poster.chatStart(c)).toBe(true);
     await poster.chatSend(c, 'message', 0, b64('before'));
     const newcomer = (await viewerOut.getSession())!.userId;
