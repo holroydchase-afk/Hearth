@@ -2,7 +2,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { AppState, Platform } from 'react-native';
 import type { HearthApi, Session, Space } from '../api/HearthApi';
-import { FeedStore, type FeedState } from '../feed/store';
+import { FeedStore, clearFeedCache, type FeedState } from '../feed/store';
 import { MediaCache } from '../media/cache';
 import type { MediaStore } from '../media/diskCache';
 import { clearArrivals, recordArrival } from '../notify/latency';
@@ -205,6 +205,8 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
     unlisten.current = null;
     const who = live.current.session?.userId;
     if (who) await clearArrivals(deps.kv, who);
+    const space = live.current.space?.space_id;
+    if (who && space) await clearFeedCache(deps.kv, who, space);
     await live.current.media?.clearDisk().catch(() => {});
     await deps.api.signOut().catch(() => {});
     setS(SIGNED_OUT);

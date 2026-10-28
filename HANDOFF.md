@@ -1,5 +1,12 @@
 # Handoff
 
+## Oct 28, release M1.1 phase 4: harden (branch claude/project-thread-kzt7by-rel3, draft PR, stacked on phase 3)
+- **Review:** privacy-security (with the qa-tdd lens) read everything since Oct 24 (`docs/reviews/2026-10-28-harden.md`).
+- **Fixed, test-first:** HARD-12 (P1): members could write reactions straight to the table, skipping the three-emoji list and "replies off". Migration **0018** closes it (not deployed: needs Chase's word). HARD-13: sign out now deletes the cached feed (captions, names, reactions). HARD-17 (P1, found by running the real-API contract 3×): Postgres JIT-compiled the feed query once a family had a few dozen posts, 1.5-2 s per Photos page instead of 20-50 ms; 0018 turns JIT off for it.
+- **Open tickets:** HARD-14 (B11), HARD-15 (T11), HARD-16 (B12), all P2/P3. Captions' sketched migration is now 0019.
+- **Tests (3 green runs):** backend SQL all suites, app Jest, real-API contract, typecheck, PRIV-2 log check.
+- **Next exact step:** Chase says "merge" (after phases 2 and 3), then "deploy 0018" (it speeds up Photos and closes the reactions hole).
+
 ## Oct 28, release M1.1 phase 3: UI to 8/10 (branch claude/project-thread-kzt7by-rel2, draft PR, stacked on phase 2)
 - **Score:** the studio ux-reviewer scored the public demo 5/10 before and 8/10 after (`docs/reviews/2026-10-28-ui-8.md`).
 - **Built, test-first (UI-1..5):** a one-line demo bar with one row of matching chips; a centred laptop frame with proof points and a "Read the case study" link; gray Open buttons in Messages; the demo's Me names Sam instead of a placeholder email; the showcase sweep waits for each screen. Persona check all Green (`docs/product/decisions/2026-10-28-ui-polish.md`).
@@ -21,7 +28,7 @@
 
 ## Oct 27: plan for post titles and captions (branch claude/project-thread-095lsp, PR)
 - **Why:** Chase, Oct 27: "the poster should be able to have a social media type post describing the set of pictures. Similar to Instagram and Facebook." The Polish Freeze is on, so this is a plan, not a build.
-- **Planned:** an optional 80-character title plus today's caption for the whole set, folded with Read more, changeable by the sender from More (no notice, comments kept), one title for a bulk send; no per-photo captions, mentions, hashtags, links or AI help (AI-FEATURES R6). Words stay out of every notice and log. Migration 0018 sketched, size M.
+- **Planned:** an optional 80-character title plus today's caption for the whole set, folded with Read more, changeable by the sender from More (no notice, comments kept), one title for a bulk send; no per-photo captions, mentions, hashtags, links or AI help (AI-FEATURES R6). Words stay out of every notice and log. Migration sketched (now 0019), size M.
 - **Next exact step:** Oct 28, Chase took all four picks (DEC-39) and said merge. Chase lifted all freezes Oct 28; the Oct 28 2:15am release run decides whether and when captions get built (TRACKER R21).
 
 ## Oct 27: Supabase starter pieces for the studio (branch claude/project-thread-0hdj2z, PR)
