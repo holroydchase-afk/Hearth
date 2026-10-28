@@ -529,7 +529,9 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
         if (page.length < 2) break;
         beforeAt = page[page.length - 1]!.sort_at; beforeId = page[page.length - 1]!.post_id;
       }
-      expect(seen).toEqual(all);
+      // REAL-1: the real harness keeps one database for the whole run, so there can be more than one 50-row page.
+      expect(seen.slice(0, all.length)).toEqual(all);
+      if (all.length < 50) expect(seen).toEqual(all);
       expect(new Set(seen).size).toBe(seen.length);
       expect((await viewerIn.getTimeline({ space: h.spaceId, limit: 500 })).length).toBeLessThanOrEqual(50);
     });
