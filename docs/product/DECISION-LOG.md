@@ -282,5 +282,12 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** Chase wants the row to look like the photo apps relatives already use. Screen readers still hear each name; the LG and FA Reds are his override.
 - **Source:** `docs/product/decisions/2026-10-25-reactions.md`, PR for migration 0017
 
+### DEC-39 · Post titles and captions: one set of words per post, editable, encrypted later (CAP-D1..D4)
+- **When / status:** Oct 28 · Decided by Chase ("picks ok"); build parked under the Polish Freeze
+- **Chose:** an optional title and caption for the whole set (CAP-D1); the sender can change them after posting (CAP-D2); the words stay plaintext until the family vault (CAP-D3); the Title box shows, marked optional (CAP-D4).
+- **Over:** a caption per photo; delete and repost (BETA-SPEC); encrypting the words now; a hidden "Add a title" button.
+- **Because:** per-photo boxes turn a 48-photo send into 48 questions for LG; reposting loses comments; encrypting now blocks caption search; a labeled box is easier to skip than a button to find.
+- **Source:** `docs/product/SPEC-CAPTIONS.md`, `docs/product/decisions/2026-10-27-post-titles-captions.md`, TRACKER R21
+
 ---
-Last updated: Oct 25, 2026 (DEC-38)
+Last updated: Oct 28, 2026 (DEC-39)
