@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 28, release M1.1 phase 6: demo (branch claude/project-thread-kzt7by-rel5, draft PR, stacked on phase 5)
+- **Live today (verified 08:00 UTC):** chaseholroyd.com/demo/hearth/ answers, passes the showcase sweep at phone and laptop width with no console errors (the not-found page's 404 is expected), first card in about 2.1 s. It's the older build: two-line bar, no titles.
+- **New build:** `app/dist-demo-site` from this branch passes `npm run e2e:site` 8/8 on a Pages-like host; first card in about 1.2 s; titles and the new bar and laptop frame show.
+- **Portfolio / public presence:** `docs/portfolio/INTAKE-2026-10-28-demo-refresh.md` asks Product Studio to re-copy the demo after Chase merges #63-#66 (a ready tarball is in the project files, `portfolio/hearth-demo-site-2026-10-28.tgz`) and to refresh the page's test counts (660+ app, 960+ database).
+- **Next exact step:** Chase merges #63-#66, then pastes the INTAKE to Product Studio.
+
 ## Oct 28, release M1.1 phase 5: post titles (branch claude/project-thread-kzt7by-rel4, draft PR, stacked on phase 4)
 - **Why this enhancement:** of everything waiting, it's the one a recruiter sees in the first ten seconds of the demo: cards read like real posts ("Mia's 5th birthday", then the caption, then photos). Chase approved the spec's picks (DEC-39), so it's the highest-value item that needs no new call from him.
 - **Built, test-first (CAP-1..5, 10..12):** an optional Title box (80 characters) on Share; the card shows the title as a heading above the caption; a long caption folds to 4 lines with Read more / Show less; By date shows titles too; two demo moments carry titles. Migration **0019** adds `posts.title`, `create_post(p_title)` and the title on `get_feed` / `get_timeline` (not deployed: needs Chase's word, after 0018). The log check now treats `title` like `caption`.
