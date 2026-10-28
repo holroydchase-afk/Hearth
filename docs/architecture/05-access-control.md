@@ -50,6 +50,8 @@ A comment or heart is read only by people who can see the post, and among them b
 | Shared on this group's posts (`on_group_posts`) | Every member of the group, only on posts sent to that group. Default for new events |
 | Always shared (`always`) | Every member of the group, on any post both can see. What households did before 0013 |
 
+Reactions (hearts, and since 0017 ❤️ 😂 👍) change only through `set_reaction` and `toggle_heart`: since 0018 an app user can't insert or update the `reactions` table directly, and the table itself refuses any other emoji, so the three-emoji list and the "replies off" switch can't be skipped (HARD-12).
+
 The settings decide who reads replies, never who sees a post. Everyone's setting can't be changed; the owner's family-wide switch is the only way to open it. One function, `private.group_reply_ok`, holds the group rule, and every reader of replies uses it: `private.reply_ok` (behind RLS on comments and hearts, `get_comments`, `can_see_reply` and `reply_readers`), `reply_scope`, and the feed and timeline counts (`private.feed_rows`).
 
 Readers are **fixed when the reply is written**. Both people must have been in the group by then, the post must already have been sent to the group (for "Shared on this group's posts"), and the reader must already have been able to see the post. A trigger logs every setting with the moment it took effect (`comment_mode_log`); a reply is judged by the **least open** setting the group had at any point from when the reply was written until now (`private.least_open_since`), so turning a group down hides earlier replies at once and turning it up, even back up, never opens them. A change is timed when it is logged (`clock_timestamp()`), not when its transaction began. Times that decide this (a heart's time, an audience row's time, a setting's time) can't be set by the app. The comment box shows the names of who will read it (`public.reply_readers`).
@@ -92,4 +94,4 @@ RLS limits what each family member's app can read. It does not limit Hearth's se
 - **Planned:** event dates (`starts_on`, `ends_on`) exist in the schema but the app doesn't use them yet.
 
 ---
-Last checked against code: 2026-10-22, 10001df (plus migrations 0013, 0015, 0016)
+Last checked against code: 2026-10-28, migration 0018 (reactions only through RPCs); earlier 2026-10-22, 10001df (plus migrations 0013, 0015, 0016)

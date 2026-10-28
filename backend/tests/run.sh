@@ -9,7 +9,7 @@
 #   tests/groups_v2_test.sql  GRP-2..14, FLAG-1..4, EVT-1: plain groups, comment settings, feature flags (SPEC-GROUPS v2, migration 0013)
 #   tests/chat_test.sql       MSG-1..8: messenger relay, MLS bytes only (SPEC-MESSENGER, migration 0015)
 #   tests/photo_helpers_test.sql  HELP-R4: photo helper off-switches, on by default for posters (SPEC-PHOTO-HELPERS, migration 0016)
-#   tests/reactions_test.sql  REACT-1..6: Love, Haha, Like (migration 0017)
+#   tests/reactions_test.sql  REACT-1..6: Love, Haha, Like (migration 0017); HARD-12: only through the RPCs (0018)
 #   tests/aud16/  BETA-AUD-16: snapshot on 0001-0010, apply 0011+, diff (0011 must change nobody's access)
 #   tests/grp1/   GRP-1/GRP-2: snapshot on 0001-0012, apply 0013+, diff (0013 must change nobody's access)
 # Usage: tests/run.sh   (needs a local Postgres 15+; PGUSER must be a superuser)

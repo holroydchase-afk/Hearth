@@ -362,6 +362,14 @@ select tests.ok(coalesce(cardinality(tests.tl(:space_a)), -1) = 0,
 select tests.ok_sql(format($$select count(*) = 0 from public.get_timeline_years(%L, 'UTC')$$, :space_a),
                     'BETA-TIME-4 removed from the family: her years list is empty (no counts survive)');
 
+-- ---------- HARD-17 (migration 0018): the feed and timeline never wait on JIT ----------
+-- Once a family has a few dozen posts, Postgres's estimate for feed_rows passes jit_above_cost and it compiles
+-- the query first: 1.5-2 s per Photos or By date page on the test harness, 20-50 ms without it.
+:as_admin
+select tests.ok((select 'jit=off' = any (p.proconfig) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+                  where n.nspname = 'private' and p.proname = 'feed_rows'),
+                'HARD-17 feed_rows runs with JIT off');
+
 -- ======================================================================
 -- Summary
 -- ======================================================================
