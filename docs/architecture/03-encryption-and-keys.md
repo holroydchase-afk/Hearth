@@ -8,7 +8,7 @@ What is encrypted, with which keys, and who can decrypt it. The short version: *
 |---|---|---|---|
 | Photo bytes (display and thumbnail) | AES-256-GCM, per-item key, encrypted on the phone | TLS | The family members the post is shared with, and Hearth's server (via `MEDIA_KEK`) |
 | Per-item keys | Wrapped with AES-KW under `MEDIA_KEK`, in a table no client can read | TLS | Hearth's server |
-| Captions, comments, names, groups, emails | Plaintext columns; disk-level encryption by Supabase | TLS | Hearth's server and Supabase |
+| Titles, captions, comments, names, groups, emails | Plaintext columns; disk-level encryption by Supabase | TLS | Hearth's server and Supabase |
 | Chat messages | MLS (RFC 9420), sealed on the phone; history on each phone, AES-256-GCM at rest | TLS | Only the people in the chat ([06-messenger.md](06-messenger.md)) |
 | Notices | Not stored after sending | TLS | Resend, Expo, Apple, Google (display names and counts only) |
 
@@ -56,4 +56,4 @@ Each step makes one more claim true. Order and status live in `docs/product/MARK
 4. **The family vault** (post-beta, opt-in). Keys live only on family devices, with a printed recovery card; Hearth's server can no longer decrypt. This is the only step that would make "end-to-end encrypted" true.
 
 ---
-Last checked against code: 2026-10-23, web storage fallback (platform/webStorage.ts); earlier 2026-10-21, A3 kept ciphertext files and keychain-sealed keys (media/cache.ts, platform/mediaStore.ts) and A1 AES-GCM providers (crypto/aesGcm.ts); earlier 2026-10-19, MS4 randomness fix (plus migration 0015: chat messages under MLS)
+Last checked against code: 2026-10-28, post titles join the plaintext words (migration 0019); earlier 2026-10-23, web storage fallback (platform/webStorage.ts); earlier 2026-10-21, A3 kept ciphertext files and keychain-sealed keys (media/cache.ts, platform/mediaStore.ts) and A1 AES-GCM providers (crypto/aesGcm.ts); earlier 2026-10-19, MS4 randomness fix (plus migration 0015: chat messages under MLS)
