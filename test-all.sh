@@ -8,6 +8,7 @@ suite_reset
 mkdir -p e2e/results
 quiet() { local out=$1; shift; "$@" > "$out" 2>&1; local rc=$?; tail -1 "$out"; return $rc; }
 suite "agent roster" bash scripts/check-agents.sh
+suite "agent sync" quiet e2e/results/sync-agents.txt bash scripts/tests/sync_agents_test.sh
 suite "persona checks" quiet e2e/results/persona-checks.txt bash scripts/tests/check_persona_checks_test.sh
 suite "Expo Go SDK" bash scripts/check-expo-go.sh
 suite "Expo Go check test" quiet e2e/results/expo-go.txt bash scripts/tests/check_expo_go_test.sh
