@@ -27,26 +27,27 @@ export function DemoBar({ be, reload, startOver, open }: {
     <View style={[styles.bar, { backgroundColor: c.accentSoft, borderBottomColor: c.line }]} testID="demo-bar" accessibilityLabel="About this demo">
       <Txt>
         {viewer === 'parent'
-          ? "Demo with a made-up family, kept in this browser. You're Sam, a parent."
-          : "Demo. You're Grandma Jo: you see only what's shared with you."}
+          ? "Made-up family. You're Sam, a parent."
+          : "You're Grandma Jo, a grandparent."}
       </Txt>
       <View style={styles.row}>
         <Button
           style={styles.btn}
           variant="secondary"
           label={viewer === 'parent' ? 'See the photos as Grandma Jo sees them' : "Back to Sam's view, the parent"}
-          text={viewer === 'parent' ? "Grandma's view" : "Parent's view"}
+          text={viewer === 'parent' ? 'As Grandma' : 'As Sam'}
           onPress={swap}
         />
         <Button style={styles.btn} variant="secondary" label="Start over with the sample family" text="Start over" onPress={startOver} />
-        <Button style={styles.btn} variant="quiet" role="link" label="Back to Chase's portfolio" text="Portfolio" onPress={() => open(PORTFOLIO_URL)} />
+        <Button style={styles.btn} variant="secondary" role="link" label="Back to Chase's portfolio" text="Portfolio" onPress={() => open(PORTFOLIO_URL)} />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  bar: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 8, gap: 8, borderBottomWidth: StyleSheet.hairlineWidth },
-  row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  btn: { flexGrow: 1, flexBasis: 100 },
+  // UI-1: one short line and one row of short chips, so the app starts high on a phone.
+  bar: { paddingHorizontal: 16, paddingTop: 6, paddingBottom: 6, gap: 4, borderBottomWidth: StyleSheet.hairlineWidth },
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  btn: { flexGrow: 1, paddingHorizontal: 10, paddingVertical: 6 },
 });
