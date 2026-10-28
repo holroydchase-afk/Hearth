@@ -2,6 +2,17 @@
 
 One entry per post mortem, newest first. Each entry gives what happened, why, and the rule or guard that now prevents it. Every agent follows the rules here.
 
+## Oct 28, 2026: the real-API proof went quiet, and Photos got slow without anyone seeing
+
+**What happened.** Two things, found in the same night run. (1) Since the SDK 58 move, jest-expo swapped the global `fetch` for Expo's native-only one, so the app's contract against the real Postgres + PostgREST API got no answers: 60 of 63 checks failed as UNKNOWN. It didn't run in CI, so nobody saw it for two days (REAL-1). (2) Once that ran again, one timeline test timed out about 1 run in 3. The cause: once a family has a few dozen posts, Postgres's cost estimate for `feed_rows` (behind Photos and By date) passes `jit_above_cost`, and Postgres JIT-compiles the query before running it, which made each page take 1.5-2 s instead of 20-50 ms (HARD-17).
+
+**Why.** A suite that only runs by hand stops being run. And the fake backend can't show database speed, so a slow plan only shows up against a real database with real-ish row counts.
+
+**Rules from now on.**
+1. **Every proof runs in CI.** A test suite that matters (the real-API contract included) is a CI job, or it doesn't count as passing.
+2. **A flaky test is a finding.** Before calling a timeout a flake, time each call; if one call is slow, find out why.
+3. **Heavy RPCs plan with JIT off.** A Supabase RPC that builds rows from many small lookups (feeds, timelines) gets `set jit = off` on its function. Check new ones with `\timing` on a database seeded with a few dozen rows.
+
 ## Oct 26, 2026: Expo Go moved to SDK 58 and our guard didn't notice
 
 **What happened.** On Oct 25 we published the reactions update (SDK 57). Chase's Expo Go had updated to SDK 58, and it said "Failed to launch embedded or launchable update: No launchable updates found in database". We lost an evening to a republish and a cache theory before Chase saw the SDK himself. PR for this entry moves the app to SDK 58 (expo 58.0.19, React Native 0.88, checked on npm Oct 26).
