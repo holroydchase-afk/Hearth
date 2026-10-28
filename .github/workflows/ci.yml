@@ -18,6 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - run: bash scripts/check-agents.sh
+      - run: bash scripts/tests/sync_agents_test.sh
 
   # TDPM (CLAUDE.md rule 9): every product decision has a full persona check; Reds need a resolution.
   persona-checks:
