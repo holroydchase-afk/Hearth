@@ -88,4 +88,13 @@ describe('DEMO-1..3, DEMO-10 sample-data demo', () => {
     const keys = ['hearth.fakeBackend.v1', 'hearth.prefs.v1.u1', 'hs_session', 'role-radar.jobs', 'theme', 'ccwatts.v1'];
     expect(demoKeysToClear(keys)).toEqual(['hearth.fakeBackend.v1', 'hearth.prefs.v1.u1', 'hs_session']);
   });
+
+  it('CAP-12 a few sample moments carry a title, so the portfolio shows the feature', async () => {
+    const be = await seeded();
+    const feed = await be.clientFor(F.users.chase.id).getFeed({ space: F.space.id, limit: 50 });
+    const titled = feed.filter((p) => p.title);
+    expect(titled.length).toBeGreaterThanOrEqual(2);
+    expect(titled.length).toBeLessThan(feed.length);
+    for (const p of titled) expect([...p.title!].length).toBeLessThanOrEqual(80);
+  });
 });

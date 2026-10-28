@@ -497,6 +497,22 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(u.sort_at).toBe(u.published_at);
     });
 
+    it('CAP-1/3/5/11 (0019) a post can carry a title: the feed and the timeline return it; none is null', async () => {
+      const id = await poster.createPost({ clientId: uuid(), space: h.spaceId, caption: 'Cake, candles, a nap', circleIds: [h.circleIn], title: "  Lily's 5th birthday " });
+      await h.attachReadyMedia(poster, id);
+      await poster.publishPost(id);
+      const plain = await datedPost(null);
+      const feed = await viewerIn.getFeed({ space: h.spaceId, limit: 50 });
+      expect(feed.find((r) => r.post_id === id)!.title).toBe("Lily's 5th birthday");
+      expect(feed.find((r) => r.post_id === plain)!.title ?? null).toBeNull();
+      expect((await viewerIn.getTimeline({ space: h.spaceId, limit: 50 })).find((r) => r.post_id === id)!.title).toBe("Lily's 5th birthday");
+      expect((await viewerOut.getFeed({ space: h.spaceId, limit: 50 })).find((r) => r.post_id === id)).toBeUndefined();
+    });
+
+    it('CAP-2 (0019) a title over 80 characters is refused with 23514', async () => {
+      expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], title: 'x'.repeat(81) }))).toBe('23514');
+    });
+
     it('BETA-TIME-1 feed rows carry taken_at (for the "Added from earlier" card); null when none', async () => {
       const old = await datedPost('2024-07-04T14:00:00.000Z');
       const undated = await datedPost(null);

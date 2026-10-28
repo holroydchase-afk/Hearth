@@ -117,11 +117,13 @@ export class SupabaseApi implements HearthApi {
     }).then((d) => d ?? []);
   getTimelineYears = (space: string, tz?: string) =>
     this.rpc<TimelineYear[]>('get_timeline_years', { p_space: space, p_tz: tz ?? 'UTC' }).then((d) => d ?? []);
-  // Batch args only when set, so an ordinary post still matches a pre-0010 create_post.
+  // Batch and title args only when set, so an ordinary post still matches an older create_post.
   createPost = (a: CreatePostArgs) =>
     this.rpc<string>('create_post', {
       p_client_id: a.clientId, p_space: a.space, p_caption: a.caption, p_circle_ids: a.circleIds, p_taken_at: a.takenAt ?? null,
       ...(a.batchId != null || a.batchSize != null ? { p_batch_id: a.batchId ?? null, p_batch_size: a.batchSize ?? null } : {}),
+      // CAP-1: only when there is one, so an untitled post still matches a pre-0019 create_post.
+      ...(a.title?.trim() ? { p_title: a.title.trim() } : {}),
     });
   publishPost = (p: string) => this.rpc<void>('publish_post', { p_post: p });
   deletePost = (p: string) => this.rpc<void>('delete_post', { p_post: p });

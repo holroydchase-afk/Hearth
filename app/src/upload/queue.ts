@@ -40,6 +40,8 @@ export interface Job {
   clientId: string;
   space: string;
   caption: string | null;
+  /** CAP-1: the set's optional title; never logged (CAP-R3). */
+  title?: string | null;
   circleIds: string[];
   items: QueueItem[];
   state: JobState;
@@ -62,7 +64,7 @@ export interface Job {
   batchSize?: number;
 }
 
-export interface EnqueueInput { space: string; caption: string | null; circleIds: string[]; items: QueueItem[] }
+export interface EnqueueInput { space: string; caption: string | null; title?: string | null; circleIds: string[]; items: QueueItem[] }
 
 /** BETA-BULK-4: one bulk pick, already planned into posts (share/bulk.ts planBatch). */
 export interface EnqueueBatchInput { space: string; circleIds: string[]; posts: { takenAt: string | null; items: QueueItem[] }[] }
@@ -158,7 +160,7 @@ export class UploadQueue {
   async enqueue(input: EnqueueInput): Promise<Job> {
     const job: Job = {
       id: this.newId(), userId: this.d.userId, clientId: this.newId(), space: input.space,
-      caption: input.caption?.trim() || null, circleIds: [...input.circleIds], items: [...input.items],
+      caption: input.caption?.trim() || null, title: input.title?.trim() || null, circleIds: [...input.circleIds], items: [...input.items],
       state: 'draft', attempts: 0, restarts: 0, progress: { done: 0, total: input.items.length }, createdAt: this.now(),
     };
     this.all.push(job);
@@ -333,7 +335,7 @@ export class UploadQueue {
    */
   private report(err: ApiError, job: Job): void {
     // DBG-1: Chase's on-device problem log (debug builds only; redacted, caption scrubbed).
-    recordProblem(err, `upload: ${this.step}`, { scrub: [job.caption], ref: job.id });
+    recordProblem(err, `upload: ${this.step}`, { scrub: [job.caption, job.title ?? null], ref: job.id });
     try {
       this.d.api.reportClientError(errorReport(err, 'upload')).catch(() => {});
     } catch {
@@ -346,6 +348,7 @@ export class UploadQueue {
     const postId = await this.d.api.createPost({
       clientId: job.clientId, space: job.space, caption: job.caption, circleIds: job.circleIds,
       ...(job.takenAt ? { takenAt: job.takenAt } : {}),
+      ...(job.title ? { title: job.title } : {}),
       ...(job.batchId ? { batchId: job.batchId, batchSize: job.batchSize ?? null } : {}),
     });
     if (this.stopped) throw new Killed();
