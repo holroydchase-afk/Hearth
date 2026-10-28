@@ -79,6 +79,7 @@
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@noble/.*|@supabase/.*|ts-mls|@hpke/.*)"
     ],
-    "testTimeout": 15000
+    "testTimeout": 15000,
+    "testEnvironment": "./jest.environment.js"
   }
 }

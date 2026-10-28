@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 28, release M1.1 phase 2: works for real (branch claude/project-thread-kzt7by-rel1, draft PR)
+- **Found (REAL-1, P0 for testing):** since the SDK 58 move, jest-expo swaps the global fetch for Expo's native-only one. So `scripts/contract-real.sh` (the app's HearthApi contract against the real Postgres + PostgREST API) got no answers at all: 60 of 63 checks failed with UNKNOWN. CI never ran it, so nobody saw it. The app itself was fine; the proof that it works against the real backend was gone.
+- **Fixed, test-first:** `app/jest.environment.js` keeps Node's network fetch, and the harness uses it (`netFetch.test.ts`, REAL-1). Two contract tests assumed a fresh database per test (T10 now makes its own group; TIME-2 allows more than one page), and the harness now knows who each JWT client is. All 63 real-API checks pass, and so do all backend SQL suites (local Postgres 16). A new CI job, "App contract on the real API (PostgREST)", runs this on every PR.
+- **Tests (3 green runs):** app 648 + 1 skipped, typecheck clean, web e2e 4, real-API contract 63/63, backend SQL all suites.
+- **Next exact step:** Chase says "merge". The release continues with phase 3 (UI to 8/10) on a stacked branch.
+
 ## Oct 28: Hearth moved onto the generic studio agents (TRACKER R16, branch claude/project-thread-0hdj2z, PR)
 - **Why:** Chase, Oct 28: "go over the generic agent updates". This pulls R16 forward from after the beta. It's process only, with no app change.
 - **Done:** synced from studio-agents main (2f27166): staff-pm, qa-tdd, engineer (replaces app-engineer), privacy-security, positioning (replaces marketing), ux-reviewer and architect (new). grandparent-ux stays Hearth's own. funding-analyst is archived in `docs/archive/agents/`. On Chase's ask ("the strongest agents, don't lose anything, combine and build"), each agent is the studio text plus a built-in "Hearth notes" section generated from `docs/eng/AGENT-NOTES.md` by the new `scripts/sync-agents.sh` (AGENTS-1..3, `scripts/tests/sync_agents_test.sh`). `check-agents.sh` now fails on drift. All the old Hearth agents are kept whole in `docs/archive/agents/`. The CLAUDE.md roster and the live references are updated.

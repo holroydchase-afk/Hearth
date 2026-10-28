@@ -30,6 +30,9 @@ const SEED_CAST: Partial<Record<ContractUser, string>> = {
   poster: 'alex', viewerIn: 'grandma_rivera', viewerOut: 'grandma_chen', ratelimit: 'blair',
 };
 
+/** REAL-1: Node's network fetch, kept by jest.environment.js before jest-expo swaps in Expo's native-only one. */
+export const netFetch: typeof fetch = (globalThis as { __hearthNodeFetch?: typeof fetch }).__hearthNodeFetch ?? fetch;
+
 export async function supabaseHarness(): Promise<ContractHarness> {
   const url = process.env.HEARTH_API_URL!.replace(/\/$/, '');
   const anonKey = process.env.HEARTH_ANON_KEY!;
@@ -38,13 +41,16 @@ export async function supabaseHarness(): Promise<ContractHarness> {
   const restRoot = process.env.HEARTH_REST_ROOT !== '0';
   const userFor = (u: ContractUser) => (users[u] ? users[u] : cast[u] ? users[cast[u]!] : undefined);
   // A bare PostgREST serves /rpc/x, not /rest/v1/rpc/x: strip the gateway prefix supabase-js adds.
-  const rewrite: typeof fetch = (input, init) => fetch(restRoot ? String(input).replace(`${url}/rest/v1/`, `${url}/`) : input, init);
-  const make = (jwt: string | null) => {
+  const rewrite: typeof fetch = (input, init) => netFetch(restRoot ? String(input).replace(`${url}/rest/v1/`, `${url}/`) : input, init);
+  const make = (jwt: string | null, userId: string | null = null) => {
     const client = createClient(url, anonKey, {
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
       global: { fetch: rewrite, ...(jwt ? { headers: { Authorization: `Bearer ${jwt}` } } : {}) },
     });
-    return new SupabaseApi({ url, anonKey, client, accessToken: async () => jwt });
+    const api = new SupabaseApi({ url, anonKey, client, accessToken: async () => jwt });
+    // REAL-1: a JWT-only client has no Auth session to read; say who it is, as a signed-in app would.
+    if (userId) api.getSession = async () => ({ userId, email: '' });
+    return api;
   };
   const rpcRaw = async (jwt: string, fn: string, args: unknown) => {
     const r = await rewrite(`${url}/rest/v1/rpc/${fn}`, {
@@ -65,7 +71,7 @@ export async function supabaseHarness(): Promise<ContractHarness> {
     as: (u) => {
       const x = userFor(u);
       if (!x) throw new Error(`HEARTH_USERS_JSON has no "${u}"`);
-      return make(x.jwt);
+      return make(x.jwt, x.id);
     },
     anon: () => make(null),
     supportsMedia: process.env.HEARTH_MEDIA === '1',

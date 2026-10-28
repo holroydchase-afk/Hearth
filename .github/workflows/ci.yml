@@ -119,6 +119,33 @@ jobs:
         run: $SUPABASE_CLI stop --no-backup
 
   # ---------------------------------------------------------------------------
+  # REAL-1: the app's HearthApi contract against the real API (Postgres + PostgREST harness), so a
+  # change that only the fake passes (or a test setup that silently can't reach the network) goes red.
+  # ---------------------------------------------------------------------------
+  contract-real:
+    name: App contract on the real API (PostgREST)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Local Postgres (runner's own, superuser for this user)
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres createuser -s "$USER"
+          sudo -u postgres createdb "$USER"
+      - run: npm ci
+      - name: Contract suite through PostgREST (fresh database)
+        run: bash scripts/contract-real.sh
+
+  # ---------------------------------------------------------------------------
   # APP: Jest (unit, screens, contract vs FakeApi) + strict typecheck.
   # ---------------------------------------------------------------------------
   app:
