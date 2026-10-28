@@ -1,6 +1,6 @@
 # Spec: post titles and captions (CAP-*)
 
-Status: plan only, Oct 27, 2026. **Parked under the Polish Freeze**: nothing here is built until Chase says "lift Polish Freeze" or "go captions". Owner: staff-pm. Persona check: `docs/product/decisions/2026-10-27-post-titles-captions.md`. TRACKER row R21.
+Status: planned Oct 27, 2026; decisions taken Oct 28 (DEC-39). Ready to build: Chase lifted all freezes Oct 28, and the release run sets when. Owner: staff-pm. Persona check: `docs/product/decisions/2026-10-27-post-titles-captions.md`. TRACKER row R21.
 
 Chase, Oct 27: "the poster should be able to have a social media type post describing the set of pictures. Similar to Instagram and Facebook."
 
@@ -59,7 +59,7 @@ So Hearth already has half of a Facebook post. The gap is a **title**, a card th
 | CAP-D3 | Encrypt the words (title, caption) so Hearth's server can't read them? | **Not in this build; with the family vault.** Encrypting them now breaks server-side search (SRCH-1/3) and adds a key step to every card. Today's honest line in `03-encryption-and-keys.md` already says the server can read them, and the threat model lists it as a gap |
 | CAP-D4 | Title box shown by default, or behind an "Add a title" button? | **Shown, marked optional.** A hidden box is a gesture to discover; a labeled box Bebar can skip is simpler. grandparent-ux confirms on the prototype |
 
-## Build plan (when the freeze lifts)
+## Build plan
 
 Size **M**, one PR, test-first. Order:
 
@@ -67,7 +67,7 @@ Size **M**, one PR, test-first. Order:
 2. **Migration 0018** (app-engineer, privacy-security review): `posts.title text check (char_length(title) <= 80)`, `posts.words_edited_at timestamptz`; `create_post` gains `p_title default null` (old app builds keep working); feed and timeline RPCs return `title` and `words_edited_at`; `edit_post_words(p_post, p_title, p_caption)` checks author plus S12 and refuses `P0002` for a post you can't see. Notice triggers don't fire on it. Update `docs/eng/API.md` and its contract tests first (API.md rule).
 3. **App**: `HearthApi` (Supabase and Fake), the upload queue carries `title`, ShareScreen and BatchReview boxes, PostCard title, fold and "Edited", the More sheet's "Change the words", demo seed.
 4. **Docs in the same PR**: `02-data-flow.md` (Draft step names the title), `03-encryption-and-keys.md` (title joins the plaintext row), `04-threat-model.md` words list, their "Last checked" footers (rule 6); BETA-SPEC scope line for editing; DECISION-LOG entries for CAP-D1..D4; TRACKER and HANDOFF.
-5. **grandparent-ux** pass on the words ("Title", "What's happening?", "Change the words", "Read more") and a prototype screenshot at 390 pt with Bigger text, before the app code. **ux-reviewer** before and after score (Polish Freeze rule).
+5. **grandparent-ux** pass on the words ("Title", "What's happening?", "Change the words", "Read more") and a prototype screenshot at 390 pt with Bigger text, before the app code. **ux-reviewer** before and after score.
 6. Suite 3× green, `check-expo-go.sh`, then Chase's word to merge, deploy 0018 and publish.
 
 ## Not in this plan
