@@ -44,7 +44,7 @@ export function MessagesScreen({ onClose }: { onClose: () => void }) {
         <Card key={c.circle_id}>
           <Txt variant="title">{c.title}</Txt>
           <Txt variant="muted">{c.kind === 'event' ? `Event · ${c.member_count} people` : `${c.member_count} people`}</Txt>
-          <Button label={chatOpenLabel(c)} text="Open" onPress={() => setOpen(c)} />
+          <Button label={chatOpenLabel(c)} text="Open" variant="secondary" onPress={() => setOpen(c)} />
         </Card>
       ))}
     </Shell>

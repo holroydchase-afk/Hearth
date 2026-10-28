@@ -1,5 +1,12 @@
 # Handoff
 
+## Oct 28, release M1.1 phase 3: UI to 8/10 (branch claude/project-thread-kzt7by-rel2, draft PR, stacked on phase 2)
+- **Score:** the studio ux-reviewer scored the public demo 5/10 before and 8/10 after (`docs/reviews/2026-10-28-ui-8.md`).
+- **Built, test-first (UI-1..5):** a one-line demo bar with one row of matching chips; a centred laptop frame with proof points and a "Read the case study" link; gray Open buttons in Messages; the demo's Me names Sam instead of a placeholder email; the showcase sweep waits for each screen. Persona check all Green (`docs/product/decisions/2026-10-28-ui-polish.md`).
+- **Tests (3 green runs):** app 654 + 1 skipped, typecheck clean, demo e2e 9, showcase sweep 48 shots with a clean console.
+- **Portfolio / public presence:** the demo's bar and laptop frame change; the live site still serves the Oct 22 build until phase 6's INTAKE re-hosts it.
+- **Next exact step:** Chase says "merge" (after phase 2's PR). The release continues with phase 4 (harden).
+
 ## Oct 28, release M1.1 phase 2: works for real (branch claude/project-thread-kzt7by-rel1, draft PR)
 - **Found (REAL-1, P0 for testing):** since the SDK 58 move, jest-expo swaps the global fetch for Expo's native-only one. So `scripts/contract-real.sh` (the app's HearthApi contract against the real Postgres + PostgREST API) got no answers at all: 60 of 63 checks failed with UNKNOWN. CI never ran it, so nobody saw it. The app itself was fine; the proof that it works against the real backend was gone.
 - **Fixed, test-first:** `app/jest.environment.js` keeps Node's network fetch, and the harness uses it (`netFetch.test.ts`, REAL-1). Two contract tests assumed a fresh database per test (T10 now makes its own group; TIME-2 allows more than one page), and the harness now knows who each JWT client is. All 63 real-API checks pass, and so do all backend SQL suites (local Postgres 16). A new CI job, "App contract on the real API (PostgREST)", runs this on every PR.
