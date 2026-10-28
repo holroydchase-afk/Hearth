@@ -1,5 +1,5 @@
 # Decision: an optional title and caption for each set of photos (CAP-*)
-Date: Oct 27, 2026 · Status: plan only, parked under the Polish Freeze · Source: Chase, Oct 27 ("a social media type post describing the set of pictures, similar to Instagram and Facebook"). Spec: `docs/product/SPEC-CAPTIONS.md`. Touches MOMENT-1..8, BETA-SHARE-1, BETA-REPLY-4, BETA-NOTIFY-2
+Date: Oct 27, 2026 · Status: decided Oct 28 (DEC-39), not built yet · Source: Chase, Oct 27 ("a social media type post describing the set of pictures, similar to Instagram and Facebook"). Spec: `docs/product/SPEC-CAPTIONS.md`. Touches MOMENT-1..8, BETA-SHARE-1, BETA-REPLY-4, BETA-NOTIFY-2
 
 **Proposal.** One optional title (80 characters) and the existing optional caption (2,000) for the whole set, shown at the top of the moment card, long captions folded behind **Read more**, and the sender can change the words later from **More**. No per-photo captions, mentions, hashtags, links or AI help.
 
