@@ -523,10 +523,12 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       const all = await tlIds(viewerIn);
       const seen: string[] = [];
       let beforeAt: string | null = null, beforeId: string | null = null;
-      for (let guard = 0; guard < 30; guard++) {
-        const page = await viewerIn.getTimeline({ space: h.spaceId, limit: 2, beforeAt, beforeId });
+      // REAL-1: pages of 5, and stop once the first 50 are covered: paging the whole shared database 2 at a time
+      // was slow, and each page cost 1.5-2 s before HARD-17 (JIT off for feed_rows).
+      for (let guard = 0; guard < 30 && seen.length < all.length; guard++) {
+        const page = await viewerIn.getTimeline({ space: h.spaceId, limit: 5, beforeAt, beforeId });
         seen.push(...page.map((p) => p.post_id));
-        if (page.length < 2) break;
+        if (page.length < 5) break;
         beforeAt = page[page.length - 1]!.sort_at; beforeId = page[page.length - 1]!.post_id;
       }
       // REAL-1: the real harness keeps one database for the whole run, so there can be more than one 50-row page.

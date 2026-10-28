@@ -442,16 +442,16 @@
    "status": "fixed",
    "title": "No rate limit on redeeming invite codes",
    "tests": [
-    "API-117",
-    "API-118",
-    "API-119",
-    "API-120",
-    "API-121",
     "API-122",
     "API-123",
     "API-124",
     "API-125",
     "API-126",
+    "API-127",
+    "API-128",
+    "API-129",
+    "API-130",
+    "API-131",
     "PRIVACY-AUDIT-005"
    ],
    "found": "2026-10-15",
@@ -884,6 +884,72 @@
    "tests": [],
    "found": "2026-10-19",
    "fixed": "2026-10-21"
+  },
+  {
+   "id": "S21",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "High",
+   "status": "fixed",
+   "title": "HARD-12: members could write reactions straight through PostgREST, skipping the three-emoji list and 'replies off' (a free-text side channel). Migration 0018",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "S22",
+   "kind": "bug",
+   "layer": "app",
+   "severity": "Medium",
+   "status": "fixed",
+   "title": "HARD-13: the cached feed (captions, names, reactions) stayed on the phone after sign out",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B11",
+   "kind": "bug",
+   "layer": "app",
+   "severity": "Medium",
+   "status": "open",
+   "title": "HARD-14: a reaction summary read before a tap can land after it and hide the confirmed reaction until the next refresh",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "T11",
+   "kind": "test fix",
+   "layer": "app",
+   "severity": "Low",
+   "status": "open",
+   "title": "HARD-15: Fake and Supabase disagree on reacting to your own unpublished post (the contract doesn't cover it)",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
+  },
+  {
+   "id": "B13",
+   "kind": "bug",
+   "layer": "backend",
+   "severity": "High",
+   "status": "fixed",
+   "title": "HARD-17: Postgres JIT-compiled feed_rows once a family had a few dozen posts: 1.5-2 s per Photos or By date page instead of 20-50 ms. Migration 0018 turns JIT off for it",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": "2026-10-15"
+  },
+  {
+   "id": "B12",
+   "kind": "bug",
+   "layer": "app",
+   "severity": "Low",
+   "status": "open",
+   "title": "HARD-16: on a server before 0017, Haha or Like takes away an existing heart (the hosted server has 0017)",
+   "tests": [],
+   "found": "2026-10-15",
+   "fixed": null
   }
  ]
 }
