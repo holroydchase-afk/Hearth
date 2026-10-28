@@ -1,6 +1,6 @@
 # Hearth tracker: what's next, what's missing, what's pending
 
-The one list of everything open between Chase and Claude. Updated Oct 24, 2026.
+The one list of everything open between Chase and Claude. Updated Oct 27, 2026.
 
 **How it works**
 - Work the **Sequence** top to bottom. One step at a time; nothing new gets built until milestone 1 passes (Chase, Oct 17).
@@ -37,6 +37,7 @@ The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/202
 | R19 | Reactions: Love, Haha, Like and Comment as icons only on each moment (REACT-1..9, DEC-38, migration 0017) | P1 | S | ◐ Oct 25: merged (PR #55), 0017 deployed. Opens on phones once the SDK 58 PR is merged and published (Oct 26) |
 | R18 | Moment cards: one compact card per upload (collage, one Love and Comment row, one-row reply box, More for who-sees-it and Delete), UAT 8-9 (MOMENT-1..8) | P1 | M | ◐ Oct 25: merged (PR #54). Publish to Expo Go and rebuild the demo on Chase's word |
 | R20 | Supabase starter pieces for the studio template: invites, token-only deploy and smoke check (`docs/supabase-starter/`, STARTER-*) | P2 | S | ◐ Oct 27: built and green 3x; PR open, waiting on Chase's merge |
+| R21 | Post titles and captions like Instagram and Facebook: optional title plus caption for the set, Read more fold, change the words after posting, title on bulk sends (`SPEC-CAPTIONS.md`, CAP-1..12) | P1 | M | ☐ Oct 27: planned and persona-checked; **parked (Polish Freeze)**. CAP-D1..D4 decided Oct 28 (DEC-39). Waits on "go captions" or the freeze lifting |
 | R16 | Rest of the studio-agents migration (`examples/hearth/MIGRATION.md` in studio-agents): move Hearth facts into docs, swap in the generic agents, archive funding-analyst | P2 | S | ☐ After the Nov 22 beta; `ux-reviewer` synced Oct 22 |
 | R14 | npm audit: recheck the Expo CLI build-tool findings after the next Expo patch (RV-X4) | P2 | S | ☑ Oct 21: still 62 from 5 advisories on expo 57.0.30 (newest SDK 57 patch). One ships: decode-uri-component in expo-router (a crafted link could freeze the app; no data exposed). No forced override; recheck at the SDK 58 move (Oct 26: moved to SDK 58; recheck in the next PR) |
 
