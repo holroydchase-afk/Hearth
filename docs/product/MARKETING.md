@@ -1,6 +1,6 @@
 # Hearth marketing and positioning
 
-Owned by the `marketing` agent. Chase logs positioning, messaging, audience and channel ideas here; the agent sharpens them. Product ideas also go in `docs/product/ANCHORS.md`. Nothing here is public copy until Chase says yes and the claims register backs it.
+Owned by the `positioning` agent (was `marketing` until Oct 28, 2026). Chase logs positioning, messaging, audience and channel ideas here; the agent sharpens them. Product ideas also go in `docs/product/ANCHORS.md`. Nothing here is public copy until Chase says yes and the claims register backs it.
 
 **Stage:** proof of concept. No paid marketing, pricing or launch before milestone 7 (`docs/product/ANCHORS.md`). Near-term copy only: invite texts, App Store listing, printed guide.
 

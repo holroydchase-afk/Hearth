@@ -22,6 +22,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - `docs/product/BETA-SPEC.md`: 35 acceptance criteria (BETA-*), the scope source of truth.
 - `docs/product/DESIGN-SYSTEM.md`: native first (Apple HIG on iPhone, Material 3 on Android) plus Hearth's stricter overrides (DS-1..DS-9). Check it before designing any screen.
 - `docs/product/SPEC-MEDIA.md`: media policy (what is stripped, kept or extracted from photos; compression), rules for location ideas, Live Photos plan (MEDIA-*, LIVE-*).
+- `docs/eng/AGENT-NOTES.md`: the source of each studio agent's "Hearth notes" (staff-pm's beta jobs, qa-tdd's test homes, the engineer's stack, privacy-security's threat list, positioning's claims). Edit there, then `scripts/sync-agents.sh`.
 - `docs/eng/LESSONS.md`: post mortems and the rules they added. Read before choosing any version or calling a build ready.
 - `docs/eng/MERGING.md`: when and how Claude merges PRs (only on Chase's word, CI green, merge commits).
 - `docs/architecture/`: system overview, data flow, encryption and keys, threat model, written for technical privacy-focused readers (anchor A4). Its README has the writing rules.
@@ -29,7 +30,7 @@ Hearth is a private family photo app for split families and for grandparents who
 - `docs/product/PERSONAS.md`, `docs/product/CORE-FEATURES.md`, `docs/eng/TESTING.md`.
 - `docs/product/AI-FEATURES.md`: future AI and smart-photo features (people → group suggestions, duplicates), the rules they must meet, and the blocking AI positioning decision.
 - `docs/product/ACCOUNTS.md`: every outside account, its login, and where the name "Hearth" is baked in. Add a row whenever Chase sets up a new account. No secrets. **Before anything that makes the name hard to change (buying the domain, a store build, telling relatives the name), stop and warn Chase**; store builds refuse until it says "Name final: yes".
-- `docs/product/MARKETING.md`: positioning, claims register (what we can truthfully say), marketing ideas log. Owned by the `marketing` agent.
+- `docs/product/MARKETING.md`: positioning, claims register (what we can truthfully say), marketing ideas log. Owned by the `positioning` agent.
 
 ## Layout
 - `backend/`: Supabase.
@@ -48,14 +49,16 @@ The main Claude session is Chase's **chief of staff**. It doesn't do specialist 
 
 | Agent | Send it |
 |---|---|
-| `staff-pm` | Specs, triage, scope calls, gate reviews, anything new before it's built |
-| `qa-tdd` | Failing tests first, suite runs, Test Log updates |
-| `app-engineer` | Building app/backend changes after the failing test exists |
+| `staff-pm` | Specs, triage, scope calls, gate reviews, persona checks, anything new before it's built |
+| `qa-tdd` | Failing tests first, suite runs 3x, Test Log updates |
+| `engineer` | Building app/backend changes after the failing test exists |
+| `architect` | Before a new dependency, vendor, paid service, schema change or CI/deploy workflow; reuse from sibling repos |
 | `grandparent-ux` | Hearth's UI/UX designer: design or review any screen, word, notification, email or guide a relative will see |
 | `ux-reviewer` | Studio UX reviewer (from studio-agents): showcase reviews of the portfolio demo for recruiters and hiring managers, visual pass with screenshots, Nielsen and WCAG sweep. Relatives' screens still go to `grandparent-ux` |
 | `privacy-security` | RLS, invites, sign-in, media URLs, keys, logging, vendors, AI, data deletion |
-| `funding-analyst` | Grants, programs, investors, funding metrics |
-| `marketing` | Positioning, messaging, taglines, audiences, channels; logs ideas in `docs/product/MARKETING.md` |
+| `positioning` | Positioning, claims, copy, names, "marketing: …" ideas; logs them in `docs/product/MARKETING.md` |
+
+**Studio agents.** Every agent above except `grandparent-ux` is the studio version from holroydchase-afk/studio-agents plus a built-in "Hearth notes" section, so each has both the studio method and everything Hearth's old agents knew. Edit Hearth facts in `docs/eng/AGENT-NOTES.md`, never in `.claude/agents/`, then run `bash scripts/sync-agents.sh <studio-agents clone>` (never studio-agents' own `sync.sh`, which drops the notes). `check-agents.sh` fails if they drift. The old Hearth agents and `funding-analyst` are kept whole in `docs/archive/agents/`.
 
 **Roster rule.** Adding, renaming or removing an agent in `.claude/agents/` means updating this table in the same commit, plus a line in `HANDOFF.md`. `scripts/check-agents.sh` (run by `test-all.sh` and CI) fails if they don't match.
 
