@@ -50,9 +50,9 @@ So Hearth already has half of a Facebook post. The gap is a **title**, a card th
 | CAP-11 | P2 | **Given** the event timeline and the year timeline, **When** a titled post shows there, **Then** it shows the title too, same rules as CAP-3 |
 | CAP-12 | P2 | **Given** the web demo (`app/dist-demo-site`), **When** it's rebuilt, **Then** a few seeded moments carry titles and captions, so the portfolio shows the feature |
 
-## Decisions for Chase (with Claude's picks)
+## Decisions (Chase took Claude's picks, Oct 28: DEC-39)
 
-| # | Question | Claude's pick |
+| # | Question | Decided |
 |---|---|---|
 | CAP-D1 | Words per photo too (a note on photo 3 of 8), or only for the whole set? | **Whole set only for now.** One box per photo turns a 48-photo send into 48 questions, and LG would wonder if they must fill them. Revisit after the beta if relatives ask; a per-photo note would live in the full-screen viewer |
 | CAP-D2 | Allow changing the words after posting? (BETA-SPEC said "delete and repost") | **Yes, title and caption only, by the sender.** Delete and repost loses every comment and reaction; fixing a typo shouldn't cost that. Photos stay unchangeable |
