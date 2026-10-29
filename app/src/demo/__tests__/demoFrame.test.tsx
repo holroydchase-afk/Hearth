@@ -9,7 +9,7 @@ describe('DEMO-6 laptop frame', () => {
   it('DEMO-6 at 1280 px: a story panel and the app in a 430 px column', () => {
     render(<DemoFrame width={1280}><Text>the app</Text></DemoFrame>);
     expect(screen.getByRole('header', { name: 'A private photo app for split families' })).toBeTruthy();
-    expect(screen.getByText(/Grandma's view/)).toBeTruthy();
+    expect(screen.getByText(/As Grandma/)).toBeTruthy();
     expect(screen.getByText(/Built test-first by Chase Holroyd/)).toBeTruthy();
     expect(StyleSheet.flatten(screen.getByTestId('demo-app-column').props.style).width).toBe(APP_COLUMN);
     expect(APP_COLUMN).toBe(430);

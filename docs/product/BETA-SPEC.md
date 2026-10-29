@@ -2,7 +2,7 @@
 
 Owner: staff-pm. Updated Oct 17, 2026 (bulk photos, timeline and groups criteria at the end). **Milestones in `docs/product/ANCHORS.md` now set the order** (see "Milestone map and trace" at the end). Nov 22 / Thanksgiving is a soft target for milestones 3–4, pending Chase.
 
-Rules: no criterion, no build. qa-tdd writes each test red before app-engineer builds.
+Rules: no criterion, no build. qa-tdd writes each test red before engineer builds.
 - **Types:** `auto` means Playwright, SQL (RLS suite), or Deno. `manual` means a real phone or a real person, logged on the Test Log page.
 - **Priorities:** P0 blocks the current ring. P1 must close before the next ring.
 - **Platforms:** iPhone through TestFlight and Android through the Play internal track. Supported phones: Android 7+ and iOS 16.4+ on Expo SDK 56+; SDK 54/55 support iOS 15.1+. Pin the SDK after the phone inventory comes back.

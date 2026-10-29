@@ -37,6 +37,11 @@ export interface FeedStoreOptions {
 
 const cacheKey = (user: string, space: string) => `hearth.feedCache.v1.${user}.${space}`;
 
+/** HARD-13: sign out takes the cached feed (captions, names, reactions) off the phone. */
+export async function clearFeedCache(kv: KV, user: string, space: string): Promise<void> {
+  try { await kv.removeItem(cacheKey(user, space)); } catch { /* best effort */ }
+}
+
 export class FeedStore {
   private state: FeedState = { posts: [], status: 'idle', loaded: false, hasMore: false, notice: null, comments: {}, drafts: {}, opened: {} };
   private listeners = new Set<() => void>();

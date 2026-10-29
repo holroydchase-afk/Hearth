@@ -27,7 +27,7 @@ export function DemoChrome({ children }: { children: ReactNode }) {
   const be = (globalThis as { __hearthFake?: FakeBackend }).__hearthFake;
   if (!DEMO_MODE || Platform.OS !== 'web' || !be) return <>{children}</>;
   return (
-    <DemoFrame width={width}>
+    <DemoFrame width={width} open={(url) => window.location.assign(url)}>
       <View style={{ flex: 1 }}>
         <DemoBar be={be} reload={goPhotos} startOver={startOver} open={(url) => window.location.assign(url)} />
         <View style={{ flex: 1 }}>{children}</View>
