@@ -1,5 +1,12 @@
 # Handoff
 
+## Oct 29, bug sweep: B11 and T11 fixed, TRACKER brought up to date (branch claude/project-thread-ewmmb7, PR)
+- **Chase's ask:** list every known bug, then "fix whatever you think is priority". Open list was 7 tickets, none High: S19, S20, S18, B11 (Medium); S14, B12, T11 (Low). No open GitHub issues; every UAT item is fixed or is a feature ask.
+- **Fixed, test-first:** B11 (HARD-14): a reaction summary read before a tap no longer hides the confirmed reaction (`store.test.ts`). T11 (HARD-15): the fake now matches 0017, so an author can react to their own unsent post and nobody else sees it; the contract test passes on the fake and on the real API (PostgREST harness, 66/66).
+- **TRACKER:** milestone 1 steps 3-6 and 8 marked done with evidence; step 7 left open (one email notice, and confirm `HEARTH_KEYS_PENDING` is gone). R16, R20 and R22 marked merged. App-only change, so no migration or deploy.
+- **Left, needs Chase or bigger work:** S18 means clearing the test bucket before real photos (can't be undone, needs Chase's word, and B2 isn't reachable from the cloud). S19 safety numbers is day 3 of the vault plan (R24). S20 needs an outside reviewer. S14 and B12 don't matter today (video is off, hosted has 0017).
+- **Next exact step:** Chase says "merge".
+
 ## Oct 29, bleeding-edge features: photo frame spec and family vault plan (branch claude/project-thread-5ifxmu, docs only)
 - **Chase's call (DEC-40):** of three ideas (photo frame, MLS vault, AI audience guard), "Start with 1", plus a day-by-day plan for 2.
 - **Specced:** `docs/product/SPEC-PHOTO-FRAME.md` (FRAME-R1..R5, FRAME-1..8), with a persona check (`decisions/2026-10-29-photo-frame.md`, LG Red mitigated: optional, set up by a helper). Live Activity moved to the poster's send progress, because Apple allows them only for things in progress. TRACKER R23.
