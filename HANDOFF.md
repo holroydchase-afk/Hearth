@@ -1,5 +1,9 @@
 # Handoff
 
+## Oct 29, night shift: one title on a bulk send (CAP-9) (branch claude/project-thread-kzt7by-n1029b, draft PR, stacked on #74)
+- **Built, test-first:** the bulk review screen has one optional "Title (optional)" box (80 characters) and nothing else; every post in the batch carries that title, captions stay empty (`bulk.test.tsx` CAP-9 ×2). App only: `create_post` already takes a title (0019, live), so this needs no deploy.
+- **Next exact step:** Chase says "merge" after #74.
+
 ## Oct 29, night shift: change the words after posting (branch claude/project-thread-kzt7by-n1029, draft PR)
 - **Built, test-first (CAP-6..8, SPEC-CAPTIONS, DEC-39 CAP-D2):** the sender's More menu has "Change the words": one sheet with the Title and "What's happening?" boxes filled in, Save and Cancel. The card then says "Edited" after the date for everyone. Nobody else gets the button; a refusal shows plain words and keeps the old words. No notice goes out; comments and reactions stay.
 - **Migration 0021 (not deployed):** `posts.words_edited_at`, `edit_post_words(p_post, p_title, p_caption)` (sender only, while they can still send to one of the post's groups; P0002 for a post you can't see), `words_edited_at` on `get_feed` / `get_timeline`. **HARD-18:** authors could `UPDATE` caption and taken_at straight in the table (no "Edited" mark); 0021 revokes it. Nothing in the app used it.

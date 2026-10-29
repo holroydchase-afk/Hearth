@@ -87,6 +87,30 @@ describe('BETA-BULK-3 batch review screen', () => {
     expect(noKeys).not.toMatch(/GPS|35\.22|Apple|DateTimeOriginal/);
   });
 
+  it('CAP-9 one optional Title box on the review: every post in the batch carries it, captions stay empty', async () => {
+    const be = FakeBackend.withFixture();
+    const { nav } = await openReview({ last: [FIXTURE.circles.dadSide.id], be });
+    const box = screen.getByLabelText('Title (optional)');
+    expect(box.props.maxLength).toBe(80);
+    expect(screen.queryByLabelText("What's happening?")).toBeNull();
+    expectGrandparentSafe();
+    fireEvent.changeText(box, '  Beach week 2024 ');
+    fireEvent.press(screen.getByRole('button', { name: 'Send 48 photos' }));
+    await waitFor(() => expect(nav.goPhotos).toHaveBeenCalled());
+    await waitFor(() => expect(Object.values(be.state.posts).filter((p) => p.status === 'published')).toHaveLength(5), { timeout: 5000 });
+    const posts = Object.values(be.state.posts);
+    expect(posts.every((p) => p.title === 'Beach week 2024' && p.caption === null)).toBe(true);
+  });
+
+  it('CAP-9 / CAP-R1 no title is fine: the batch sends untitled, nothing asks for one', async () => {
+    const be = FakeBackend.withFixture();
+    const { nav } = await openReview({ last: [FIXTURE.circles.dadSide.id], be });
+    fireEvent.press(screen.getByRole('button', { name: 'Send 48 photos' }));
+    await waitFor(() => expect(nav.goPhotos).toHaveBeenCalled());
+    await waitFor(() => expect(Object.values(be.state.posts).filter((p) => p.status === 'published')).toHaveLength(5), { timeout: 5000 });
+    expect(Object.values(be.state.posts).every((p) => (p.title ?? null) === null)).toBe(true);
+  });
+
   it('BETA-BULK-3 "Don\'t send" goes back without sending anything', async () => {
     const be = FakeBackend.withFixture();
     await openReview({ last: [FIXTURE.circles.dadSide.id], be });
