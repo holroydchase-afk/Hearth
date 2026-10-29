@@ -33,7 +33,7 @@ Resolution: <ID> mitigation: <change, test ID>
 
 ## Persona cards
 
-Ranked from the least tech-savvy smartphone user up (Chase, Oct 19: "ranked from least tech-savvy smartphone user up"; his order: Bebar 95, Gigi 88, Great-Grandma 85, Grandaddy 62, Sue 60, Pawpaw 68, Grandmomma 58, Granny 60; then the cousins, "they will be my age and some are parents"). AG is the one card that isn't a skill rank: it is the phone, and it sits on top of LG for Grandaddy and Pawpaw. Decision tables list the personas in this order.
+Ranked from the least tech-savvy smartphone user up (Chase, Oct 19: "ranked from least tech-savvy smartphone user up"; his order: Bebar 95, Gigi 88, Great-Grandma 85, Grandaddy 62, Memaw 60, Pawpaw 68, Grandmomma 58, Granny 60; then the cousins, "they will be my age and some are parents"). AG is the one card that isn't a skill rank: it is the phone, and it sits on top of LG for Grandaddy and Pawpaw. Decision tables list the personas in this order.
 
 The roster the script reads (IDs are the first two letters of each line):
 
@@ -54,7 +54,7 @@ The roster the script reads (IDs are the first two letters of each line):
 | 2 | Gigi, 88 | GG |
 | 3 | Great-Grandma, 85 | GG |
 | 4 | Grandaddy, 62 | LG, AG |
-| 5 | Sue, 60 | LG |
+| 5 | Memaw, 60 | LG |
 | 6 | Pawpaw, 68 | LG, AG |
 | 7 | Grandmomma, 58 | SG |
 | 8 | Granny, 60 | SG |
@@ -68,7 +68,7 @@ The roster the script reads (IDs are the first two letters of each line):
 - Hard reds: a feature that only works in the app and makes the frame or email copy worse; anything they must set up.
 - Guards: milestone 6, CF-18.
 
-**LG Least-savvy grandparent** (ranks 4–6: Grandaddy 62, Sue 60, Pawpaw 68; the June stand-in, now named)
+**LG Least-savvy grandparent** (ranks 4–6: Grandaddy 62, Memaw 60, Pawpaw 68; the June stand-in, now named)
 - Phone/skill: the least savvy grandparents who will use the app; scam-wary, spotty WV signal; call family instead of reading instructions. Two of three are on Android (AG).
 - Yes: "just show me the babies": the photo fills the screen, nothing to learn.
 - Hard reds: a new choice, picker or setting on their screens; anything slow on bad signal; a help call.
@@ -80,7 +80,7 @@ The roster the script reads (IDs are the first two letters of each line):
 - Hard reds: anything iPhone-only that he can see he's missing; blank emoji boxes; blurry copies.
 - Guards: STORY problem 3 ("Somebody doesn't get the photo, or gets a blurry one"), G2, milestone 5.
 
-**SG Step or other-household grandparent** (ranks 7–8: Grandmomma 58, Granny 60, the savviest grandparents; was "Linda". The household rule also covers Sue and Grandaddy's split households)
+**SG Step or other-household grandparent** (ranks 7–8: Grandmomma 58, Granny 60, the savviest grandparents; was "Linda". The household rule also covers Memaw and Grandaddy's split households)
 - Phone/skill: more at ease than LG; phones not confirmed.
 - Yes: full grandparent, never second-tier; can reply without the other house reading it.
 - Hard reds: anything that ranks, counts or shows who looked; replies reaching the other household.
@@ -114,12 +114,11 @@ The roster the script reads (IDs are the first two letters of each line):
 
 1. **Questions for Chase (Oct 19 ranking):**
    - Which phone does each person on the list have (iPhone or Android, roughly how old)? Only Grandaddy and Pawpaw are known Android; Bebar is "Android?". The phone survey (CH-4) fills this.
-   - Is Grandmomma Grandmomma (PERSONAS.md says "Grandmomma")?
    - Gammy isn't in the ranking. Where does she fall?
    - Bebar: computer better than Gigi. Should his way in be email on the computer rather than (or beside) the frame?
    - Cousins: which of them get invited for the beta, and do they sit in a side's group or only Everyone?
    - Far-away inviter: keep as a persona (kept by default)? Does Mom's sister count as an inviter in the beta?
-2. Milestone 4 order ("most savvy first, least savvy last") now follows this table read bottom-up: cousins and Granny/Grandmomma before Grandaddy/Sue/Pawpaw, great-grandparents last. Chase to confirm.
+2. Milestone 4 order ("most savvy first, least savvy last") now follows this table read bottom-up: cousins and Granny/Grandmomma before Grandaddy/Memaw/Pawpaw, great-grandparents last. Chase to confirm.
 3. TR and PA are both Chase today. Split them only if a check ever goes Green for one and Red for the other for the same reason.
 4. Retired: Rob (co-parent ex; the co-parent split stays protected by backend RLS tests), Kim, Tammy. Gammy's possible new partner isn't a persona yet; add one if a decision touches joining or removal.
 5. Cards are one-liners from STORY.md, GOALS.md and Chase's ranking, not research. Each needs evidence (phone survey, M3/M4 Test Log entries, help calls) before a Green from that card can be trusted. The CU card is the thinnest.

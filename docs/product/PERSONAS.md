@@ -1,24 +1,24 @@
 # Hearth people: Chase's real family (Oct 16, 2026)
 
-Hearth is built for this family first (milestones in `docs/product/ANCHORS.md`, story in `docs/product/STORY.md`). Use these names in specs and reviews. Each person is named the way the kids say it.
+Hearth is built for this family first (milestones in `docs/product/ANCHORS.md`, story in `docs/product/STORY.md`). Use these names in specs and reviews. Each person is named the way the kids say it. The repo is public, so real names, surnames and private details stay out of it (the key lives in the project's private files).
 
 **Still to confirm with Chase** (marked "?" below): phones. Tech-savvy ranking: Chase gave it Oct 19; the ranked persona cards live in `docs/product/PERSONA-CHECK.md`.
 
 ## Who's who
 
-| Kids call them | Name | Role | Side / household | Phone | Notes |
-|---|---|---|---|---|---|
-| Dad | Chase | Parent, posts most | — | iPhone | Founder. Stay-at-home dad near Charlotte; milestone 1 |
-| Mom | Mom | Parent, posts | — | iPhone | From Charleston, WV; works remotely; milestone 2 |
-| Gammy | Gammy | Grandparent (Chase's mom) | Chase's side, her own household | iPhone? | Divorced from Grandaddy; her own household |
-| Grandaddy | Grandaddy | Grandparent (Chase's dad) | Chase's side, with Grandmomma | Android | Divorced from Gammy |
-| Grandmomma | Grandmomma | Grandparent (Chase's stepmom) | Chase's side, with Grandaddy | iPhone? | Chase sends her videos separately today and hopes nobody feels slighted |
-| Memaw | Sue | Grandparent (Mom's mom) | Mom's side, her own household | iPhone? | Divorced from Pawpaw |
-| Pawpaw | Pawpaw | Grandparent (Mom's dad) | Mom's side, with Granny | Android | Divorced from Sue |
-| Granny | Granny | Grandparent (Mom's stepmom) | Mom's side, with Pawpaw | iPhone? | |
-| Gigi | Gigi | Great-grandparent (Chase's great-grandmother) | Chase's side, with Bebar | ? | |
-| Bebar | Bebar | Great-grandparent (Chase's great-grandfather) | Chase's side, with Gigi | Android? | Has the Aluratek smart frame (milestone 6) |
-| Great-Grandma | Great-Grandma | Great-grandparent (Granny's mother) | Mom's side, her own household | ? | The only other great-grandparent |
+| Kids call them | Role | Side / household | Phone | Notes |
+|---|---|---|---|---|
+| Dad (Chase) | Parent, posts most | — | iPhone | Founder. Stay-at-home dad near Charlotte; milestone 1 |
+| Mom | Parent, posts | — | iPhone | From Charleston, WV; works remotely; milestone 2 |
+| Gammy | Grandparent (Chase's mom) | Chase's side, her own household | iPhone? | Divorced from Grandaddy; her own household |
+| Grandaddy | Grandparent (Chase's dad) | Chase's side, with Grandmomma | Android | Divorced from Gammy |
+| Grandmomma | Grandparent (Chase's stepmom) | Chase's side, with Grandaddy | iPhone? | Chase sends her videos separately today and hopes nobody feels slighted |
+| Memaw | Grandparent (Mom's mom) | Mom's side, her own household | iPhone? | Divorced from Pawpaw |
+| Pawpaw | Grandparent (Mom's dad) | Mom's side, with Granny | Android | Divorced from Memaw |
+| Granny | Grandparent (Mom's stepmom) | Mom's side, with Pawpaw | iPhone? | |
+| Gigi | Great-grandparent (Chase's great-grandmother) | Chase's side, with Bebar | ? | |
+| Bebar | Great-grandparent (Chase's great-grandfather) | Chase's side, with Gigi | Android? | Has the Aluratek smart frame (milestone 6) |
+| Great-Grandma | Great-grandparent (Granny's mother) | Mom's side, her own household | ? | The only other great-grandparent |
 
 The phones come from the story: "every grandpa has an Android and everyone else has an iPhone."
 
@@ -38,7 +38,7 @@ Older docs and test names still use the composites. Read them as:
 | Composite | Now |
 |---|---|
 | Megan (organizer parent) | Chase (and Mom) |
-| June (least-techy WV grandma) | the least-savvy grandparents on a phone: Grandaddy, Sue, Pawpaw (Chase's ranking, Oct 19; card LG) |
+| June (least-techy WV grandma) | the least-savvy grandparents on a phone: Grandaddy, Memaw, Pawpaw (Chase's ranking, Oct 19; card LG) |
 | Earl (never installs an app) | Bebar (smart frame), Gigi, Great-Grandma (card GG) |
 | Linda (other-side grandma, feels left out) | any stepparent or other-household grandparent: Grandmomma, Granny, Memaw |
 | Rob (co-parent ex) | retired: the splits are among the grandparents, not the parents |

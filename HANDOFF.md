@@ -1,11 +1,14 @@
 # Handoff
 
-## Oct 29: host the demo publicly (TRACKER R26, branch claude/project-thread-h2kh6k, draft PR)
-- **Why:** Product Studio INTAKE (Oct 29): the repo is public, so Hearth hosts its own demo, after a privacy check of the whole history.
-- **Scan (all branches, 208 commits):** gitleaks 0 leaks; no Supabase, Backblaze or API keys (the one JWT is a fake test token), so no rotation needed. Emails are made-up test addresses; the one phone number is a public office line. **Found:** real-family details (names, relationships) in docs and tests, so Chase was asked to make the repo private again. Before it goes public again (at the rename), scrub them from history or publish a fresh repo.
-- **Done:** `.github/workflows/demo-site.yml`, manual only: builds the demo with `app/scripts/build-demo.sh`, fails if the build holds a Supabase address or key, and keeps it as the `hearth-demo-site` artifact. No Pages, no name in it. The demo already links back to chaseholroyd.com/family-photos.html (DEMO-3).
-- **Portfolio / public presence:** INTAKE for Product Studio at `/mnt/project-files/portfolio/INTAKE-2026-10-29-demo-host.md` (demo URL chaseholroyd.com/demo/hearth/, 3 lines of page copy, team credits) with a fresh build tarball beside it.
-- **Next exact step:** Chase makes the repo private, picks where the demo lives (recommended: the portfolio site), then pastes the INTAKE into Product Studio.
+## Oct 29: host the demo publicly; real-family details scrubbed (TRACKER R26, branch claude/project-thread-h2kh6k, PR #77)
+- **Why:** Product Studio INTAKE (Oct 29): the repo was public, so Hearth hosts its own demo, after a privacy check of the whole history.
+- **Scan (all branches, 208 commits):** gitleaks found 0 leaks. No Supabase, Backblaze or API keys (the one JWT is a fake test token), so nothing needs rotating. The emails are made-up test addresses, and the one phone number is a public office line. **Found:** real-family details (names, surnames, relationships) in docs, tests and commit messages. Chase made the repo private again (Oct 29, 20:19Z).
+- **Chase, Oct 29:** keep the name Hearth for now. Each product hosts its own demo and the portfolio page links to it ("fix the issues, then proceed").
+- **Done, today's files (43):** real names are now the kids' nicknames (Mom, Gammy, Grandaddy, Grandmomma, Memaw, Pawpaw, Granny, Gigi, Bebar, Great-Grandma). Made-up test names that matched real ones changed too (Sue, Tess). The surnames, birthplaces and the private details are gone. `family-setup.sh --mom-email` is now `--mom-email`, and its new families get "Mom's side". **The live family still has the old side name:** rename it in the app (Groups) before any re-run of `family-setup.sh`, or the re-run adds a second side. New rule in CLAUDE.md (privacy invariants). The real-name key is in the project's private files (`plans/family-names-key.md`).
+- **Done, demo:** `.github/workflows/demo-site.yml`, manual only. It builds the demo with `app/scripts/build-demo.sh`, fails if the build holds a Supabase address or key, and keeps it as the `hearth-demo-site` artifact. The demo already links back to chaseholroyd.com/family-photos.html (DEMO-3).
+- **Tests (3 green runs):** backend `tests/run.sh` all suites; app Jest 677 + 1 skipped; typecheck; agents, persona checks and the PRIV-2 log check.
+- **Portfolio / public presence:** INTAKE for Product Studio at `/mnt/project-files/portfolio/INTAKE-2026-10-29-demo-host.md`, with a fresh build tarball beside it. To update once Pages is live: Pages URL instead of /demo/hearth/.
+- **Next exact step:** Chase picks how to clean the old commits (card; recommended: rewrite in place right after #70-#77 merge, then one GitHub Support form to purge cached PR pages). Then the repo goes public, the workflow gains a Pages deploy at chaseholroyd.com/Hearth/, and the INTAKE gets that URL.
 
 ## Oct 29: studio agents re-synced (TRACKER R25, branch claude/project-thread-jt1p84, PR)
 - **Why:** Chase, Oct 29: re-sync from studio-agents main (b6a9a8b) to get the upgraded ux-reviewer and the ux tools; keep project-only agents.

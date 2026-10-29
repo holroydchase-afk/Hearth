@@ -76,6 +76,7 @@ The main Claude session is Chase's **chief of staff**. It doesn't do specialist 
    - Strip EXIF/GPS on the device.
    - No media or metadata goes to any AI or analytics service.
    - Never log keys, URLs or captions.
+   - No real family names, surnames or private family details in the repo (it's public). Use the kids' nicknames (Gammy, Pawpaw, Mom…) from `docs/product/PERSONAS.md`.
 3. **Grandparent UX.**
    - Text 17pt+ and 48pt tap targets.
    - Verb labels and words under icons; no gesture-only actions.
