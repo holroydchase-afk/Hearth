@@ -289,6 +289,13 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** per-photo boxes turn a 48-photo send into 48 questions for LG; reposting loses comments; encrypting now blocks caption search; a labeled box is easier to skip than a button to find.
 - **Source:** `docs/product/SPEC-CAPTIONS.md`, `docs/product/decisions/2026-10-27-post-titles-captions.md`, TRACKER R21
 
+### DEC-40 · Bleeding-edge pick: home-screen photo frame first; plan the family vault next (FRAME-*)
+- **When / status:** Oct 29 · Decided by Chase ("Start with 1"; then "I also want a plan for 2"); specced, not built
+- **Chose:** (1) a home-screen photo frame widget, plus a send-progress Live Activity for posters, after milestone 2's real build; (2) a day-by-day plan for the family vault on MLS (`PLAN-FAMILY-VAULT.md`), timing still per DEC-16.
+- **Over:** an on-device AI audience guard (paid tier; blocked on the face-scanning claim), and starting the vault build now.
+- **Because:** the frame is the cheapest of the three, and grandparents see it with zero taps (STORY problem 3). The vault is the long-term moat and reuses the messenger's MLS.
+- **Source:** `docs/product/SPEC-PHOTO-FRAME.md`, `docs/product/decisions/2026-10-29-photo-frame.md`, `docs/product/PLAN-FAMILY-VAULT.md`, TRACKER R23, R24
+
 ### DEC-41 · Photos refresh on their own; sort uses the system icon (UI-26)
 - **When / status:** Oct 26 · Decided by Chase (thread "Review latest build UI")
 - **Chose:** no "Check for new photos" button (auto-refresh on open and return, plus pull-down); "By date" with the system sort icon beside Messages in one row.
