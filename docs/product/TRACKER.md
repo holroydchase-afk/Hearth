@@ -1,6 +1,6 @@
 # Hearth tracker: what's next, what's missing, what's pending
 
-The one list of everything open between Chase and Claude. Updated Oct 24, 2026.
+The one list of everything open between Chase and Claude. Updated Oct 27, 2026.
 
 **How it works**
 - Work the **Sequence** top to bottom. One step at a time; nothing new gets built until milestone 1 passes (Chase, Oct 17).
@@ -36,7 +36,12 @@ The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/202
 | R17 | A "Photo helpers" on/off switch for the family's owner on a screen (today it's a database row). grandparent-ux words and a persona check first | P2 | S | ☐ |
 | R19 | Reactions: Love, Haha, Like and Comment as icons only on each moment (REACT-1..9, DEC-38, migration 0017) | P1 | S | ◐ Oct 25: merged (PR #55), 0017 deployed. Opens on phones once the SDK 58 PR is merged and published (Oct 26) |
 | R18 | Moment cards: one compact card per upload (collage, one Love and Comment row, one-row reply box, More for who-sees-it and Delete), UAT 8-9 (MOMENT-1..8) | P1 | M | ◐ Oct 25: merged (PR #54). Publish to Expo Go and rebuild the demo on Chase's word |
-| R16 | Rest of the studio-agents migration (`examples/hearth/MIGRATION.md` in studio-agents): move Hearth facts into docs, swap in the generic agents, archive funding-analyst | P2 | S | ☐ After the Nov 22 beta; `ux-reviewer` synced Oct 22 |
+| R20 | Supabase starter pieces for the studio template: invites, token-only deploy and smoke check (`docs/supabase-starter/`, STARTER-*) | P2 | S | ◐ Oct 27: built and green 3x; PR open, waiting on Chase's merge |
+| R21 | Post titles and captions like Instagram and Facebook: optional title plus caption for the set, Read more fold, change the words after posting, title on bulk sends (`SPEC-CAPTIONS.md`, CAP-1..12) | P1 | M | ◐ Oct 28 (release M1.1 phase 5, PR): titles built: CAP-1..5, 10..12, migration 0019 (deploy on Chase's word). Left: change the words after posting (CAP-6..8), bulk title (CAP-9), grandparent-ux pass on the words |
+| R16 | Rest of the studio-agents migration (`examples/hearth/MIGRATION.md` in studio-agents): move Hearth facts into docs, swap in the generic agents, archive funding-analyst | P2 | S | ◐ Oct 28: pulled forward on Chase's word. Studio agents synced (staff-pm, qa-tdd, engineer, privacy-security, positioning, ux-reviewer, architect), each with a built-in Hearth notes section from `docs/eng/AGENT-NOTES.md` via `scripts/sync-agents.sh`, old agents archived. PR open, waiting on Chase's merge |
+| R22 | Release M1.1 "functional, high-quality demo" (Chase, Oct 28): plan, works for real, UI 8/10, harden, enhancements, demo, reusable blocks; one PR per phase | P0 | L | ◐ Oct 28: phase 2 (REAL-1: the real-API contract run works again and runs in CI) PR open; phase 3 (UI-1..5, UX 5/10 → 8/10) PR open; phase 4 (HARD-12 reactions lockdown and HARD-17 feed speed in migration 0018, HARD-13) PR open, deploy 0018 on Chase's word; HARD-14..16 open tickets; phase 5 (post titles, R21) PR open; phase 6 (demo rebuilt, live checked, INTAKE to re-host) PR open; phase 7 (LESSONS + reusable-blocks INTAKE) PR open. Waiting on Chase: merge #63-#68, deploy 0018/0019. Left from the review: Messages privacy note wording and the Share group-count wrap (to grandparent-ux) |
+| R23 | Home-screen photo frame widget and poster send-progress Live Activity (`SPEC-PHOTO-FRAME.md`, FRAME-*, DEC-40). Needs a real build; architect picks the library, privacy-security reviews the widget's photo copy (rule 6) | P2 | M | ◐ Oct 29: specced, persona check done; build after milestone 2's real build |
+| R24 | Family vault: end-to-end encrypted groups on MLS, 14 one-PR days (`PLAN-FAMILY-VAULT.md`, DEC-16, DEC-40). Days 2 (per-family keys, D8) and 3 (safety numbers) help everyone and could go early | P2 | L | ☐ Oct 29: planned; day 1 needs Chase's two picks (per family, recovery card) |
 | R14 | npm audit: recheck the Expo CLI build-tool findings after the next Expo patch (RV-X4) | P2 | S | ☑ Oct 21: still 62 from 5 advisories on expo 57.0.30 (newest SDK 57 patch). One ships: decode-uri-component in expo-router (a crafted link could freeze the app; no data exposed). No forced override; recheck at the SDK 58 move (Oct 26: moved to SDK 58; recheck in the next PR) |
 
 ## Sequence to milestone 1
@@ -158,7 +163,7 @@ The plan with priorities and refactors is `AI-FEATURES.md` "Build plan". Milesto
 
 ## Done (latest first)
 
-- Oct 26: the messenger moved into the shared library `packages/messenger` (`@holroyd/messenger`), licensed AGPL-3.0-or-later with Chase as copyright holder (DEC-39, Product Studio STU-DEC-1). Hearth's chat is a thin adapter over it with no behavior change; PKG-1..6 and the relay template's RELAY-1..9 run in the suites. Crew Clock is the next user.
+- Oct 26: the messenger moved into the shared library `packages/messenger` (`@holroyd/messenger`), licensed AGPL-3.0-or-later with Chase as copyright holder (DEC-42, Product Studio STU-DEC-1). Hearth's chat is a thin adapter over it with no behavior change; PKG-1..6 and the relay template's RELAY-1..9 run in the suites. Crew Clock is the next user.
 - Oct 24 (night shift 4): the published demo was checked live and is ready to send to recruiters; the README and case study link it (RD-1, RD-2). HARD-8 to HARD-11 fixed test-first (`docs/reviews/2026-10-24-share-ready.md`). Draft PR, not merged.
 - Oct 23 (night shift 3, hardening): HARD-1..5 and HARD-7 fixed test-first (`docs/reviews/2026-10-23-harden.md`): no duplicate group on a retry, Share says when photos were left out or there's no group, a pasted invite link works, the code minute holds after going back, the demo opens with browser storage blocked. Draft PR, not merged.
 - Oct 19: messenger merged (PR #29) and migration 0015 deployed. Open PR #20's still-true items folded in here and in ACCOUNTS.md (QA-R1 and QA-R2 were already done: account B exists, keys live Oct 18).

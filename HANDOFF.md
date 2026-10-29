@@ -1,10 +1,73 @@
 # Handoff
 
 ## Oct 26: the messenger is now a shared library (branch claude/project-thread-tzgzk8, PR)
-- **Why:** Chase, Oct 26: "proceed. Build the library" so Crew Clock can use it too (STU-DEC-1, DEC-39). He asked for it directly, so this goes ahead under the Polish Freeze, with no change to what users see.
+- **Why:** Chase, Oct 26: "proceed. Build the library" so Crew Clock can use it too (STU-DEC-1, DEC-42). No change to what users see.
 - **Done:** `packages/messenger` (`@holroyd/messenger`): the engine and noble-only ciphersuite behind Relay, Roster and Store, plus `relay/supabase.sql` (0015 without Hearth; each product writes `private.messenger_people`). **License: AGPL-3.0-or-later, copyright Chase Holroyd**: `packages/messenger/LICENSE`, plus SPDX headers on every file. Hearth's `app/src/messenger/client.ts` and `mlsCrypto.ts` are now thin adapters. Storage keys are unchanged, so phones keep their chats. Wiring: the app links the library with `file:../packages/messenger`; `app/metro.config.js` (watchFolders, nodeModulesPaths), `preserveSymlinks` in tsconfig, and Jest `roots` and `modulePaths`.
 - **Tests:** PKG-1..6 (engine on test fakes, run in the app suite), RELAY-1..9 (`packages/messenger/relay/test.sql`, run by `backend/tests/run.sh` and `run_supabase.sh`), all MSG tests unchanged. The iOS bundle compiles with the library inside.
+- Oct 29: brought up to date with main after release M1.1; decision renumbered DEC-39 → DEC-42 (DEC-39 is captions, DEC-40 the photo frame, DEC-41 PR #58).
 - **Next exact step:** Chase says "merge". Then he pastes the Product Studio and Crew Clock prompts from the thread "Built-in messenger". No deploy is needed (no migration change).
+
+## Oct 29, bleeding-edge features: photo frame spec and family vault plan (branch claude/project-thread-5ifxmu, docs only)
+- **Chase's call (DEC-40):** of three ideas (photo frame, MLS vault, AI audience guard), "Start with 1", plus a day-by-day plan for 2.
+- **Specced:** `docs/product/SPEC-PHOTO-FRAME.md` (FRAME-R1..R5, FRAME-1..8), with a persona check (`decisions/2026-10-29-photo-frame.md`, LG Red mitigated: optional, set up by a helper). Live Activity moved to the poster's send progress, because Apple allows them only for things in progress. TRACKER R23.
+- **Planned:** `docs/product/PLAN-FAMILY-VAULT.md`, 14 one-PR days reusing the messenger's MLS, with an MLS explainer. TRACKER R24. Ideas log row added.
+- **Next exact step:** Chase answers day 1's two picks (vault per family; recovery card yes) and says "merge" for this docs PR. The frame build waits for milestone 2's real build.
+
+## Oct 28, release M1.1 phase 7: reusable blocks (branch claude/project-thread-kzt7by-rel6, draft PR, stacked on phase 6)
+- **Lesson written:** `docs/eng/LESSONS.md` Oct 28 (every proof runs in CI; a flaky test is a finding; heavy RPCs plan with JIT off).
+- **Give-back (INTAKE only, per STACK.md: no extraction until a second product needs it):** `docs/portfolio/INTAKE-2026-10-28-reusable-blocks.md` (also in the project files) offers Product Studio the jest-expo fetch snippet, the Supabase JIT rule and the CI rule for studio-agents and pm-tools.
+- **Next exact step:** Chase merges #63-#68 in order, says "deploy 0018 and 0019", then pastes the two Oct 28 INTAKEs to Product Studio.
+
+## Oct 28, release M1.1 phase 6: demo (branch claude/project-thread-kzt7by-rel5, draft PR, stacked on phase 5)
+- **Live today (verified 08:00 UTC):** chaseholroyd.com/demo/hearth/ answers, passes the showcase sweep at phone and laptop width with no console errors (the not-found page's 404 is expected), first card in about 2.1 s. It's the older build: two-line bar, no titles.
+- **New build:** `app/dist-demo-site` from this branch passes `npm run e2e:site` 8/8 on a Pages-like host; first card in about 1.2 s; titles and the new bar and laptop frame show.
+- **Portfolio / public presence:** `docs/portfolio/INTAKE-2026-10-28-demo-refresh.md` asks Product Studio to re-copy the demo after Chase merges #63-#66 (a ready tarball is in the project files, `portfolio/hearth-demo-site-2026-10-28.tgz`) and to refresh the page's test counts (660+ app, 960+ database).
+- **Next exact step:** Chase merges #63-#66, then pastes the INTAKE to Product Studio.
+
+## Oct 28, release M1.1 phase 5: post titles (branch claude/project-thread-kzt7by-rel4, draft PR, stacked on phase 4)
+- **Why this enhancement:** of everything waiting, it's the one a recruiter sees in the first ten seconds of the demo: cards read like real posts ("Mia's 5th birthday", then the caption, then photos). Chase approved the spec's picks (DEC-39), so it's the highest-value item that needs no new call from him.
+- **Built, test-first (CAP-1..5, 10..12):** an optional Title box (80 characters) on Share; the card shows the title as a heading above the caption; a long caption folds to 4 lines with Read more / Show less; By date shows titles too; two demo moments carry titles. Migration **0019** adds `posts.title`, `create_post(p_title)` and the title on `get_feed` / `get_timeline` (not deployed: needs Chase's word, after 0018). The log check now treats `title` like `caption`.
+- **Left:** change the words after posting (CAP-6..8), a bulk title (CAP-9), and a grandparent-ux pass on the words.
+- **Tests (3 green runs):** app Jest 664 + 1 skipped, typecheck, web e2e 4, demo e2e 5, real-API contract 65/65, backend SQL all suites (new `captions_test.sql`), PRIV-2 12/12.
+- **Portfolio / public presence:** demo cards now show titles once the demo is rebuilt (phase 6).
+- **Next exact step:** Chase says "merge" (after phases 2-4), then "deploy 0018 and 0019" and an app update.
+
+## Oct 28, release M1.1 phase 4: harden (branch claude/project-thread-kzt7by-rel3, draft PR, stacked on phase 3)
+- **Review:** privacy-security (with the qa-tdd lens) read everything since Oct 24 (`docs/reviews/2026-10-28-harden.md`).
+- **Fixed, test-first:** HARD-12 (P1): members could write reactions straight to the table, skipping the three-emoji list and "replies off". Migration **0018** closes it (not deployed: needs Chase's word). HARD-13: sign out now deletes the cached feed (captions, names, reactions). HARD-17 (P1, found by running the real-API contract 3×): Postgres JIT-compiled the feed query once a family had a few dozen posts, 1.5-2 s per Photos page instead of 20-50 ms; 0018 turns JIT off for it.
+- **Open tickets:** HARD-14 (B11), HARD-15 (T11), HARD-16 (B12), all P2/P3. Captions' sketched migration is now 0019.
+- **Tests (3 green runs):** backend SQL all suites, app Jest, real-API contract, typecheck, PRIV-2 log check.
+- **Next exact step:** Chase says "merge" (after phases 2 and 3), then "deploy 0018" (it speeds up Photos and closes the reactions hole).
+
+## Oct 28, release M1.1 phase 3: UI to 8/10 (branch claude/project-thread-kzt7by-rel2, draft PR, stacked on phase 2)
+- **Score:** the studio ux-reviewer scored the public demo 5/10 before and 8/10 after (`docs/reviews/2026-10-28-ui-8.md`).
+- **Built, test-first (UI-1..5):** a one-line demo bar with one row of matching chips; a centred laptop frame with proof points and a "Read the case study" link; gray Open buttons in Messages; the demo's Me names Sam instead of a placeholder email; the showcase sweep waits for each screen. Persona check all Green (`docs/product/decisions/2026-10-28-ui-polish.md`).
+- **Tests (3 green runs):** app 654 + 1 skipped, typecheck clean, demo e2e 9, showcase sweep 48 shots with a clean console.
+- **Portfolio / public presence:** the demo's bar and laptop frame change; the live site still serves the Oct 22 build until phase 6's INTAKE re-hosts it.
+- **Next exact step:** Chase says "merge" (after phase 2's PR). The release continues with phase 4 (harden).
+
+## Oct 28, release M1.1 phase 2: works for real (branch claude/project-thread-kzt7by-rel1, draft PR)
+- **Found (REAL-1, P0 for testing):** since the SDK 58 move, jest-expo swaps the global fetch for Expo's native-only one. So `scripts/contract-real.sh` (the app's HearthApi contract against the real Postgres + PostgREST API) got no answers at all: 60 of 63 checks failed with UNKNOWN. CI never ran it, so nobody saw it. The app itself was fine; the proof that it works against the real backend was gone.
+- **Fixed, test-first:** `app/jest.environment.js` keeps Node's network fetch, and the harness uses it (`netFetch.test.ts`, REAL-1). Two contract tests assumed a fresh database per test (T10 now makes its own group; TIME-2 allows more than one page), and the harness now knows who each JWT client is. All 63 real-API checks pass, and so do all backend SQL suites (local Postgres 16). A new CI job, "App contract on the real API (PostgREST)", runs this on every PR.
+- **Tests (3 green runs):** app 648 + 1 skipped, typecheck clean, web e2e 4, real-API contract 63/63, backend SQL all suites.
+- **Next exact step:** Chase says "merge". The release continues with phase 3 (UI to 8/10) on a stacked branch.
+
+## Oct 28: Hearth moved onto the generic studio agents (TRACKER R16, branch claude/project-thread-0hdj2z, PR)
+- **Why:** Chase, Oct 28: "go over the generic agent updates". This pulls R16 forward from after the beta. It's process only, with no app change.
+- **Done:** synced from studio-agents main (2f27166): staff-pm, qa-tdd, engineer (replaces app-engineer), privacy-security, positioning (replaces marketing), ux-reviewer and architect (new). grandparent-ux stays Hearth's own. funding-analyst is archived in `docs/archive/agents/`. On Chase's ask ("the strongest agents, don't lose anything, combine and build"), each agent is the studio text plus a built-in "Hearth notes" section generated from `docs/eng/AGENT-NOTES.md` by the new `scripts/sync-agents.sh` (AGENTS-1..3, `scripts/tests/sync_agents_test.sh`). `check-agents.sh` now fails on drift. All the old Hearth agents are kept whole in `docs/archive/agents/`. The CLAUDE.md roster and the live references are updated.
+- **Give-back:** an INTAKE asks Product Studio to add the persona check and the crypto bar to the generic staff-pm and privacy-security (`/mnt/project-files/portfolio/INTAKE-2026-10-28-agent-giveback.md`).
+- **Next exact step:** Chase says "merge".
+
+## Oct 27: plan for post titles and captions (branch claude/project-thread-095lsp, PR)
+- **Why:** Chase, Oct 27: "the poster should be able to have a social media type post describing the set of pictures. Similar to Instagram and Facebook." The Polish Freeze is on, so this is a plan, not a build.
+- **Planned:** an optional 80-character title plus today's caption for the whole set, folded with Read more, changeable by the sender from More (no notice, comments kept), one title for a bulk send; no per-photo captions, mentions, hashtags, links or AI help (AI-FEATURES R6). Words stay out of every notice and log. Migration sketched (now 0019), size M.
+- **Next exact step:** Oct 28, Chase took all four picks (DEC-39) and said merge. Chase lifted all freezes Oct 28; the Oct 28 2:15am release run decides whether and when captions get built (TRACKER R21).
+
+## Oct 27: Supabase starter pieces for the studio (branch claude/project-thread-0hdj2z, PR)
+- **Why:** Chase, Oct 27, asked to work through the reuse list one item at a time ("Let's go"). That's new scope under the Polish Freeze, on his explicit word. This is Hearth's half of pm-tools `docs/intakes/hearth-supabase-starter.md` (Crew Clock needs Supabase next).
+- **Built, test-first:** `docs/supabase-starter/` holds invite codes on the studio template's orgs (STARTER-INV-1..7, 25 checks) and token-only `deploy.sh` and `smoke-check.sh` with no Hearth defaults (STARTER-DEPLOY-1..5, STARTER-SMOKE-1..2, 17 checks). There's a new CI job `supabase-starter` (studio-agents pinned at 5a90300, PR #11). Hearth's own backend is unchanged.
+- **Also from the list:** the other gaps (ACCOUNTS template, architecture skeleton, check-agents and check-logs scripts) went to Product Studio as an INTAKE. The photo privacy library and the other Expo-only pieces are skipped: STACK.md says to extract only once a second product needs something.
+- **Next exact step:** Chase says "merge". Then Product Studio copies the four files into studio-agents `templates/supabase/` (see the folder's README).
 
 ## Oct 26: SDK 58 (branch claude/project-thread-d16zyx, PR)
 - **Why:** Chase's Expo Go moved to SDK 58, so the SDK 57 reactions update wouldn't open ("No launchable updates"). The Expo Go check missed it because Expo's `expoGoSdkVersion` lagged (LESSONS.md, Oct 26).

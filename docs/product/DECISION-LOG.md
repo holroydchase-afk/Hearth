@@ -282,7 +282,21 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** Chase wants the row to look like the photo apps relatives already use. Screen readers still hear each name; the LG and FA Reds are his override.
 - **Source:** `docs/product/decisions/2026-10-25-reactions.md`, PR for migration 0017
 
-### DEC-39 · The messenger becomes a shared AGPL library (STU-DEC-1)
+### DEC-39 · Post titles and captions: one set of words per post, editable, encrypted later (CAP-D1..D4)
+- **When / status:** Oct 28 · Decided by Chase ("picks ok"); not built yet (freezes lifted Oct 28)
+- **Chose:** an optional title and caption for the whole set (CAP-D1); the sender can change them after posting (CAP-D2); the words stay plaintext until the family vault (CAP-D3); the Title box shows, marked optional (CAP-D4).
+- **Over:** a caption per photo; delete and repost (BETA-SPEC); encrypting the words now; a hidden "Add a title" button.
+- **Because:** per-photo boxes turn a 48-photo send into 48 questions for LG; reposting loses comments; encrypting now blocks caption search; a labeled box is easier to skip than a button to find.
+- **Source:** `docs/product/SPEC-CAPTIONS.md`, `docs/product/decisions/2026-10-27-post-titles-captions.md`, TRACKER R21
+
+### DEC-40 · Bleeding-edge pick: home-screen photo frame first; plan the family vault next (FRAME-*)
+- **When / status:** Oct 29 · Decided by Chase ("Start with 1"; then "I also want a plan for 2"); specced, not built
+- **Chose:** (1) a home-screen photo frame widget, plus a send-progress Live Activity for posters, after milestone 2's real build; (2) a day-by-day plan for the family vault on MLS (`PLAN-FAMILY-VAULT.md`), timing still per DEC-16.
+- **Over:** an on-device AI audience guard (paid tier; blocked on the face-scanning claim), and starting the vault build now.
+- **Because:** the frame is the cheapest of the three, and grandparents see it with zero taps (STORY problem 3). The vault is the long-term moat and reuses the messenger's MLS.
+- **Source:** `docs/product/SPEC-PHOTO-FRAME.md`, `docs/product/decisions/2026-10-29-photo-frame.md`, `docs/product/PLAN-FAMILY-VAULT.md`, TRACKER R23, R24
+
+### DEC-42 · The messenger becomes a shared AGPL library (STU-DEC-1)
 - **When / status:** Oct 26 · Decided by Chase (Product Studio STU-DEC-1, license on Oct 26; built the same day on his word)
 - **Chose:** move the MLS engine and ciphersuite into `packages/messenger` (`@holroyd/messenger`), with three plug points (Relay, Roster, Store) and a Supabase relay template. It's licensed AGPL-3.0-or-later, copyright Chase, with its own LICENSE file and SPDX headers. Hearth uses it through a thin adapter. Crew Clock is the second user.
 - **Over:** a standalone messenger product (it would need push, multiple devices, safety numbers and an outside audit first); Apache-2.0 (Product Studio's first draft); waiting until after the beta.
@@ -290,4 +304,4 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Source:** pm-tools `DECISIONS.md` STU-DEC-1, `packages/messenger/README.md`
 
 ---
-Last updated: Oct 26, 2026 (DEC-39)
+Last updated: Oct 29, 2026 (DEC-42)

@@ -497,6 +497,22 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(u.sort_at).toBe(u.published_at);
     });
 
+    it('CAP-1/3/5/11 (0019) a post can carry a title: the feed and the timeline return it; none is null', async () => {
+      const id = await poster.createPost({ clientId: uuid(), space: h.spaceId, caption: 'Cake, candles, a nap', circleIds: [h.circleIn], title: "  Lily's 5th birthday " });
+      await h.attachReadyMedia(poster, id);
+      await poster.publishPost(id);
+      const plain = await datedPost(null);
+      const feed = await viewerIn.getFeed({ space: h.spaceId, limit: 50 });
+      expect(feed.find((r) => r.post_id === id)!.title).toBe("Lily's 5th birthday");
+      expect(feed.find((r) => r.post_id === plain)!.title ?? null).toBeNull();
+      expect((await viewerIn.getTimeline({ space: h.spaceId, limit: 50 })).find((r) => r.post_id === id)!.title).toBe("Lily's 5th birthday");
+      expect((await viewerOut.getFeed({ space: h.spaceId, limit: 50 })).find((r) => r.post_id === id)).toBeUndefined();
+    });
+
+    it('CAP-2 (0019) a title over 80 characters is refused with 23514', async () => {
+      expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], title: 'x'.repeat(81) }))).toBe('23514');
+    });
+
     it('BETA-TIME-1 feed rows carry taken_at (for the "Added from earlier" card); null when none', async () => {
       const old = await datedPost('2024-07-04T14:00:00.000Z');
       const undated = await datedPost(null);
@@ -523,13 +539,17 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       const all = await tlIds(viewerIn);
       const seen: string[] = [];
       let beforeAt: string | null = null, beforeId: string | null = null;
-      for (let guard = 0; guard < 30; guard++) {
-        const page = await viewerIn.getTimeline({ space: h.spaceId, limit: 2, beforeAt, beforeId });
+      // REAL-1: pages of 5, and stop once the first 50 are covered: paging the whole shared database 2 at a time
+      // was slow, and each page cost 1.5-2 s before HARD-17 (JIT off for feed_rows).
+      for (let guard = 0; guard < 30 && seen.length < all.length; guard++) {
+        const page = await viewerIn.getTimeline({ space: h.spaceId, limit: 5, beforeAt, beforeId });
         seen.push(...page.map((p) => p.post_id));
-        if (page.length < 2) break;
+        if (page.length < 5) break;
         beforeAt = page[page.length - 1]!.sort_at; beforeId = page[page.length - 1]!.post_id;
       }
-      expect(seen).toEqual(all);
+      // REAL-1: the real harness keeps one database for the whole run, so there can be more than one 50-row page.
+      expect(seen.slice(0, all.length)).toEqual(all);
+      if (all.length < 50) expect(seen).toEqual(all);
       expect(new Set(seen).size).toBe(seen.length);
       expect((await viewerIn.getTimeline({ space: h.spaceId, limit: 500 })).length).toBeLessThanOrEqual(50);
     });
