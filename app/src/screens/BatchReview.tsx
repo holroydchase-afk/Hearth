@@ -65,8 +65,8 @@ export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel,
                 key={g.circle_id}
                 kind="checkbox"
                 label={`${g.name}, ${people(g.member_count)}`}
-                title={`${g.name} · ${people(g.member_count)}`}
-                detail={g.member_names.join(', ')}
+                title={g.name}
+                detail={`${people(g.member_count)}: ${g.member_names.join(', ')}`}
                 checked={chosen.includes(g.circle_id)}
                 onPress={() => onToggle(g.circle_id)}
               />

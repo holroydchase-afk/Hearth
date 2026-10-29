@@ -290,7 +290,7 @@ export class FeedStore {
       this.set({ posts: this.state.posts.map((p) => (p.post_id === id ? { ...p, title: t, caption: c, words_edited_at: at } : p)) });
       return null;
     } catch (e) {
-      return messageFor(e, { inviter: this.o.inviter });
+      return messageFor(e, { inviter: this.o.inviter, action: 'edit' });
     }
   }
 
