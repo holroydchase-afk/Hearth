@@ -7,8 +7,8 @@ Every group and event in a family space has a chat. Messages are end-to-end encr
 | Piece | What it does | Code |
 |---|---|---|
 | MLS library | `ts-mls` 1.6.4 (MIT, pure TypeScript): groups, key changes ("commits"), welcomes, application messages | `app/package.json` |
-| Ciphersuite | `MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519` (suite 3), built on the audited `@noble` libraries because Expo Go (Hermes) has no WebCrypto. HPKE ([RFC 9180](https://www.rfc-editor.org/rfc/rfc9180)) base mode, HKDF/HMAC-SHA256, X25519, Ed25519, ChaCha20-Poly1305. Tests interoperate both ways with ts-mls's WebCrypto pieces (`@hpke/core`) | `app/src/messenger/mlsCrypto.ts` |
-| Phone client | Keeps this phone's signing key, key packages, each group's MLS state and the message history; joins, sends, applies key changes, adds and removes people | `app/src/messenger/client.ts` |
+| Ciphersuite | `MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519` (suite 3), built on the audited `@noble` libraries because Expo Go (Hermes) has no WebCrypto. HPKE ([RFC 9180](https://www.rfc-editor.org/rfc/rfc9180)) base mode, HKDF/HMAC-SHA256, X25519, Ed25519, ChaCha20-Poly1305. Tests interoperate both ways with ts-mls's WebCrypto pieces (`@hpke/core`) | `packages/messenger/src/crypto.ts` (shared library; Hearth's `app/src/messenger/mlsCrypto.ts` feeds it `getRandomValues`) |
+| Phone client | Keeps this phone's signing key, key packages, each group's MLS state and the message history; joins, sends, applies key changes, adds and removes people | `packages/messenger/src/engine.ts` (shared library, AGPL-3.0-or-later); Hearth's adapter `app/src/messenger/client.ts` plugs in the 0015 relay, the roster and encrypted storage |
 | Relay | Six RPCs over four RPC-only tables; stores opaque base64 MLS bytes | `backend/supabase/migrations/0015_messenger.sql` |
 | Screen | Messages, opened from a button at the top of Photos | `app/src/screens/MessagesScreen.tsx` |
 
@@ -50,4 +50,4 @@ The server decides who *may* be in the chat; the phones decide who *is* in the M
 - **Gap: not audited.** `mlsCrypto.ts` is about 170 lines of our own glue code (hand-written HPKE plus the ciphersuite wiring) around the audited `@noble` primitives and ts-mls. It has had no outside review. Our privacy-security agent checked it against RFC 9180 and RFC 9420 on 2026-10-19 and found the math right (labels, key schedule, nonces, export, the all-zero X25519 check). It found one real problem, now fixed: expo-crypto's `getRandomBytes` quietly uses `Math.random` in development builds, which includes Expo Go, so keys could have been predictable. All app randomness now goes through `app/src/crypto/random.ts`, which uses only `getRandomValues` and fails rather than fall back (tests MS4). That fix also covers photo keys and the local-storage key, which used the same call. Smaller items still open: no RFC 9180 known-answer test vectors, and export is interop-tested in one direction only. Signatures use strict RFC 8032 checks.
 
 ---
-Last checked against code: 2026-10-19, MS4 randomness fix (migration 0015)
+Last checked against code: 2026-10-26, messenger moved into the shared library `packages/messenger` (behavior unchanged; migration 0015)

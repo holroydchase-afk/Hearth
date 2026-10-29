@@ -303,5 +303,12 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** Chase didn't understand the refresh button and wants common system icons where they're universal. The first photo comes a row sooner.
 - **Source:** `docs/product/decisions/2026-10-26-photos-refresh-sort.md`
 
+### DEC-42 · The messenger becomes a shared AGPL library (STU-DEC-1)
+- **When / status:** Oct 26 · Decided by Chase (Product Studio STU-DEC-1, license on Oct 26; built the same day on his word)
+- **Chose:** move the MLS engine and ciphersuite into `packages/messenger` (`@holroyd/messenger`), with three plug points (Relay, Roster, Store) and a Supabase relay template. It's licensed AGPL-3.0-or-later, copyright Chase, with its own LICENSE file and SPDX headers. Hearth uses it through a thin adapter. Crew Clock is the second user.
+- **Over:** a standalone messenger product (it would need push, multiple devices, safety numbers and an outside audit first); Apache-2.0 (Product Studio's first draft); waiting until after the beta.
+- **Because:** Chase wants one messenger across his products. A library with one home costs little now and keeps Hearth's behavior unchanged; the AGPL keeps every product that uses it open.
+- **Source:** pm-tools `DECISIONS.md` STU-DEC-1, `packages/messenger/README.md`
+
 ---
-Last updated: Oct 29, 2026 (DEC-41)
+Last updated: Oct 29, 2026 (DEC-42)
