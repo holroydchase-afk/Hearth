@@ -167,6 +167,13 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(viewerOut.setReaction(id, '❤️'))).toBe('P0002');
       expect(await viewerOut.reactionSummary([id])).toEqual([]);
     });
+    it('HARD-15 (T11) the author can react to their own unsent post; nobody else can see it', async () => {
+      const id = await poster.createPost({ clientId: uuid(), space: h.spaceId, caption: 'draft', circleIds: [h.circleIn] });
+      expect(await poster.setReaction(id, '❤️')).toEqual({ my_reaction: '❤️', heart_count: 1, counts: { '❤️': 1 } });
+      expect(await poster.reactionSummary([id])).toEqual([{ post_id: id, my_reaction: '❤️', counts: { '❤️': 1 } }]);
+      expect(await code(viewerIn.setReaction(id, '❤️'))).toBe('P0002');
+      expect(await viewerIn.reactionSummary([id])).toEqual([]);
+    });
   });
 
   describe('BETA-REPLY-2 comments', () => {
