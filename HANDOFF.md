@@ -8,6 +8,12 @@
 - Oct 29: brought up to date with main after release M1.1; decision renumbered DEC-39 → DEC-41 (DEC-39 is captions, DEC-40 is PR #69).
 - Next: publish to Expo Go after merge (Chase's word). Next gap: tall cards from the always-open reply box (DEC-30 keeps it).
 
+## Oct 29, bleeding-edge features: photo frame spec and family vault plan (branch claude/project-thread-5ifxmu, docs only)
+- **Chase's call (DEC-40):** of three ideas (photo frame, MLS vault, AI audience guard), "Start with 1", plus a day-by-day plan for 2.
+- **Specced:** `docs/product/SPEC-PHOTO-FRAME.md` (FRAME-R1..R5, FRAME-1..8), with a persona check (`decisions/2026-10-29-photo-frame.md`, LG Red mitigated: optional, set up by a helper). Live Activity moved to the poster's send progress, because Apple allows them only for things in progress. TRACKER R23.
+- **Planned:** `docs/product/PLAN-FAMILY-VAULT.md`, 14 one-PR days reusing the messenger's MLS, with an MLS explainer. TRACKER R24. Ideas log row added.
+- **Next exact step:** Chase answers day 1's two picks (vault per family; recovery card yes) and says "merge" for this docs PR. The frame build waits for milestone 2's real build.
+
 ## Oct 28, release M1.1 phase 7: reusable blocks (branch claude/project-thread-kzt7by-rel6, draft PR, stacked on phase 6)
 - **Lesson written:** `docs/eng/LESSONS.md` Oct 28 (every proof runs in CI; a flaky test is a finding; heavy RPCs plan with JIT off).
 - **Give-back (INTAKE only, per STACK.md: no extraction until a second product needs it):** `docs/portfolio/INTAKE-2026-10-28-reusable-blocks.md` (also in the project files) offers Product Studio the jest-expo fetch snippet, the Supabase JIT rule and the CI rule for studio-agents and pm-tools.
