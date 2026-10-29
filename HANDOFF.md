@@ -1,5 +1,13 @@
 # Handoff
 
+## Oct 26: Photos screen UI review and fixes (branch claude/project-thread-vhp0f2, PR)
+- ux-reviewer on Chase's phone screenshot plus the web demo at 390 and 1280: 5/10 → 6/10. Review: `docs/reviews/2026-10-26-photos-screen.md`.
+- Built test-first: UI-26 no "Check for new photos" button (auto-refresh on open and return, plus pull-down), "By date" with the system sort icon beside Messages in one row (DEC-41); UI-27 avatar letter skips "The".
+- The gear in Chase's screenshot is Expo Go's developer button, not ours.
+- **Parked:** filter Photos by group (Chase, Oct 26; not scheduled).
+- Oct 29: brought up to date with main after release M1.1; decision renumbered DEC-39 → DEC-41 (DEC-39 is captions, DEC-40 is PR #69).
+- Next: publish to Expo Go after merge (Chase's word). Next gap: tall cards from the always-open reply box (DEC-30 keeps it).
+
 ## Oct 29, bleeding-edge features: photo frame spec and family vault plan (branch claude/project-thread-5ifxmu, docs only)
 - **Chase's call (DEC-40):** of three ideas (photo frame, MLS vault, AI audience guard), "Start with 1", plus a day-by-day plan for 2.
 - **Specced:** `docs/product/SPEC-PHOTO-FRAME.md` (FRAME-R1..R5, FRAME-1..8), with a persona check (`decisions/2026-10-29-photo-frame.md`, LG Red mitigated: optional, set up by a helper). Live Activity moved to the poster's send progress, because Apple allows them only for things in progress. TRACKER R23.
