@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 29: repo public, root LICENSE added (branch claude/project-thread-l5pj6x, PR)
+- Chase made the repo public Oct 29 (it also unblocked GitHub Actions, which had stopped on the private repo's billing limit). A read-only scan of every branch's history found no secrets (only AWS's documentation example key and a dummy test JWT). The web app URL is in the code because invite links use it; invites still gate sign-in.
+- Added the root `LICENSE` (AGPL-3.0 text, copied from `packages/messenger/LICENSE`) so the public code is under the license Chase picked (DEC-7). DEC-7 planned going public after milestone 1 and a final name; Chase went public earlier, so the name "Hearth" is now more visible, and the README says so. Still open: whether Hearth's notices say AGPL-3.0-only or -or-later (the messenger library uses -or-later); SPDX headers on Hearth's own files.
+- Also Oct 29 in thread "Check all open PRs": #69, #58 and #57 merged (decisions renumbered DEC-41 and DEC-42).
+- Next exact step: Chase says "merge" for this PR.
+
 ## Oct 26: the messenger is now a shared library (branch claude/project-thread-tzgzk8, PR #57, merged Oct 29)
 - **Why:** Chase, Oct 26: "proceed. Build the library" so Crew Clock can use it too (STU-DEC-1, DEC-42). No change to what users see.
 - **Done:** `packages/messenger` (`@holroyd/messenger`): the engine and noble-only ciphersuite behind Relay, Roster and Store, plus `relay/supabase.sql` (0015 without Hearth; each product writes `private.messenger_people`). **License: AGPL-3.0-or-later, copyright Chase Holroyd**: `packages/messenger/LICENSE`, plus SPDX headers on every file. Hearth's `app/src/messenger/client.ts` and `mlsCrypto.ts` are now thin adapters. Storage keys are unchanged, so phones keep their chats. Wiring: the app links the library with `file:../packages/messenger`; `app/metro.config.js` (watchFolders, nodeModulesPaths), `preserveSymlinks` in tsconfig, and Jest `roots` and `modulePaths`.
