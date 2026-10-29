@@ -1,0 +1,17 @@
+ok      AGENTS-1 sync succeeds
+ok      AGENTS-1 the studio text comes first, unchanged
+ok      AGENTS-1 each agent gets its own section plus the every-agent section
+ok      AGENTS-1 no other section leaks in
+ok      AGENTS-1 only listed agents are synced; project agents are left alone
+ok      AGENTS-1 running it twice changes nothing
+ok      AGENTS-2 --check passes when the agents match the notes
+ok      AGENTS-2 --check fails when the notes changed but the agent wasn't re-synced
+ok      AGENTS-2 a re-sync fixes it
+ok      AGENTS-2 --check fails when an agent lost its Hearth section
+ok      AGENTS-3 an unknown agent copies nothing and says which
+ok      AGENTS-2 the real agents match docs/eng/AGENT-NOTES.md
+ok      AGENTS-4 every skill ux-reviewer preloads is in .claude/skills
+ok      AGENTS-4 the studio design rules and ux tools are synced
+ok      AGENTS-4 settings.json keeps the Expo plugin and wires the HANDOFF and agent-run hooks
+ok      AGENTS-4 studio-checks.json points the log roots at Hearth code and keeps caption and kek banned
+SYNC AGENTS RESULT: 16 passed, 0 failed
