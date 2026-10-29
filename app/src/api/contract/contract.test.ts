@@ -513,7 +513,7 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], title: 'x'.repeat(81) }))).toBe('23514');
     });
 
-    it('CAP-6/8 (0020) the sender changes the words; everyone gets them with an "Edited" time, and nothing else changes', async () => {
+    it('CAP-6/8 (0021) the sender changes the words; everyone gets them with an "Edited" time, and nothing else changes', async () => {
       const id = await poster.createPost({ clientId: uuid(), space: h.spaceId, caption: 'Cake', circleIds: [h.circleIn], title: 'Party' });
       await h.attachReadyMedia(poster, id);
       await poster.publishPost(id);
@@ -534,7 +534,7 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(cleared.caption ?? null).toBeNull();
     });
 
-    it('CAP-7 (0020) only the sender may change the words: others get 42501, people who can\'t see it P0002; too long is 23514', async () => {
+    it('CAP-7 (0021) only the sender may change the words: others get 42501, people who can\'t see it P0002; too long is 23514', async () => {
       const id = await datedPost(null);
       expect(await code(viewerIn.editPostWords(id, 'Mine', null))).toBe('42501');
       expect(await code(viewerOut.editPostWords(id, 'Mine', null))).toBe('P0002');

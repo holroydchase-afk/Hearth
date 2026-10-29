@@ -1,6 +1,6 @@
 # Spec: post titles and captions (CAP-*)
 
-Status: planned Oct 27, 2026; decisions taken Oct 28 (DEC-39). Part built Oct 28 (release M1.1 phase 5): CAP-1..5, CAP-10..12 and migration 0019. Oct 29: CAP-6..8 (change the words) built with migration 0020. Still to build: CAP-9 (bulk title). The caption box keeps its label "What's happening?" (CAP-1's "(optional)" is on Title only) so the words relatives know stay put; grandparent-ux to confirm. Owner: staff-pm. Persona check: `docs/product/decisions/2026-10-27-post-titles-captions.md`. TRACKER row R21.
+Status: planned Oct 27, 2026; decisions taken Oct 28 (DEC-39). Part built Oct 28 (release M1.1 phase 5): CAP-1..5, CAP-10..12 and migration 0019. Oct 29: CAP-6..8 (change the words) built with migration 0021. Still to build: CAP-9 (bulk title). The caption box keeps its label "What's happening?" (CAP-1's "(optional)" is on Title only) so the words relatives know stay put; grandparent-ux to confirm. Owner: staff-pm. Persona check: `docs/product/decisions/2026-10-27-post-titles-captions.md`. TRACKER row R21.
 
 Chase, Oct 27: "the poster should be able to have a social media type post describing the set of pictures. Similar to Instagram and Facebook."
 

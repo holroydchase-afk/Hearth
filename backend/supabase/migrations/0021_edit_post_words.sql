@@ -1,4 +1,4 @@
--- 0020: the sender changes the words after posting (CAP-6..8; docs/product/SPEC-CAPTIONS.md, DEC-39 CAP-D2), and
+-- 0021 (0020 is taken by the video-cap PR #73): the sender changes the words after posting (CAP-6..8; docs/product/SPEC-CAPTIONS.md, DEC-39 CAP-D2), and
 -- HARD-18: the words change only through that one call.
 -- edit_post_words(p_post, p_title, p_caption) changes the title and caption together and stamps words_edited_at, so
 -- every card can say "Edited". Only the sender, only while the post is theirs to send: someone who can't see the post

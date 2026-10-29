@@ -40,7 +40,7 @@ interface PostRow {
   taken_at?: string | null; batch_id?: string | null; batch_size?: number | null;
   /** 0019 (CAP-1): optional title, null when blank. */
   title?: string | null;
-  /** 0020 (CAP-6): when the sender last changed the words. */
+  /** 0021 (CAP-6): when the sender last changed the words. */
   words_edited_at?: string | null;
 }
 interface MediaRow {
@@ -548,7 +548,7 @@ export class FakeBackend {
     this.changed();
   }
 
-  /** edit_post_words (0020, CAP-6..8): the sender only, while they can still post here; no notice. */
+  /** edit_post_words (0021, CAP-6..8): the sender only, while they can still post here; no notice. */
   editPostWords(user: string | null, post: string, title: string | null, caption: string | null): string {
     const me = this.requireUser(user);
     const row = this.authorPost(me, post);
