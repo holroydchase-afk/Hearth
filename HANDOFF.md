@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 29: video, part 1: location stripping and a fair video limit (branch claude/project-thread-ponhs5, PR)
+- **Why:** Chase, Oct 29: "build video". Video was "in v1" (Oct 18) but blocked on stripping location from video on the phone (FLAG-7), plus S14 (the free cap reset per family space).
+- **Built, test-first:** `app/src/media/cleanVideo.ts`, a pure-TypeScript QuickTime/MP4 cleaner and verifier that runs in Expo Go with no re-encode: location boxes (Apple's ISO6709 key, `©xyz`), make, model, software, XMP, face boxes, metadata and timecode tracks (their samples too), dates, vendor names and trailers are zeroed in place; picture and sound bytes stay identical (VID-1..11, plus two real ffmpeg-made files that still decode). `processVideo` in `pipeline.ts` (VID-12); iPhone picks come as 720p H.264 MP4 (VID-13, BETA-SHARE-6). Migration **0020** counts the 10 free videos a month per person across every free family (`private.video_usage`; S14-1..7 in `backend/tests/video_cap_test.sql`). Test Log: S14 fixed. Spec: SPEC-MEDIA section 4.
+- **Still off:** `video_posting` stays off and `prepare.ts` still stops videos: no poster frame or player yet (TRACKER R25).
+- **Next exact step:** Chase says "merge", then "deploy 0020". Then part 2: poster frame, player, grandparent-ux words, the FLAG-7 check on Chase's iPhone, and turning video on.
+
 ## Oct 26: the messenger is now a shared library (branch claude/project-thread-tzgzk8, PR #57, merged Oct 29)
 - **Why:** Chase, Oct 26: "proceed. Build the library" so Crew Clock can use it too (STU-DEC-1, DEC-42). No change to what users see.
 - **Done:** `packages/messenger` (`@holroyd/messenger`): the engine and noble-only ciphersuite behind Relay, Roster and Store, plus `relay/supabase.sql` (0015 without Hearth; each product writes `private.messenger_people`). **License: AGPL-3.0-or-later, copyright Chase Holroyd**: `packages/messenger/LICENSE`, plus SPDX headers on every file. Hearth's `app/src/messenger/client.ts` and `mlsCrypto.ts` are now thin adapters. Storage keys are unchanged, so phones keep their chats. Wiring: the app links the library with `file:../packages/messenger`; `app/metro.config.js` (watchFolders, nodeModulesPaths), `preserveSymlinks` in tsconfig, and Jest `roots` and `modulePaths`.

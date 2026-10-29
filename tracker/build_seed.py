@@ -188,7 +188,7 @@ tickets = [
  ("S11", "bug", B, "Medium", "fixed", "A guardian can unlink their child from the other household's space", []),
  ("S12", "bug", B, "Low", "fixed", "Removed members can still edit captions on their old posts", []),
  ("S13", "bug", B, "Low", "fixed", "Members of a deleted circle can still see each other's profiles", []),
- ("S14", "bug", B, "Low", "open", "Free-tier video cap is per space; someone can make extra spaces", []),
+ ("S14", "bug", B, "Low", "fixed", "Free-tier video cap is per space; someone can make extra spaces (fixed Oct 29: counted per person, migration 0020)", []),
  ("S15", "bug", E_, "Low", "fixed", "Media can be marked ready without its key saved, which breaks that post (fails closed)", []),
  ("S16", "task", B, "High", "fixed", "Rerun the backend suite on a real Supabase stack before launch (today's runs use a stand-in)", []),
  ("E9", "enhancement", P, "High", "open", "Filter the feed by child (tag Mia / Leo on a post)", []),
@@ -207,7 +207,7 @@ tickets = [
  ("AE-6", "task", "app", "Medium", "open", "TestFlight external submission (milestone 3, after the name is final)", []),
  ("AE-7", "enhancement", B, "Medium", "fixed", "Our own error reports, fixed fields only, 30 days (0006, BETA-OPS-1)", []),
  ("AE-8", "bug", B, "Low", "fixed", "S12: removed members can't edit their old captions (0005, BETA-REPLY-4)", []),
- ("V1", "enhancement", "app", "Medium", "deferred", "Video posting: off until location can be stripped from video too (BETA-SPEC)", []),
+ ("V1", "enhancement", "app", "Medium", "deferred", "Video posting: off until location can be stripped from video too (BETA-SPEC). Oct 29: stripping built (FLAG-7 auto); poster frame, player and iPhone check left (TRACKER R25)", []),
  ("REPLY-1", "enhancement", "app", "Low", "deferred", "BETA-REPLY-1, deferred in BETA-SPEC", []),
  # Overnight Oct 18 (privacy first)
  ("PRIV-1", "bug", B, "Medium", "fixed", "The invite rate limit kept raw IP addresses, and the last ones could stay forever. Now a keyed hash, purged daily, pepper replaced daily (0012)", []),
@@ -240,7 +240,7 @@ DATES = {"S9": ("2026-10-15", "2026-10-16"), "S10": ("2026-10-15", "2026-10-16")
          "AE-5": ("2026-10-16", "2026-10-16"), "AE-6": ("2026-10-16", None), "AE-7": ("2026-10-16", "2026-10-16"),
          "AE-8": ("2026-10-16", "2026-10-16"), "V1": ("2026-10-16", None), "REPLY-1": ("2026-10-16", None),
          **{t: ("2026-10-18", "2026-10-18") for t in ("PRIV-1", "PRIV-2", "QA-3", "QA-2", "BULK-1F", "T6", "T7")},
-         "S17": ("2026-10-19", "2026-10-19"), **{t: ("2026-10-19", None) for t in ("S18", "S19", "S20")}, **{t: ("2026-10-19", "2026-10-21") for t in ("T8", "T9", "T10")}}
+         "S17": ("2026-10-19", "2026-10-19"), "S14": ("2026-10-15", "2026-10-29"), **{t: ("2026-10-19", None) for t in ("S18", "S19", "S20")}, **{t: ("2026-10-19", "2026-10-21") for t in ("T8", "T9", "T10")}}
 # link backend tickets to SQL tests
 for c in sql_cases:
     for t in c["tickets"]:

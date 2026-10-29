@@ -1,6 +1,6 @@
 # Hearth tracker: what's next, what's missing, what's pending
 
-The one list of everything open between Chase and Claude. Updated Oct 27, 2026.
+The one list of everything open between Chase and Claude. Updated Oct 29, 2026.
 
 **How it works**
 - Work the **Sequence** top to bottom. One step at a time; nothing new gets built until milestone 1 passes (Chase, Oct 17).
@@ -32,7 +32,7 @@ The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/202
 | R15 | Build the photo helpers (HELP-DUP-1..4, HELP-SHOT-1, HELP-BLUR-1/2, HELP-ALL-1) | P2 | M | ◐ Oct 21: same photo twice sent once, screenshots, look-alikes (clearest kept) and photos already sent in the last 30 days left out, "Show what we left out" with Put back, all one button from coming back. Blur is built but off until tuned. Oct 22: server off-switches built (migration 0016, HELP-R4; deploy waits on Chase's word). Left: tune blur on 40 labeled photos (needs Chase), R17 |
 | R11 | Photos header: fewer stacked buttons before the first photo (RV-U3; grandparent-ux sketch first) | P2 | S | ☑ Oct 21: buttons two to a row, wrapping with Bigger text; the first photo shows without scrolling. Sketch and persona check in `decisions/2026-10-21-photos-header.md` (decision to review) |
 | R12 | Thumbnail sizing from a first guess instead of up to 7 encodes (RV-P5; measure on a phone) | P2 | S | ☑ Oct 21: the display JPEG's bytes per pixel pick the first step (padded 1.5×); a busy photo takes 1 to 2 thumbnail encodes instead of up to 7, a plain one still gets the sharpest. Phone timing still to measure |
-| R13 | A4 resumable video uploads (after FLAG-7 video stripping; RV-P7) | P2 | L | ☐ |
+| R13 | A4 resumable video uploads (after FLAG-7 video stripping; RV-P7) | P2 | L | ☐ Oct 29: stripping built (R25); still waits on video being on |
 | R17 | A "Photo helpers" on/off switch for the family's owner on a screen (today it's a database row). grandparent-ux words and a persona check first | P2 | S | ☐ |
 | R19 | Reactions: Love, Haha, Like and Comment as icons only on each moment (REACT-1..9, DEC-38, migration 0017) | P1 | S | ◐ Oct 25: merged (PR #55), 0017 deployed. Opens on phones once the SDK 58 PR is merged and published (Oct 26) |
 | R18 | Moment cards: one compact card per upload (collage, one Love and Comment row, one-row reply box, More for who-sees-it and Delete), UAT 8-9 (MOMENT-1..8) | P1 | M | ◐ Oct 25: merged (PR #54). Publish to Expo Go and rebuild the demo on Chase's word |
@@ -42,6 +42,7 @@ The freeze is lifted (DEC-28). Ranked by staff-pm from `docs/product/reviews/202
 | R22 | Release M1.1 "functional, high-quality demo" (Chase, Oct 28): plan, works for real, UI 8/10, harden, enhancements, demo, reusable blocks; one PR per phase | P0 | L | ◐ Oct 28: phase 2 (REAL-1: the real-API contract run works again and runs in CI) PR open; phase 3 (UI-1..5, UX 5/10 → 8/10) PR open; phase 4 (HARD-12 reactions lockdown and HARD-17 feed speed in migration 0018, HARD-13) PR open, deploy 0018 on Chase's word; HARD-14..16 open tickets; phase 5 (post titles, R21) PR open; phase 6 (demo rebuilt, live checked, INTAKE to re-host) PR open; phase 7 (LESSONS + reusable-blocks INTAKE) PR open. Waiting on Chase: merge #63-#68, deploy 0018/0019. Left from the review: Messages privacy note wording and the Share group-count wrap (to grandparent-ux) |
 | R23 | Home-screen photo frame widget and poster send-progress Live Activity (`SPEC-PHOTO-FRAME.md`, FRAME-*, DEC-40). Needs a real build; architect picks the library, privacy-security reviews the widget's photo copy (rule 6) | P2 | M | ◐ Oct 29: specced, persona check done; build after milestone 2's real build |
 | R24 | Family vault: end-to-end encrypted groups on MLS, 14 one-PR days (`PLAN-FAMILY-VAULT.md`, DEC-16, DEC-40). Days 2 (per-family keys, D8) and 3 (safety numbers) help everyone and could go early | P2 | L | ☐ Oct 29: planned; day 1 needs Chase's two picks (per family, recovery card) |
+| R25 | Video (Chase, Oct 29: "build video"): location stripped on the phone without a re-encode (FLAG-7 auto, VID-1..13, SPEC-MEDIA section 4); iPhone picks come as 720p; free cap of 10 a month counted per person, not per family (S14, migration 0020) | P1 | M | ◐ Oct 29: cleaner and S14 built, PR open; deploy 0020 on Chase's word. Left, in order: poster frame (thumbnail), player on Photos with a Play word button, grandparent-ux words (E12), FLAG-7 check on Chase's iPhone and an Android video, then turn `video_posting` on |
 | R14 | npm audit: recheck the Expo CLI build-tool findings after the next Expo patch (RV-X4) | P2 | S | ☑ Oct 21: still 62 from 5 advisories on expo 57.0.30 (newest SDK 57 patch). One ships: decode-uri-component in expo-router (a crafted link could freeze the app; no data exposed). No forced override; recheck at the SDK 58 move (Oct 26: moved to SDK 58; recheck in the next PR) |
 
 ## Sequence to milestone 1
