@@ -2,10 +2,10 @@
 
 ## Oct 29, night shift: change the words after posting (branch claude/project-thread-kzt7by-n1029, draft PR)
 - **Built, test-first (CAP-6..8, SPEC-CAPTIONS, DEC-39 CAP-D2):** the sender's More menu has "Change the words": one sheet with the Title and "What's happening?" boxes filled in, Save and Cancel. The card then says "Edited" after the date for everyone. Nobody else gets the button; a refusal shows plain words and keeps the old words. No notice goes out; comments and reactions stay.
-- **Migration 0020 (not deployed):** `posts.words_edited_at`, `edit_post_words(p_post, p_title, p_caption)` (sender only, while they can still send to one of the post's groups; P0002 for a post you can't see), `words_edited_at` on `get_feed` / `get_timeline`. **HARD-18:** authors could `UPDATE` caption and taken_at straight in the table (no "Edited" mark); 0020 revokes it. Nothing in the app used it.
+- **Migration 0021 (not deployed):** `posts.words_edited_at`, `edit_post_words(p_post, p_title, p_caption)` (sender only, while they can still send to one of the post's groups; P0002 for a post you can't see), `words_edited_at` on `get_feed` / `get_timeline`. **HARD-18:** authors could `UPDATE` caption and taken_at straight in the table (no "Edited" mark); 0021 revokes it. Nothing in the app used it.
 - **Tests:** `captions_test.sql` (32), `rls_test.sql` updated to the HARD-18 contract, contract CAP-6/7/8 (Fake and real PostgREST), `changeWords.test.tsx` (4).
 - **Docs:** API.md, architecture 02 and 05 (Last checked), SPEC-CAPTIONS, TRACKER R21/R22.
-- **Next exact step:** Chase says "merge", then "deploy 0020" and an app update (the button needs 0020 live; older servers answer "can't do that").
+- **Next exact step:** Chase says "merge", then "deploy 0021" and an app update (the button needs 0021 live; older servers answer "can't do that").
 
 ## Oct 26: the messenger is now a shared library (branch claude/project-thread-tzgzk8, PR #57, merged Oct 29)
 - **Why:** Chase, Oct 26: "proceed. Build the library" so Crew Clock can use it too (STU-DEC-1, DEC-42). No change to what users see.

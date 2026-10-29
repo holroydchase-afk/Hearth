@@ -1,5 +1,5 @@
 -- CAP-1..3, CAP-5, CAP-10, CAP-11 (docs/product/SPEC-CAPTIONS.md, DEC-39): an optional title of up to 80 characters
--- for the whole set, migration 0019. CAP-6..8 and HARD-18: the sender changes the words after posting, migration 0020. Written FIRST: red until 0019 lands. Seed: Alex owns space A; Grandma Rivera
+-- for the whole set, migration 0019. CAP-6..8 and HARD-18: the sender changes the words after posting, migration 0021. Written FIRST: red until 0019 lands. Seed: Alex owns space A; Grandma Rivera
 -- (ma) is a viewer on Dad's side (a1); Grandma Chen (chen) follows space A's Everyone only, so she can't see Dad's-side posts.
 \set ON_ERROR_STOP 1
 \pset footer off

@@ -23,7 +23,7 @@ How data moves through Hearth, one flow at a time. Each step says who sees what.
 
 The upload queue survives app restarts and bad signal; each step can be retried safely.
 
-**Changing the words (Built, migration 0020).** The sender can change a post's title and caption later with `edit_post_words`; photos never change. Postgres stamps `words_edited_at` so every card says "Edited", sends no notice, and leaves comments and reactions as they were.
+**Changing the words (Built, migration 0021).** The sender can change a post's title and caption later with `edit_post_words`; photos never change. Postgres stamps `words_edited_at` so every card says "Edited", sends no notice, and leaves comments and reactions as they were.
 
 **Who sees what.** B2 sees ciphertext and sizes only. Supabase stores the caption and title, the audience, dimensions and byte sizes in plaintext, and the wrapped key.
 
@@ -52,4 +52,4 @@ Group chat is end-to-end encrypted with MLS: phones seal messages before sending
 - **Gap.** The nightly hard purge (`purge_soft_deleted`, 30 days) is not scheduled by `backend/scripts/deploy.sh`; the worker that deletes queued B2 objects, removes the auth user and builds data exports is not written (`backend/README.md`). Database backups keep deleted rows, including wrapped keys, for Supabase's backup window.
 
 ---
-Last checked against code: 2026-10-29, changing the words after posting (migration 0020); earlier 2026-10-28, post titles (migration 0019) and sign out clears the feed cache (state/AppContext.tsx, HARD-13); earlier 2026-10-21, R15 photo helpers (share/helpers.ts, media/pick.ts) and A3 kept photo files (media/cache.ts); earlier 2026-10-19, a522a3a (plus migrations 0014, 0015) and 624fc39 (MEDIA-1/2/3 on-phone cleaner)
+Last checked against code: 2026-10-29, changing the words after posting (migration 0021); earlier 2026-10-28, post titles (migration 0019) and sign out clears the feed cache (state/AppContext.tsx, HARD-13); earlier 2026-10-21, R15 photo helpers (share/helpers.ts, media/pick.ts) and A3 kept photo files (media/cache.ts); earlier 2026-10-19, a522a3a (plus migrations 0014, 0015) and 624fc39 (MEDIA-1/2/3 on-phone cleaner)
