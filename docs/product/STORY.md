@@ -12,7 +12,7 @@ Hearth exists so parents can share their kids with every part of a complicated f
 
 **How most posts go** (Chase, Oct 16): "for us 90% of the content we post will be to everyone." Sharing to everyone must be the fastest path; picking a narrower audience is the exception.
 
-**The family it was built for.** I'm from West Virginia, where about 25 of my family members still live. I live in Charlotte now. My mom's parents are divorced and remarried. My parents are divorced and remarried. My mom was later widowed and is now dating. My wife Danielle's family, from Charleston, WV, has about the same amount of divorce and separation. People who won't sit in the same room certainly won't comment on each other's photos of the grandkids.
+**The family it was built for.** I'm from West Virginia, where about 25 of my family members still live. I live in Charlotte now. My mom's parents are divorced and remarried. My parents are divorced and remarried. My wife's family, from Charleston, WV, has about the same amount of divorce and separation. People who won't sit in the same room certainly won't comment on each other's photos of the grandkids.
 
 **What that looks like today.** We keep at least 5 group texts. Grandma A should be able to comment on a photo without divorced Grandpa B seeing it, and without worrying that he might.
 
@@ -20,7 +20,7 @@ Hearth exists so parents can share their kids with every part of a complicated f
 - Videos are worse. In a 5-person chat with 1 Android, the video arrives degraded. So I send it to my stepmom separately and hope nobody feels slighted. With my in-laws, they do.
 - Underneath it all is guilt. Like a lot of America, we live far from our hometown. Getting a "good enough" amount of the kids to the grandparents is hard, and the barriers make it harder.
 
-**Why not social media.** Danielle and I don't post our kids online, and neither do many of our peers. The risks are real: deepfakes, predators, stalkers, AI trained on our children, ads, and more. Family photos belong with family.
+**Why not social media.** My wife and I don't post our kids online, and neither do many of our peers. The risks are real: deepfakes, predators, stalkers, AI trained on our children, ads, and more. Family photos belong with family.
 
 **The feeling we want.** It should feel like the preschool app. Parents know it's secure and that only people they trust are in it. They stop thinking about it and just share.
 
@@ -47,17 +47,17 @@ These are the stories Chase has shared in this project and related chats. The pe
 
 | Story | What Chase said | Why it matters for Hearth |
 | --- | --- | --- |
-| Divorce across generations | Mom's parents divorced and remarried. Chase's parents divorced and remarried. His mom was later widowed and is now dating | Up to 3 generations of separate households want the same photos |
-| Danielle's side | About the same level of divorce and separation. Danielle was born in Charleston, WV | Two families' worth of households, not one |
+| Divorce across generations | Mom's parents divorced and remarried. Chase's parents divorced and remarried | Up to 3 generations of separate households want the same photos |
+| Mom's side | About the same level of divorce and separation. Mom was born in Charleston, WV | Two families' worth of households, not one |
 | 5+ group texts | Relatives won't sit in a room together, let alone comment on each other's photos | The core use case: comment without being seen by the other side |
-| Birthday at Gigi's | "We had a birthday party at Gigi's house. My dad's side was there, Danielle's dad's side was there. I'd want to only post to those groups." | Some posts belong to an occasion: share with the people who were there (the events idea) |
-| The Charleston trip | "Danielle's dad and stepmom and her sister (who lives in Texas) were all together with us in Charleston, WV. That would be a natural group." (Oct 17) | A natural group crosses households and states: Pawpaw and Granny's house plus a sister in Texas. Hearth must combine households from different places, not only follow a strict family tree: this is an event (`docs/product/SPEC-GROUPS.md` §3) |
+| Birthday at Gigi's | "We had a birthday party at Gigi's house. My dad's side was there, Mom's dad's side was there. I'd want to only post to those groups." | Some posts belong to an occasion: share with the people who were there (the events idea) |
+| The Charleston trip | "Mom's dad and stepmom and her sister (who lives in Texas) were all together with us in Charleston, WV. That would be a natural group." (Oct 17) | A natural group crosses households and states: Pawpaw and Granny's house plus a sister in Texas. Hearth must combine households from different places, not only follow a strict family tree: this is an event (`docs/product/SPEC-GROUPS.md` §3) |
 | The stepmom workaround | Sends videos to his stepmom separately and worries about offending his dad. With the in-laws, people really do get offended | Video quality turns into a family relationships problem |
 | Android grandpas | Every grandpa has an Android; everyone else has an iPhone | Cross-platform quality is a must-have |
-| No kids on social media | Chase and Danielle don't post the kids, and neither do many of their peers | Privacy is the reason to switch, not a feature |
-| WV roots | About 25 family members in WV. Great-grandfather Frank Holroyd was from Princeton, WV. Danielle's father John Empson and her grandfather Harold Empson (a twin) may have been born in WV | The first users are rural WV relatives |
+| No kids on social media | Chase and Mom don't post the kids, and neither do many of their peers | Privacy is the reason to switch, not a feature |
+| WV roots | About 25 family members in WV. Several great-grandparents and grandparents were born there | The first users are rural WV relatives |
 | Distance | Chase lives in the Charlotte area and once weighed moving back to Charleston, WV to be near family. He stayed, and moves to North Carolina in 2027 | Distance is why sharing "enough" feels hard |
-| Home life | Stay-at-home dad with young kids; Danielle works remotely | The founder is the target parent, and time is short |
+| Home life | Stay-at-home dad with young kids; Mom works remotely | The founder is the target parent, and time is short |
 
 
 ## West Virginia vs Charlotte tech culture (inferred)

@@ -7,7 +7,7 @@ Scope and tests stay in `docs/product/BETA-SPEC.md`. This file adds no features.
 ## The two people every goal serves
 
 - **The grandparent who stayed.** Rural WV, older or budget phone (every grandpa is on Android), spotty signal, scam-wary, "just show me the babies". Real people: Gammy, Grandaddy, Grandmomma, Memaw, Pawpaw, Granny; the great-grandparents later.
-- **The adult child who moved away.** Chase's insight: the tech-savvy relatives are often the ones who left. Chase is in Charlotte; Danielle's sister is in Texas. They invite and set up, from hundreds of miles away. STORY: "Like a lot of America, we live far from our hometown."
+- **The adult child who moved away.** Chase's insight: the tech-savvy relatives are often the ones who left. Chase is in Charlotte; Mom's sister is in Texas. They invite and set up, from hundreds of miles away. STORY: "Like a lot of America, we live far from our hometown."
 
 **What distance means.** Nobody is in the room. Setup happens over a phone call where the helper can't see the screen. So:
 1. The invite text must work on its own, from a named person ("Chase invited you to Hearth", NOTIFY-7).
@@ -44,7 +44,7 @@ One moment per session. If that moment doesn't land, the session failed, whateve
 |---|---|---|---|
 | 1. First share and invite | Post once instead of five group texts, then invite Mom by text from 300 miles away | **One post to Everyone, 3 taps, and the screen says who gets it ("Everyone · 11 people")** | SHARE-1, AUD-17, AUD-1; invite made and texted in under 2 min (ONB-5) |
 | 2. It reached her | Proof Grandma got it, without calling to ask "did you get the photos?" | **Grandma's heart or comment arrives within a minute** | REPLY-3 ≤ 60 s. Deliberately not "Seen by" (A2) |
-| 3. The hard post | The post that used to mean a separate text: only Danielle's dad's side, or only the people at the Charleston trip | **Posting to one side or one event and trusting it, because the screen says who sees it and who doesn't** | AUD-17, AUD-18, AUD-1 3 of 3; 0 leaks (AUD-3, REPLY-7..9) |
+| 3. The hard post | The post that used to mean a separate text: only Mom's dad's side, or only the people at the Charleston trip | **Posting to one side or one event and trusting it, because the screen says who sees it and who doesn't** | AUD-17, AUD-18, AUD-1 3 of 3; 0 leaks (AUD-3, REPLY-7..9) |
 
 **GOAL-WOW-4 (*proposed*, manual).** After a relative's third session, Chase calls and asks one question: "Would you go back to the group text for photos?" Log the answer word for word on the Test Log. Met when every M3–M4 relative says no without being led, and 0 help calls were logged across their sessions 1–3.
 
@@ -62,4 +62,4 @@ One moment per session. If that moment doesn't land, the session failed, whateve
 - **"See what Mom will see"**: the inviter previews the invite and first screen on their own phone before sending.
 - **A first photo waiting at invite time**: the inviter picks one photo when making the invite, so session 1 is never empty (stronger than ONB-10's reminder).
 - **A texted picture guide** in place of (or as well as) the printed guide, since the helper isn't there to hand it over.
-- **"The one who moved away" as a named persona** in PERSONAS.md (Chase, Danielle's sister in Texas).
+- **"The one who moved away" as a named persona** in PERSONAS.md (Chase, Mom's sister in Texas).

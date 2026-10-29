@@ -1,6 +1,6 @@
 -- family-setup v2 (docs/product/SPEC-GROUPS.md section 2 and section 8 step 3; privacy review item 14).
 -- Re-seeds Chase's family into the fixed shape, AS CHASE, through the same RPCs and RLS the app uses:
---   Everyone; set groups Chase's side and Danielle's side; households under them; the Charleston trip and
+--   Everyone; set groups Chase's side and Mom's side; households under them; the Charleston trip and
 --   Birthday at Gigi's events. People are placed by the name the family uses (their display name).
 --   Posts Chase sent to a v1 group move to the matching household; then the v1 groups are retired.
 -- This CHANGES WHO SEES WHAT, so by default it is a DRY RUN: it does everything inside a transaction, prints
@@ -8,9 +8,9 @@
 -- a backup is taken:
 --
 --   psql "$SUPABASE_DB_URL" -v chase_email=you@example.com -v space_name='Our kids' \
---        [-v sister_name='Danielle''s sister'] [-v apply=yes] -f backend/scripts/family-setup-v2.sql
+--        [-v sister_name='Mom''s sister'] [-v apply=yes] -f backend/scripts/family-setup-v2.sql
 --
--- sister_name (optional): the name Danielle's sister uses; she is placed in Memaw's house AND Pawpaw and
+-- sister_name (optional): the name Mom's sister uses; she is placed in Memaw's house AND Pawpaw and
 -- Granny's house (the sibling workaround), and gets her own house in the Charleston trip.
 -- Safe to re-run: it reuses everything it made before. Never run against hosted without the dry run first.
 \set ON_ERROR_STOP 1
@@ -78,10 +78,10 @@ begin
 
   -- containers (reused by kind and name if they exist)
   for r in select * from (values
-      (1, 'group', 'Chase''s side'), (2, 'group', 'Danielle''s side'),
+      (1, 'group', 'Chase''s side'), (2, 'group', 'Mom''s side'),
       (3, 'household', 'Gammy''s house'), (4, 'household', 'Grandaddy and Grandmomma''s house'),
       (5, 'household', 'Gigi and Bebar''s house'), (6, 'household', 'Memaw''s house'),
-      (7, 'household', 'Pawpaw and Granny''s house'), (8, 'household', 'Grandma Phyllis''s house'),
+      (7, 'household', 'Pawpaw and Granny''s house'), (8, 'household', 'Great-Grandma''s house'),
       (9, 'event', 'Charleston trip'), (10, 'event', 'Birthday at Gigi''s')) x(o, kind, name)
     union all
     select 11, 'household', v_sister || '''s house' where v_sister is not null
@@ -95,8 +95,8 @@ begin
   for r in select * from (values
       ('Chase''s side', 'Gammy''s house'), ('Chase''s side', 'Grandaddy and Grandmomma''s house'),
       ('Chase''s side', 'Gigi and Bebar''s house'),
-      ('Danielle''s side', 'Memaw''s house'), ('Danielle''s side', 'Pawpaw and Granny''s house'),
-      ('Danielle''s side', 'Grandma Phyllis''s house'),
+      ('Mom''s side', 'Memaw''s house'), ('Mom''s side', 'Pawpaw and Granny''s house'),
+      ('Mom''s side', 'Great-Grandma''s house'),
       ('Charleston trip', 'Pawpaw and Granny''s house'),
       ('Birthday at Gigi''s', 'Grandaddy and Grandmomma''s house'), ('Birthday at Gigi''s', 'Gigi and Bebar''s house'),
       ('Birthday at Gigi''s', 'Pawpaw and Granny''s house')) x(parent, child)
@@ -113,7 +113,7 @@ begin
                         ('Grandaddy and Grandmomma''s house', 'Grandmomma'), ('Gigi and Bebar''s house', 'Gigi'),
                         ('Gigi and Bebar''s house', 'Bebar'), ('Memaw''s house', 'Memaw'),
                         ('Pawpaw and Granny''s house', 'Pawpaw'), ('Pawpaw and Granny''s house', 'Granny'),
-                        ('Grandma Phyllis''s house', 'Grandma Phyllis')) x(house, who)
+                        ('Great-Grandma''s house', 'Great-Grandma')) x(house, who)
            join public.profiles pr on lower(btrim(pr.display_name)) = lower(x.who)
            join public.space_members sm on sm.space_id = v_space and sm.user_id = pr.id and sm.role = 'viewer'
            union all
@@ -132,7 +132,7 @@ begin
     from unnest(v_aud) a
     join public.circles c on c.id = a
     left join (values ('Chase''s mom''s side', 'Gammy''s house'), ('Chase''s dad''s side', 'Grandaddy and Grandmomma''s house'),
-                      ('Danielle''s mom''s side', 'Memaw''s house'), ('Danielle''s dad''s side', 'Pawpaw and Granny''s house')) mp(old, new)
+                      ('Mom''s mom''s side', 'Memaw''s house'), ('Mom''s dad''s side', 'Pawpaw and Granny''s house')) mp(old, new)
       on mp.old = c.name and c.kind = 'group'
     left join public.circles t on t.space_id = v_space and t.name = mp.new and t.kind = 'household' and t.deleted_at is null;
     if v_new is not null and v_new is distinct from v_aud
@@ -144,7 +144,7 @@ begin
   -- retire the v1 groups (anything of kind group other than the two set groups)
   for r in select c.id from public.circles c
            where c.space_id = v_space and c.kind = 'group' and c.deleted_at is null
-             and c.name not in ('Chase''s side', 'Danielle''s side') loop
+             and c.name not in ('Chase''s side', 'Mom''s side') loop
     perform public.retire_level(r.id);
   end loop;
 

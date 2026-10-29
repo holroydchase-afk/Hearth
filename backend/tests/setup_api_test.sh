@@ -78,21 +78,21 @@ out=$(setup --chase-email chase@example.com --space-name 'Our kids'); rc=$?
 q "insert into auth.users (id, email, raw_user_meta_data) values
    ('e0000000-0000-0000-0000-0000000000e1', 'Chase@Example.com', '{\"display_name\":\"Chase\"}'),
    ('e0000000-0000-0000-0000-0000000000e2', 'tester@example.com', '{\"display_name\":\"Test viewer\"}'),
-   ('e0000000-0000-0000-0000-0000000000e3', 'danielle@example.com', '{\"display_name\":\"Danielle\"}')" >/dev/null
+   ('e0000000-0000-0000-0000-0000000000e3', 'mom@example.com', '{\"display_name\":\"Mom\"}')" >/dev/null
 
 # ---- 2. fresh setup ----
 : > "$T/log/requests"
-out=$(setup --chase-email chase@example.com --space-name "Chase's kids" --danielle-email danielle@example.com); rc=$?
+out=$(setup --chase-email chase@example.com --space-name "Chase's kids" --mom-email mom@example.com); rc=$?
 ok $rc "SETUP-API: fresh setup runs without error"
 echo "$out" | sed 's/^/        | /'
 SPACE=$(q "select id from public.spaces where name = 'Chase''s kids'")
 [ -n "$SPACE" ] && [ "$(q "select count(*) from public.space_members where space_id = '$SPACE' and role = 'owner' and user_id = 'e0000000-0000-0000-0000-0000000000e1'")" = 1 ]
 ok $? "SETUP-API: Chase owns one family, named as given (an apostrophe in the name is kept, not a SQL error)"
 [ "$(q "select count(*) from public.circles where space_id = '$SPACE' and kind = 'everyone'")" = 1 ]; ok $? "SETUP-API: one Everyone"
-[ "$(q "select string_agg(name, ',' order by name) from public.circles where space_id = '$SPACE' and kind = 'group'")" = "Chase's side,Danielle's side" ]
-ok $? "SETUP-API: the set groups are Chase's side and Danielle's side (no v1 groups to retire later)"
+[ "$(q "select string_agg(name, ',' order by name) from public.circles where space_id = '$SPACE' and kind = 'group'")" = "Chase's side,Mom's side" ]
+ok $? "SETUP-API: the set groups are Chase's side and Mom's side (no v1 groups to retire later)"
 [ "$(q "select string_agg(name, ',' order by name) from public.circles where space_id = '$SPACE' and kind = 'household'")" = \
-  "Gammy's house,Gigi and Bebar's house,Grandaddy and Grandmomma's house,Grandma Phyllis's house,Memaw's house,Pawpaw and Granny's house,Test house" ]
+  "Gammy's house,Gigi and Bebar's house,Grandaddy and Grandmomma's house,Great-Grandma's house,Memaw's house,Pawpaw and Granny's house,Test house" ]
 ok $? "SETUP-API: the family's houses (SPEC-GROUPS section 2) plus a Test house for account B"
 [ "$(q "select string_agg(name, ',' order by name) from public.circles where space_id = '$SPACE' and kind = 'event'")" = "Birthday at Gigi's,Charleston trip" ]
 ok $? "SETUP-API: the Charleston trip and Birthday at Gigi's events"
@@ -105,9 +105,9 @@ ok $? "SETUP-API: the Test house is under no group or event (account B sees only
 ok $? "SETUP-API: everything is made as Chase (through the app's RPCs, not as the database owner)"
 code=$(echo "$out" | sed -n 's/^Test viewer invite (account B): code \([A-Z0-9]\{10\}\).*/\1/p' | head -1)
 [ -n "$code" ]; ok $? "SETUP-API: prints the test viewer's 10-letter invite code"
-echo "$out" | grep -q "^Danielle's poster invite: code [A-Z0-9]\{10\}"; ok $? "SETUP-API: prints Danielle's poster invite code when --danielle-email is given"
-[ "$(q "select role || ':' || coalesce(target_email, '') from public.invites where space_id = '$SPACE' and role = 'adult'")" = "adult:danielle@example.com" ]
-ok $? "SETUP-API: Danielle's invite is a poster (adult) invite for her email"
+echo "$out" | grep -q "^Mom's poster invite: code [A-Z0-9]\{10\}"; ok $? "SETUP-API: prints Mom's poster invite code when --mom-email is given"
+[ "$(q "select role || ':' || coalesce(target_email, '') from public.invites where space_id = '$SPACE' and role = 'adult'")" = "adult:mom@example.com" ]
+ok $? "SETUP-API: Mom's invite is a poster (adult) invite for her email"
 [ "$(q "select string_agg(c.name || ':' || i.history, ',' order by c.name) from public.invites i join public.invite_circles ic on ic.invite_id = i.id join public.circles c on c.id = ic.circle_id
         where i.space_id = '$SPACE' and i.role = 'viewer'")" = "Everyone:all,Test house:all" ]
 ok $? "SETUP-API / PRIV-G2: the test viewer's invite names Everyone and the Test house (a new invite adds Everyone only if named) and says \"all past photos\""
@@ -126,7 +126,7 @@ ok $rc "SETUP-API: re-running runs without error"
 [ "$n1" = "$(q "select count(*) from public.circles where space_id = '$SPACE'")" ] && [ "$(q "select count(*) from public.spaces where name = 'Chase''s kids'")" = 1 ]
 ok $? "SETUP-API: re-running adds no family, group, house or event"
 echo "$out" | grep -q "^Test viewer invite (account B): code [A-Z0-9]\{10\}"; ok $? "SETUP-API: re-running prints a fresh test viewer code"
-! echo "$out" | grep -q "^Danielle's"; ok $? "SETUP-API: no Danielle invite unless --danielle-email is given"
+! echo "$out" | grep -q "^Mom's"; ok $? "SETUP-API: no Mom invite unless --mom-email is given"
 
 # ---- 4. account B joins with the code and sees only what it should (BETA-AUD-1 in the 0011 shape) ----
 q "select set_config('request.jwt.claim.sub', 'e0000000-0000-0000-0000-0000000000e2', false);

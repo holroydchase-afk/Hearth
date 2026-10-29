@@ -158,7 +158,7 @@ function MoreMenu({ visible, post, mine, these, onDelete, onClose }: {
   );
 }
 
-/** REPLY-11: "Memaw, Pawpaw, Granny, Chase and Danielle"; a long list ends "and 6 more people". */
+/** REPLY-11: "Memaw, Pawpaw, Granny, Chase and Mom"; a long list ends "and 6 more people". */
 function readerNames(names: string[]): string {
   if (names.length <= 6) return andList(names);
   return `${names.slice(0, 5).join(', ')} and ${names.length - 5} more people`;

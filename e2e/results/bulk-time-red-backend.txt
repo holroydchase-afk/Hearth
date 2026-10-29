@@ -368,7 +368,7 @@ SOME TESTS FAILED
 psql:tests/notify_test.sql:444: ERROR:  division by zero
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
 Test viewer invite (milestone 1, account B):
-Danielle's poster invite (milestone 2; she can post to every group):
+Mom's poster invite (milestone 2; she can post to every group):
  ok 
 ----
  
@@ -390,7 +390,7 @@ Danielle's poster invite (milestone 2; she can post to every group):
 (1 row)
 
 Test viewer invite (milestone 1, account B):
-Danielle's poster invite (milestone 2; she can post to every group):
+Mom's poster invite (milestone 2; she can post to every group):
  ok 
 ----
  
@@ -401,7 +401,7 @@ Danielle's poster invite (milestone 2; she can post to every group):
  1 | ok     | M1 setup: Chase owns one space
  2 | ok     | M1 setup: the starter groups exist (Chase can rename them in the app)
  3 | ok     | M1 setup: one viewer invite for the test account
- 4 | ok     | M2 setup: one poster (adult) invite for Danielle
+ 4 | ok     | M2 setup: one poster (adult) invite for Mom
  5 | ok     | setup: running it again reuses the space and groups (no duplicates)
 (5 rows)
 

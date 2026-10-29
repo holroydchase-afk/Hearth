@@ -2,7 +2,7 @@
 
 Owner: staff-pm. Rewritten Fri Oct 16, 2026 (overnight) around the milestones in `docs/product/ANCHORS.md`, which supersede the Ring 0–3 plan. Scope and acceptance criteria live in `docs/product/BETA-SPEC.md` (see its "Milestone map and trace" table for which BETA-* each milestone needs). Product scope beyond that is in `docs/product/CORE-FEATURES.md`.
 
-**Bottom line:** Milestone 1 (Chase uses Hearth end to end) is mostly blocked on Chase, not code. Backend, notification sender and app are built and green locally; nothing is deployed and nothing has run on a real phone. The shortest path: deploy to the one existing Supabase project, run the app on Chase's iPhone, post for 2 days. Milestone 2 (Danielle posting too) adds the email sender domain, invite links and a build she can install.
+**Bottom line:** Milestone 1 (Chase uses Hearth end to end) is mostly blocked on Chase, not code. Backend, notification sender and app are built and green locally; nothing is deployed and nothing has run on a real phone. The shortest path: deploy to the one existing Supabase project, run the app on Chase's iPhone, post for 2 days. Milestone 2 (Mom posting too) adds the email sender domain, invite links and a build she can install.
 
 **Dates.** The ring dates (Ring 0 gate Oct 29, Ring 1 Nov 5, Ring 2 Nov 12) are **dropped**: they were gates for rings that no longer exist. Milestones have no dates. **Nov 22 / Thanksgiving (Nov 26) is kept only as a soft target** for milestones 3–4, because Thanksgiving is the one in-person setup chance with WV family. Whether it's still a target is a decision for Chase.
 
@@ -72,19 +72,19 @@ Email codes at M1: Supabase's built-in mailer only sends to project team members
 
 ---
 
-## Milestone 2: Danielle posts too; both family sides work
+## Milestone 2: Mom posts too; both family sides work
 
-**Gate:** Danielle signs in from an invite and posts unaided (JOIN-2, SHARE-1, stopwatch); both of them post to both family sides' groups (Chase's WV side, Danielle's Charleston side) with 0 cross-side leaks; AUD-1 answered correctly by both; AUD-6 audience change works; NOTIFY-1 p90 ≤ 60 s over ≥10 posts; REPLY-3 notices reach the poster; 0 open P0.
+**Gate:** Mom signs in from an invite and posts unaided (JOIN-2, SHARE-1, stopwatch); both of them post to both family sides' groups (Chase's WV side, Mom's Charleston side) with 0 cross-side leaks; AUD-1 answered correctly by both; AUD-6 audience change works; NOTIFY-1 p90 ≤ 60 s over ≥10 posts; REPLY-3 notices reach the poster; 0 open P0.
 
 | # | Item | Owner | Needs Chase? |
 |---|---|---|---|
 | 1 | Name check + domain (CH-3) | **Chase** (~$15/yr) | Yes |
-| 2 | Resend + SPF/DKIM/DMARC so codes reach Danielle's inbox (IN-6) | infra after CH-3; **Resend account (free tier)** | Yes (account) |
+| 2 | Resend + SPF/DKIM/DMARC so codes reach Mom's inbox (IN-6) | infra after CH-3; **Resend account (free tier)** | Yes (account) |
 | 3 | Website: `/join/*`, AASA, `/p/<id>` (IN-5, minus privacy policy) | infra | No, after 1 |
-| 4 | A build Danielle can install: Expo Go (if M1 proved it) or TestFlight **internal** testing (she's added as an App Store Connect user; no Beta App Review) | app-engineer + **Chase** | Yes |
+| 4 | A build Mom can install: Expo Go (if M1 proved it) or TestFlight **internal** testing (she's added as an App Store Connect user; no Beta App Review) | app-engineer + **Chase** | Yes |
 | 5 | AE-10 push latency log (NOTIFY-1); AE-4 expo-updates channels | app-engineer | No |
-| 6 | Danielle's **adult** (poster) invite plus both sides' groups, seeded by Claude via SQL from Chase's list. The app can only invite viewers and can't create groups; no setup UI in scope | infra + **Chase gives the list** | Yes (list) |
-| 7 | Triage fixes from Danielle's use (AE-11) | app-engineer | No |
+| 6 | Mom's **adult** (poster) invite plus both sides' groups, seeded by Claude via SQL from Chase's list. The app can only invite viewers and can't create groups; no setup UI in scope | infra + **Chase gives the list** | Yes (list) |
+| 7 | Triage fixes from Mom's use (AE-11) | app-engineer | No |
 
 ---
 
@@ -114,7 +114,7 @@ Email codes at M1: Supabase's built-in mailer only sends to project team members
 - Do any open Chase decisions now block the next milestone?
 - Does the next milestone still make sense (order, scope, the Nov 22 soft date)?
 
-**Tonight (Oct 16 late), in order:** (1) BETA-REPLY-6 comment wording, red test first; (2) device readiness without a device: `expo export` for iOS and Android, `expo-doctor`, Expo Go yes/no per native path; (3) the M1 setup-and-demo page for Chase, with the M2 SQL seed for Danielle attached. Not tonight: the printed guide (GU-3, M3/M4; screens will change after the device run).
+**Tonight (Oct 16 late), in order:** (1) BETA-REPLY-6 comment wording, red test first; (2) device readiness without a device: `expo export` for iOS and Android, `expo-doctor`, Expo Go yes/no per native path; (3) the M1 setup-and-demo page for Chase, with the M2 SQL seed for Mom attached. Not tonight: the printed guide (GU-3, M3/M4; screens will change after the device run).
 
 **Status Oct 16 (late):** the code-only M1 list is done (push-token wiring, NOTIFY-7, AUD-7, REPLY-4, OPS-1, pushed with 3 green runs). Trigger 2 is now armed: no backend or test work until a deploy or a device run, except the M1 setup-and-demo doc and the deploy script.
 
