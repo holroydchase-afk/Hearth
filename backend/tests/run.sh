@@ -11,6 +11,7 @@
 #   tests/photo_helpers_test.sql  HELP-R4: photo helper off-switches, on by default for posters (SPEC-PHOTO-HELPERS, migration 0016)
 #   tests/reactions_test.sql  REACT-1..6: Love, Haha, Like (migration 0017); HARD-12: only through the RPCs (0018)
 #   tests/captions_test.sql   CAP-1..3, 5, 10, 11: post titles (migration 0019)
+#   ../packages/messenger/relay/test.sql  RELAY-1..9: the shared messenger library's relay template
 #   tests/aud16/  BETA-AUD-16: snapshot on 0001-0010, apply 0011+, diff (0011 must change nobody's access)
 #   tests/grp1/   GRP-1/GRP-2: snapshot on 0001-0012, apply 0013+, diff (0013 must change nobody's access)
 # Usage: tests/run.sh   (needs a local Postgres 15+; PGUSER must be a superuser)
@@ -64,4 +65,7 @@ bash tests/setup_api_test.sh || STATUS=1
 bash tests/sent_received_test.sh || STATUS=1
 # D1 read-only hosted smoke check (curl stubbed, SQL real and read-only)
 bash tests/smoke_check_test.sh || STATUS=1
+# RELAY-1..9: the shared messenger library's relay template, with a toy membership rule (rolls back)
+dropdb --if-exists "$DB"; createdb "$DB"
+psql -d "$DB" -v ON_ERROR_STOP=1 -X -q -f ../packages/messenger/relay/test.sql >/dev/null || { echo "relay template: FAILED" >&2; STATUS=1; }
 exit $STATUS

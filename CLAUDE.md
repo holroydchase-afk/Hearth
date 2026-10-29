@@ -40,6 +40,7 @@ Hearth is a private family photo app for split families and for grandparents who
   - `functions/sign-media/`: Deno TS; presigned Backblaze B2 URLs and per-item keys.
   - `tests/`: SQL, perf, integration (PostgREST harness).
 - `app/`: Expo SDK 58, TypeScript strict, `HearthApi` with a Supabase and a Fake implementation, upload queue, media pipeline.
+- `packages/messenger/`: `@holroyd/messenger`, the shared MLS messenger library (AGPL-3.0-or-later; Relay, Roster, Store; Supabase relay template). Hearth's `app/src/messenger/` is its adapter. Crew Clock is the next user (DEC-42).
 - `prototype/`, `e2e/`: the clickable HTML prototype and its Playwright tests. Throwaway.
 - `tracker/`: Hearth Test Log seed builder.
 - `.claude/agents/`: the specialist agents. See "Chief of staff and agent roster" below.
