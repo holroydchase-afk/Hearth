@@ -87,6 +87,7 @@
     ],
     "modulePaths": [
       "<rootDir>/node_modules"
-    ]
+    ],
+    "testEnvironment": "./jest.environment.js"
   }
 }

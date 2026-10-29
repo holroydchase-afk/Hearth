@@ -5,7 +5,7 @@ Owner: staff-pm · Source: Chase, Oct 19: "I want a built in messenger. maybe we
 ## What it is
 Every group and event has a **Messages** page. Only the people in that group read it. Messages are end to end encrypted with **MLS** (Messaging Layer Security, RFC 9420), the IETF standard for encrypted group chat. Hearth's servers relay sealed messages and never hold the keys.
 
-- **Library:** `ts-mls` 1.6.4 (MIT, pure TypeScript). Its built-in crypto needs WebCrypto, which Expo Go (Hermes) lacks, so Hearth adds its own ciphersuite on the audited `@noble` libraries (`packages/messenger/src/crypto.ts`, the shared library `@holroyd/messenger` since Oct 26, DEC-39). Suite: `MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519`. Tests check it against ts-mls's WebCrypto pieces in both directions.
+- **Library:** `ts-mls` 1.6.4 (MIT, pure TypeScript). Its built-in crypto needs WebCrypto, which Expo Go (Hermes) lacks, so Hearth adds its own ciphersuite on the audited `@noble` libraries (`packages/messenger/src/crypto.ts`, the shared library `@holroyd/messenger` since Oct 26, DEC-42). Suite: `MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519`. Tests check it against ts-mls's WebCrypto pieces in both directions.
 - **Server:** relays only. It stores sealed message bodies, public key packages and each person's public signing key, plus who sent what to which group and when (metadata, see Limits).
 - **History lives on the phone.** MLS gives forward secrecy, so a message can't be decrypted again later. Each phone keeps its own copy, encrypted at rest (the `secureSession` pattern). A new phone starts with an empty history.
 

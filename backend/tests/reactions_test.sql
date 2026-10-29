@@ -66,6 +66,23 @@ select tests.throws_code(format($$select public.set_reaction(%L, '😂')$$, :p1)
 :as_admin
 update public.spaces set viewers_can_comment = true where id = '22222222-0000-0000-0000-00000000000a';
 
+-- ---------- HARD-12 (migration 0018): reactions change only through set_reaction / toggle_heart ----------
+-- Before 0018 a member could write the table straight through PostgREST: any short word as the "emoji",
+-- even with replies turned off, which reaction_summary then showed to everyone (a free-text side channel).
+:as_ma
+select tests.lives(format($$select public.set_reaction(%L, '👍')$$, :p1), 'setup: Grandma likes a1');
+select tests.throws_any(format($$update public.reactions set emoji = 'ugly' where post_id = %L$$, :p1),
+                        'HARD-12 a direct update to a made-up reaction is refused', array['42501']);
+select tests.ok_sql(format($$select r.my_reaction = '👍' from public.reaction_summary(array[%L]::uuid[]) r$$, :p1),
+                    'HARD-12 her Like is unchanged');
+select tests.lives(format($$select public.set_reaction(%L, '👍')$$, :p1), 'setup: Grandma takes it back');
+select tests.throws_any(format($$insert into public.reactions (post_id, user_id, emoji) values (%L, 'a0000000-0000-0000-0000-0000000000a1', 'ugly')$$, :p1),
+                        'HARD-12 a direct insert of a made-up reaction is refused', array['42501']);
+:as_admin
+select tests.throws_any(format($$insert into public.reactions (post_id, user_id, emoji) values (%L, 'a0000000-0000-0000-0000-00000000000a', 'ugly')$$,
+                        '55555555-0000-0000-0000-0000000000a2'),
+                        'HARD-12 even the database refuses a reaction that isn''t ❤️ 😂 or 👍', array['23514']);
+
 -- ---------- report ----------
 \o
 \pset format aligned

@@ -66,4 +66,4 @@ Copyright (C) 2026 Chase Holroyd.
 
 This library is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See [LICENSE](LICENSE). Every source file carries `SPDX-License-Identifier: AGPL-3.0-or-later`.
 
-The AGPL means a product that uses this library, including over a network, must offer its users its own source under the AGPL too. Decision: Product Studio STU-DEC-1, licensed AGPL-3.0 by Chase on Oct 26, 2026 (Hearth DEC-39).
+The AGPL means a product that uses this library, including over a network, must offer its users its own source under the AGPL too. Decision: Product Studio STU-DEC-1, licensed AGPL-3.0 by Chase on Oct 26, 2026 (Hearth DEC-42).

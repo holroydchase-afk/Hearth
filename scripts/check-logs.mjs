@@ -2,7 +2,7 @@
 // PRIV-2 (CLAUDE.md rule 2: never log keys, URLs or captions). Static check of every console.* call in
 // the app and the edge functions. Run by test-all.sh and CI; its own test is scripts/tests/check_logs_test.sh.
 // Rules, applied to the call's arguments with string literals blanked (template ${...} parts are kept):
-//   1. no variable or property whose name says key, secret, token, url/uri, caption, email, password,
+//   1. no variable or property whose name says key, secret, token, url/uri, caption, title, email, password,
 //      kek, header, authorization or body
 //   2. an error's .message only as .message.replace(/https?:\S+/g, ...), so a URL inside it is cut
 //   3. no bare error object (e, err, error): it prints the message and stack unfiltered
@@ -13,7 +13,7 @@ import { join, relative } from "node:path";
 
 const ROOTS = process.argv.slice(2).length ? process.argv.slice(2) : ["app/src", "backend/supabase/functions"];
 const SKIP = /(__tests__|\/test\/|\.test\.tsx?$|_test\.ts$|node_modules)/;
-const SECRETISH = /\b[A-Za-z_$]*(key|secret|token|ur[li]|caption|email|password|kek|header|authorization|body)[A-Za-z_$]*\b/i;
+const SECRETISH = /\b[A-Za-z_$]*(key|secret|token|ur[li]|caption|title|email|password|kek|header|authorization|body)[A-Za-z_$]*\b/i;
 
 function files(p) {
   if (statSync(p).isDirectory()) return readdirSync(p).flatMap((f) => files(join(p, f)));
