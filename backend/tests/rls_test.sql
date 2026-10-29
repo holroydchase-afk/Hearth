@@ -128,8 +128,9 @@ select tests.throws(format('select public.set_post_audience(%L, array[%L]::uuid[
                     'Non-author cannot change a post''s audience', 'only the author');
 with d as (delete from post_audiences where post_id = :p_a_co returning 1)
 select tests.ok((select count(*) from d) = 0, 'Non-author delete on post_audiences affects 0 rows');
-with d as (update posts set caption = 'hacked' where id = :p_a_co returning 1)
-select tests.ok((select count(*) from d) = 0, 'Non-author cannot edit post');
+-- HARD-18 (0020): nobody updates posts.caption directly any more; the sender uses edit_post_words.
+select tests.throws(format('update posts set caption = %L where id = %L', 'hacked', :p_a_co),
+                    'Non-author cannot edit post', 'permission denied');
 select tests.throws(format('select public.create_invite(%L, %L, array[%L]::uuid[])', :space_a, 'viewer', :c_a_co),
                     'Co-parent (viewer) cannot create invites in the other space', 'only space owners');
 reset role;

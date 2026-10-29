@@ -40,6 +40,8 @@ interface PostRow {
   taken_at?: string | null; batch_id?: string | null; batch_size?: number | null;
   /** 0019 (CAP-1): optional title, null when blank. */
   title?: string | null;
+  /** 0020 (CAP-6): when the sender last changed the words. */
+  words_edited_at?: string | null;
 }
 interface MediaRow {
   id: string; post: string; position: number; kind: MediaKind; mime: string; width: number; height: number;
@@ -472,6 +474,7 @@ export class FakeBackend {
         author_name: this.state.users[p.author]?.name ?? '',
         caption: p.caption,
         title: p.title ?? null,
+        words_edited_at: p.words_edited_at ?? null,
         published_at: p.published_at!,
         media: Object.values(this.state.media).filter((m) => m.post === p.id).sort((x, y) => x.position - y.position)
           .map((m) => ({ media_id: m.id, kind: m.kind, width: m.width, height: m.height, duration_ms: m.duration_ms, status: m.status })),
@@ -543,6 +546,22 @@ export class FakeBackend {
     const row = this.authorPost(me, post);
     row.deleted = true;
     this.changed();
+  }
+
+  /** edit_post_words (0020, CAP-6..8): the sender only, while they can still post here; no notice. */
+  editPostWords(user: string | null, post: string, title: string | null, caption: string | null): string {
+    const me = this.requireUser(user);
+    const row = this.authorPost(me, post);
+    if (!this.isPoster(row.space, me)) throw new ApiError('42501', 'you can no longer send here');
+    const t = title?.trim() || null;
+    const c = caption?.trim() || null;
+    if (t && [...t].length > 80) throw new ApiError('23514', 'a title is 80 characters at most');
+    if (c && [...c].length > 2000) throw new ApiError('23514', 'a caption is 2000 characters at most');
+    row.title = t;
+    row.caption = c;
+    row.words_edited_at = this.now();
+    this.changed();
+    return row.words_edited_at;
   }
 
   toggleHeart(user: string | null, post: string): HeartState {
@@ -981,6 +1000,7 @@ export class FakeApi implements HearthApi {
   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
   deletePost = (p: string) => this.run(() => this.be.deletePost(this.userId, p));
+  editPostWords = (p: string, title: string | null, caption: string | null) => this.run(() => this.be.editPostWords(this.userId, p, title, caption));
   toggleHeart = (p: string) => this.run(() => this.be.toggleHeart(this.userId, p));
   setReaction = (p: string, emoji: Reaction) => this.run(() => this.be.setReaction(this.userId, p, emoji));
   reactionSummary = (posts: string[]) => this.run(() => this.be.reactionSummary(this.userId, posts));

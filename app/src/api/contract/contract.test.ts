@@ -513,6 +513,37 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await code(poster.createPost({ clientId: uuid(), space: h.spaceId, caption: null, circleIds: [h.circleIn], title: 'x'.repeat(81) }))).toBe('23514');
     });
 
+    it('CAP-6/8 (0020) the sender changes the words; everyone gets them with an "Edited" time, and nothing else changes', async () => {
+      const id = await poster.createPost({ clientId: uuid(), space: h.spaceId, caption: 'Cake', circleIds: [h.circleIn], title: 'Party' });
+      await h.attachReadyMedia(poster, id);
+      await poster.publishPost(id);
+      await viewerIn.setReaction(id, '❤️');
+      const before = (await viewerIn.getFeed({ space: h.spaceId, limit: 50 })).find((r) => r.post_id === id)!;
+      expect(before.words_edited_at ?? null).toBeNull();
+      const at = await poster.editPostWords(id, '  Mia turns 5 ', 'Cake, candles, a nap');
+      expect(typeof at).toBe('string');
+      const after = (await viewerIn.getFeed({ space: h.spaceId, limit: 50 })).find((r) => r.post_id === id)!;
+      expect(after.title).toBe('Mia turns 5');
+      expect(after.caption).toBe('Cake, candles, a nap');
+      expect(after.words_edited_at).toBeTruthy();
+      expect(after.heart_count).toBe(before.heart_count);
+      expect((await viewerIn.getTimeline({ space: h.spaceId, limit: 50 })).find((r) => r.post_id === id)!.words_edited_at).toBeTruthy();
+      await poster.editPostWords(id, ' ', '');
+      const cleared = (await viewerIn.getFeed({ space: h.spaceId, limit: 50 })).find((r) => r.post_id === id)!;
+      expect(cleared.title ?? null).toBeNull();
+      expect(cleared.caption ?? null).toBeNull();
+    });
+
+    it('CAP-7 (0020) only the sender may change the words: others get 42501, people who can\'t see it P0002; too long is 23514', async () => {
+      const id = await datedPost(null);
+      expect(await code(viewerIn.editPostWords(id, 'Mine', null))).toBe('42501');
+      expect(await code(viewerOut.editPostWords(id, 'Mine', null))).toBe('P0002');
+      expect(await code(poster.editPostWords(uuid(), 'Gone', null))).toBe('P0002');
+      expect(await code(poster.editPostWords(id, 'x'.repeat(81), null))).toBe('23514');
+      await poster.deletePost(id);
+      expect(await code(poster.editPostWords(id, 'Back', null))).toBe('P0002');
+    });
+
     it('BETA-TIME-1 feed rows carry taken_at (for the "Added from earlier" card); null when none', async () => {
       const old = await datedPost('2024-07-04T14:00:00.000Z');
       const undated = await datedPost(null);

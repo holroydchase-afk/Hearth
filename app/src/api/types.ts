@@ -93,6 +93,8 @@ export interface FeedPost {
   event_name?: string | null;
   /** 0019 (CAP-3): the set's optional title, 80 characters at most. Older servers omit it. */
   title?: string | null;
+  /** 0020 (CAP-6): when the sender last changed the words; null if never. Older servers omit it. */
+  words_edited_at?: string | null;
 }
 
 export interface FeedArgs {
