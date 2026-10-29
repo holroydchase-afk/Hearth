@@ -29,7 +29,9 @@ for (const size of SIZES) {
       page.on('requestfailed', (r) => problems.push({ tag, url: r.url(), text: `request failed: ${r.failure()?.errorText}` }));
       let n = 0;
       const shot = async (name) => {
-        await page.waitForTimeout(500);
+        // UI-5: wait for the screen's own header, not a fixed delay (a cold tab takes ~750 ms to draw).
+        await page.getByRole('heading').first().waitFor({ timeout: 3000 }).catch(() => {}); // the full-screen viewer has none
+        await page.waitForTimeout(300);
         const sideways = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
         if (sideways) problems.push({ tag, url: page.url(), text: `sideways scroll on ${name}` });
         n += 1;

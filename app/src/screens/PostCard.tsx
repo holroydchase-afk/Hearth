@@ -65,7 +65,8 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
           onPress={() => setSheet('more')}
         />
       </View>
-      {post.caption ? <Txt style={styles.caption}>{post.caption}</Txt> : null}
+      {post.title ? <Txt variant="title" role="header" testID={`post-title-${post.post_id}`} style={styles.title}>{post.title}</Txt> : null}
+      {post.caption ? <Caption text={post.caption} /> : null}
       <PhotoCollage postId={post.post_id} media={ready} />
       {kinds.length ? (
         <View testID={`reactions-${post.post_id}`} accessible accessibilityLabel={kinds.map(([e, k]) => `${k} ${WORD[e]}`).join(', ')} style={styles.summary}>
@@ -254,11 +255,36 @@ const ReplyBox = forwardRef<TextInputInstance, { post: FeedPost; mine: boolean }
   );
 });
 
+/** CAP-4: past about 4 lines the caption folds, with a worded Read more / Show less (no tap on the text needed). */
+const FOLD_LINES = 4;
+const foldable = (t: string) => t.split('\n').length > FOLD_LINES || t.length > 220;
+
+function Caption({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  const fold = foldable(text);
+  return (
+    <View style={styles.caption}>
+      <Txt numberOfLines={fold && !open ? FOLD_LINES : undefined}>{text}</Txt>
+      {fold ? (
+        <Button
+          label={open ? 'Show less of this caption' : 'Read more of this caption'}
+          text={open ? 'Show less' : 'Read more'}
+          variant="quiet"
+          style={styles.fold}
+          onPress={() => setOpen((o) => !o)}
+        />
+      ) : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, paddingLeft: 14, paddingRight: 4 },
   avatar: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   more: { paddingHorizontal: 10 },
+  title: { paddingHorizontal: 14, paddingBottom: 4 },
   caption: { paddingHorizontal: 14, paddingBottom: 12 },
+  fold: { alignSelf: 'flex-start', paddingHorizontal: 0 },
   summary: { paddingHorizontal: 14, paddingTop: 10 },
   emoji: { fontSize: 24, lineHeight: 30, textAlign: 'center' },
   actions: { flexDirection: 'row', gap: 8, marginHorizontal: 8, marginTop: 6, paddingVertical: 4, borderTopWidth: StyleSheet.hairlineWidth },

@@ -8,6 +8,7 @@ suite_reset
 mkdir -p e2e/results
 quiet() { local out=$1; shift; "$@" > "$out" 2>&1; local rc=$?; tail -1 "$out"; return $rc; }
 suite "agent roster" bash scripts/check-agents.sh
+suite "agent sync" quiet e2e/results/sync-agents.txt bash scripts/tests/sync_agents_test.sh
 suite "persona checks" quiet e2e/results/persona-checks.txt bash scripts/tests/check_persona_checks_test.sh
 suite "Expo Go SDK" bash scripts/check-expo-go.sh
 suite "Expo Go check test" quiet e2e/results/expo-go.txt bash scripts/tests/check_expo_go_test.sh
@@ -20,6 +21,16 @@ if pg_isready -q 2>/dev/null; then
   suite "backend SQL" quiet e2e/results/backend-sql.txt bash -c 'cd backend && bash tests/run.sh'
 else
   suite_skip "backend SQL" "no local Postgres running"
+fi
+if pg_isready -q 2>/dev/null; then
+  suite "Supabase starter scripts" quiet e2e/results/starter-scripts.txt bash docs/supabase-starter/tests/scripts_test.sh
+else
+  suite_skip "Supabase starter scripts" "no local Postgres running"
+fi
+if [ -n "${STUDIO_SUPABASE_TEMPLATE:-}" ] && pg_isready -q 2>/dev/null; then
+  suite "Supabase starter invites" quiet e2e/results/starter-invites.txt bash docs/supabase-starter/tests/run-with-template.sh "$STUDIO_SUPABASE_TEMPLATE"
+else
+  suite_skip "Supabase starter invites" "set STUDIO_SUPABASE_TEMPLATE to studio-agents/templates/supabase; CI runs it"
 fi
 if command -v deno >/dev/null 2>&1; then
   suite "Deno functions" quiet e2e/results/backend-deno.txt bash -c 'cd backend && deno test --allow-env --allow-read supabase/functions/sign-media/ supabase/functions/notify/ tests/templates/'

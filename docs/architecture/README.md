@@ -31,6 +31,6 @@ Planned sections: data retention and deletion once the purge worker exists; the 
 
 The rule (also in `CLAUDE.md`): **a PR that changes how data is stored, moved, encrypted, logged or shared updates the matching section here in the same PR**, and refreshes its "Last checked" footer. That covers migrations, edge functions, `app/src/crypto/`, `app/src/media/`, notification content, sign-in, and any new vendor (also a row in `docs/product/ACCOUNTS.md`).
 
-- The PR author (usually `app-engineer`) makes the edit; `privacy-security` reviews changes to 03 and 04.
+- The PR author (usually `engineer`) makes the edit; `privacy-security` reviews changes to 03 and 04.
 - If a PR can't update the doc, it adds a TRACKER row saying which section is stale.
 - At each milestone gate, `staff-pm` checks that every footer is newer than the last change to the code it describes.
