@@ -296,6 +296,13 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** the frame is the cheapest of the three, and grandparents see it with zero taps (STORY problem 3). The vault is the long-term moat and reuses the messenger's MLS.
 - **Source:** `docs/product/SPEC-PHOTO-FRAME.md`, `docs/product/decisions/2026-10-29-photo-frame.md`, `docs/product/PLAN-FAMILY-VAULT.md`, TRACKER R23, R24
 
+### DEC-41 · Photos refresh on their own; sort uses the system icon (UI-26)
+- **When / status:** Oct 26 · Decided by Chase (thread "Review latest build UI")
+- **Chose:** no "Check for new photos" button (auto-refresh on open and return, plus pull-down); "By date" with the system sort icon beside Messages in one row.
+- **Over:** a worded refresh button and two header rows (R11).
+- **Because:** Chase didn't understand the refresh button and wants common system icons where they're universal. The first photo comes a row sooner.
+- **Source:** `docs/product/decisions/2026-10-26-photos-refresh-sort.md`
+
 ### DEC-42 · The messenger becomes a shared AGPL library (STU-DEC-1)
 - **When / status:** Oct 26 · Decided by Chase (Product Studio STU-DEC-1, license on Oct 26; built the same day on his word)
 - **Chose:** move the MLS engine and ciphersuite into `packages/messenger` (`@holroyd/messenger`), with three plug points (Relay, Roster, Store) and a Supabase relay template. It's licensed AGPL-3.0-or-later, copyright Chase, with its own LICENSE file and SPDX headers. Hearth uses it through a thin adapter. Crew Clock is the second user.

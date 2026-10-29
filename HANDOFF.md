@@ -1,13 +1,21 @@
 # Handoff
 
-## Oct 26: the messenger is now a shared library (branch claude/project-thread-tzgzk8, PR)
+## Oct 26: the messenger is now a shared library (branch claude/project-thread-tzgzk8, PR #57, merged Oct 29)
 - **Why:** Chase, Oct 26: "proceed. Build the library" so Crew Clock can use it too (STU-DEC-1, DEC-42). No change to what users see.
 - **Done:** `packages/messenger` (`@holroyd/messenger`): the engine and noble-only ciphersuite behind Relay, Roster and Store, plus `relay/supabase.sql` (0015 without Hearth; each product writes `private.messenger_people`). **License: AGPL-3.0-or-later, copyright Chase Holroyd**: `packages/messenger/LICENSE`, plus SPDX headers on every file. Hearth's `app/src/messenger/client.ts` and `mlsCrypto.ts` are now thin adapters. Storage keys are unchanged, so phones keep their chats. Wiring: the app links the library with `file:../packages/messenger`; `app/metro.config.js` (watchFolders, nodeModulesPaths), `preserveSymlinks` in tsconfig, and Jest `roots` and `modulePaths`.
 - **Tests:** PKG-1..6 (engine on test fakes, run in the app suite), RELAY-1..9 (`packages/messenger/relay/test.sql`, run by `backend/tests/run.sh` and `run_supabase.sh`), all MSG tests unchanged. The iOS bundle compiles with the library inside.
 - Oct 29: brought up to date with main after release M1.1; decision renumbered DEC-39 → DEC-42 (DEC-39 is captions, DEC-40 the photo frame, DEC-41 PR #58).
 - **Next exact step:** Chase says "merge". Then he pastes the Product Studio and Crew Clock prompts from the thread "Built-in messenger". No deploy is needed (no migration change).
 
-## Oct 29, bleeding-edge features: photo frame spec and family vault plan (branch claude/project-thread-5ifxmu, docs only)
+## Oct 26: Photos screen UI review and fixes (branch claude/project-thread-vhp0f2, PR #58, merged Oct 29)
+- ux-reviewer on Chase's phone screenshot plus the web demo at 390 and 1280: 5/10 → 6/10. Review: `docs/reviews/2026-10-26-photos-screen.md`.
+- Built test-first: UI-26 no "Check for new photos" button (auto-refresh on open and return, plus pull-down), "By date" with the system sort icon beside Messages in one row (DEC-41); UI-27 avatar letter skips "The".
+- The gear in Chase's screenshot is Expo Go's developer button, not ours.
+- **Parked:** filter Photos by group (Chase, Oct 26; not scheduled).
+- Oct 29: brought up to date with main after release M1.1; decision renumbered DEC-39 → DEC-41 (DEC-39 is captions, DEC-40 is PR #69).
+- Next: publish to Expo Go after merge (Chase's word). Next gap: tall cards from the always-open reply box (DEC-30 keeps it).
+
+## Oct 29, bleeding-edge features: photo frame spec and family vault plan (branch claude/project-thread-5ifxmu, docs only, PR #69, merged Oct 29)
 - **Chase's call (DEC-40):** of three ideas (photo frame, MLS vault, AI audience guard), "Start with 1", plus a day-by-day plan for 2.
 - **Specced:** `docs/product/SPEC-PHOTO-FRAME.md` (FRAME-R1..R5, FRAME-1..8), with a persona check (`decisions/2026-10-29-photo-frame.md`, LG Red mitigated: optional, set up by a helper). Live Activity moved to the poster's send progress, because Apple allows them only for things in progress. TRACKER R23.
 - **Planned:** `docs/product/PLAN-FAMILY-VAULT.md`, 14 one-PR days reusing the messenger's MLS, with an MLS explainer. TRACKER R24. Ideas log row added.
