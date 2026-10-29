@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { REACTIONS, type FeedPost, type Reaction } from '../api/HearthApi';
 import type { CommentView } from '../feed/store';
 import { useApp, useFeed } from '../state/AppContext';
-import { Button, Card, Confirm, Txt } from '../ui/kit';
+import { Button, Card, Confirm, Field, Notice, Txt } from '../ui/kit';
 import { andList, initialOf, people, shortDate } from '../ui/format';
 import { MIN_TARGET, fontFamily, useTheme } from '../ui/theme';
 import { PhotoCollage } from './PhotoCollage';
@@ -23,7 +23,7 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
   const { c } = useTheme();
   const ready = post.media.filter((m) => m.status === 'ready');
   const mine = post.author_id === session?.userId;
-  const [sheet, setSheet] = useState<'comments' | 'more' | 'delete' | null>(null);
+  const [sheet, setSheet] = useState<'comments' | 'more' | 'delete' | 'words' | null>(null);
   const box = useRef<TextInputInstance>(null);
 
   useEffect(() => {
@@ -45,6 +45,8 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
   const these = many ? `these ${ready.length} photos` : 'this photo';
   // MOMENT-1: the sender sees which groups it went to, by name.
   const to = mine && post.audience?.length ? `to ${andList(post.audience.map((a) => a.name))}` : null;
+  // CAP-6: "Edited" after the date once the sender changed the words.
+  const when = [shortDate(post.published_at), post.words_edited_at ? 'Edited' : null, to].filter(Boolean).join(' · ');
 
   return (
     <Card testID={`post-${post.post_id}`} style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
@@ -54,7 +56,7 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
         </View>
         <View style={{ flex: 1, minWidth: 0 }}>
           <Txt variant="strong">{post.author_name}</Txt>
-          <Txt variant="muted">{to ? `${shortDate(post.published_at)} · ${to}` : shortDate(post.published_at)}</Txt>
+          <Txt variant="muted" testID={`when-${post.post_id}`}>{when}</Txt>
         </View>
         <Button
           label={`More for ${many ? 'these photos' : 'this photo'}`}
@@ -117,8 +119,10 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
         mine={mine}
         these={these}
         onDelete={() => setSheet('delete')}
+        onChangeWords={() => setSheet('words')}
         onClose={() => setSheet(null)}
       />
+      {sheet === 'words' ? <WordsSheet post={post} onClose={() => setSheet(null)} /> : null}
       <Confirm
         visible={sheet === 'delete'}
         title={`Delete ${these} for everyone?`}
@@ -132,9 +136,10 @@ export const PostCard = memo(function PostCard({ post }: { post: FeedPost }) {
   );
 });
 
-/** MOMENT-6: "More" says who can see it (BETA-AUD-1) and holds Delete for the sender (BETA-AUD-5). */
-function MoreMenu({ visible, post, mine, these, onDelete, onClose }: {
-  visible: boolean; post: FeedPost; mine: boolean; these: string; onDelete: () => void; onClose: () => void;
+/** MOMENT-6: "More" says who can see it (BETA-AUD-1) and holds, for the sender only, Change the words (CAP-6)
+ *  and Delete (BETA-AUD-5). */
+function MoreMenu({ visible, post, mine, these, onDelete, onChangeWords, onClose }: {
+  visible: boolean; post: FeedPost; mine: boolean; these: string; onDelete: () => void; onChangeWords: () => void; onClose: () => void;
 }) {
   const { c, os } = useTheme();
   if (!visible) return null;
@@ -149,11 +154,49 @@ function MoreMenu({ visible, post, mine, these, onDelete, onClose }: {
           <Txt variant="title" role="header">Who can see this</Txt>
           <Txt style={{ color: post.audience ? c.ink : c.safe }}>{audience}</Txt>
           {mine ? (
-            <Button label={`Delete ${these}`} variant="danger" onPress={onDelete} />
+            <>
+              <Button label="Change the words" variant="secondary" onPress={onChangeWords} />
+              <Button label={`Delete ${these}`} variant="danger" onPress={onDelete} />
+            </>
           ) : null}
           <Button label="Close this menu" text="Close" variant="secondary" onPress={onClose} />
         </SafeAreaView>
       </View>
+    </Modal>
+  );
+}
+
+/** CAP-6: one sheet with the same two boxes as Share, filled in, plus Save and Cancel. Photos never change here.
+ *  No notice goes out (CAP-8); a refusal shows its reason in plain words and keeps the old words (CAP-7). */
+function WordsSheet({ post, onClose }: { post: FeedPost; onClose: () => void }) {
+  const { feed } = useApp();
+  const { c } = useTheme();
+  const [title, setTitle] = useState(post.title ?? '');
+  const [caption, setCaption] = useState(post.caption ?? '');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const save = async () => {
+    if (!feed) return;
+    setBusy(true);
+    setError(null);
+    const why = await feed.editWords(post.post_id, title, caption);
+    setBusy(false);
+    if (why) setError(why);
+    else onClose();
+  };
+  return (
+    <Modal visible animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+      <SafeAreaView testID={`words-${post.post_id}`} style={{ flex: 1, backgroundColor: c.bg }}>
+        <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }} keyboardShouldPersistTaps="handled">
+          <Txt variant="title" role="header">Change the words</Txt>
+          <Txt variant="muted">The photos stay as they are. Nobody gets a notice.</Txt>
+          <Field label="Title (optional)" value={title} onChangeText={setTitle} maxLength={80} />
+          <Field label="What's happening?" value={caption} onChangeText={setCaption} multiline maxLength={2000} />
+          {error ? <Notice text={error} /> : null}
+          <Button label="Save the new words" text="Save" busy={busy} onPress={() => void save()} />
+          <Button label="Cancel, keep the words" text="Cancel" variant="secondary" onPress={onClose} />
+        </ScrollView>
+      </SafeAreaView>
     </Modal>
   );
 }

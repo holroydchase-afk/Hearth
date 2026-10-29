@@ -71,6 +71,9 @@ export interface HearthApi {
   createPost(args: CreatePostArgs): Promise<string>;
   publishPost(post: string): Promise<void>;
   deletePost(post: string): Promise<void>;
+  /** CAP-6..8 (0020): the sender changes the title and caption together; blank means none. Returns the "Edited" time.
+   *  Others get 42501, posts you can't see P0002, too long 23514. No notice goes out. */
+  editPostWords(post: string, title: string | null, caption: string | null): Promise<string>;
   toggleHeart(post: string): Promise<HeartState>;
   /** REACT-1: the same reaction again takes it back; another switches to it. */
   setReaction(post: string, emoji: Reaction): Promise<ReactionState>;
