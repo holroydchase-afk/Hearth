@@ -64,5 +64,16 @@ check "AGENTS-3 an unknown agent copies nothing and says which" '(( rc != 0 )) &
 out=$(bash scripts/sync-agents.sh --check 2>&1); rc=$?
 check "AGENTS-2 the real agents match docs/eng/AGENT-NOTES.md" '(( rc == 0 ))' || echo "$out"
 
+# AGENTS-4: the studio refresh (studio-agents sync.sh, sync-tools.sh, install-rules.sh) landed whole.
+skills=$(awk 'NR>1&&$0=="---"{exit} NR>1&&/^skills:/{on=1;next} on&&/^ *- /{sub(/^ *- */,"");print;next} on{on=0}' .claude/agents/ux-reviewer.md)
+check "AGENTS-4 every skill ux-reviewer preloads is in .claude/skills" \
+  '[[ -n $skills ]] && for s in $skills; do [[ -f .claude/skills/$s/SKILL.md ]] || exit 1; done'
+check "AGENTS-4 the studio design rules and ux tools are synced" \
+  '[[ -f .claude/design-rules.md && -f scripts/ux-shots.mjs && -f scripts/ux-rules.mjs ]]'
+check "AGENTS-4 settings.json keeps the Expo plugin and wires the HANDOFF and agent-run hooks" \
+  'python3 -c "import json,sys; s=json.load(open(\".claude/settings.json\")); h=json.dumps(s.get(\"hooks\",{})); sys.exit(0 if s[\"enabledPlugins\"].get(\"expo@claude-plugins-official\") and \"SessionStart\" in h and \"log-agent-run.sh\" in h else 1)"'
+check "AGENTS-4 studio-checks.json points the log roots at Hearth code and keeps caption and kek banned" \
+  'python3 -c "import json,sys; c=json.load(open(\"studio-checks.json\")); sys.exit(0 if \"app/src\" in c[\"logs\"][\"roots\"] and {\"caption\",\"kek\"} <= set(c[\"logs\"][\"banned\"]) and c[\"agents\"][\"verify\"] else 1)"'
+
 echo "SYNC AGENTS RESULT: $pass passed, $fail failed"
 [ $fail -eq 0 ]
