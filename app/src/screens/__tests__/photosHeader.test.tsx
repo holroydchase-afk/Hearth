@@ -18,22 +18,24 @@ async function withEvent() {
 }
 
 describe('R11 RV-U3 Photos header', () => {
-  it('R11 RV-U3 Messages and See events share a row; Check for new photos and Show by date share a row', async () => {
+  it('UI-26 one header row: Messages and By date (sort icon) side by side, no "Check for new photos" button', async () => {
     await renderApp(<PhotosScreen />, { be: await withEvent(), user: 'jo' });
-    const top = await screen.findByTestId('photos-actions-top');
-    await within(top).findByRole('button', { name: 'See events' });
-    expect(within(top).getByRole('button', { name: 'Messages' })).toBeTruthy();
-    const feed = await screen.findByTestId('photos-actions-feed');
-    expect(within(feed).getByRole('button', { name: 'Check for new photos' })).toBeTruthy();
-    expect(within(feed).getByRole('button', { name: 'Show photos by the date they were taken' })).toBeTruthy();
-    for (const row of [top, feed]) expect(StyleSheet.flatten(row.props.style)).toMatchObject({ flexDirection: 'row', flexWrap: 'wrap' });
+    const row = await screen.findByTestId('photos-actions');
+    await within(row).findByRole('button', { name: 'See events' });
+    expect(within(row).getByRole('button', { name: 'Messages' })).toBeTruthy();
+    expect(within(row).getByRole('button', { name: 'Show photos by the date they were taken' })).toBeTruthy();
+    expect(within(row).getByText('By date')).toBeTruthy();
+    expect(StyleSheet.flatten(row.props.style)).toMatchObject({ flexDirection: 'row', flexWrap: 'wrap' });
+    // Photos refresh on their own (open, back in front) and with pull-to-refresh; no button for it.
+    expect(screen.queryByRole('button', { name: 'Check for new photos' })).toBeNull();
+    expect(screen.queryByTestId('photos-actions-feed')).toBeNull();
   });
 
   it('R11 RV-U3 each half-width button keeps a 48 pt target and room for its words (min 150 pt, grows to fill)', async () => {
     await renderApp(<PhotosScreen />, { be: await withEvent(), user: 'jo' });
-    const top = await screen.findByTestId('photos-actions-top');
-    await within(top).findByRole('button', { name: 'See events' });
-    for (const b of within(top).getAllByRole('button')) {
+    const row = await screen.findByTestId('photos-actions');
+    await within(row).findByRole('button', { name: 'See events' });
+    for (const b of within(row).getAllByRole('button')) {
       expect(StyleSheet.flatten(b.props.style)).toMatchObject({ flexGrow: 1, flexBasis: 150 });
       expect(StyleSheet.flatten(b.props.style).minHeight).toBeGreaterThanOrEqual(48);
     }
