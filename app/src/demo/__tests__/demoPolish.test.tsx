@@ -20,9 +20,9 @@ describe('UI-1 compact demo bar', () => {
     await seedDemo(be, pic);
     setDemoViewer(be, who);
     render(<DemoBar be={be} reload={jest.fn()} startOver={jest.fn()} open={jest.fn()} />);
-    const line = screen.getByText(who === 'parent' ? /You're Sam, a parent/ : /You're Grandma Jo/).props.children as string;
+    const line = screen.getByText(who === 'parent' ? /You're Kai, a parent/ : /You're Grandma Jo/).props.children as string;
     expect(line.length).toBeLessThanOrEqual(38); // one line at 390 px
-    const swap = who === 'parent' ? 'See the photos as Grandma Jo sees them' : "Back to Sam's view, the parent";
+    const swap = who === 'parent' ? 'See the photos as Grandma Jo sees them' : "Back to Kai's view, the parent";
     const chips = [words(swap), words('Start over with the sample family'), screen.getByRole('link', { name: "Back to Chase's portfolio" }).findAllByType(Text)[0]!.props.children];
     expect(chips.join('').length).toBeLessThanOrEqual(30);
     expect(StyleSheet.flatten(screen.getByTestId('demo-bar').props.style).paddingTop).toBeLessThanOrEqual(8);
