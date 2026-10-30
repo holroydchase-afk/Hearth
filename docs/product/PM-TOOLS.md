@@ -34,4 +34,6 @@ Built means it exists and is in use. "Hub" marks what ACT-1 should show.
 | Accounts list | Every outside account and where the name "Hearth" is baked in | `docs/product/ACCOUNTS.md` | Built | No |
 | Handoff | Current state and history, read at the start of every session | `HANDOFF.md` | Built | No |
 | Agent roster | The specialist agents and what to send each; CI checks it matches `.claude/agents/` | `CLAUDE.md`, `scripts/check-agents.sh` | Built | No |
+| Agents line and run log | Every PR names the agents that ran; CI checks the line against `.claude/agent-runs/<branch>.log` (written by a hook) and reruns qa-tdd's suites 3x | `.github/workflows/agents-check.yml`, `scripts/check-agent-runs.sh`, `studio-checks.json` | Built (Oct 29, from studio-agents) | No |
+| UI review tools | ux-reviewer's screenshots plus checks (`ux-shots`) and design-rule checks (`ux-rules`), scored 0-10 | `scripts/ux-shots.mjs`, `scripts/ux-rules.mjs`, `.claude/design-rules.md` | Built (Oct 29, from studio-agents) | No |
 | Central PM hub | One place to see all of the above | Not decided | Idea (ACT-1) | n/a |
