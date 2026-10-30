@@ -9,5 +9,28 @@
   },
   "enabledPlugins": {
     "expo@claude-plugins-official": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if [ -f HANDOFF.md ]; then echo '=== HANDOFF.md (read before starting; update it in every commit that makes progress) ==='; head -c 6000 HANDOFF.md; else echo 'No HANDOFF.md in this repo. Create one before any other change (see studio-agents docs/session-rules.md).'; fi"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/scripts/log-agent-run.sh\"; [ -f \"$f\" ] || f=\"$CLAUDE_PROJECT_DIR/templates/scripts/log-agent-run.sh\"; [ -f \"$f\" ] && bash \"$f\"; exit 0"
+          }
+        ]
+      }
+    ]
   }
 }
