@@ -92,6 +92,36 @@ describe('SupabaseApi RPC wiring (API.md names and args)', () => {
   });
 });
 
+describe('HARD-16 (B12) a server before 0017 knows only hearts', () => {
+  /** A pre-0017 server: no set_reaction; toggle_heart flips a stored heart. */
+  function oldServer(hearted: boolean) {
+    const c = mockClient();
+    let on = hearted;
+    c.rpc.mockImplementation(async (name: string) => {
+      if (name === 'set_reaction') return { data: null, error: { code: 'PGRST202', message: 'not found' } };
+      on = !on;
+      return { data: { i_hearted: on, heart_count: on ? 1 : 0 }, error: null };
+    });
+    return { c, hearted: () => on };
+  }
+
+  it('HARD-16 Haha or Like on a post you already hearted keeps the heart', async () => {
+    for (const emoji of ['😂', '👍'] as const) {
+      const s = oldServer(true);
+      expect(await make(s.c).setReaction('P', emoji)).toEqual({ my_reaction: '❤️', heart_count: 1, counts: { '❤️': 1 } });
+      expect(s.hearted()).toBe(true);
+    }
+  });
+
+  it('HARD-16 Haha on a post without a heart adds one; Love still takes a heart back', async () => {
+    const s = oldServer(false);
+    expect((await make(s.c).setReaction('P', '😂')).my_reaction).toBe('❤️');
+    expect(s.hearted()).toBe(true);
+    expect((await make(s.c).setReaction('P', '❤️')).my_reaction).toBeNull();
+    expect(s.hearted()).toBe(false);
+  });
+});
+
 describe('SupabaseApi auth: 6-digit email code, no passwords, no magic links', () => {
   it('asks Supabase for an email OTP without a redirect link', async () => {
     const c = mockClient();
