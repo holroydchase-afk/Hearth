@@ -27,15 +27,15 @@ export function DemoBar({ be, reload, startOver, open }: {
     <View style={[styles.bar, { backgroundColor: c.accentSoft, borderBottomColor: c.line }]} testID="demo-bar" accessibilityLabel="About this demo">
       <Txt>
         {viewer === 'parent'
-          ? "Made-up family. You're Max, a parent."
+          ? "Made-up family. You're Sam, a parent."
           : "You're Grandma Jo, a grandparent."}
       </Txt>
       <View style={styles.row}>
         <Button
           style={styles.btn}
           variant="secondary"
-          label={viewer === 'parent' ? 'See the photos as Grandma Jo sees them' : "Back to Max's view, the parent"}
-          text={viewer === 'parent' ? 'As Grandma' : 'As Max'}
+          label={viewer === 'parent' ? 'See the photos as Grandma Jo sees them' : "Back to Sam's view, the parent"}
+          text={viewer === 'parent' ? 'As Grandma' : 'As Sam'}
           onPress={swap}
         />
         <Button style={styles.btn} variant="secondary" label="Start over with the sample family" text="Start over" onPress={startOver} />

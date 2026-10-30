@@ -1,12 +1,5 @@
 # Handoff
 
-## Oct 30: demo parent renamed "Sam" → "Max" (Product Studio INTAKE, branch claude/project-thread-h2kh6k, PR #77)
-- **Why:** Hearth is now on the portfolio homepage (portfolio PR #38), and a real brother named Sam is credited there, so the made-up parent needs a name no relative has.
-- **Built, test-first (DEMO-3):** the seed test now expects "Max" and fails on "Sam" (red, then green). The demo bar, chips, Me line and the e2e specs say Max. Old review docs keep "Sam" as history.
-- **Tests, run locally because Actions doesn't run while the repo is private:** app Jest 677 + 1 skipped (3 runs), typecheck, backend `tests/run.sh` 1,002 checks with 0 failed (3 runs), demo e2e 5 passed + 5 showcase skipped (3 runs), static-site e2e 8/8 (3 runs).
-- **Portfolio / public presence:** new build `/mnt/project-files/portfolio/hearth-demo-site-2026-10-30.tgz` (base /demo/hearth) and `INTAKE-2026-10-30-demo-max.md` for Product Studio. Counts confirmed: 660+ app tests and 960+ database checks are still true (677 and 1,002).
-- **Next exact step:** Chase pastes the INTAKE into Product Studio. PR #77 waits on the history-cleanup call.
-
 ## Oct 29: host the demo publicly; real-family details scrubbed (TRACKER R26, branch claude/project-thread-h2kh6k, PR #77)
 - **Why:** Product Studio INTAKE (Oct 29): the repo was public, so Hearth hosts its own demo, after a privacy check of the whole history.
 - **Scan (all branches, 208 commits):** gitleaks found 0 leaks. No Supabase, Backblaze or API keys (the one JWT is a fake test token), so nothing needs rotating. The emails are made-up test addresses, and the one phone number is a public office line. **Found:** real-family details (names, surnames, relationships) in docs, tests and commit messages. Chase made the repo private again (Oct 29, 20:19Z).

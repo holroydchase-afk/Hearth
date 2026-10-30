@@ -30,8 +30,8 @@ test("DEMO-10 Grandma Jo's view hides the Mom's-side posts; the parent's view sh
   await expect(page.getByText(/You're Grandma Jo/)).toBeVisible();
   await expect(page.getByText('Pumpkin patch day', { exact: true })).toBeVisible();
   await expect(page.getByText('Canoe day at the lake', { exact: true })).toHaveCount(0);
-  await page.getByRole('button', { name: "Back to Max's view, the parent" }).click();
-  await expect(page.getByText(/You're Max, a parent/)).toBeVisible();
+  await page.getByRole('button', { name: "Back to Sam's view, the parent" }).click();
+  await expect(page.getByText(/You're Sam, a parent/)).toBeVisible();
   await page.getByText('Canoe day at the lake', { exact: true }).scrollIntoViewIfNeeded();
   await expect(page.getByText('Canoe day at the lake', { exact: true })).toBeVisible();
 });
