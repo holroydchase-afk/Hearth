@@ -231,7 +231,7 @@ tickets = [
  ("B11", "bug", "app", "Medium", "open", "HARD-14: a reaction summary read before a tap can land after it and hide the confirmed reaction until the next refresh", []),
  ("T11", "test fix", "app", "Low", "open", "HARD-15: Fake and Supabase disagree on reacting to your own unpublished post (the contract doesn't cover it)", []),
  ("B13", "bug", B, "High", "fixed", "HARD-17: Postgres JIT-compiled feed_rows once a family had a few dozen posts: 1.5-2 s per Photos or By date page instead of 20-50 ms. Migration 0018 turns JIT off for it", []),
- ("B12", "bug", "app", "Low", "open", "HARD-16: on a server before 0017, Haha or Like takes away an existing heart (the hosted server has 0017)", []),
+ ("B12", "bug", "app", "Low", "fixed", "HARD-16: on a server before 0017, Haha or Like takes away an existing heart (the hosted server has 0017)", []),
 ]
 # When each ticket was found and fixed, where it isn't Oct 15.
 DATES = {"S9": ("2026-10-15", "2026-10-16"), "S10": ("2026-10-15", "2026-10-16"), "S12": ("2026-10-15", "2026-10-16"),

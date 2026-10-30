@@ -130,12 +130,14 @@ export class SupabaseApi implements HearthApi {
   editPostWords = (p: string, title: string | null, caption: string | null) =>
     this.rpc<string>('edit_post_words', { p_post: p, p_title: title, p_caption: caption });
   toggleHeart = (p: string) => this.rpc<unknown>('toggle_heart', { p_post: p }).then((d) => one<HeartState>(d));
-  /** REACT-1. A server before 0017 has no set_reaction: any reaction is a heart there. */
+  /** REACT-1. A server before 0017 has no set_reaction: any reaction is a heart there. Only Love takes a heart
+   *  back; Haha or Like never removes one (HARD-16), so a flip that turned it off is flipped back. */
   setReaction = async (p: string, emoji: Reaction): Promise<ReactionState> => {
     const res = (await this.o.client.rpc('set_reaction', { p_post: p, p_emoji: emoji }).then((r) => r, (e) => ({ data: null, error: e }))) as
       { data: unknown; error: { code?: string } | null };
     if (res.error?.code === 'PGRST202') {
-      const h = await this.toggleHeart(p);
+      let h = await this.toggleHeart(p);
+      if (emoji !== '❤️' && !h.i_hearted) h = await this.toggleHeart(p);
       return { my_reaction: h.i_hearted ? '❤️' : null, heart_count: h.heart_count, counts: h.heart_count ? { '❤️': h.heart_count } : {} };
     }
     if (res.error) throw toApiError(res.error);
