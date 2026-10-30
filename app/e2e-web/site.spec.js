@@ -30,7 +30,7 @@ test("DEMO-5 Grandma's view and Start over stay inside /demo/hearth/", async ({ 
   await expect(page.getByText(/You're Grandma Jo/)).toBeVisible();
   expect(new URL(page.url()).pathname).toMatch(/^\/demo\/hearth\/photos\/?$/);
   await page.getByRole('button', { name: 'Start over with the sample family' }).click();
-  await expect(page.getByText(/You're Sam, a parent/)).toBeVisible();
+  await expect(page.getByText(/You're Kai, a parent/)).toBeVisible();
   expect(new URL(page.url()).pathname).toMatch(/^\/demo\/hearth\//);
 });
 
