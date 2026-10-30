@@ -1,8 +1,10 @@
 ok   - EXPO-4: script exists
 ok   - EXPO-4: passes when Expo Go runs the app's SDK
 ok   - EXPO-4: fails when Expo Go has moved on, naming both versions
+ok   - EXPO-5: fails when a newer released SDK has an iPhone Expo Go, even if expoGoSdkVersion lags
+ok   - EXPO-5: a newer SDK still in beta doesn't count
 ok   - EXPO-4: fails closed when Expo's answer has no Expo Go version
 ok   - EXPO-4: fails closed with a clear message when Expo can't be reached
 ok   - EXPO-4: CI runs the live check
 ok   - EXPO-4: test-all.sh runs the live check
-# 7 passed, 0 failed
+# 9 passed, 0 failed
