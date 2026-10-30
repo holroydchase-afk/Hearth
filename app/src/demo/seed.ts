@@ -9,7 +9,7 @@ const DAY = 864e5;
 
 /** Made-up names only (DEMO-3). The fixture's parent is renamed so no real person appears. */
 export const DEMO_NAMES: Record<string, string> = {
-  [F.users.chase.id]: 'Max',
+  [F.users.chase.id]: 'Sam',
   [F.users.alex.id]: 'Alex',
 };
 

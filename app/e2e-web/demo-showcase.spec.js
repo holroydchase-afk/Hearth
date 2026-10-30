@@ -75,7 +75,7 @@ for (const size of SIZES) {
       await shot('not-found');
       await page.goto('');
       await page.getByRole('button', { name: 'Start over with the sample family' }).click();
-      await expect(page.getByText(/You're Max, a parent/)).toBeVisible();
+      await expect(page.getByText(/You're Sam, a parent/)).toBeVisible();
       await ctx.close();
     });
   }
