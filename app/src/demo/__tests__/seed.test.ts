@@ -54,10 +54,10 @@ describe('DEMO-1..3, DEMO-10 sample-data demo', () => {
     expect(plain).toEqual((await picture(first.pictures[0]!)).display);
   });
 
-  it('DEMO-3 sample data has made-up names only (the parent is "Sam", never the founder)', async () => {
+  it('DEMO-3 sample data has made-up names only (the parent is "Kai", never the founder)', async () => {
     const be = await seeded();
     const names = Object.values(be.state.users).map((u) => u.name);
-    expect(names).toEqual(expect.arrayContaining(['Sam', 'Grandma Jo']));
+    expect(names).toEqual(expect.arrayContaining(['Kai', 'Grandma Jo']));
     expect(JSON.stringify(be.state.users)).not.toMatch(/chase/i);
     expect(Object.values(DEMO_NAMES)).not.toContain('Chase');
     expect(be.state.spaces[F.space.id]!.name).toBe('Mia and Leo');
