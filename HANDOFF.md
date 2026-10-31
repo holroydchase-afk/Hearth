@@ -1,5 +1,12 @@
 # Handoff
 
+## Oct 31: studio demo bar (intake #82, TRACKER R28, DEC-45; branch claude/project-thread-v54okb, PR)
+- **Why:** Product Studio intake #82 (Chase, Oct 31: one demo banner standard, pm-tools `docs/DEMO-BANNER.md`). Picked up by the new "Intake check" scheduled task (4x a day, owned by thread "Set up intake check routine").
+- **Done, test-first:** `app/src/demo/DemoBar.tsx` is the slim Demo bar (← Portfolio, Demo badge, Details) with a push-down drawer: standard copy, See it as Grandma Jo, Reset demo that asks first and says "Sample data restored." once, and the way back. `DemoTip.tsx` adds one tip line on the phone's Photos. The old chip bar is gone. Tests: DEMO-BAR in `demoBar.test.tsx` and `demoTip.test.tsx`, browser cases in `e2e-web/demo.spec.js`; the demo, site and showcase specs open Details first.
+- **Review:** `docs/reviews/2026-10-31-demo-bar.md` with before/after screenshots (390/1280, light/dark). ux-reviewer: 5/10 before, 7/10 after its first pass; its two P1s and two P2s are fixed.
+- **Portfolio / public presence:** the hosted demo still has the old chip bar until this merges and Product Studio re-copies a fresh build (`portfolio/hearth-demo-site-2026-10-31-demobar.tgz` in the project files, built from this branch); then Product Studio re-shoots `assets/home/hearth-*.webp`.
+- **Next exact step:** Chase says "merge" for this PR.
+
 ## Oct 31: open PRs merged, 0020 and 0021 deployed, AGPL headers (branch claude/project-thread-rmj7at, PR)
 - **Chase's ask:** "fix all issues, determine the correct order including merge 73, deploy 0020", then "also do the AGPL work".
 - **CI:** Actions started no jobs while the repo was private (no runner, no logs: the billing limit). Public again Oct 31, so CI runs; every PR below was green before it merged.

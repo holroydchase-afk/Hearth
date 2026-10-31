@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 Chase Holroyd
 import React, { useState } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { PhotosDemoTip } from '../demo/DemoTip';
 import { useApp, useFeed } from '../state/AppContext';
 import { eventList, photosRows, type PhotosRow } from '../feed/events';
 import { earlierGroups, isFromEarlier, monthSpan, startOfNextMonth, type EarlierGroup } from '../feed/timeline';
@@ -36,6 +37,7 @@ export function PhotosScreen() {
   const app = useApp();
   const state = useFeed();
   const { c } = useTheme();
+  const { width } = useWindowDimensions();
   // BETA-TIME-2: the timeline opens in place; "Back to Photos" returns here.
   const [timeline, setTimeline] = useState<{ startAt: string | null } | null>(null);
   // EVT-3/4: the Events list or one event, opened in place; Back returns here.
@@ -78,6 +80,7 @@ export function PhotosScreen() {
     <View style={{ gap: 12 }}>
       <Txt variant="display" role="header">{`Photos of ${app.space.name}`}</Txt>
       {senders ? <Txt variant="muted">{`Sent by ${senders}`}</Txt> : null}
+      <PhotosDemoTip width={width} />
       {/* UI-26 (Chase, Oct 26): one row. Photos refresh on their own (open, back in front) and on pull-down,
           so there's no "Check for new photos" button; By date uses the system sort icon. Wraps with Bigger text. */}
       <View testID="photos-actions" style={ROW}>

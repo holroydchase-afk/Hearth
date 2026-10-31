@@ -2,13 +2,24 @@
 // the first page, a cold load of each tab's address, the pictures, and no failed requests.
 const { test, expect } = require('../../e2e/node_modules/@playwright/test');
 
+// DEMO-BAR: Grandma's view and Reset live in the Details drawer.
+const details = async (page) => {
+  const t = page.getByRole('button', { name: 'Demo details' });
+  if ((await t.getAttribute('aria-expanded')) !== 'true') await t.click();
+};
+const resetDemo = async (page) => {
+  await details(page);
+  await page.getByRole('button', { name: 'Reset demo' }).click();
+  await page.getByRole('button', { name: 'Reset', exact: true }).click();
+};
+
 for (const tab of ['', 'photos', 'share', 'groups', 'me']) {
   test(`DEMO-5 a cold load of /demo/hearth/${tab} works with no server fallback`, async ({ page }) => {
     const failed = [];
     page.on('response', (r) => { if (r.status() >= 400) failed.push(`${r.status()} ${r.url()}`); });
     page.on('pageerror', (e) => failed.push(String(e)));
     await page.goto(`/demo/hearth/${tab}`);
-    await expect(page.getByText(/made-up family/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Demo details' })).toBeVisible();
     if (tab === '' || tab === 'photos') {
       await expect(page.getByText('Mia turned 5!', { exact: true })).toBeVisible();
       await expect.poll(() => page.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth > 0).length)).toBeGreaterThan(0);
@@ -26,10 +37,12 @@ test('DEMO-5 every link inside the demo stays under /demo/hearth/ or goes to cha
 
 test("DEMO-5 Grandma's view and Start over stay inside /demo/hearth/", async ({ page }) => {
   await page.goto('/demo/hearth/');
+  await details(page);
   await page.getByRole('button', { name: 'See the photos as Grandma Jo sees them' }).click();
+  await details(page);
   await expect(page.getByText(/You're Grandma Jo/)).toBeVisible();
   expect(new URL(page.url()).pathname).toMatch(/^\/demo\/hearth\/photos\/?$/);
-  await page.getByRole('button', { name: 'Start over with the sample family' }).click();
+  await resetDemo(page);
   await expect(page.getByText(/You're Kai, a parent/)).toBeVisible();
   expect(new URL(page.url()).pathname).toMatch(/^\/demo\/hearth\//);
 });

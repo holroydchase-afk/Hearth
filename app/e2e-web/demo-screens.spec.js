@@ -5,6 +5,12 @@
 const path = require('path');
 const { test, expect } = require('../../e2e/node_modules/@playwright/test');
 
+// DEMO-BAR: Grandma's view and Reset live in the Details drawer.
+const details = async (page) => {
+  const t = page.getByRole('button', { name: 'Demo details' });
+  if ((await t.getAttribute('aria-expanded')) !== 'true') await t.click();
+};
+
 const DIR = process.env.SNAPSHOT_DIR;
 const PICTURE = path.join(__dirname, '..', 'public', 'demo-pictures', 'snow.jpg');
 const HIDE_BAR = '[data-testid="demo-bar"] { display: none !important; }';
@@ -40,7 +46,9 @@ test('portfolio screenshots from the demo', async ({ page }) => {
   await shot('iphone-04-groups');
 
   await hide.evaluate((el) => el.remove());
+  await details(page);
   await page.getByRole('button', { name: 'See the photos as Grandma Jo sees them' }).click();
+  await details(page);
   await expect(page.getByText(/You're Grandma Jo/)).toBeVisible();
   hide = await page.addStyleTag({ content: HIDE_BAR });
   await expect(page.getByText('First snow!', { exact: true })).toBeVisible();
