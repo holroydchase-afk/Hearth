@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 29, night shift: grandparent-ux words pass (branch claude/project-thread-kzt7by-n1029c, draft PR, stacked on CAP-9)
+- **Score:** grandparent-ux (reading the code) 7/10 for the new title and change-the-words flows, 8.5/10 with these fixes. It confirmed "What's happening?" without "(optional)", plus "Change the words", "Edited" and Read more.
+- **Built, test-first (WORDS-1..4, DEC-43, persona check all Green):** the caption hint says "The groups you pick will see it." (it said "Grandma will see this", untrue for a one-side post); a refused edit says "These words can't be changed now. Your old words are kept."; Messages says "Not even Hearth can read it: …"; on Share and the bulk review a group shows its name alone and the count starts the names line. Spoken labels unchanged.
+- **Decisions to review:** DEC-43 (all four word changes). WORDS-4 should be checked on an older Android at 200% text.
+- **Next exact step:** Chase says "merge" after #74 and the CAP-9 PR.
+
 ## Oct 29, night shift: one title on a bulk send (CAP-9) (branch claude/project-thread-kzt7by-n1029b, draft PR, stacked on #74)
 - **Built, test-first:** the bulk review screen has one optional "Title (optional)" box (80 characters) and nothing else; every post in the batch carries that title, captions stay empty (`bulk.test.tsx` CAP-9 ×2). App only: `create_post` already takes a title (0019, live), so this needs no deploy.
 - **Next exact step:** Chase says "merge" after #74.

@@ -67,7 +67,7 @@ describe('CAP change the words', () => {
     const sheet = await openChange();
     fireEvent.changeText(within(sheet).getByLabelText('Title (optional)'), 'Mia turns 5');
     fireEvent.press(within(sheet).getByRole('button', { name: 'Save the new words' }));
-    expect(await within(sheet).findByText("You can't do that here.")).toBeTruthy();
+    expect(await within(sheet).findByText("These words can't be changed now. Your old words are kept.")).toBeTruthy();
     fireEvent.press(within(sheet).getByRole('button', { name: 'Cancel, keep the words' }));
     await waitFor(() => expect(screen.queryByTestId(/^words-/)).toBeNull());
     expect(screen.getByRole('header', { name: 'Party' })).toBeTruthy();
