@@ -324,5 +324,12 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** one license string everywhere is clearer for tech readers and tools; -or-later is the FSF's recommended form; Chase still owns all the code, so dual licensing stays possible (DEC-7).
 - **Source:** `docs/product/decisions/2026-10-31-license-or-later.md`
 
+### DEC-45 · The demo uses the studio demo bar; Grandma's view moves into its drawer (DEMO-BAR)
+- **When / status:** Oct 31 · Chase's call for every studio demo ("one standard", pm-tools DEMO-BANNER.md), filed to Hearth as intake #82; the Hearth-specific placement is Claude's default
+- **Chose:** the slim Demo bar with a push-down Details drawer, drawn in Hearth's own kit at Hearth's 17 pt and 48 px floors; the "See it as Grandma Jo" switch sits first in the drawer, with one tip line on the phone's Photos pointing to it.
+- **Over:** keeping the three-chip bar (ux-reviewer 5/10, its own look per demo) and keeping the Grandma chip on the collapsed bar (breaks the standard's one-row layout at 390 px).
+- **Because:** the same bar on every demo reads as one studio; the drawer keeps the app in view; the tip keeps Hearth's key feature findable on a phone. Demo build only, so relatives never see it and no persona check applies.
+- **Source:** intake #82, `docs/reviews/2026-10-31-demo-bar.md`
+
 ---
-Last updated: Oct 31, 2026 (DEC-44)
+Last updated: Oct 31, 2026 (DEC-45)

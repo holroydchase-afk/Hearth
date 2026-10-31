@@ -10,11 +10,11 @@ import { useTheme } from '../ui/theme';
 import { PORTFOLIO_URL } from './DemoBar';
 
 export const APP_COLUMN = 430;
-const WIDE = 900;
+export const WIDE = 900;
 
 const TRY = [
   'Scroll Photos. Each card you sent says who it went to.',
-  'Tap As Grandma. Grandma Jo sees only what was shared with her side of the family.',
+  'Open Details at the top and tap See it as Grandma Jo. She sees only what was shared with her side of the family.',
   'Open Share, pick a photo from this computer, and choose who sees it.',
 ];
 const PROOF = ['Private by name', 'Data stays in the US', 'No ads, no AI training'];

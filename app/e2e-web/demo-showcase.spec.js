@@ -8,6 +8,17 @@ const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('../../e2e/node_modules/@playwright/test');
 
+// DEMO-BAR: Grandma's view and Reset live in the Details drawer.
+const details = async (page) => {
+  const t = page.getByRole('button', { name: 'Demo details' });
+  if ((await t.getAttribute('aria-expanded')) !== 'true') await t.click();
+};
+const resetDemo = async (page) => {
+  await details(page);
+  await page.getByRole('button', { name: 'Reset demo' }).click();
+  await page.getByRole('button', { name: 'Reset', exact: true }).click();
+};
+
 const DIR = process.env.SHOWCASE_DIR;
 const BASE = (process.env.SHOWCASE_BASE || 'http://127.0.0.1:8090/').replace(/\/?$/, '/');
 const PICTURE = path.join(__dirname, '..', 'public', 'demo-pictures', 'snow.jpg');
@@ -66,7 +77,9 @@ for (const size of SIZES) {
       await shot('groups');
       await page.getByRole('tab', { name: 'Me' }).click();
       await shot('me');
+      await details(page);
       await page.getByRole('button', { name: 'See the photos as Grandma Jo sees them' }).click();
+      await details(page);
       await expect(page.getByText(/You're Grandma Jo/)).toBeVisible();
       await shot('grandparent');
       await page.getByRole('tab', { name: 'Help' }).click();
@@ -74,7 +87,7 @@ for (const size of SIZES) {
       await page.goto('no-such-page');
       await shot('not-found');
       await page.goto('');
-      await page.getByRole('button', { name: 'Start over with the sample family' }).click();
+      await resetDemo(page);
       await expect(page.getByText(/You're Kai, a parent/)).toBeVisible();
       await ctx.close();
     });
