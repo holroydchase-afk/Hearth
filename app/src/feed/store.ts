@@ -286,6 +286,20 @@ export class FeedStore {
     }
   }
 
+  /** CAP-6..8: the sender changes the title and caption. Waits for the server (no guess on screen); on a refusal
+   *  the card keeps its words and the plain-words reason comes back for the sheet to show. */
+  async editWords(id: string, title: string, caption: string): Promise<string | null> {
+    const t = title.trim() || null;
+    const c = caption.trim() || null;
+    try {
+      const at = await this.o.api.editPostWords(id, t, c);
+      this.set({ posts: this.state.posts.map((p) => (p.post_id === id ? { ...p, title: t, caption: c, words_edited_at: at } : p)) });
+      return null;
+    } catch (e) {
+      return messageFor(e, { inviter: this.o.inviter });
+    }
+  }
+
   /** Record that this person looked at a post (feeds "Seen by"). Never for the author. */
   markSeen(p: FeedPost): void {
     if (p.author_id === this.o.userId || this.seen.has(p.post_id)) return;

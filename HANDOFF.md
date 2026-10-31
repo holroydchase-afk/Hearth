@@ -13,7 +13,14 @@
 - **Left, needs Chase or bigger work:** S18 means clearing the test bucket before real photos (can't be undone, needs Chase's word, and B2 isn't reachable from the cloud). S19 safety numbers is day 3 of the vault plan (R24). S20 needs an outside reviewer. S14 and B12 don't matter today (video is off, hosted has 0017).
 - **Next exact step:** Chase says "merge".
 
-## Oct 29: studio agents re-synced (TRACKER R25, branch claude/project-thread-jt1p84, PR)
+## Oct 29, night shift: change the words after posting (branch claude/project-thread-kzt7by-n1029, draft PR)
+- **Built, test-first (CAP-6..8, SPEC-CAPTIONS, DEC-39 CAP-D2):** the sender's More menu has "Change the words": one sheet with the Title and "What's happening?" boxes filled in, Save and Cancel. The card then says "Edited" after the date for everyone. Nobody else gets the button; a refusal shows plain words and keeps the old words. No notice goes out; comments and reactions stay.
+- **Migration 0021 (not deployed):** `posts.words_edited_at`, `edit_post_words(p_post, p_title, p_caption)` (sender only, while they can still send to one of the post's groups; P0002 for a post you can't see), `words_edited_at` on `get_feed` / `get_timeline`. **HARD-18:** authors could `UPDATE` caption and taken_at straight in the table (no "Edited" mark); 0021 revokes it. Nothing in the app used it.
+- **Tests:** `captions_test.sql` (32), `rls_test.sql` updated to the HARD-18 contract, contract CAP-6/7/8 (Fake and real PostgREST), `changeWords.test.tsx` (4).
+- **Docs:** API.md, architecture 02 and 05 (Last checked), SPEC-CAPTIONS, TRACKER R21/R22.
+- **Next exact step:** Chase says "merge", then "deploy 0021" and an app update (the button needs 0021 live; older servers answer "can't do that").
+
+## Oct 29: studio agents re-synced (TRACKER R25, branch claude/project-thread-jt1p84, PR #72, merged Oct 29)
 - **Why:** Chase, Oct 29: re-sync from studio-agents main (b6a9a8b) to get the upgraded ux-reviewer and the ux tools; keep project-only agents.
 - **Done:** ran studio-agents `scripts/sync.sh`, `sync-tools.sh` and `install-rules.sh` on this repo, then `scripts/sync-agents.sh` to put the Hearth notes back (sync.sh had dropped them from all 7). ux-reviewer is now the visual critic (Layer V, 0-10 score, 8 is the bar) and preloads the `review-rounds` skill; `.claude/design-rules.md` is the studio rules (incl. older-adult rules A1-A6). New `scripts/ux-shots.mjs` and `scripts/ux-rules.mjs` (need Playwright). New PR checks `agents-check.yml` (Agents: line, qa-tdd on code PRs, run log) and `handoff-check.yml`, plus `scripts/log-agent-run.sh` and `check-agent-runs.sh`. `.claude/settings.json` hand-merged: Expo plugin kept, SessionStart HANDOFF hook and Agent-run log hook added. `studio-checks.json` set to Hearth's log roots, `caption` and `kek` banned, and a light verify command. Hearth's own `check-agents.sh` and `check-logs.mjs` kept (install-rules never overwrites; ours also checks the notes). `grandparent-ux` untouched. Only privacy-security and ux-reviewer actually changed text.
 - **Tests:** AGENTS-4 (4 checks in `scripts/tests/sync_agents_test.sh`): ux-reviewer's skills present, design rules and tools synced, settings hooks wired with Expo kept, studio-checks config. Red before the settings and config merge, green after; check-agents, sync-agents, logs, persona checks, test-all run 3x.
@@ -40,18 +47,18 @@
 - **Planned:** `docs/product/PLAN-FAMILY-VAULT.md`, 14 one-PR days reusing the messenger's MLS, with an MLS explainer. TRACKER R24. Ideas log row added.
 - **Next exact step:** Chase answers day 1's two picks (vault per family; recovery card yes) and says "merge" for this docs PR. The frame build waits for milestone 2's real build.
 
-## Oct 28, release M1.1 phase 7: reusable blocks (branch claude/project-thread-kzt7by-rel6, draft PR, stacked on phase 6)
+## Oct 28, release M1.1 phase 7: reusable blocks (branch claude/project-thread-kzt7by-rel6, PR #68, merged Oct 28)
 - **Lesson written:** `docs/eng/LESSONS.md` Oct 28 (every proof runs in CI; a flaky test is a finding; heavy RPCs plan with JIT off).
 - **Give-back (INTAKE only, per STACK.md: no extraction until a second product needs it):** `docs/portfolio/INTAKE-2026-10-28-reusable-blocks.md` (also in the project files) offers Product Studio the jest-expo fetch snippet, the Supabase JIT rule and the CI rule for studio-agents and pm-tools.
-- **Next exact step:** Chase merges #63-#68 in order, says "deploy 0018 and 0019", then pastes the two Oct 28 INTAKEs to Product Studio.
+- **Done Oct 28 (Chase's word):** #63-#68 merged in order, 0018 and 0019 deployed (smoke 9/9), Expo preview republished from main 565f65b. **Next exact step:** Chase pastes the two Oct 28 INTAKEs to Product Studio.
 
-## Oct 28, release M1.1 phase 6: demo (branch claude/project-thread-kzt7by-rel5, draft PR, stacked on phase 5)
+## Oct 28, release M1.1 phase 6: demo (branch claude/project-thread-kzt7by-rel5, PR #67, merged Oct 28)
 - **Live today (verified 08:00 UTC):** chaseholroyd.com/demo/hearth/ answers, passes the showcase sweep at phone and laptop width with no console errors (the not-found page's 404 is expected), first card in about 2.1 s. It's the older build: two-line bar, no titles.
 - **New build:** `app/dist-demo-site` from this branch passes `npm run e2e:site` 8/8 on a Pages-like host; first card in about 1.2 s; titles and the new bar and laptop frame show.
 - **Portfolio / public presence:** `docs/portfolio/INTAKE-2026-10-28-demo-refresh.md` asks Product Studio to re-copy the demo after Chase merges #63-#66 (a ready tarball is in the project files, `portfolio/hearth-demo-site-2026-10-28.tgz`) and to refresh the page's test counts (660+ app, 960+ database).
 - **Next exact step:** Chase merges #63-#66, then pastes the INTAKE to Product Studio.
 
-## Oct 28, release M1.1 phase 5: post titles (branch claude/project-thread-kzt7by-rel4, draft PR, stacked on phase 4)
+## Oct 28, release M1.1 phase 5: post titles (branch claude/project-thread-kzt7by-rel4, PR #66, merged Oct 28)
 - **Why this enhancement:** of everything waiting, it's the one a recruiter sees in the first ten seconds of the demo: cards read like real posts ("Mia's 5th birthday", then the caption, then photos). Chase approved the spec's picks (DEC-39), so it's the highest-value item that needs no new call from him.
 - **Built, test-first (CAP-1..5, 10..12):** an optional Title box (80 characters) on Share; the card shows the title as a heading above the caption; a long caption folds to 4 lines with Read more / Show less; By date shows titles too; two demo moments carry titles. Migration **0019** adds `posts.title`, `create_post(p_title)` and the title on `get_feed` / `get_timeline` (not deployed: needs Chase's word, after 0018). The log check now treats `title` like `caption`.
 - **Left:** change the words after posting (CAP-6..8), a bulk title (CAP-9), and a grandparent-ux pass on the words.
@@ -59,21 +66,21 @@
 - **Portfolio / public presence:** demo cards now show titles once the demo is rebuilt (phase 6).
 - **Next exact step:** Chase says "merge" (after phases 2-4), then "deploy 0018 and 0019" and an app update.
 
-## Oct 28, release M1.1 phase 4: harden (branch claude/project-thread-kzt7by-rel3, draft PR, stacked on phase 3)
+## Oct 28, release M1.1 phase 4: harden (branch claude/project-thread-kzt7by-rel3, PR #65, merged Oct 28)
 - **Review:** privacy-security (with the qa-tdd lens) read everything since Oct 24 (`docs/reviews/2026-10-28-harden.md`).
 - **Fixed, test-first:** HARD-12 (P1): members could write reactions straight to the table, skipping the three-emoji list and "replies off". Migration **0018** closes it (not deployed: needs Chase's word). HARD-13: sign out now deletes the cached feed (captions, names, reactions). HARD-17 (P1, found by running the real-API contract 3×): Postgres JIT-compiled the feed query once a family had a few dozen posts, 1.5-2 s per Photos page instead of 20-50 ms; 0018 turns JIT off for it.
 - **Open tickets:** HARD-14 (B11), HARD-15 (T11), HARD-16 (B12), all P2/P3. Captions' sketched migration is now 0019.
 - **Tests (3 green runs):** backend SQL all suites, app Jest, real-API contract, typecheck, PRIV-2 log check.
 - **Next exact step:** Chase says "merge" (after phases 2 and 3), then "deploy 0018" (it speeds up Photos and closes the reactions hole).
 
-## Oct 28, release M1.1 phase 3: UI to 8/10 (branch claude/project-thread-kzt7by-rel2, draft PR, stacked on phase 2)
+## Oct 28, release M1.1 phase 3: UI to 8/10 (branch claude/project-thread-kzt7by-rel2, PR #64, merged Oct 28)
 - **Score:** the studio ux-reviewer scored the public demo 5/10 before and 8/10 after (`docs/reviews/2026-10-28-ui-8.md`).
 - **Built, test-first (UI-1..5):** a one-line demo bar with one row of matching chips; a centred laptop frame with proof points and a "Read the case study" link; gray Open buttons in Messages; the demo's Me names Sam instead of a placeholder email; the showcase sweep waits for each screen. Persona check all Green (`docs/product/decisions/2026-10-28-ui-polish.md`).
 - **Tests (3 green runs):** app 654 + 1 skipped, typecheck clean, demo e2e 9, showcase sweep 48 shots with a clean console.
 - **Portfolio / public presence:** the demo's bar and laptop frame change; the live site still serves the Oct 22 build until phase 6's INTAKE re-hosts it.
 - **Next exact step:** Chase says "merge" (after phase 2's PR). The release continues with phase 4 (harden).
 
-## Oct 28, release M1.1 phase 2: works for real (branch claude/project-thread-kzt7by-rel1, draft PR)
+## Oct 28, release M1.1 phase 2: works for real (branch claude/project-thread-kzt7by-rel1, PR #63, merged Oct 28)
 - **Found (REAL-1, P0 for testing):** since the SDK 58 move, jest-expo swaps the global fetch for Expo's native-only one. So `scripts/contract-real.sh` (the app's HearthApi contract against the real Postgres + PostgREST API) got no answers at all: 60 of 63 checks failed with UNKNOWN. CI never ran it, so nobody saw it. The app itself was fine; the proof that it works against the real backend was gone.
 - **Fixed, test-first:** `app/jest.environment.js` keeps Node's network fetch, and the harness uses it (`netFetch.test.ts`, REAL-1). Two contract tests assumed a fresh database per test (T10 now makes its own group; TIME-2 allows more than one page), and the harness now knows who each JWT client is. All 63 real-API checks pass, and so do all backend SQL suites (local Postgres 16). A new CI job, "App contract on the real API (PostgREST)", runs this on every PR.
 - **Tests (3 green runs):** app 648 + 1 skipped, typecheck clean, web e2e 4, real-API contract 63/63, backend SQL all suites.
