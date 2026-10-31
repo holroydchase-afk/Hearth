@@ -67,7 +67,8 @@ export interface Job {
 export interface EnqueueInput { space: string; caption: string | null; title?: string | null; circleIds: string[]; items: QueueItem[] }
 
 /** BETA-BULK-4: one bulk pick, already planned into posts (share/bulk.ts planBatch). */
-export interface EnqueueBatchInput { space: string; circleIds: string[]; posts: { takenAt: string | null; items: QueueItem[] }[] }
+/** CAP-9: one optional title for every post in the batch; captions stay empty. */
+export interface EnqueueBatchInput { space: string; circleIds: string[]; title?: string | null; posts: { takenAt: string | null; items: QueueItem[] }[] }
 
 /** "Sending 12 of 48 photos…" across the whole batch; "Sent 48 photos" when done. */
 export function batchLabel(p: { done: number; total: number }): string {
@@ -178,12 +179,13 @@ export class UploadQueue {
     const posts = input.posts.filter((p) => p.items.length > 0);
     if (posts.length === 0 || posts.length > 100) throw new ApiError('23514', 'a batch is 1 to 100 posts');
     const batchId = this.newId();
+    const title = input.title?.trim() || null;
     for (const p of posts) {
       this.all.push({
         id: this.newId(), userId: this.d.userId, clientId: this.newId(), space: input.space,
         caption: null, circleIds: [...input.circleIds], items: [...p.items],
         state: 'draft', attempts: 0, restarts: 0, progress: { done: 0, total: p.items.length }, createdAt: this.now(),
-        takenAt: p.takenAt ?? null, batchId, batchSize: posts.length,
+        takenAt: p.takenAt ?? null, batchId, batchSize: posts.length, title,
       });
     }
     await this.save();
