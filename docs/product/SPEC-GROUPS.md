@@ -70,7 +70,7 @@ Phase: **0013** = backend migration now (SQL test first, `backend/tests/groups_v
 | FLAG-4 | auto | 0013 | **Given** `video_posting` off for a family, **When** anyone asks `sign-media` to sign a video upload, **Then** refused (server, not only the app). |
 | FLAG-5 | auto | app-now | **Given** the app, **When** it starts, **Then** it reads `my_features(space)` and `VIDEO_POSTING_ENABLED` is gone from `app/src/media/prepare.ts`; video choice hidden when off. |
 | FLAG-6 | auto | app-now | **Given** every AI flag off, **When** CI builds the app bundle, **Then** no AI/ML library is in it or loaded (test lists the bundle's modules). |
-| FLAG-7 | manual | later | **Given** on-phone video transcode, **When** a test video from an iPhone and an Android phone is posted, **Then** the stored file has no location (checked with exiftool) before `video_posting` is turned on globally. |
+| FLAG-7 | manual | later | (Oct 29: the on-phone cleaner is built without a transcode, SPEC-MEDIA section 4.) **Given** on-phone video cleaning, **When** a test video from an iPhone and an Android phone is posted, **Then** the stored file has no location (checked with exiftool) before `video_posting` is turned on globally. |
 
 ### Events (EVT)
 | ID | Type | Phase | Given / When / Then |

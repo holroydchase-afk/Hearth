@@ -20,6 +20,9 @@ export async function pickPhotos(limit = 10, opts: { videos: boolean } = { video
     selectionLimit: limit,
     exif: false,
     quality: 1,
+    // FLAG-7 / BETA-SHARE-6: on iPhone the picker re-encodes a video to 720p H.264 MP4 (AVAssetExportSession, in
+    // Expo Go). Android ignores this and hands over the camera's file. Either way cleanVideo strips the metadata.
+    ...(opts.videos ? { videoExportPreset: ImagePicker.VideoExportPreset.H264_1280x720 } : {}),
   });
   if (r.canceled) return { items: [] };
   return {

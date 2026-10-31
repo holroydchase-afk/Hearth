@@ -164,3 +164,28 @@ describe('buildUploadSpec', () => {
     });
   });
 });
+
+describe('processVideo (FLAG-7)', () => {
+  const { movie, contains, SAMSUNG_TRAILER } = require('../../test/mp4') as typeof import('../../test/mp4');
+  const { processVideo } = require('../pipeline') as typeof import('../pipeline');
+
+  it('VID-12 reads the picked file, cleans it on the phone and names its type from the file', async () => {
+    const src = movie({ brand: 'isom', moovFirst: true, trailer: SAMSUNG_TRAILER });
+    const readBytes = jest.fn(async () => src);
+    const v = await processVideo({ uri: 'file:///pick.mp4', durationMs: 12_000 }, { readBytes });
+    expect(readBytes).toHaveBeenCalledWith('file:///pick.mp4');
+    expect(v.kind).toBe('video');
+    expect(v.mime_type).toBe('video/mp4');
+    expect(v.duration_ms).toBe(12_000);
+    expect(contains(v.bytes, '+35.6895')).toBe(false);
+    expect(v.bytes.length).toBe(src.length);
+  });
+
+  it('VID-12 refuses a video over 60 s before reading it, and a file it can\'t read with EXIF', async () => {
+    const readBytes = jest.fn(async () => movie());
+    await expect(processVideo({ uri: 'file:///long.mov', durationMs: 61_000 }, { readBytes })).rejects.toMatchObject({ code: 'VIDEO_TOO_LONG' });
+    expect(readBytes).not.toHaveBeenCalled();
+    await expect(processVideo({ uri: 'file:///x.mov', durationMs: 5_000 }, { readBytes: async () => new Uint8Array([1, 2, 3]) }))
+      .rejects.toMatchObject({ code: 'EXIF' });
+  });
+});
