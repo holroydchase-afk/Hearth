@@ -707,7 +707,7 @@
    "layer": "app",
    "severity": "Medium",
    "status": "deferred",
-   "title": "Video posting: off until location can be stripped from video too (BETA-SPEC). Oct 29: stripping built (FLAG-7 auto); poster frame, player and iPhone check left (TRACKER R25)",
+   "title": "Video posting: off until location can be stripped from video too (BETA-SPEC). Oct 29: stripping built (FLAG-7 auto); poster frame, player and iPhone check left (TRACKER R27)",
    "tests": [],
    "found": "2026-10-16",
    "fixed": null

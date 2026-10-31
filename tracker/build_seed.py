@@ -207,7 +207,7 @@ tickets = [
  ("AE-6", "task", "app", "Medium", "open", "TestFlight external submission (milestone 3, after the name is final)", []),
  ("AE-7", "enhancement", B, "Medium", "fixed", "Our own error reports, fixed fields only, 30 days (0006, BETA-OPS-1)", []),
  ("AE-8", "bug", B, "Low", "fixed", "S12: removed members can't edit their old captions (0005, BETA-REPLY-4)", []),
- ("V1", "enhancement", "app", "Medium", "deferred", "Video posting: off until location can be stripped from video too (BETA-SPEC). Oct 29: stripping built (FLAG-7 auto); poster frame, player and iPhone check left (TRACKER R25)", []),
+ ("V1", "enhancement", "app", "Medium", "deferred", "Video posting: off until location can be stripped from video too (BETA-SPEC). Oct 29: stripping built (FLAG-7 auto); poster frame, player and iPhone check left (TRACKER R27)", []),
  ("REPLY-1", "enhancement", "app", "Low", "deferred", "BETA-REPLY-1, deferred in BETA-SPEC", []),
  # Overnight Oct 18 (privacy first)
  ("PRIV-1", "bug", B, "Medium", "fixed", "The invite rate limit kept raw IP addresses, and the last ones could stay forever. Now a keyed hash, purged daily, pepper replaced daily (0012)", []),
