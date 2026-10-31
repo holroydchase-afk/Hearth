@@ -127,6 +127,8 @@ export class SupabaseApi implements HearthApi {
     });
   publishPost = (p: string) => this.rpc<void>('publish_post', { p_post: p });
   deletePost = (p: string) => this.rpc<void>('delete_post', { p_post: p });
+  editPostWords = (p: string, title: string | null, caption: string | null) =>
+    this.rpc<string>('edit_post_words', { p_post: p, p_title: title, p_caption: caption });
   toggleHeart = (p: string) => this.rpc<unknown>('toggle_heart', { p_post: p }).then((d) => one<HeartState>(d));
   /** REACT-1. A server before 0017 has no set_reaction: any reaction is a heart there. */
   setReaction = async (p: string, emoji: Reaction): Promise<ReactionState> => {

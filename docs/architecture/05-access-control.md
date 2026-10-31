@@ -64,6 +64,8 @@ A feature such as video posting is on for someone only when three switches are a
 
 **Off-switches (Built, migration 0016).** The photo helpers (`photo_helpers_duplicates`, `photo_helpers_screens_blur`; `SPEC-PHOTO-HELPERS.md` HELP-R4) use the same three switches with the opposite default: a missing global or family row means on (`private.feature_default_on`), and the capability is `post`, so a viewer who can't post never gets them. Hearth's global row is a kill switch; the family's owner can turn either off. The rows hold only on/off: the helpers run on the phone and the server never learns anything about a photo (HELP-R2). The app treats every feature as off until `my_features` answers, so a failed read leaves the helpers off too.
 
+**Changing a post's words (migration 0021).** Only the sender, through `edit_post_words`, and only while they can still send to at least one of the post's groups (`can_send_to`); someone who can't see the post, or a sender removed from the family, gets "not found". App users can no longer `UPDATE` a post's caption or date directly (HARD-18), so every change carries the "Edited" mark.
+
 **Event names.** A feed or timeline row carries the event a post was sent to (`event_id`, `event_name`) only for that event's members and the parents; anyone who sees the post through another group gets nulls and never learns the event exists.
 
 ## Who sees a name (Built)
@@ -94,4 +96,4 @@ RLS limits what each family member's app can read. It does not limit Hearth's se
 - **Planned:** event dates (`starts_on`, `ends_on`) exist in the schema but the app doesn't use them yet.
 
 ---
-Last checked against code: 2026-10-28, migration 0018 (reactions only through RPCs); earlier 2026-10-22, 10001df (plus migrations 0013, 0015, 0016)
+Last checked against code: 2026-10-29, migration 0021 (words change only through edit_post_words); earlier 2026-10-28, migration 0018 (reactions only through RPCs); earlier 2026-10-22, 10001df (plus migrations 0013, 0015, 0016)
