@@ -14,7 +14,7 @@ import { useTheme } from '../ui/theme';
 
 const POLL_MS = 10_000;
 // RR-18: parents are in every chat (REPLY-10), so a chat's count can be higher than its group's; say why.
-const PRIVACY = 'Only the people in this chat can read it. Parents are in every chat. Hearth can’t: messages are locked on your phone before they are sent.';
+const PRIVACY = 'Only the people in this chat can read it. Parents are in every chat. Not even Hearth can read it: messages are locked on your phone before they are sent.';
 
 export function MessagesScreen({ onClose }: { onClose: () => void }) {
   const app = useApp();
