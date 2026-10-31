@@ -1,5 +1,19 @@
 # Handoff
 
+## Oct 30: demo parent rename kept as "Kai" (main, PR #81); PR #77 brought up to date
+- PR #77 had renamed the parent to "Max" in parallel; that commit is reverted and main (458236e) merged in, so the demo says Kai. Product Studio uses `portfolio/hearth-demo-site-2026-10-30-kai.tgz` (issue #79). App Jest 677 + 1 skipped and typecheck, 3 runs, local (Actions is off while private).
+
+## Oct 29: host the demo publicly; real-family details scrubbed (TRACKER R26, branch claude/project-thread-h2kh6k, PR #77)
+- **Why:** Product Studio INTAKE (Oct 29): the repo was public, so Hearth hosts its own demo, after a privacy check of the whole history.
+- **Scan (all branches, 208 commits):** gitleaks found 0 leaks. No Supabase, Backblaze or API keys (the one JWT is a fake test token), so nothing needs rotating. The emails are made-up test addresses, and the one phone number is a public office line. **Found:** real-family details (names, surnames, relationships) in docs, tests and commit messages. Chase made the repo private again (Oct 29, 20:19Z).
+- **Chase, Oct 29:** keep the name Hearth for now. Each product hosts its own demo and the portfolio page links to it ("fix the issues, then proceed").
+- **Done, today's files (43):** real names are now the kids' nicknames (Mom, Gammy, Grandaddy, Grandmomma, Memaw, Pawpaw, Granny, Gigi, Bebar, Great-Grandma). Made-up test names that matched real ones changed too (Sue, Tess). The surnames, birthplaces and the private details are gone. `family-setup.sh`'s poster-invite flag is now `--mom-email`, and its new families get "Mom's side". **The live family still has the old side name:** rename it in the app (Groups) before any re-run of `family-setup.sh`, or the re-run adds a second side. New rule in CLAUDE.md (privacy invariants). The real-name key is in the project's private files (`plans/family-names-key.md`).
+- **Done, demo:** `.github/workflows/demo-site.yml`, manual only. It builds the demo with `app/scripts/build-demo.sh`, fails if the build holds a Supabase address or key, and keeps it as the `hearth-demo-site` artifact. The demo already links back to chaseholroyd.com/family-photos.html (DEMO-3).
+- **Tests (3 green runs):** backend `tests/run.sh` all suites; app Jest 677 + 1 skipped; typecheck; agents, persona checks and the PRIV-2 log check.
+- **Portfolio / public presence:** INTAKE for Product Studio at `/mnt/project-files/portfolio/INTAKE-2026-10-29-demo-host.md`, with a fresh build tarball beside it. To update once Pages is live: Pages URL instead of /demo/hearth/.
+- **Next exact step:** Chase picks how to clean the old commits (card; recommended: rewrite in place right after #70-#77 merge, then one GitHub Support form to purge cached PR pages). Then the repo goes public, the workflow gains a Pages deploy at chaseholroyd.com/Hearth/, and the INTAKE gets that URL.
+
+## Oct 29: studio agents re-synced (TRACKER R25, branch claude/project-thread-jt1p84, PR)
 ## Oct 29: repo public, root LICENSE added (branch claude/project-thread-l5pj6x, PR)
 - Chase made the repo public Oct 29 (it also unblocked GitHub Actions, which had stopped on the private repo's billing limit). A read-only scan of every branch's history found no secrets (only AWS's documentation example key and a dummy test JWT). The web app URL is in the code because invite links use it; invites still gate sign-in.
 - Added the root `LICENSE` (AGPL-3.0 text, copied from `packages/messenger/LICENSE`) so the public code is under the license Chase picked (DEC-7). DEC-7 planned going public after milestone 1 and a final name; Chase went public earlier, so the name "Hearth" is now more visible, and the README says so. Still open: whether Hearth's notices say AGPL-3.0-only or -or-later (the messenger library uses -or-later); SPDX headers on Hearth's own files.
