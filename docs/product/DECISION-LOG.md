@@ -171,7 +171,7 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **When / status:** Oct 18 · Decided (building)
 - **Chose:** a group is a plain list of people; anyone can be in several groups. Events copy people in from groups once.
 - **Replaces:** the Oct 17 fixed shape (Everyone, sides, households, events; migration 0011).
-- **Because:** real split families don't fit one hierarchy (Danielle's sister belongs in two houses). Plain groups cover every case with less to explain.
+- **Because:** real split families don't fit one hierarchy (Mom's sister belongs in two houses). Plain groups cover every case with less to explain.
 - **Source:** `/mnt/project-files/plans/v1-groups-plan.md`, PR #22
 
 ### DEC-20 · Who reads a comment: three settings per group
@@ -226,7 +226,7 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **When / status:** Oct 21 · Decided
 - **Chose:** the Oct 19 build freeze ends now that the app is on Chase's phone. The staff PM, UI/UX, engineering and security lanes reviewed the app from the code, and one ranked list (`TRACKER.md` "Sequence to milestone 2") replaces ad-hoc picks. A recurring 2:15am run works it night after night.
 - **Over:** building the next feature from the ideas log.
-- **Because:** Chase's bar is "a world class, very fast, very stable product". Measuring and ranking first keeps the work on what Danielle (M2) will feel.
+- **Because:** Chase's bar is "a world class, very fast, very stable product". Measuring and ranking first keeps the work on what Mom (M2) will feel.
 - **Source:** `docs/product/reviews/2026-10-21-app-review.md`
 
 ### DEC-29 · Speed architecture A1 to A4; no-model photo helpers specced now

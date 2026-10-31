@@ -1,5 +1,19 @@
 # Handoff
 
+## Oct 30: demo parent rename kept as "Kai" (main, PR #81); PR #77 brought up to date
+- PR #77 had renamed the parent to "Max" in parallel; that commit is reverted and main (458236e) merged in, so the demo says Kai. Product Studio uses `portfolio/hearth-demo-site-2026-10-30-kai.tgz` (issue #79). App Jest 677 + 1 skipped and typecheck, 3 runs, local (Actions is off while private).
+
+## Oct 29: host the demo publicly; real-family details scrubbed (TRACKER R26, branch claude/project-thread-h2kh6k, PR #77)
+- **Why:** Product Studio INTAKE (Oct 29): the repo was public, so Hearth hosts its own demo, after a privacy check of the whole history.
+- **Scan (all branches, 208 commits):** gitleaks found 0 leaks. No Supabase, Backblaze or API keys (the one JWT is a fake test token), so nothing needs rotating. The emails are made-up test addresses, and the one phone number is a public office line. **Found:** real-family details (names, surnames, relationships) in docs, tests and commit messages. Chase made the repo private again (Oct 29, 20:19Z).
+- **Chase, Oct 29:** keep the name Hearth for now. Each product hosts its own demo and the portfolio page links to it ("fix the issues, then proceed").
+- **Done, today's files (43):** real names are now the kids' nicknames (Mom, Gammy, Grandaddy, Grandmomma, Memaw, Pawpaw, Granny, Gigi, Bebar, Great-Grandma). Made-up test names that matched real ones changed too (Sue, Tess). The surnames, birthplaces and the private details are gone. `family-setup.sh`'s poster-invite flag is now `--mom-email`, and its new families get "Mom's side". **The live family still has the old side name:** rename it in the app (Groups) before any re-run of `family-setup.sh`, or the re-run adds a second side. New rule in CLAUDE.md (privacy invariants). The real-name key is in the project's private files (`plans/family-names-key.md`).
+- **Done, demo:** `.github/workflows/demo-site.yml`, manual only. It builds the demo with `app/scripts/build-demo.sh`, fails if the build holds a Supabase address or key, and keeps it as the `hearth-demo-site` artifact. The demo already links back to chaseholroyd.com/family-photos.html (DEMO-3).
+- **Tests (3 green runs):** backend `tests/run.sh` all suites; app Jest 677 + 1 skipped; typecheck; agents, persona checks and the PRIV-2 log check.
+- **Portfolio / public presence:** INTAKE for Product Studio at `/mnt/project-files/portfolio/INTAKE-2026-10-29-demo-host.md`, with a fresh build tarball beside it. To update once Pages is live: Pages URL instead of /demo/hearth/.
+- **Next exact step:** Chase picks how to clean the old commits (card; recommended: rewrite in place right after #70-#77 merge, then one GitHub Support form to purge cached PR pages). Then the repo goes public, the workflow gains a Pages deploy at chaseholroyd.com/Hearth/, and the INTAKE gets that URL.
+
+## Oct 29: studio agents re-synced (TRACKER R25, branch claude/project-thread-jt1p84, PR)
 ## Oct 29: repo public, root LICENSE added (branch claude/project-thread-l5pj6x, PR)
 - Chase made the repo public Oct 29 (it also unblocked GitHub Actions, which had stopped on the private repo's billing limit). A read-only scan of every branch's history found no secrets (only AWS's documentation example key and a dummy test JWT). The web app URL is in the code because invite links use it; invites still gate sign-in.
 - Added the root `LICENSE` (AGPL-3.0 text, copied from `packages/messenger/LICENSE`) so the public code is under the license Chase picked (DEC-7). DEC-7 planned going public after milestone 1 and a final name; Chase went public earlier, so the name "Hearth" is now more visible, and the README says so. Still open: whether Hearth's notices say AGPL-3.0-only or -or-later (the messenger library uses -or-later); SPDX headers on Hearth's own files.
@@ -206,11 +220,11 @@
    - [ ] Paste the two code email templates in the Supabase dashboard, then sign in once (Claude then runs `family-setup.sh` and sends account B's code).
    - [ ] Add the Backblaze B2 keys and `MEDIA_KEK` as Hearth environment secrets (photos), plus Resend (email notices). Never in chat.
    - [ ] Run the 2-day demo in Expo Go, with account B on the web build.
-   - [ ] Later: Danielle's email for her poster invite (M2), the "Seen by" call (before M4), the phone survey (Oct 20).
+   - [ ] Later: Mom's email for her poster invite (M2), the "Seen by" call (before M4), the phone survey (Oct 20).
 4. **Stale items below, now closed:** PR #9 merged; 0010 and 0011 deployed to an empty database (Oct 17), so the v2 dry run, the apply step and the re-seed family list aren't needed.
 
 ## Oct 17, afternoon: family setup in one command, no database password (SETUP-API)
-1. **Built, test-first (`backend/tests/setup_api_test.sh`, 34 checks; in `tests/run.sh` and on the real stack in CI):** `bash backend/scripts/family-setup.sh --chase-email <yours> --space-name 'Our kids' [--danielle-email <hers>]` sets up your family in the groups shape through the Management API, like `deploy.sh`. It needs only `SUPABASE_ACCESS_TOKEN` (no `SUPABASE_DB_URL`, no `psql`) and runs as you through the app's RPCs and RLS. It makes Everyone, both sides, each grandparent's house, a Test house for account B, the two events, and prints the invite codes. It stops once anyone else has joined (then use `family-setup-v2.sql`'s dry run).
+1. **Built, test-first (`backend/tests/setup_api_test.sh`, 34 checks; in `tests/run.sh` and on the real stack in CI):** `bash backend/scripts/family-setup.sh --chase-email <yours> --space-name 'Our kids' [--mom-email <hers>]` sets up your family in the groups shape through the Management API, like `deploy.sh`. It needs only `SUPABASE_ACCESS_TOKEN` (no `SUPABASE_DB_URL`, no `psql`) and runs as you through the app's RPCs and RLS. It makes Everyone, both sides, each grandparent's house, a Test house for account B, the two events, and prints the invite codes. It stops once anyone else has joined (then use `family-setup-v2.sql`'s dry run).
 2. **Why:** hosted now runs 0001–0011 and is empty, so the v1 `family-setup.sql` then v2 would hand account B an invite to a group v2 retires. MILESTONE-1 step 5 and the demo rows now use this script and the Test house.
 3. **Next for you:** paste the sign-in code email templates (action item below), sign in once in Expo Go or the web build, then Claude runs the script and gives you account B's code.
 
@@ -227,7 +241,7 @@
 3. **Chase:** don't deploy 0011 yet. Run the v2 dry run on a copy of the database with `-v sister_name=...`, read the gains/losses with staff-pm, then take a backup and apply with `-v apply=yes`.
 
 ## Oct 17, 3 am: groups, households, events, roles (spec only, staff-pm; replaces "one family hierarchy")
-1. **Specced, not built:** `docs/product/SPEC-GROUPS.md` (renamed from SPEC-HIERARCHY.md), from your 2:47 am answer. Fixed shape: Everyone, set groups (your side, Danielle's side), households just under them; a person can be in several households and groups (Danielle's sister in Memaw's and Pawpaw's houses). Events combine any groups and households (Charleston trip, Gigi's birthday, custom groups). Only parents send to Everyone. Adding anyone asks "Share all past photos" or "Only new photos", no default. Criteria BETA-AUD-11 to 22, REPLY-7 to 13; AUD-9 retires.
+1. **Specced, not built:** `docs/product/SPEC-GROUPS.md` (renamed from SPEC-HIERARCHY.md), from your 2:47 am answer. Fixed shape: Everyone, set groups (your side, Mom's side), households just under them; a person can be in several households and groups (Mom's sister in Memaw's and Pawpaw's houses). Events combine any groups and households (Charleston trip, Gigi's birthday, custom groups). Only parents send to Everyone. Adding anyone asks "Share all past photos" or "Only new photos", no default. Criteria BETA-AUD-11 to 22, REPLY-7 to 13; AUD-9 retires.
 2. **Migration order (also in the overnight plan):** 0010 timeline, 0011 family shape (removes the 0009 switch), `family-setup.sql` v2 re-seed, 0012 households-only. Next: privacy-security review, then qa-tdd failing tests. Before milestone 3; doesn't block M1 or M2.
 
 ## Oct 17, 2 am: first real deploy (Chase's ask, without function keys)
@@ -236,13 +250,13 @@
 3. **Action items for Chase:**
    - [x] **Merge PR #9** (bulk upload + timeline, family shape, review fixes).
    - [x] *(Moot: deployed Oct 17 to an empty database.)* **DON'T run `deploy.sh` from main until the v2 dry run is reviewed.** Deploying applies 0010 and 0011; 0011 changes who reads replies and needs the v2 re-seed right after.
-   - [x] *(Moot, empty database.)* **v2 dry run, on a copy of the database** (a restored backup or a Supabase branch with 0010 and 0011 applied, never the live one): `psql "$SUPABASE_DB_URL" -v chase_email=you@example.com -v space_name='Our kids' -v sister_name='<her name>' -f backend/scripts/family-setup-v2.sql`. Read each person's "gains N posts, loses M posts" line with staff-pm (expected: Danielle gains 3 posts as a Parent, since Parents see every post). It needs `SUPABASE_DB_URL` (the database connection string from the Supabase dashboard; `SUPABASE_ACCESS_TOKEN` alone isn't enough, since the script runs through `psql`), `psql` installed, and your account signed in once in the app.
+   - [x] *(Moot, empty database.)* **v2 dry run, on a copy of the database** (a restored backup or a Supabase branch with 0010 and 0011 applied, never the live one): `psql "$SUPABASE_DB_URL" -v chase_email=you@example.com -v space_name='Our kids' -v sister_name='<her name>' -f backend/scripts/family-setup-v2.sql`. Read each person's "gains N posts, loses M posts" line with staff-pm (expected: Mom gains 3 posts as a Parent, since Parents see every post). It needs `SUPABASE_DB_URL` (the database connection string from the Supabase dashboard; `SUPABASE_ACCESS_TOKEN` alone isn't enough, since the script runs through `psql`), `psql` installed, and your account signed in once in the app.
    - [x] *(Done: 0010 and 0011 deployed Oct 17.)* **Then apply:** take a backup, run `deploy.sh` (applies 0010 and 0011), and right after run the same command on the live database with `-v apply=yes` added.
    - [ ] **Sign-in code email.** Either paste the templates in the Supabase dashboard (Authentication → email templates: Magic Link and Confirm signup, subject `Your Hearth code: {{ .Token }}`, bodies from `backend/supabase/templates/`; code length 6, expiry 3600 s), or make a token with project admin write, replace the `SUPABASE_ACCESS_TOKEN` secret, and rerun `deploy.sh` (applied steps are skipped).
    - [ ] **Function keys.** Fill the values in `backend/supabase/functions/.env.example` (Backblaze B2, `MEDIA_KEK`, `ALLOWED_ORIGINS`, Resend, `APP_LINK_BASE`, Expo). Add them as Hearth environment secrets so a session can write `.env` and rerun the deploy. Until then, photos (sign-media) and notifications (notify) are deployed but can't work.
    - [ ] **Cleanup after the keys are in:** delete the placeholder Supabase secret `HEARTH_KEYS_PENDING`. It was set only because `supabase secrets set --env-file` rejects an empty file.
    - [x] **Groups spec, 3 one-word answers** (Oct 17, 3:26 am: Groups, Parents; event replies default to Event) (`docs/product/SPEC-GROUPS.md` §9): event replies Event or Household (rec. Event); a relative's post goes to Groups or Everyone (rec. Groups); who sends to Everyone and makes events, Parents or Owner (rec. Parents).
-   - [x] *(Moot: `family-setup.sh` makes a fresh family.)* **Family list for the re-seed** (spec §2): Danielle's sister's name; put her in both Memaw's and Pawpaw and Granny's houses (rec. yes); who was at Gigi's birthday; any sibling of yours to place in both your parents' houses.
+   - [x] *(Moot: `family-setup.sh` makes a fresh family.)* **Family list for the re-seed** (spec §2): Mom's sister's name; put her in both Memaw's and Pawpaw and Granny's houses (rec. yes); who was at Gigi's birthday; any sibling of yours to place in both your parents' houses.
 
 ## Oct 17: deploy review fixes (DEPLOY-2, DEPLOY-3)
 1. **Built, test-first (`backend/tests/deploy/deploy_test.sh`, now 20 checks):** function deploys pass `--use-api`, so Supabase bundles them and no Docker is needed (DEPLOY-2). A migration the API rejects now prints its file name and the Postgres error, with the cron secret redacted; before, it said only "failed" (DEPLOY-3).
@@ -254,11 +268,11 @@
 2. **Needs you:** only `SUPABASE_ACCESS_TOKEN`. `SUPABASE_DB_PASSWORD` and `SUPABASE_DB_URL` are no longer needed to deploy. The hosted SQL suites and `family-setup.sql` still use `psql`, so they will need a connection string or the same API route later.
 
 ## Oct 16: who reads replies (Chase's call), and the real family
-1. **Family:** `docs/product/PERSONAS.md` is now your real family (Gammy Barbara … Grandma Phyllis, Gigi Sarah, Bebar Fred with the smart frame). Docs live in `docs/product` and `docs/eng`; `docs/product/STORY.md` is the story agents read.
+1. **Family:** `docs/product/PERSONAS.md` is now your real family (Gammy … Great-Grandma, Gigi, Bebar with the smart frame). Docs live in `docs/product` and `docs/eng`; `docs/product/STORY.md` is the story agents read.
 2. **Built (migration 0009, AUD-8/9/10):** by default only the parents (and the post's author) read a relative's comment or heart; counts leave hidden ones out; parents' replies reach everyone. A group can turn on "members see each other's replies". The owner can open replies to everyone (Me screen). The comment box says who will read it. privacy-security fixes: raw counters hidden, no profile leak through replies, no setting leak.
 3. **Tests (3 green runs):** SQL 116 + 169 + 48 + 5 + 37 reply; Deno 26; Jest 245 + 1 skipped; typecheck clean; web e2e 1; app contract vs real PostgREST 85 passed (9 skipped).
 4. **Next (your direction):** nested groups (a group inside a group, e.g. person → household → side → whole family), set up by a guided flow or by select/drag. This changes who sees posts, so it gets its own spec and review.
-5. **Your calls:** should adults (Danielle) also flip the group switch, or only you? A viewer who posts (off by default) has their replies treated like a parent's on their own post.
+5. **Your calls:** should adults (Mom) also flip the group switch, or only you? A viewer who posts (off by default) has their replies treated like a parent's on their own post.
 
 ## Oct 16 morning: sign-in and sign-up for every persona (Chase's ask)
 1. **Day-1 blocker fixed:** Supabase's default sign-in email sends a link, not a code. New templates show the 6-number code big and in the subject, have no links, and warn "Never read this code to anyone who calls or texts you". `deploy.sh` step 5 pushes them to the hosted project.
@@ -276,7 +290,7 @@
 
 ## Overnight Oct 16, part 3 (staff-pm product review)
 1. **Found:** comments are readable by everyone a post was shared with, but the app said "Sent. Chase will see it." Fixed the words (BETA-REPLY-6). *Who should see comments* (story: Grandma A without Grandpa B) is logged in docs/product/ANCHORS.md for Chase; staff-pm leans "the poster plus people who share a group with the commenter".
-2. **Built:** `backend/scripts/family-setup.sql` (space, starter groups, test-viewer invite, Danielle's poster invite; run as Chase through RPCs; 5 tests). `backend/scripts/deploy.sh` (one-command deploy; dry-run only). `docs/product/MILESTONE-1.md` (Chase's steps, the $99 answer, Expo Go yes/no, 2-day demo).
+2. **Built:** `backend/scripts/family-setup.sql` (space, starter groups, test-viewer invite, Mom's poster invite; run as Chase through RPCs; 5 tests). `backend/scripts/deploy.sh` (one-command deploy; dry-run only). `docs/product/MILESTONE-1.md` (Chase's steps, the $99 answer, Expo Go yes/no, 2-day demo).
 3. **Tests, 3 green runs:** SQL 116 + 141 + 48 + 5 setup; Deno 19; Jest 196 + 1 skipped; typecheck clean; web e2e 1 ×3.
 4. **Reflection point armed** (docs/product/REMAINING.md): no more backend/test polish until a deploy or a device run.
 5. **Resume at 4 am ET:** a scheduled check-in restarts this session; next is whatever doesn't need access (staff-pm's list), then deploy once Chase finishes MILESTONE-1 steps 1–4.
@@ -324,7 +338,7 @@
 
 ## Next session, in order
 - **Native look (Oct 19, PR #30):** the app follows Apple's rules on iPhone and Material 3 on Android, plus Hearth's overrides (`docs/product/DESIGN-SYSTEM.md`). Every look is saved in `docs/design/versions/`; add a folder with `app/e2e-web/snapshot.spec.js` whenever the look changes.
-- **Agent update (Oct 19): `grandparent-ux` is Hearth's UI/UX designer.** It designs as well as reviews, introduces itself to Chase, uses the ranked family personas (Bebar, Gigi, Phyllis first; Scott and John on Android) instead of "Grandma June", and measures sizes and contrast rather than guessing.
+- **Agent update (Oct 19): `grandparent-ux` is Hearth's UI/UX designer.** It designs as well as reviews, introduces itself to Chase, uses the ranked family personas (Bebar, Gigi, Great-Grandma first; Grandaddy and Pawpaw on Android) instead of "Grandma June", and measures sizes and contrast rather than guessing.
 - **New agent (Oct 16): `marketing`.** Logs and develops Chase's positioning ideas in `docs/product/MARKETING.md`. The chief of staff (main session) routes by the roster in `CLAUDE.md`; `scripts/check-agents.sh` keeps it in sync.
 0. **Read `docs/product/ANCHORS.md` (added Oct 16, midnight).** Chase reframed Hearth as a proof of concept with new milestones. staff-pm: reconcile `docs/product/BETA-SPEC.md`, `docs/product/REMAINING.md` and the ring gates to those milestones (Ring 0 ≈ Chase only, then wife, then 1 savvy relative). Raise the A2 "Seen by" conflict as a decision for Chase before milestone 4. Don't delete built features.
 1. Confirm the repo is pushed and CI is running. Fix CI until it's green; that closes S16.

@@ -5,10 +5,10 @@
 -- Chase must have signed in once first (so his account exists).
 --
 --   psql "$SUPABASE_DB_URL" -v chase_email=you@example.com \
---        -v danielle_email=her@example.com -v space_name='Our kids' \
+--        -v mom_email=her@example.com -v space_name='Our kids' \
 --        -f backend/scripts/family-setup.sql
 --
--- danielle_email is optional. Safe to re-run: reuses the space and groups and
+-- mom_email is optional. Safe to re-run: reuses the space and groups and
 -- prints fresh invite links (each works once, for 7 days). Groups can be renamed
 -- in the app's Groups screen.
 \set ON_ERROR_STOP 1
@@ -38,7 +38,7 @@ begin
     v_space := public.create_space(public.create_household(v_name), v_name);
   end if;
   foreach g in array array['Test viewer', 'Chase''s mom''s side', 'Chase''s dad''s side',
-                           'Danielle''s mom''s side', 'Danielle''s dad''s side'] loop
+                           'Mom''s mom''s side', 'Mom''s dad''s side'] loop
     insert into public.circles (space_id, name, created_by) values (v_space, g, auth.uid())
     on conflict (space_id, name) do nothing;
   end loop;
@@ -51,11 +51,11 @@ select link from public.create_invite(
   array(select id from public.circles where space_id = current_setting('hearth.space_id')::uuid and name = 'Test viewer'),
   p_history => 'all');   -- 0011: every relative's invite says whether they see past photos
 
-\if :{?danielle_email}
-\echo 'Danielle''s poster invite (milestone 2; she can post to every group):'
+\if :{?mom_email}
+\echo 'Mom''s poster invite (milestone 2; she can post to every group):'
 select link from public.create_invite(
   current_setting('hearth.space_id')::uuid, 'adult',
   array(select id from public.circles where space_id = current_setting('hearth.space_id')::uuid and deleted_at is null),
-  'email', :'danielle_email');
+  'email', :'mom_email');
 \endif
 reset role;

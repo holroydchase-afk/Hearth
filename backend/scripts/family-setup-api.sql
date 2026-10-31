@@ -5,7 +5,7 @@
 -- authenticated role with his user id for the rest of the call. Safe to re-run until anyone else joins; after
 -- that it refuses, because new links could change who sees what (use family-setup-v2.sql's dry run).
 create or replace function pg_temp.hearth_family_setup(
-  p_chase_email text, p_space_name text, p_danielle_email text, p_sister_name text)
+  p_chase_email text, p_space_name text, p_mom_email text, p_sister_name text)
 returns setof text language plpgsql as $$
 declare
   v_chase  uuid;
@@ -34,10 +34,10 @@ begin
 
   -- containers (reused by kind and name if they exist)
   for r in select * from (values
-      (1, 'group', 'Chase''s side'), (2, 'group', 'Danielle''s side'),
+      (1, 'group', 'Chase''s side'), (2, 'group', 'Mom''s side'),
       (3, 'household', 'Gammy''s house'), (4, 'household', 'Grandaddy and Grandmomma''s house'),
       (5, 'household', 'Gigi and Bebar''s house'), (6, 'household', 'Memaw''s house'),
-      (7, 'household', 'Pawpaw and Granny''s house'), (8, 'household', 'Grandma Phyllis''s house'),
+      (7, 'household', 'Pawpaw and Granny''s house'), (8, 'household', 'Great-Grandma''s house'),
       (9, 'household', 'Test house'),
       (10, 'event', 'Charleston trip'), (11, 'event', 'Birthday at Gigi''s')) x(o, kind, name)
     union all
@@ -53,13 +53,13 @@ begin
   for r in select * from (values
       ('Chase''s side', 'Gammy''s house'), ('Chase''s side', 'Grandaddy and Grandmomma''s house'),
       ('Chase''s side', 'Gigi and Bebar''s house'),
-      ('Danielle''s side', 'Memaw''s house'), ('Danielle''s side', 'Pawpaw and Granny''s house'),
-      ('Danielle''s side', 'Grandma Phyllis''s house'),
+      ('Mom''s side', 'Memaw''s house'), ('Mom''s side', 'Pawpaw and Granny''s house'),
+      ('Mom''s side', 'Great-Grandma''s house'),
       ('Charleston trip', 'Pawpaw and Granny''s house'),
       ('Birthday at Gigi''s', 'Grandaddy and Grandmomma''s house'), ('Birthday at Gigi''s', 'Gigi and Bebar''s house'),
       ('Birthday at Gigi''s', 'Pawpaw and Granny''s house')) x(parent, child)
     union all
-    select 'Danielle''s side', v_sister || '''s house' where v_sister is not null
+    select 'Mom''s side', v_sister || '''s house' where v_sister is not null
     union all
     select 'Charleston trip', v_sister || '''s house' where v_sister is not null loop
     perform public.link_level(
@@ -67,7 +67,7 @@ begin
       (select id from public.circles where space_id = v_space and name = r.child and deleted_at is null), 'all');
   end loop;
 
-  return next format('Family "%s" is ready: Everyone, Chase''s side, Danielle''s side, %s houses, 2 events.', p_space_name,
+  return next format('Family "%s" is ready: Everyone, Chase''s side, Mom''s side, %s houses, 2 events.', p_space_name,
                      (select count(*) from public.circles where space_id = v_space and kind = 'household' and deleted_at is null));
 
   v_inv := public.create_invite(v_space, 'viewer',
@@ -78,12 +78,12 @@ begin
                      to_char(v_inv.expires_at at time zone 'America/New_York', 'Mon DD'),
                      coalesce(', link ' || v_inv.link, ''));
 
-  if nullif(btrim(coalesce(p_danielle_email, '')), '') is not null then
+  if nullif(btrim(coalesce(p_mom_email, '')), '') is not null then
     v_inv := public.create_invite(v_space, 'adult',
                array[(select id from public.circles where space_id = v_space and kind = 'everyone' and deleted_at is null)],
-               'email', btrim(p_danielle_email));
-    return next format('Danielle''s poster invite: code %s, works once until %s, only for %s%s', v_inv.code,
-                       to_char(v_inv.expires_at at time zone 'America/New_York', 'Mon DD'), lower(btrim(p_danielle_email)),
+               'email', btrim(p_mom_email));
+    return next format('Mom''s poster invite: code %s, works once until %s, only for %s%s', v_inv.code,
+                       to_char(v_inv.expires_at at time zone 'America/New_York', 'Mon DD'), lower(btrim(p_mom_email)),
                        coalesce(', link ' || v_inv.link, ''));
   end if;
 end $$;

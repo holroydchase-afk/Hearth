@@ -2508,7 +2508,7 @@
   },
   {
    "id": "SETUP-004",
-   "title": "M2 setup: one poster (adult) invite for Danielle",
+   "title": "M2 setup: one poster (adult) invite for Mom",
    "area": "Family setup",
    "tickets": [],
    "where": "backend/tests/setup_test.sql"
@@ -3152,7 +3152,7 @@
   },
   {
    "id": "GROUPS-006",
-   "title": "BETA-AUD-11 allowed: Memaw, Pawpaw, Granny, Grandma Phyllis and Danielle's sister see the Danielle's side post",
+   "title": "BETA-AUD-11 allowed: Memaw, Pawpaw, Granny, Great-Grandma and Mom's sister see the Mom's side post",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3180,21 +3180,21 @@
   },
   {
    "id": "GROUPS-010",
-   "title": "BETA-AUD-11 timeline: Grandma Phyllis gets it; Bebar never does",
+   "title": "BETA-AUD-11 timeline: Great-Grandma gets it; Bebar never does",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-011",
-   "title": "BETA-AUD-11 media signer: Gammy can read no media row (no key, no URL) of the Danielle's side post",
+   "title": "BETA-AUD-11 media signer: Gammy can read no media row (no key, no URL) of the Mom's side post",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-012",
-   "title": "BETA-AUD-11 push and email: the post notice is queued for Danielle, Memaw, Pawpaw, Granny, Grandma Phyllis and the sister only (once each)",
+   "title": "BETA-AUD-11 push and email: the post notice is queued for Mom, Memaw, Pawpaw, Granny, Great-Grandma and the sister only (once each)",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3208,7 +3208,7 @@
   },
   {
    "id": "GROUPS-014",
-   "title": "BETA-AUD-12 feed: the sister gets the Danielle's side, Pawpaw and Granny's house, Memaw's house and Everyone posts once each",
+   "title": "BETA-AUD-12 feed: the sister gets the Mom's side, Pawpaw and Granny's house, Memaw's house and Everyone posts once each",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3236,21 +3236,21 @@
   },
   {
    "id": "GROUPS-018",
-   "title": "BETA-AUD-18 allowed: John (Pawpaw), Anna (Granny), the sister and both parents see the Charleston trip post",
+   "title": "BETA-AUD-18 allowed: Pawpaw, Granny, the sister and both parents see the Charleston trip post",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-019",
-   "title": "BETA-AUD-18 excluded: Memaw, Gammy and Grandma Phyllis don't",
+   "title": "BETA-AUD-18 excluded: Memaw, Gammy and Great-Grandma don't",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-020",
-   "title": "BETA-AUD-18: the same people still get Danielle's side and Everyone posts",
+   "title": "BETA-AUD-18: the same people still get Mom's side and Everyone posts",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3362,7 +3362,7 @@
   },
   {
    "id": "GROUPS-036",
-   "title": "BETA-REPLY-7 allowed: Chase (author, parent), Danielle (parent) and Gammy's household (Gammy) read her comment",
+   "title": "BETA-REPLY-7 allowed: Chase (author, parent), Mom (parent) and Gammy's household (Gammy) read her comment",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3383,7 +3383,7 @@
   },
   {
    "id": "GROUPS-039",
-   "title": "BETA-REPLY-7 counts leave hidden replies out: Grandaddy 1 heart 1 comment (Danielle's), Gammy 2:2, Chase 3:5",
+   "title": "BETA-REPLY-7 counts leave hidden replies out: Grandaddy 1 heart 1 comment (Mom's), Gammy 2:2, Chase 3:5",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3432,21 +3432,21 @@
   },
   {
    "id": "GROUPS-046",
-   "title": "BETA-REPLY-9: the sister's comment reaches Memaw, Pawpaw, Granny, Chase and Danielle",
+   "title": "BETA-REPLY-9: the sister's comment reaches Memaw, Pawpaw, Granny, Chase and Mom",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-047",
-   "title": "BETA-REPLY-9: ... and not Gammy, Grandaddy or Grandma Phyllis",
+   "title": "BETA-REPLY-9: ... and not Gammy, Grandaddy or Great-Grandma",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-048",
-   "title": "BETA-REPLY-9: Memaw's comment reaches the sister, Chase and Danielle",
+   "title": "BETA-REPLY-9: Memaw's comment reaches the sister, Chase and Mom",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3474,63 +3474,63 @@
   },
   {
    "id": "GROUPS-052",
-   "title": "privacy item 4: on a Danielle's side post, Memaw's comment does not reach Grandma Phyllis or Pawpaw (a group never passes replies along)",
+   "title": "privacy item 4: on a Mom's side post, Memaw's comment does not reach Great-Grandma or Pawpaw (a group never passes replies along)",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-053",
-   "title": "BETA-REPLY-10: Danielle's comment and heart on an Everyone post reach everyone who can see it",
+   "title": "BETA-REPLY-10: Mom's comment and heart on an Everyone post reach everyone who can see it",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-054",
-   "title": "BETA-REPLY-10 / rule 4: on Danielle's post, Gammy's comment reaches Danielle (author) and Chase, not Memaw",
+   "title": "BETA-REPLY-10 / rule 4: on Mom's post, Gammy's comment reaches Mom (author) and Chase, not Memaw",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-055",
-   "title": "BETA-REPLY-10: a parent reads every reply on every post they can see (Chase and Danielle)",
+   "title": "BETA-REPLY-10: a parent reads every reply on every post they can see (Chase and Mom)",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-056",
-   "title": "BETA-REPLY-11 sibling: reply_readers for the sister on an Everyone post = Memaw, Pawpaw, Granny, Chase, Danielle",
+   "title": "BETA-REPLY-11 sibling: reply_readers for the sister on an Everyone post = Memaw, Pawpaw, Granny, Chase, Mom",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-057",
-   "title": "BETA-REPLY-11 household of one: Gammy's readers on an Everyone post = Chase, Danielle",
+   "title": "BETA-REPLY-11 household of one: Gammy's readers on an Everyone post = Chase, Mom",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-058",
-   "title": "BETA-REPLY-11 event: Granny's readers on the Charleston trip = Pawpaw, the sister, Chase, Danielle",
+   "title": "BETA-REPLY-11 event: Granny's readers on the Charleston trip = Pawpaw, the sister, Chase, Mom",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-059",
-   "title": "BETA-REPLY-11 household: Pawpaw's readers on an Everyone post = Granny, the sister, Chase, Danielle",
+   "title": "BETA-REPLY-11 household: Pawpaw's readers on an Everyone post = Granny, the sister, Chase, Mom",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
   },
   {
    "id": "GROUPS-060",
-   "title": "BETA-REPLY-11 parent: Danielle's readers on an Everyone post = all 11 others; on a pre-T post, not Gigi (privacy item 7)",
+   "title": "BETA-REPLY-11 parent: Mom's readers on an Everyone post = all 11 others; on a pre-T post, not Gigi (privacy item 7)",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3572,7 +3572,7 @@
   },
   {
    "id": "GROUPS-066",
-   "title": "BETA-AUD-21: ... and for Danielle (parent)",
+   "title": "BETA-AUD-21: ... and for Mom (parent)",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3607,7 +3607,7 @@
   },
   {
    "id": "GROUPS-071",
-   "title": "BETA-AUD-21 allowed: Danielle (parent) sends to Everyone through create_post",
+   "title": "BETA-AUD-21 allowed: Mom (parent) sends to Everyone through create_post",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3628,7 +3628,7 @@
   },
   {
    "id": "GROUPS-074",
-   "title": "privacy item 2: Gammy to Danielle's side (not hers) is refused",
+   "title": "privacy item 2: Gammy to Mom's side (not hers) is refused",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3677,7 +3677,7 @@
   },
   {
    "id": "GROUPS-081",
-   "title": "privacy item 2: Danielle, demoted to relative after drafting to Everyone, can't publish it (42501)",
+   "title": "privacy item 2: Mom, demoted to relative after drafting to Everyone, can't publish it (42501)",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -3978,7 +3978,7 @@
   },
   {
    "id": "GROUPS-124",
-   "title": "privacy item 5 / REPLY-11: Memaw's comment box now names the sister, Pawpaw, Granny, Chase and Danielle",
+   "title": "privacy item 5 / REPLY-11: Memaw's comment box now names the sister, Pawpaw, Granny, Chase and Mom",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -4006,7 +4006,7 @@
   },
   {
    "id": "GROUPS-128",
-   "title": "BETA-AUD-20: Grandma Phyllis's house added to the trip with \"Only new photos\": she can't open its earlier post",
+   "title": "BETA-AUD-20: Great-Grandma's house added to the trip with \"Only new photos\": she can't open its earlier post",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -4027,7 +4027,7 @@
   },
   {
    "id": "GROUPS-131",
-   "title": "BETA-AUD-15: Grandma Phyllis removed from her house loses the Danielle's side post in the same transaction",
+   "title": "BETA-AUD-15: Great-Grandma removed from her house loses the Mom's side post in the same transaction",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -4076,7 +4076,7 @@
   },
   {
    "id": "GROUPS-138",
-   "title": "S-0011-1 setup: the sister's comment box names only Chase and Danielle",
+   "title": "S-0011-1 setup: the sister's comment box names only Chase and Mom",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"
@@ -4132,7 +4132,7 @@
   },
   {
    "id": "GROUPS-146",
-   "title": "S-0011-2 allowed: Danielle (parent) retires Pawpaw and Granny's house: they lose its posts at once",
+   "title": "S-0011-2 allowed: Mom (parent) retires Pawpaw and Granny's house: they lose its posts at once",
    "area": "Groups, households, events",
    "tickets": [],
    "where": "backend/tests/groups_test.sql"

@@ -5,14 +5,14 @@
 -- supabase/functions/sign-media/index_test.ts ("FLAG-4 ...").
 --
 -- Fixture: family "Hearth v2 family" (own space), built through the real RPCs as Chase.
---   Parents: Chase (owner, "Dad": his posts are "Dad's post"), Danielle (adult).
---   Relatives (all in Everyone unless noted): Meemaw Susan, Auntie Rachel, Aunt Linda, Pop Joe, Neighbor Ann,
+--   Parents: Chase (owner, "Dad": his posts are "Dad's post"), Mom (adult).
+--   Relatives (all in Everyone unless noted): Meemaw Sue, Auntie Rachel, Aunt Linda, Pop Joe, Neighbor Ann,
 --   Cousin Beth, Uncle Ray; Great-aunt Opal is NOT in Everyone (only in Meemaw's).
 --   Chase's side     (group, Private):  Pop Joe, Auntie Rachel        (+ Uncle Ray, later: GRP-11)
---   Danielle's side  (group, Private):  Meemaw Susan, Auntie Rachel, Aunt Linda
---   Meemaw's         (group, Always shared, set by Chase): Meemaw Susan, Auntie Rachel, Great-aunt Opal
+--   Mom's side  (group, Private):  Meemaw Sue, Auntie Rachel, Aunt Linda
+--   Meemaw's         (group, Always shared, set by Chase): Meemaw Sue, Auntie Rachel, Great-aunt Opal
 --                                       (+ Cousin Beth, later: GRP-8)
---   Chase's birthday (event, Shared on this group's posts): add_people_from both sides = Joe, Rachel, Susan, Linda
+--   Chase's birthday (event, Shared on this group's posts): add_people_from both sides = Joe, Rachel, Sue, Linda
 --   Porch            (group, Private, switched in GRP-7): Pop Joe, Aunt Linda
 -- Interpretations this suite encodes (staff-pm can change them; then change the test first):
 --   * GRP-13: relatives get no comment setting = the column is not readable by app users (42501 on
@@ -36,8 +36,8 @@ create table tests.people (k text primary key, id uuid not null, name text not n
                            in_everyone boolean not null);
 insert into tests.people values
   ('chase',    'e2000000-0000-0000-0000-000000000001', 'Chase',           'owner',  false),
-  ('danielle', 'e2000000-0000-0000-0000-000000000002', 'Danielle',        'adult',  false),
-  ('susan',    'e2000000-0000-0000-0000-000000000011', 'Meemaw Susan',    'viewer', true),
+  ('mom', 'e2000000-0000-0000-0000-000000000002', 'Mom',        'adult',  false),
+  ('sue',    'e2000000-0000-0000-0000-000000000011', 'Meemaw Sue',    'viewer', true),
   ('rachel',   'e2000000-0000-0000-0000-000000000012', 'Auntie Rachel',   'viewer', true),
   ('linda',    'e2000000-0000-0000-0000-000000000013', 'Aunt Linda',      'viewer', true),
   ('opal',     'e2000000-0000-0000-0000-000000000014', 'Great-aunt Opal', 'viewer', false),
@@ -66,7 +66,7 @@ create function tests.tbl(p_name text) returns text language sql stable as $$
                    order by n.nspname = 'public' desc limit 1), 'public.' || p_name) $$;
 
 \set as_chase    'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''e2000000-0000-0000-0000-000000000001'', false);'
-\set as_danielle 'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''e2000000-0000-0000-0000-000000000002'', false);'
+\set as_mom 'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''e2000000-0000-0000-0000-000000000002'', false);'
 \set as_joe      'reset role; set role authenticated; select set_config(''request.jwt.claim.sub'', ''e2000000-0000-0000-0000-000000000021'', false);'
 
 -- ---------- fixture helpers (admin; each acts as one person through the real RPCs) ----------
@@ -266,7 +266,7 @@ select tests.ok_sql(format($q$select count(*) = (select count(*) from public.cir
 insert into auth.users (id, email, raw_user_meta_data)
 select id, k || '@v2.hearth.test', jsonb_build_object('display_name', name) from tests.people
 union all select id, k || '@v2.hearth.test', jsonb_build_object('display_name', name) from tests.joiners;
-insert into public.households (id, name, created_by) values ('11111111-0000-0000-0000-0000000000e0', 'Chase and Danielle v2', tests.u('chase'));
+insert into public.households (id, name, created_by) values ('11111111-0000-0000-0000-0000000000e0', 'Chase and Mom v2', tests.u('chase'));
 insert into public.household_members (household_id, user_id, role) values ('11111111-0000-0000-0000-0000000000e0', tests.u('chase'), 'admin');
 insert into public.spaces (id, household_id, name, plan, created_by)
 values (:space_v, '11111111-0000-0000-0000-0000000000e0', 'Hearth v2 family', 'family', tests.u('chase'));
@@ -276,23 +276,23 @@ insert into public.space_members (space_id, user_id, role, invited_by, in_everyo
 select :space_v, id, role, case when k = 'chase' then null else tests.u('chase') end, in_everyone from tests.people;
 
 select tests.level('g_chase',  'group', 'Chase''s side');
-select tests.level('g_dan',    'group', 'Danielle''s side');
+select tests.level('g_dan',    'group', 'Mom''s side');
 select tests.level('g_meemaw', 'group', 'Meemaw''s');
 select tests.level('g_porch',  'group', 'Porch');
 select tests.level('e_bday',   'event', 'Chase''s birthday');
 select tests.place('g_chase', 'joe');
 select tests.place('g_chase', 'rachel');
-select tests.place('g_dan', 'susan');
+select tests.place('g_dan', 'sue');
 select tests.place('g_dan', 'rachel');
 select tests.place('g_dan', 'linda');
-select tests.place('g_meemaw', 'susan');
+select tests.place('g_meemaw', 'sue');
 select tests.place('g_meemaw', 'rachel');
 select tests.place('g_meemaw', 'opal');
 select tests.place('g_porch', 'joe');
 select tests.place('g_porch', 'linda');
 -- a parent placed in a side is not copied (parents already read everything)
 select tests.try($$insert into public.circle_people (circle_id, user_id, added_by)
-                   values (tests.c('g_dan'), tests.u('danielle'), tests.u('chase'))$$);
+                   values (tests.c('g_dan'), tests.u('mom'), tests.u('chase'))$$);
 select tests.set_mode('g_meemaw', 'always');
 
 -- ======================================================================
@@ -302,10 +302,10 @@ select set_config('request.jwt.claim.sub', 'e2000000-0000-0000-0000-000000000001
 select tests.lives(format('select public.add_people_from(p_target => %L, p_source => %L, p_history => %L)', tests.c('e_bday'), tests.c('g_chase'), 'all'),
                    'GRP-11 a parent copies everyone in Chase''s side into Chase''s birthday');
 select tests.lives(format('select public.add_people_from(p_target => %L, p_source => %L, p_history => %L)', tests.c('e_bday'), tests.c('g_dan'), 'all'),
-                   'GRP-11 ...and everyone in Danielle''s side (Auntie Rachel, in both, does not make it fail)');
+                   'GRP-11 ...and everyone in Mom''s side (Auntie Rachel, in both, does not make it fail)');
 select tests.ok((select array_agg(user_id order by user_id) from public.circle_people where circle_id = tests.c('e_bday'))
-                = (select array_agg(id order by id) from tests.people where k in ('joe', 'rachel', 'susan', 'linda')),
-                'GRP-11 the birthday holds exactly Pop Joe, Auntie Rachel, Meemaw Susan and Aunt Linda, each once (no parent copied)');
+                = (select array_agg(id order by id) from tests.people where k in ('joe', 'rachel', 'sue', 'linda')),
+                'GRP-11 the birthday holds exactly Pop Joe, Auntie Rachel, Meemaw Sue and Aunt Linda, each once (no parent copied)');
 select tests.ok(not exists (select 1 from public.circle_links where tests.c('e_bday') in (parent_id, child_id)),
                 'GRP-11 copied, not linked: no circle_links row for the birthday');
 select tests.throws_code(format('select public.add_people_from(p_target => %L, p_source => %L, p_history => null)', tests.c('e_bday'), tests.c('g_chase')),
@@ -323,7 +323,7 @@ select tests.ok(tests.placed('g_chase', 'ray') and not tests.member('e_bday', 'r
 -- ======================================================================
 select tests.ok(tests.mode('g_chase') = 'private' and tests.mode('g_porch') = 'private',
                 'GRP-9 a group made with create_level starts Private');
-select tests.level('e_reunion', 'event', 'Reunion', 'danielle');
+select tests.level('e_reunion', 'event', 'Reunion', 'mom');
 select tests.ok(tests.mode('e_bday') = 'on_group_posts' and tests.mode('e_reunion') = 'on_group_posts',
                 'GRP-9 an event made with create_level (by either parent) starts Shared on this group''s posts');
 select tests.ok(tests.mode('g_meemaw') = 'always', 'GRP-9 a parent sets Meemaw''s to Always shared with set_comment_mode');
@@ -377,36 +377,36 @@ select tests.ok(not tests.member('g_porch', 'ann'), 'GRP-10 the refused placemen
 -- Posts and replies
 -- ======================================================================
 select tests.post('p_all',  array['all']);        -- Dad's (Chase's) post to Everyone
-select tests.post('p_dan',  array['g_dan']);      -- to Danielle's side only
+select tests.post('p_dan',  array['g_dan']);      -- to Mom's side only
 select tests.post('p_bday', array['e_bday']);     -- to Chase's birthday only
 select tests.post('p_evt',  array['e_bday', 'all']);  -- to the birthday and Everyone (EVT-1)
 
 -- ---------- GRP-3 (Scenario 1): Meemaw comments and hearts Dad's post to Everyone ----------
-select tests.say('c3', 'susan', 'p_all');
-select tests.heart('susan', 'p_all');
-select tests.ok(tests.reads('chase', 'c3') and tests.reads('danielle', 'c3') and tests.reads('rachel', 'c3'),
-                'GRP-3 Chase, Danielle and Auntie Rachel (Meemaw''s, Always shared) read Meemaw''s comment on the Everyone post');
-select tests.ok(tests.reads_heart('chase', 'p_all', 'susan') and tests.reads_heart('danielle', 'p_all', 'susan') and tests.reads_heart('rachel', 'p_all', 'susan'),
+select tests.say('c3', 'sue', 'p_all');
+select tests.heart('sue', 'p_all');
+select tests.ok(tests.reads('chase', 'c3') and tests.reads('mom', 'c3') and tests.reads('rachel', 'c3'),
+                'GRP-3 Chase, Mom and Auntie Rachel (Meemaw''s, Always shared) read Meemaw''s comment on the Everyone post');
+select tests.ok(tests.reads_heart('chase', 'p_all', 'sue') and tests.reads_heart('mom', 'p_all', 'sue') and tests.reads_heart('rachel', 'p_all', 'sue'),
                 'GRP-3 ...and her heart');
 select tests.ok(not tests.reads('linda', 'c3') and not tests.reads('joe', 'c3') and not tests.reads('ann', 'c3')
                 and not tests.reads('beth', 'c3') and not tests.reads('ray', 'c3'),
                 'GRP-3 everyone else who sees the post (Linda, Joe, Ann, Beth, Ray) does not read her comment');
-select tests.ok(not tests.reads_heart('linda', 'p_all', 'susan') and not tests.reads_heart('joe', 'p_all', 'susan')
-                and not tests.reads_heart('ann', 'p_all', 'susan') and not tests.reads_heart('beth', 'p_all', 'susan'),
+select tests.ok(not tests.reads_heart('linda', 'p_all', 'sue') and not tests.reads_heart('joe', 'p_all', 'sue')
+                and not tests.reads_heart('ann', 'p_all', 'sue') and not tests.reads_heart('beth', 'p_all', 'sue'),
                 'GRP-3 ...nor her heart');
-select tests.ok(tests.readers('susan', 'p_all') = tests.names(array['Chase', 'Danielle', 'Auntie Rachel']),
-                format('GRP-3 reply_readers for Meemaw names exactly Chase, Danielle and Auntie Rachel (got %s)', tests.readers('susan', 'p_all')));
+select tests.ok(tests.readers('sue', 'p_all') = tests.names(array['Chase', 'Mom', 'Auntie Rachel']),
+                format('GRP-3 reply_readers for Meemaw names exactly Chase, Mom and Auntie Rachel (got %s)', tests.readers('sue', 'p_all')));
 
 -- ---------- GRP-4 (Scenario 2): comments on a post sent to the birthday ----------
 select tests.say('c4', 'joe', 'p_bday');
 select tests.say('c4b', 'linda', 'p_bday');
-select tests.ok(tests.reads('susan', 'c4') and tests.reads('rachel', 'c4') and tests.reads('linda', 'c4'),
+select tests.ok(tests.reads('sue', 'c4') and tests.reads('rachel', 'c4') and tests.reads('linda', 'c4'),
                 'GRP-4 every birthday member reads Pop Joe''s comment on a post sent to the birthday');
-select tests.ok(tests.reads('joe', 'c4b') and tests.reads('susan', 'c4b') and tests.reads('rachel', 'c4b'),
+select tests.ok(tests.reads('joe', 'c4b') and tests.reads('sue', 'c4b') and tests.reads('rachel', 'c4b'),
                 'GRP-4 ...and Aunt Linda''s');
 select tests.ok(not tests.reads('ann', 'c4') and not tests.reads('opal', 'c4') and not tests.reads('ray', 'c4'),
                 'GRP-4 people outside the birthday (who can''t see the post) read nothing');
-select tests.ok(tests.readers('joe', 'p_bday') = tests.names(array['Chase', 'Danielle', 'Meemaw Susan', 'Auntie Rachel', 'Aunt Linda']),
+select tests.ok(tests.readers('joe', 'p_bday') = tests.names(array['Chase', 'Mom', 'Meemaw Sue', 'Auntie Rachel', 'Aunt Linda']),
                 format('GRP-4 reply_readers for Pop Joe on the birthday post names the parents and every other member (got %s)', tests.readers('joe', 'p_bday')));
 
 -- ---------- GRP-5 (leak case): Shared-on-this-group's-posts never leaks to other posts ----------
@@ -414,18 +414,18 @@ select tests.ok(not tests.reads('joe', 'c3') and not tests.reads('linda', 'c3'),
                 'GRP-5 birthday members Joe and Linda don''t read Meemaw''s comment on an Everyone-only post');
 select tests.ok(tests.reads('rachel', 'c3'),
                 'GRP-5 ...unless another rule allows it (Rachel shares the Always-shared Meemaw''s)');
-select tests.say('c5', 'susan', 'p_dan');
+select tests.say('c5', 'sue', 'p_dan');
 select tests.ok(not tests.reads('linda', 'c5'),
-                'GRP-5 same for a post sent to another group: Linda (birthday + Danielle''s side, both with Meemaw) doesn''t read her comment on the Danielle''s side post');
-select tests.ok(tests.readers('susan', 'p_dan') = tests.names(array['Chase', 'Danielle', 'Auntie Rachel']),
-                format('GRP-5 reply_readers for Meemaw on the Danielle''s side post leaves out Aunt Linda (got %s)', tests.readers('susan', 'p_dan')));
+                'GRP-5 same for a post sent to another group: Linda (birthday + Mom''s side, both with Meemaw) doesn''t read her comment on the Mom''s side post');
+select tests.ok(tests.readers('sue', 'p_dan') = tests.names(array['Chase', 'Mom', 'Auntie Rachel']),
+                format('GRP-5 reply_readers for Meemaw on the Mom''s side post leaves out Aunt Linda (got %s)', tests.readers('sue', 'p_dan')));
 
 -- ---------- GRP-6: Always shared crosses posts, but only to people who see the post ----------
 select tests.ok(tests.reads('rachel', 'c5'),
                 'GRP-6 Rachel (Meemaw''s, Always shared) reads Meemaw''s comment on a post not sent to Meemaw''s');
 select tests.ok(not tests.reads('opal', 'c5') and not tests.reads_rls('opal', tests.c('c5')),
                 'GRP-6 Great-aunt Opal (Meemaw''s, can''t see that post) reads nothing: get_comments says not found, RLS hides it');
-select tests.ok(not tests.reads_heart('opal', 'p_all', 'susan'),
+select tests.ok(not tests.reads_heart('opal', 'p_all', 'sue'),
                 'GRP-6 ...and can''t read Meemaw''s heart on a post she can''t see');
 
 -- ---------- GRP-7: the setting at write time and now; the less open wins ----------
@@ -448,8 +448,8 @@ select tests.place('g_meemaw', 'beth');     -- after c3 was written
 select tests.ok(tests.member('g_meemaw', 'beth'), 'GRP-8 setup: Cousin Beth is now in Meemaw''s');
 select tests.ok(not tests.reads('beth', 'c3') and not tests.reads_rls('beth', tests.c('c3')),
                 'GRP-8 Beth, added to Meemaw''s after Meemaw''s comment, doesn''t read it through the group');
-select tests.ok(not tests.reads_heart('beth', 'p_all', 'susan'), 'GRP-8 ...nor Meemaw''s earlier heart');
-select tests.say('c8', 'susan', 'p_all');
+select tests.ok(not tests.reads_heart('beth', 'p_all', 'sue'), 'GRP-8 ...nor Meemaw''s earlier heart');
+select tests.say('c8', 'sue', 'p_all');
 select tests.ok(tests.reads('beth', 'c8'), 'GRP-8 Beth does read Meemaw''s next comment, written after Beth joined');
 
 -- ======================================================================
@@ -550,7 +550,7 @@ begin
   end loop;
   return true;
 end $$;
-select tests.ok(tests.no_mode_key('joe') and tests.no_mode_key('susan'),
+select tests.ok(tests.no_mode_key('joe') and tests.no_mode_key('sue'),
                 'GRP-13 feed rows never carry a comment setting for a relative');
 
 -- ======================================================================
@@ -566,9 +566,9 @@ select tests.ok_sql($q$select count(*) = 3
 -- expected table (end state), from GRP-3..8: reader x comment -> reads?
 create table tests.expect (reader text, comment text, expected boolean);
 insert into tests.expect values
-  ('chase', 'c3', true), ('danielle', 'c3', true), ('rachel', 'c3', true), ('linda', 'c3', false), ('joe', 'c3', false),
+  ('chase', 'c3', true), ('mom', 'c3', true), ('rachel', 'c3', true), ('linda', 'c3', false), ('joe', 'c3', false),
   ('ann', 'c3', false), ('beth', 'c3', false), ('ray', 'c3', false), ('opal', 'c3', false),
-  ('susan', 'c4', true), ('rachel', 'c4', true), ('linda', 'c4', true), ('ann', 'c4', false), ('opal', 'c4', false),
+  ('sue', 'c4', true), ('rachel', 'c4', true), ('linda', 'c4', true), ('ann', 'c4', false), ('opal', 'c4', false),
   ('rachel', 'c5', true), ('linda', 'c5', false), ('opal', 'c5', false), ('joe', 'c5', false),
   ('linda', 'c7a', false), ('linda', 'c7b', false), ('rachel', 'c7b', false),
   ('beth', 'c8', true), ('rachel', 'c8', true), ('joe', 'c8', false);
@@ -664,7 +664,7 @@ select tests.ok(tests.feature_on_as('chase') = false, 'FLAG-1 with no rows, feat
 select tests.ok(tests.my_features_has('chase') = false, 'FLAG-1 ...and my_features doesn''t list it');
 select tests.flag_global(true);
 select tests.flag_family(true);
-select tests.ok(tests.feature_on_as('chase') = true and tests.feature_on_as('danielle') = true,
+select tests.ok(tests.feature_on_as('chase') = true and tests.feature_on_as('mom') = true,
                 'FLAG-2 global on + family on: a parent (owner or adult) gets true');
 select tests.ok(tests.feature_on_as('joe') = false, 'FLAG-2 ...a relative asking for the parents-only capability gets false');
 select tests.ok(tests.my_features_has('chase') = true and tests.my_features_has('joe') = false,
@@ -786,7 +786,7 @@ select tests.flag_global(true);
 -- PRIV-G5 (SPEC-GROUPS section 5: family add-ons are family settings, owner only): an adult parent can't write
 -- space_features, neither a new row nor switching an existing one.
 select tests.flag_family(false);
-:as_danielle
+:as_mom
 select tests.throws_code(format('insert into %s (space_id, feature, enabled) values (%L, ''photo_books'', true)',
                                 tests.tbl('space_features'), tests.space()),
                          'PRIV-G5 an adult parent can''t add a family add-on row (owner only)', '42501');

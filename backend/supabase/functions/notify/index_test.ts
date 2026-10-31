@@ -74,8 +74,8 @@ Deno.test("email: names are HTML-escaped", () => {
 Deno.test("BETA-NOTIFY-7: push and email name the real sender, never a generic notice", () => {
   const [m] = buildPush(pushBatch({ actor_names: ["Chase"] }));
   eq(m.title, "From Chase on Hearth", "push title names the sender");
-  const [m2] = buildPush(pushBatch({ actor_names: ["Chase", "Danielle"] }));
-  eq(m2.title, "From Chase and Danielle on Hearth", "two senders");
+  const [m2] = buildPush(pushBatch({ actor_names: ["Chase", "Mom"] }));
+  eq(m2.title, "From Chase and Mom on Hearth", "two senders");
   const e = buildEmail(emailBatch({ actor_names: ["Chase"] }))!;
   eq(e.from, "Chase on Hearth <hello@hearth.family>", "email From shows the sender's name");
   for (const t of [m.title, m.body, e.subject, e.text]) {

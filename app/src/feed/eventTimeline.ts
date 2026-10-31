@@ -26,7 +26,7 @@ export function timeLabel(iso: string): string {
   return `${h % 12 === 0 ? 12 : h % 12}:${String(d.getMinutes()).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`;
 }
 
-/** "3:10 pm · 14 photos from Danielle, Rachel and Susan"; no time for "Added later". */
+/** "3:10 pm · 14 photos from Mom, Rachel and Sue"; no time for "Added later". */
 export function momentLine(at: string | null, count: number, names: string[]): string {
   const what = `${photos(count)} from ${andList(names)}`;
   return at ? `${timeLabel(at)} · ${what}` : what;

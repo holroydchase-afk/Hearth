@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # family-setup.sql v2 (SPEC-GROUPS section 8 step 3; privacy review item 14). Written first (qa-tdd, Oct 17).
-# v2 re-seeds Chase's family into section 2's shape (Everyone; Chase's side and Danielle's side; households;
+# v2 re-seeds Chase's family into section 2's shape (Everyone; Chase's side and Mom's side; households;
 # the two events), placing people by the name the family uses (display_name). It changes access, so:
 #   * by default it is a DRY RUN: it changes nothing and prints, for each person, the posts they would gain and lose:
 #       DRY RUN: nothing was changed
@@ -25,7 +25,7 @@ psql -d "$DB" -v ON_ERROR_STOP=1 -q "${files[@]}" -f supabase/seed.sql >/dev/nul
 psql -d "$DB" -X -q >/dev/null 2>&1 <<'SQL'
 insert into auth.users (id, email, raw_user_meta_data) values
   ('e0000000-0000-0000-0000-0000000000e1', 'chase@example.com', '{"display_name":"Chase"}'),
-  ('e0000000-0000-0000-0000-0000000000e2', 'danielle@example.com', '{"display_name":"Danielle"}'),
+  ('e0000000-0000-0000-0000-0000000000e2', 'mom@example.com', '{"display_name":"Mom"}'),
   ('e0000000-0000-0000-0000-0000000000e3', 'gammy@example.com', '{"display_name":"Gammy"}'),
   ('e0000000-0000-0000-0000-0000000000e4', 'grandaddy@example.com', '{"display_name":"Grandaddy"}'),
   ('e0000000-0000-0000-0000-0000000000e5', 'grandmomma@example.com', '{"display_name":"Grandmomma"}'),
@@ -41,15 +41,15 @@ create schema t;
 create function t.space() returns uuid language sql stable as $$ select id from public.spaces where name = 'Our kids' $$;
 create function t.circle(p text) returns uuid language sql stable as $$ select id from public.circles where space_id = t.space() and name = p $$;
 insert into public.space_members (space_id, user_id, role, invited_by)
-select t.space(), id, case when email like 'danielle%' then 'adult' else 'viewer' end::public.member_role, 'e0000000-0000-0000-0000-0000000000e1'
-from auth.users where email in ('danielle@example.com', 'gammy@example.com', 'grandaddy@example.com', 'grandmomma@example.com',
+select t.space(), id, case when email like 'mom%' then 'adult' else 'viewer' end::public.member_role, 'e0000000-0000-0000-0000-0000000000e1'
+from auth.users where email in ('mom@example.com', 'gammy@example.com', 'grandaddy@example.com', 'grandmomma@example.com',
                                 'memaw@example.com', 'pawpaw@example.com', 'granny@example.com', 'tester@example.com');
 insert into public.circle_members (circle_id, user_id)
 select t.circle(g), u.id from (values
-  ('Everyone', 'danielle'), ('Everyone', 'gammy'), ('Everyone', 'grandaddy'), ('Everyone', 'grandmomma'),
+  ('Everyone', 'mom'), ('Everyone', 'gammy'), ('Everyone', 'grandaddy'), ('Everyone', 'grandmomma'),
   ('Everyone', 'memaw'), ('Everyone', 'pawpaw'), ('Everyone', 'granny'),
   ('Chase''s mom''s side', 'gammy'), ('Chase''s dad''s side', 'grandaddy'), ('Chase''s dad''s side', 'grandmomma'),
-  ('Danielle''s mom''s side', 'memaw'), ('Danielle''s dad''s side', 'pawpaw'), ('Danielle''s dad''s side', 'granny'),
+  ('Mom''s mom''s side', 'memaw'), ('Mom''s dad''s side', 'pawpaw'), ('Mom''s dad''s side', 'granny'),
   ('Test viewer', 'tester')) x(g, who)
 join auth.users u on u.email = x.who || '@example.com'
 on conflict do nothing;
@@ -64,7 +64,7 @@ begin
   update public.posts set status = 'published' where id = v;
 end $$;
 select t.post('pumpkins', 'Everyone'); select t.post('soccer', 'Everyone');
-select t.post('for Gammy', 'Chase''s mom''s side'); select t.post('for Pawpaw and Granny', 'Danielle''s dad''s side');
+select t.post('for Gammy', 'Chase''s mom''s side'); select t.post('for Pawpaw and Granny', 'Mom''s dad''s side');
 select t.post('for the tester', 'Test viewer');
 -- who sees what, before
 create table t.access (phase text, user_id uuid, post_id uuid);
@@ -117,12 +117,12 @@ after=$(q "select t.fingerprint()")
 [ -n "$before" ] && [ "$before" = "$after" ]; ok $? "setup v2 dry run: changes nothing (groups, members, placements, links, audiences, invites identical)"
 echo "$out" | grep -q "^DRY RUN: nothing was changed"; ok $? "setup v2 dry run: says \"DRY RUN: nothing was changed\""
 missing=0
-for name in Danielle Gammy Grandaddy Grandmomma Memaw Pawpaw Granny "Test viewer"; do
+for name in Mom Gammy Grandaddy Grandmomma Memaw Pawpaw Granny "Test viewer"; do
   echo "$out" | grep -Eq "^${name}: gains [0-9]+ posts?, loses [0-9]+ posts?$" || { missing=1; echo "        no report line for $name"; }
 done
 ok $missing "setup v2 dry run: one \"<name>: gains N posts, loses M posts\" line for every member of the family"
-echo "$out" | grep -q "^Danielle: gains 3 posts, loses 0 posts$" && echo "$out" | grep -q "^Danielle is a Parent: from 0011 on, sees every post and reads every reply"
-ok $? "S-0011-4 / privacy item 14: the dry run counts what 0011 gives a Parent (Danielle gains the 3 posts outside her v1 groups) and says why"
+echo "$out" | grep -q "^Mom: gains 3 posts, loses 0 posts$" && echo "$out" | grep -q "^Mom is a Parent: from 0011 on, sees every post and reads every reply"
+ok $? "S-0011-4 / privacy item 14: the dry run counts what 0011 gives a Parent (Mom gains the 3 posts outside her v1 groups) and says why"
 
 # 2. apply: the report must match what actually changed
 out2=$(psql -d "$DB" -X -q -v chase_email=chase@example.com -v space_name='Our kids' -v apply=yes -f "$SCRIPT" 2>&1); rc=$?
@@ -143,8 +143,8 @@ done < <(q "select pr.display_name,
             where sm.space_id = t.space() and sm.role <> 'owner'")
 [ -n "$out" ] && [ $mismatch = 0 ]; ok $? "setup v2: the dry-run report equals each person's real posts gained and lost after apply"
 [ "$(q "select count(*) from public.circles where space_id = t.space() and kind = 'everyone'")" = 1 ]; ok $? "setup v2 apply: one Everyone"
-[ "$(q "select string_agg(name, ',' order by name) from public.circles where space_id = t.space() and kind = 'group' and deleted_at is null")" = "Chase's side,Danielle's side" ]
-ok $? "setup v2 apply: the set groups are Chase's side and Danielle's side (legacy groups retired)"
+[ "$(q "select string_agg(name, ',' order by name) from public.circles where space_id = t.space() and kind = 'group' and deleted_at is null")" = "Chase's side,Mom's side" ]
+ok $? "setup v2 apply: the set groups are Chase's side and Mom's side (legacy groups retired)"
 [ "$(q "select count(*) from public.circle_people cp join public.circles h on h.id = cp.circle_id join public.profiles p on p.id = cp.user_id
         join public.circle_links l on l.child_id = h.id join public.circles g on g.id = l.parent_id
         where h.name = 'Gammy''s house' and p.display_name = 'Gammy' and g.name = 'Chase''s side'")" = 1 ]

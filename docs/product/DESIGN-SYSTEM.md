@@ -6,7 +6,7 @@ Owner: grandparent-ux (Hearth's UI/UX designer). Written Oct 19, 2026, from Chas
 
 1. **On iPhone, follow Apple's Human Interface Guidelines (HIG)**: https://developer.apple.com/design/human-interface-guidelines
 2. **On Android, follow Material Design 3** (https://m3.material.io) and Android's accessibility guidance (https://developer.android.com/guide/topics/ui/accessibility/apps).
-3. **The Hearth overrides below win** wherever they are stricter. They exist because the guidelines are written for everyone, and our least savvy relatives (Scott, Susan and John; the great-grandparents) need a few things stricter.
+3. **The Hearth overrides below win** wherever they are stricter. They exist because the guidelines are written for everyone, and our least savvy relatives (Grandaddy, Memaw and Pawpaw; the great-grandparents) need a few things stricter.
 4. **Don't invent.** Before designing a custom control, look for the system one. A custom control needs a written reason in the PR.
 
 Same features, same photo quality and same words on both phones (persona AG). Only the look follows each phone.
