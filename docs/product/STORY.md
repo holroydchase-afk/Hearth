@@ -20,7 +20,7 @@ Hearth exists so parents can share their kids with every part of a complicated f
 - Videos are worse. In a 5-person chat with 1 Android, the video arrives degraded. So I send it to my stepmom separately and hope nobody feels slighted. With my in-laws, they do.
 - Underneath it all is guilt. Like a lot of America, we live far from our hometown. Getting a "good enough" amount of the kids to the grandparents is hard, and the barriers make it harder.
 
-**Why not social media.** Mom and I don't post our kids online, and neither do many of our peers. The risks are real: deepfakes, predators, stalkers, AI trained on our children, ads, and more. Family photos belong with family.
+**Why not social media.** My wife and I don't post our kids online, and neither do many of our peers. The risks are real: deepfakes, predators, stalkers, AI trained on our children, ads, and more. Family photos belong with family.
 
 **The feeling we want.** It should feel like the preschool app. Parents know it's secure and that only people they trust are in it. They stop thinking about it and just share.
 

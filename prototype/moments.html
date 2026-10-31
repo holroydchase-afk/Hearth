@@ -166,7 +166,7 @@ textarea { font: inherit; color: var(--ink); background: var(--surface); border:
 
   // People (Chase's family; ranking in docs/product/PERSONA-CHECK.md)
   const P = {
-    Chase: '#3A6FD8', Mom: '#B4489A', Tess: '#2E8B6E', Gigi: '#C0392B', Grandaddy: '#8E5A2B', Sue: '#6A4FB3', Grandmomma: '#1F7A8C', Pawpaw: '#7A7A2E', You: '#3A6FD8',
+    Chase: '#3A6FD8', Mom: '#B4489A', Tess: '#2E8B6E', Gigi: '#C0392B', Grandaddy: '#8E5A2B', Memaw: '#6A4FB3', Grandmomma: '#1F7A8C', Pawpaw: '#7A7A2E', You: '#3A6FD8',
   };
   const avatar = (n, cls = '') => `<span class="avatar ${cls}" style="background:${P[n] || '#666'}" aria-hidden="true">${n[0]}</span>`;
 
@@ -210,7 +210,7 @@ textarea { font: inherit; color: var(--ink); background: var(--surface); border:
     { by: 'Chase', when: '12 minutes ago', to: "Everyone", cap: 'Pumpkin patch with Mia and Leo 🎃', photos: photos('pumpkins', 'LPPSLLWPP'),
       react: { love: 3, haha: 1, like: 0 }, comments: [['Gigi', 'Look at those cheeks!! Leo is getting so big.'], ['Grandaddy', 'Mia picked the biggest one of course']] },
     { by: 'Mom', when: 'Yesterday at 6:40 PM', to: "Grandparents – Mom's side", cap: 'First time making pancakes by herself', photos: photos('kitchen', 'P'),
-      react: { love: 4, haha: 0, like: 1 }, comments: [['Sue', 'A chef already! Save me one.']] },
+      react: { love: 4, haha: 0, like: 1 }, comments: [['Memaw', 'A chef already! Save me one.']] },
     { by: 'Chase', when: 'Sat, Oct 17', to: 'Everyone', event: "Leo's 5th birthday", eventCount: 42, cap: 'Blowing out the candles', photos: photos('cake', 'LP'),
       react: { love: 6, haha: 2, like: 1 }, comments: [['Grandmomma', 'Happy birthday sweet boy!'], ['Gigi', 'Wish we could have been there'], ['Pawpaw', 'Five! Where does the time go']] },
     { by: 'Tess', when: 'Fri, Oct 16', to: 'Cousins', cap: 'Park day with the cousins', photos: photos('park', 'LLP'),
@@ -313,7 +313,7 @@ textarea { font: inherit; color: var(--ink); background: var(--surface); border:
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && layer.firstChild) closeLayer(); });
 
   function readers(m) {
-    const map = { Everyone: 'Chase, Mom, Gigi, Grandaddy, Sue, Grandmomma and Pawpaw', "Grandparents – Mom's side": 'Chase, Mom, Sue and Pawpaw',
+    const map = { Everyone: 'Chase, Mom, Gigi, Grandaddy, Memaw, Grandmomma and Pawpaw', "Grandparents – Mom's side": 'Chase, Mom, Memaw and Pawpaw',
       "Grandparents – Dad's side": 'Chase, Mom, Gigi and Grandaddy', Cousins: 'Tess, Chase, Mom and the cousins' };
     return map[m.to] || 'The family this was shared with';
   }

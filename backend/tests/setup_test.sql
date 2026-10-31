@@ -24,8 +24,8 @@ select tests.ok((select count(*) = 1 from public.spaces s join public.space_memb
                 'M1 setup: Chase owns one space');
 select tests.ok((select array_agg(c.name order by c.name) from public.circles c join public.spaces s on s.id = c.space_id
                  where s.name = 'Our kids')
-                = array['Chase''s dad''s side', 'Chase''s mom''s side', 'Mom''s dad''s side',
-                        'Mom''s mom''s side', 'Everyone', 'Test viewer'],
+                = array['Chase''s dad''s side', 'Chase''s mom''s side', 'Everyone',
+                        'Mom''s dad''s side', 'Mom''s mom''s side', 'Test viewer'],
                 'M1 setup: the starter groups exist (Chase can rename them in the app)');
 select tests.ok((select count(*) = 1 from public.invites i join public.spaces s on s.id = i.space_id
                  where s.name = 'Our kids' and i.role = 'viewer'),
