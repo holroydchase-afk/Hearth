@@ -1,5 +1,8 @@
 # Handoff
 
+## Oct 29, night shift: one title on a bulk send (CAP-9) (branch claude/project-thread-kzt7by-n1029b, draft PR, stacked on #74)
+- **Built, test-first:** the bulk review screen has one optional "Title (optional)" box (80 characters) and nothing else; every post in the batch carries that title, captions stay empty (`bulk.test.tsx` CAP-9 ×2). App only: `create_post` already takes a title (0019, live), so this needs no deploy.
+- **Next exact step:** Chase says "merge" after #74.
 ## Oct 29: video, part 1: location stripping and a fair video limit (branch claude/project-thread-ponhs5, PR)
 - **Why:** Chase, Oct 29: "build video". Video was "in v1" (Oct 18) but blocked on stripping location from video on the phone (FLAG-7), plus S14 (the free cap reset per family space).
 - **Built, test-first:** `app/src/media/cleanVideo.ts`, a pure-TypeScript QuickTime/MP4 cleaner and verifier that runs in Expo Go with no re-encode: location boxes (Apple's ISO6709 key, `©xyz`), make, model, software, XMP, face boxes, metadata and timecode tracks (their samples too), dates, vendor names and trailers are zeroed in place; picture and sound bytes stay identical (VID-1..11, plus two real ffmpeg-made files that still decode). `processVideo` in `pipeline.ts` (VID-12); iPhone picks come as 720p H.264 MP4 (VID-13, BETA-SHARE-6). Migration **0020** counts the 10 free videos a month per person across every free family (`private.video_usage`; S14-1..7 in `backend/tests/video_cap_test.sql`). Test Log: S14 fixed. Spec: SPEC-MEDIA section 4.
