@@ -342,6 +342,7 @@
 7. **Video is off for the beta.** iOS location metadata can't be stripped without a transcoder.
 
 ## Chase's to-dos (blocking)
+- **Intake #83 (stock photos in the demo), Oct 31:** this cloud environment can't reach any stock photo site (Unsplash, Pexels, Openverse and Wikimedia all refused). Add `images.unsplash.com`, `unsplash.com`, `images.pexels.com`, `api.pexels.com`, `api.openverse.org` and `upload.wikimedia.org` under Allowed domains (Project settings, Cloud environment, gear), then the next Intake check does it. Labeled needs-chase.
 - Confirm Apple Developer enrollment.
 - Create the accounts:
   - Supabase: a staging and a prod project, both East US
