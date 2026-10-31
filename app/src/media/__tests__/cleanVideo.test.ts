@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // FLAG-7 / VID-1..9 (SPEC-MEDIA 3.3, BETA-SPEC "Out of beta: video"): the pure-TS video cleaner removes location
 // and every other phone metadata from a QuickTime / MP4 file on the phone, without re-encoding, so it runs in Expo Go.
 // Removed boxes become zero-filled `free` boxes of the same size, so every sample offset stays valid; the samples of

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import { createContext, useContext } from 'react';
 
 /** Navigation as the screens see it. The app wires it to expo-router; tests pass spies. */

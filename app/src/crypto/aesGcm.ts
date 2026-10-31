@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // A1 (DEC-29): AES-256-GCM providers for media bytes. Every provider produces the same bytes
 // (ciphertext || 16-byte tag), so the stored format (aes-256-gcm-chunked-v1) doesn't change.
 //   native     a development build registers one at start-up (react-native-quick-crypto); fastest on phones

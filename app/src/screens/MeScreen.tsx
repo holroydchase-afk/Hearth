@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import React, { useEffect, useState } from 'react';
 import { DEMO_MODE } from '../demo/flags';
 import { useApp } from '../state/AppContext';

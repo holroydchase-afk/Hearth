@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DS-1..DS-9 (docs/product/DESIGN-SYSTEM.md): each phone's own design system, plus Hearth's overrides.
 import { render, screen } from '@testing-library/react-native';
 import React from 'react';

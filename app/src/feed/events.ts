@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // SPEC-GROUPS v2, EVT-2..4: how event posts sit in Photos, and the Events list.
 // The server decides who learns an event exists (EVT-1: event_id/event_name are null for anyone not in it),
 // so nothing here filters for privacy. Works on the feed pages loaded so far.

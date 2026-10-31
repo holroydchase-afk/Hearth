@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MS4 (privacy-security review, PR #29), ported into PR 25 so photo encryption on this branch never uses
 // expo-crypto's getRandomBytes, which quietly falls back to Math.random in Expo Go on RN 0.86.
 const zeros = (n: number) => new Uint8Array(n); // stands in for the predictable Math.random fallback

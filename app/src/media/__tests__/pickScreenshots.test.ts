@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R15 HELP-SHOT-1: the photo library says which picks are screenshots (iPhone: the "screenshot"
 // subtype; Android: the "Screenshots" album). Read on the phone only, kept as one true/false.
 const assets = [

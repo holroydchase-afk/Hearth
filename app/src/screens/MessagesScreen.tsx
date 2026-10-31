@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Messenger (docs/product/SPEC-MESSENGER.md): opened in place from a "Messages" button at the top of Photos, like
 // Events. The list of chats, then one chat. End to end encrypted (MLS); the words never reach Hearth's servers.
 // A2: no read receipts, typing dots, "seen" or last-active anywhere. Relatives see a group chat titled by its

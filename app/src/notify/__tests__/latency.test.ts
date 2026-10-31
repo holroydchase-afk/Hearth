@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // AE-10 / BETA-NOTIFY-1: the phone keeps its own record of when notices arrived.
 // Nothing is sent anywhere; the report has delays only, no post ids or names.
 import { memoryKV } from '../../platform/kv';

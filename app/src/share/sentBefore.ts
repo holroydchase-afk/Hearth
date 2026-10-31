@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R15 HELP-DUP-2: what this person sent from this phone in the last 30 days, as preview fingerprints
 // (SHA-256 of the 160 px preview, never the photo). Kept on the phone only; never sent (HELP-R2).
 import type { KV } from '../platform/kv';

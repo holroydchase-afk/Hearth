@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MEDIA-3 + BETA-OPS-1 (SPEC-MEDIA 1.3 step 3; UAT item 6): when a job fails for good in the
 // prepare step, the queue sends ONE error report with the error code only (no URL, key, caption
 // or metadata) through the existing report_client_error path. Today it sends nothing, which is

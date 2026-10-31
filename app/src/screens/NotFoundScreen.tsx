@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // NF-1 (RR-7): any link the app doesn't know. Plain words and one way back.
 import React from 'react';
 import { useNav } from '../state/nav';

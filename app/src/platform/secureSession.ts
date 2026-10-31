@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Supabase session storage. Sessions can exceed SecureStore's ~2 KB comfort limit, so the
 // session JSON is AES-256-GCM encrypted into AsyncStorage and only the 32-byte key lives in
 // the Keychain / Keystore (the "LargeSecureStore" pattern). Signed in for months (JOIN-5).

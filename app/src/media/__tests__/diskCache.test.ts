@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R8 / A3 (DEC-29): Photos opens instantly and offline. Encrypted photo files are kept on the phone; their keys
 // live only in the keychain-backed store, never in plain storage. Kept files follow the feed and sign-out.
 import { FakeBackend, FIXTURE } from '../../api/fake/FakeBackend';

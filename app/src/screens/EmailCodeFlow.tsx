@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Email → 6-digit code. No passwords, no magic links, nothing to copy.
 import React, { useEffect, useState } from 'react';
 import { messageFor } from '../errors/messages';

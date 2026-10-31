@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // "Did you mean june@yahoo.com?" for the email providers our families use (JOIN-2).
 // Only suggests; never changes what someone typed.
 const DOMAINS = [

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-TIME-1..4: pure helpers behind Photos' "Added from earlier" card and the timeline.
 // Months and years follow the phone's local time (Jest runs in UTC here).
 import { FakeBackend, FIXTURE } from '../../api/fake/FakeBackend';

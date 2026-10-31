@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // AE-10 / BETA-NOTIFY-1: when did each notice reach this phone? Kept on the phone only
 // (never sent anywhere). The report Chase copies has delays in seconds, no post ids.
 import type { KV } from '../platform/kv';

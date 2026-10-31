@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // SPEC-GROUPS v2, app-now: New group (GRP-15), copy people from a group (GRP-16), the Always-shared
 // confirmation (GRP-17) and inviting to several groups (GRP-18). Written first: red until the screen catches up.
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';

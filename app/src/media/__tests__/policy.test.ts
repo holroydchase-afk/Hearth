@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MEDIA-1, MEDIA-2, MEDIA-5 (SPEC-MEDIA D1-D7): the media policy is ONE typed, frozen,
 // code-level object in app/src/media/policy.ts. These tests pin its defaults and prove
 // that changing the policy changes what the cleaner keeps and how the photo is encoded.

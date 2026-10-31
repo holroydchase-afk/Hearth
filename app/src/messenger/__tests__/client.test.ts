@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MSG-1, 3, 5, 8: the phone side of the messenger, end to end over the fake relay (docs/product/SPEC-MESSENGER.md).
 // Chase and Alex are the parents (in every chat); Grandma Jo and Grandpa Earl are in "Grandparents – Dad's side";
 // Nana Ruth is not, until MSG-5 adds her.

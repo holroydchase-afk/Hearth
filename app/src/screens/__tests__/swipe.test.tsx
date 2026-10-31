@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // SWIPE-1..5 (Chase, Oct 18): photos as one swipeable photo, with labeled Back / Next buttons and "2 of 7"
 // words (no gesture-only actions). Since MOMENT-2 (Oct 24) a moment card in Photos shows a collage instead
 // (moments.test.tsx); the swipe lives on inside an event's timeline (EVT-7), so these test it directly.

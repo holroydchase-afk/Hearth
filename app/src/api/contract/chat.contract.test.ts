@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Messenger relay contract (docs/product/SPEC-MESSENGER.md, migration 0015). Same cast as contract.test.ts:
 // FakeApi always; SupabaseApi when the env is set. Bodies are opaque base64 here; the MLS side is src/messenger.
 import { ApiError, type HearthApi } from '../HearthApi';

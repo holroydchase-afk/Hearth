@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R15 photo helpers, phase 1 (SPEC-PHOTO-HELPERS): rules and the picks that need no pixels.
 import type { PickedAsset } from '../bulk';
 import { blur, dark, edges, other, scene, toJpeg } from '../../test/pictures';

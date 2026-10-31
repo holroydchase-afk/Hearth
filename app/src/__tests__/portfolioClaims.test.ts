@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // RD-1/RD-2: the README and case study are what a recruiter reads next to the demo; their numbers and links must stay true.
 import fs from 'fs';
 import path from 'path';

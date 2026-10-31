@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-AUD-10: the family owner picks who reads what relatives write; safest is the default.
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';

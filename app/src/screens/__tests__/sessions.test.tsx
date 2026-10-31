@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MOMENT-7 (Oct 24) replaces SESS-1..3 (Oct 18): Photos no longer merges a sender's posts within an hour into one
 // swipe. Each upload is its own moment card, so its caption, hearts, replies and Delete are plainly its own.
 // feed/sessions.ts stays (unused on screen) until Chase confirms; see the PR.

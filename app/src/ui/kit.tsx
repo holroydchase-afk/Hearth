@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Grandparent-first building blocks in each phone's own style (DESIGN-SYSTEM.md): Apple's on iPhone and the
 // web, Material 3 on Android. Every tappable thing is a <Button>/<Choice>: it always has an
 // accessibilityLabel, a visible word (DS-3), and a 48 pt minimum target (DS-1).

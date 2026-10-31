@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // PRIV-G2 / GRP-12: the fake applies the server's invite rule (redeem_invite, migration 0013).
 // A new invite puts the person in Everyone only if it names Everyone. An invite made before 0013
 // (household_means_everyone) that names a household keeps the old meaning: Everyone too.

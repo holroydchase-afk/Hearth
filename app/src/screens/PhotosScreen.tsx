@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import React, { useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

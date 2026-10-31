@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // A3 wiring: the app keeps photo files only through deps.mediaDisk, prunes them to the feed, and wipes them at sign-out.
 import { act, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // SPEC-GROUPS v2, EVT-2..4: the event card and update line shown in Photos, and the Events section
 // (opened in place from a "See events" button at the top of Photos, like the timeline; not a tab).
 // EVT-6..9: inside an event, one timeline of everyone's photos by when they were taken (feed/eventTimeline.ts).

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // QueueItem -> bytes + sign-media spec, using the real pipeline.
 import { ApiError } from '../api/HearthApi';
 import { readBytes } from '../platform/bytes';

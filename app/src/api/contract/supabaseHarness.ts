@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Runs the same contract against a real PostgREST (+ optional sign-media), e.g. the backend's
 // integration harness (backend/tests/integration/start.sh) or a `supabase start` stack.
 //

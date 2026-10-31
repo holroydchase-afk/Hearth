@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import { CHUNK_SIZE, ENC_SCHEME, decryptMedia, encryptMedia, encryptedSize } from '../media';
 import { fromBase64, toBase64 } from '../base64';
 

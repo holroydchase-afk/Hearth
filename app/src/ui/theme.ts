@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Native first (docs/product/DESIGN-SYSTEM.md): each phone's own font, colors and type ramp,
 // plus Hearth's overrides (DS-1..DS-9). Nothing under 17 pt (DS-2). RN Text scales with the
 // phone's text size (Dynamic Type / Android font scale) because we never turn allowFontScaling off.

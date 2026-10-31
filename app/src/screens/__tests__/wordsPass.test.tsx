@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // WORDS-1..4 (grandparent-ux words pass, Oct 29; docs/product/decisions/2026-10-29-words-pass.md): words that must be
 // true for every sender, a refusal that says nothing was lost, a privacy line that reads as a whole sentence, and a
 // group name that never wraps around its count.

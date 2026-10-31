@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Share: pick → caption → "Who can see it" → Post (BETA-SHARE-1, BETA-AUD-1/2).
 import React, { useEffect, useMemo, useState } from 'react';
 import { Image, View } from 'react-native';

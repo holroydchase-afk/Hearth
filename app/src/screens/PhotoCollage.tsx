@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MOMENT-2: a moment's photos as one collage, so the whole upload shows at once (like Facebook or FamilyAlbum).
 // 1 photo alone in its own shape (between 4:5 tall and 1.91:1 wide), 2 side by side, 3 = one big and two,
 // 4 or more = one big and three, the last saying "+5". Every photo fills its tile (no grey bars); tapping

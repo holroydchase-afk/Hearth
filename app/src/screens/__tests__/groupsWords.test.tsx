@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // grandparent-ux review of the SPEC-GROUPS first build (Oct 17). Written first: red until the screens catch up.
 // UX-G1..G6 are this review's acceptance criteria; the BETA ID each serves is in the title.
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';

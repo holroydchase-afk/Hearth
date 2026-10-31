@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-AUD-2 / B8: the share sheet preselects THIS user's last audience, never anyone else's.
 // The key includes the user id so two people on one phone never inherit each other's choice.
 import type { KV } from '../platform/kv';
