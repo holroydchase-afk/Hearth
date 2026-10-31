@@ -1,5 +1,5 @@
 -- scripts/family-setup.sql (milestone 1 + 2 setup): Chase's space, the starter
--- groups, an invite for the test viewer and a poster ("adult") invite for Danielle.
+-- groups, an invite for the test viewer and a poster ("adult") invite for Mom.
 -- Runs against a FRESH db: stub -> migrations -> seed -> this file (see tests/run.sh).
 \set ON_ERROR_STOP 1
 set client_min_messages = warning;
@@ -12,7 +12,7 @@ insert into auth.users (id, email, raw_user_meta_data) values
   ('e0000000-0000-0000-0000-0000000000e1', 'chase@example.com', '{"display_name":"Chase"}');
 
 \set chase_email 'chase@example.com'
-\set danielle_email 'danielle@example.com'
+\set mom_email 'mom@example.com'
 \set space_name 'Our kids'
 \o /dev/null
 \ir ../scripts/family-setup.sql
@@ -24,15 +24,15 @@ select tests.ok((select count(*) = 1 from public.spaces s join public.space_memb
                 'M1 setup: Chase owns one space');
 select tests.ok((select array_agg(c.name order by c.name) from public.circles c join public.spaces s on s.id = c.space_id
                  where s.name = 'Our kids')
-                = array['Chase''s dad''s side', 'Chase''s mom''s side', 'Danielle''s dad''s side',
-                        'Danielle''s mom''s side', 'Everyone', 'Test viewer'],
+                = array['Chase''s dad''s side', 'Chase''s mom''s side', 'Everyone',
+                        'Mom''s dad''s side', 'Mom''s mom''s side', 'Test viewer'],
                 'M1 setup: the starter groups exist (Chase can rename them in the app)');
 select tests.ok((select count(*) = 1 from public.invites i join public.spaces s on s.id = i.space_id
                  where s.name = 'Our kids' and i.role = 'viewer'),
                 'M1 setup: one viewer invite for the test account');
 select tests.ok((select count(*) = 1 from public.invites i join public.spaces s on s.id = i.space_id
                  where s.name = 'Our kids' and i.role = 'adult'),
-                'M2 setup: one poster (adult) invite for Danielle');
+                'M2 setup: one poster (adult) invite for Mom');
 
 -- re-running changes nothing but adds fresh invites
 \o /dev/null

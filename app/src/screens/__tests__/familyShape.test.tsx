@@ -118,7 +118,7 @@ describe('BETA-REPLY-12 the per-group reply switch is gone', () => {
 });
 
 describe('BETA-REPLY-11 the comment box names who will read it', () => {
-  const READERS = ['Memaw', 'Pawpaw', 'Granny', 'Chase', 'Danielle'];
+  const READERS = ['Memaw', 'Pawpaw', 'Granny', 'Chase', 'Mom'];
 
   async function photosWithReaders() {
     const be = FakeBackend.withFixture();
@@ -131,11 +131,11 @@ describe('BETA-REPLY-11 the comment box names who will read it', () => {
     return { id, replyReaders };
   }
 
-  it('BETA-REPLY-11 before sending: "Memaw, Pawpaw, Granny, Chase and Danielle will read this."', async () => {
+  it('BETA-REPLY-11 before sending: "Memaw, Pawpaw, Granny, Chase and Mom will read this."', async () => {
     const { id, replyReaders } = await photosWithReaders();
     await waitFor(() => expect(replyReaders).toHaveBeenCalledWith(id));
     const card = screen.getByTestId(`post-${id}`);
-    expect(await within(card).findByText('Memaw, Pawpaw, Granny, Chase and Danielle will read this.')).toBeTruthy();
+    expect(await within(card).findByText('Memaw, Pawpaw, Granny, Chase and Mom will read this.')).toBeTruthy();
     // never a vague "everyone", never a group name
     expect(within(card).queryByText(/everyone|Grandparents/i)).toBeNull();
   });
@@ -145,7 +145,7 @@ describe('BETA-REPLY-11 the comment box names who will read it', () => {
     const card = screen.getByTestId(`post-${id}`);
     fireEvent.changeText(within(card).getByLabelText('Write something back to Chase'), 'So cute!');
     fireEvent.press(within(card).getByRole('button', { name: 'Send' }));
-    expect(await within(card).findByText(/Memaw, Pawpaw, Granny, Chase and Danielle (will )?read it/)).toBeTruthy();
+    expect(await within(card).findByText(/Memaw, Pawpaw, Granny, Chase and Mom (will )?read it/)).toBeTruthy();
   });
 });
 

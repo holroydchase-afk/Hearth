@@ -166,7 +166,7 @@ textarea { font: inherit; color: var(--ink); background: var(--surface); border:
 
   // People (Chase's family; ranking in docs/product/PERSONA-CHECK.md)
   const P = {
-    Chase: '#3A6FD8', Danielle: '#B4489A', Kate: '#2E8B6E', Gigi: '#C0392B', Scott: '#8E5A2B', Susan: '#6A4FB3', Margaret: '#1F7A8C', John: '#7A7A2E', You: '#3A6FD8',
+    Chase: '#3A6FD8', Mom: '#B4489A', Tess: '#2E8B6E', Gigi: '#C0392B', Grandaddy: '#8E5A2B', Memaw: '#6A4FB3', Grandmomma: '#1F7A8C', Pawpaw: '#7A7A2E', You: '#3A6FD8',
   };
   const avatar = (n, cls = '') => `<span class="avatar ${cls}" style="background:${P[n] || '#666'}" aria-hidden="true">${n[0]}</span>`;
 
@@ -208,20 +208,20 @@ textarea { font: inherit; color: var(--ink); background: var(--surface); border:
   const photos = (scene, list) => list.split('').map((k, i) => ({ scene, seed: i + scene.length, w: shapes[k][0], h: shapes[k][1] }));
   let moments = [
     { by: 'Chase', when: '12 minutes ago', to: "Everyone", cap: 'Pumpkin patch with Mia and Leo 🎃', photos: photos('pumpkins', 'LPPSLLWPP'),
-      react: { love: 3, haha: 1, like: 0 }, comments: [['Gigi', 'Look at those cheeks!! Leo is getting so big.'], ['Scott', 'Mia picked the biggest one of course']] },
-    { by: 'Danielle', when: 'Yesterday at 6:40 PM', to: "Grandparents – Mom's side", cap: 'First time making pancakes by herself', photos: photos('kitchen', 'P'),
-      react: { love: 4, haha: 0, like: 1 }, comments: [['Susan', 'A chef already! Save me one.']] },
+      react: { love: 3, haha: 1, like: 0 }, comments: [['Gigi', 'Look at those cheeks!! Leo is getting so big.'], ['Grandaddy', 'Mia picked the biggest one of course']] },
+    { by: 'Mom', when: 'Yesterday at 6:40 PM', to: "Grandparents – Mom's side", cap: 'First time making pancakes by herself', photos: photos('kitchen', 'P'),
+      react: { love: 4, haha: 0, like: 1 }, comments: [['Memaw', 'A chef already! Save me one.']] },
     { by: 'Chase', when: 'Sat, Oct 17', to: 'Everyone', event: "Leo's 5th birthday", eventCount: 42, cap: 'Blowing out the candles', photos: photos('cake', 'LP'),
-      react: { love: 6, haha: 2, like: 1 }, comments: [['Margaret', 'Happy birthday sweet boy!'], ['Gigi', 'Wish we could have been there'], ['John', 'Five! Where does the time go']] },
-    { by: 'Kate', when: 'Fri, Oct 16', to: 'Cousins', cap: 'Park day with the cousins', photos: photos('park', 'LLP'),
+      react: { love: 6, haha: 2, like: 1 }, comments: [['Grandmomma', 'Happy birthday sweet boy!'], ['Gigi', 'Wish we could have been there'], ['Pawpaw', 'Five! Where does the time go']] },
+    { by: 'Tess', when: 'Fri, Oct 16', to: 'Cousins', cap: 'Park day with the cousins', photos: photos('park', 'LLP'),
       react: { love: 2, haha: 0, like: 2 }, comments: [] },
     { by: 'Chase', when: 'Wed, Oct 14', to: "Grandparents – Dad's side", cap: '', photos: photos('dusk', 'W'),
       react: { love: 1, haha: 0, like: 0 }, comments: [] },
   ];
   const older = [
-    { by: 'Danielle', when: 'Sun, Oct 11', to: 'Everyone', cap: 'Beach weekend', photos: photos('beach', 'LPLP'), react: { love: 5, haha: 0, like: 0 }, comments: [['Scott', 'Wish I was there!']] },
+    { by: 'Mom', when: 'Sun, Oct 11', to: 'Everyone', cap: 'Beach weekend', photos: photos('beach', 'LPLP'), react: { love: 5, haha: 0, like: 0 }, comments: [['Grandaddy', 'Wish I was there!']] },
     { by: 'Chase', when: 'Sat, Oct 3', to: 'Everyone', cap: 'Mia lost her first tooth', photos: photos('kitchen', 'S'), react: { love: 7, haha: 3, like: 0 }, comments: [['Gigi', 'The tooth fairy is coming!']] },
-    { by: 'Kate', when: 'Mon, Sep 28', to: 'Cousins', cap: '', photos: photos('park', 'PPLLPP'), react: { love: 2, haha: 0, like: 1 }, comments: [] },
+    { by: 'Tess', when: 'Mon, Sep 28', to: 'Cousins', cap: '', photos: photos('park', 'PPLLPP'), react: { love: 2, haha: 0, like: 1 }, comments: [] },
     { by: 'Chase', when: 'Last winter', to: 'Everyone', cap: 'Snow day!', photos: photos('snow', 'LP'), react: { love: 4, haha: 1, like: 0 }, comments: [] },
   ];
   moments.forEach((m, i) => { m.id = 'm' + i; m.mine = m.by === 'Chase'; m.my = null; });
@@ -313,8 +313,8 @@ textarea { font: inherit; color: var(--ink); background: var(--surface); border:
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && layer.firstChild) closeLayer(); });
 
   function readers(m) {
-    const map = { Everyone: 'Chase, Danielle, Gigi, Scott, Susan, Margaret and John', "Grandparents – Mom's side": 'Chase, Danielle, Susan and John',
-      "Grandparents – Dad's side": 'Chase, Danielle, Gigi and Scott', Cousins: 'Kate, Chase, Danielle and the cousins' };
+    const map = { Everyone: 'Chase, Mom, Gigi, Grandaddy, Memaw, Grandmomma and Pawpaw', "Grandparents – Mom's side": 'Chase, Mom, Memaw and Pawpaw',
+      "Grandparents – Dad's side": 'Chase, Mom, Gigi and Grandaddy', Cousins: 'Tess, Chase, Mom and the cousins' };
     return map[m.to] || 'The family this was shared with';
   }
 

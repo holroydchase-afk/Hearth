@@ -88,7 +88,7 @@ export function EventsScreen({ posts, view, hasMore, loadingMore, onLoadMore, on
   );
 }
 
-/** EVT-7: one moment: "3:10 pm · 14 photos from Danielle, Rachel and Susan", a swipe through its photos, and under
+/** EVT-7: one moment: "3:10 pm · 14 photos from Mom, Rachel and Sue", a swipe through its photos, and under
  *  each photo who it is from (and its post's caption). */
 function Moment({ row, swipeId, posts }: { row: Extract<EventTimelineRow, { type: 'moment' }>; swipeId: string; posts: FeedPost[] }) {
   const byMedia = new Map<string, EventPhoto>(row.photos.map((p) => [p.media.media_id, p]));

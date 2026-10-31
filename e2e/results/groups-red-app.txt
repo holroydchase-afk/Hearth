@@ -1032,7 +1032,7 @@ FAIL src/screens/__tests__/familyShape.test.tsx (9.901 s)
 
       at Object.toBeUndefined (src/screens/__tests__/familyShape.test.tsx:84:39)
 
-  ● BETA-REPLY-11 the comment box names who will read it › BETA-REPLY-11 before sending: "Memaw, Pawpaw, Granny, Chase and Danielle will read this."
+  ● BETA-REPLY-11 the comment box names who will read it › BETA-REPLY-11 before sending: "Memaw, Pawpaw, Granny, Chase and Mom will read this."
 
     expect(jest.fn()).toHaveBeenCalledWith(...expected)
 
@@ -1040,12 +1040,12 @@ FAIL src/screens/__tests__/familyShape.test.tsx (9.901 s)
 
     Number of calls: 0
 
-      102 |   it('BETA-REPLY-11 before sending: "Memaw, Pawpaw, Granny, Chase and Danielle will read this."', async () => {
+      102 |   it('BETA-REPLY-11 before sending: "Memaw, Pawpaw, Granny, Chase and Mom will read this."', async () => {
       103 |     const { id, replyReaders } = await photosWithReaders();
     > 104 |     await waitFor(() => expect(replyReaders).toHaveBeenCalledWith(id));
           |                  ^
       105 |     const card = screen.getByTestId(`post-${id}`);
-      106 |     expect(await within(card).findByText('Memaw, Pawpaw, Granny, Chase and Danielle will read this.')).toBeTruthy();
+      106 |     expect(await within(card).findByText('Memaw, Pawpaw, Granny, Chase and Mom will read this.')).toBeTruthy();
       107 |     // never a vague "everyone", never a group name
 
       at Object.<anonymous> (src/screens/__tests__/familyShape.test.tsx:104:18)
@@ -1054,7 +1054,7 @@ FAIL src/screens/__tests__/familyShape.test.tsx (9.901 s)
 
   ● BETA-REPLY-11 the comment box names who will read it › BETA-REPLY-11 after Send it still names them
 
-    Unable to find an element with text: /Memaw, Pawpaw, Granny, Chase and Danielle (will )?read it/
+    Unable to find an element with text: /Memaw, Pawpaw, Granny, Chase and Mom (will )?read it/
 
     <RNCSafeAreaView>
       <RCTScrollView>
@@ -1198,7 +1198,7 @@ FAIL src/screens/__tests__/familyShape.test.tsx (9.901 s)
 
       114 |     fireEvent.changeText(within(card).getByLabelText('Write something back to Chase'), 'So cute!');
       115 |     fireEvent.press(within(card).getByRole('button', { name: 'Send' }));
-    > 116 |     expect(await within(card).findByText(/Memaw, Pawpaw, Granny, Chase and Danielle (will )?read it/)).toBeTruthy();
+    > 116 |     expect(await within(card).findByText(/Memaw, Pawpaw, Granny, Chase and Mom (will )?read it/)).toBeTruthy();
           |                               ^
       117 |   });
       118 | });

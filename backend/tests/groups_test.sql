@@ -3,12 +3,12 @@
 -- (privacy review, Oct 17). Written FIRST (qa-tdd, Oct 17): red until 0011 lands.
 --
 -- Fixture: Chase's real family shape (SPEC-GROUPS section 2, PERSONAS names) in its own space "Hearth family".
---   Parents:  Chase (owner), Danielle (adult).
+--   Parents:  Chase (owner), Mom (adult).
 --   Chase's side    (group): Gammy's house [Gammy]; Grandaddy and Grandmomma's house [Grandaddy, Grandmomma];
 --                            Gigi and Bebar's house [Gigi, Bebar].
---   Danielle's side (group): Memaw's house [Memaw, Danielle's sister]; Pawpaw and Granny's house
---                            [Pawpaw, Granny, Danielle's sister]; Grandma Phyllis's house [Grandma Phyllis].
---   Danielle's sister also has her own house (not under any group), linked to the Charleston trip.
+--   Mom's side (group): Memaw's house [Memaw, Mom's sister]; Pawpaw and Granny's house
+--                            [Pawpaw, Granny, Mom's sister]; Great-Grandma's house [Great-Grandma].
+--   Mom's sister also has her own house (not under any group), linked to the Charleston trip.
 --   Charleston trip    (event): Pawpaw and Granny's house + the sister's house.
 --   Birthday at Gigi's (event): Grandaddy and Grandmomma's house, Gigi and Bebar's house, Pawpaw and Granny's house.
 --   Everyone: every relative who joined by invite, plus the parents.
@@ -36,7 +36,7 @@
 create table tests.people (k text primary key, id uuid not null, name text not null, role public.member_role not null);
 insert into tests.people values
   ('chase',      'f0000000-0000-0000-0000-000000000001', 'Chase',              'owner'),
-  ('danielle',   'f0000000-0000-0000-0000-000000000002', 'Danielle',           'adult'),
+  ('mom',   'f0000000-0000-0000-0000-000000000002', 'Mom',           'adult'),
   ('gammy',      'f0000000-0000-0000-0000-000000000011', 'Gammy',              'viewer'),
   ('grandaddy',  'f0000000-0000-0000-0000-000000000012', 'Grandaddy',          'viewer'),
   ('grandmomma', 'f0000000-0000-0000-0000-000000000013', 'Grandmomma',         'viewer'),
@@ -45,8 +45,8 @@ insert into tests.people values
   ('memaw',      'f0000000-0000-0000-0000-000000000021', 'Memaw',              'viewer'),
   ('pawpaw',     'f0000000-0000-0000-0000-000000000022', 'Pawpaw',             'viewer'),
   ('granny',     'f0000000-0000-0000-0000-000000000023', 'Granny',             'viewer'),
-  ('phyllis',    'f0000000-0000-0000-0000-000000000024', 'Grandma Phyllis',    'viewer'),
-  ('sister',     'f0000000-0000-0000-0000-000000000025', 'Danielle''s sister', 'viewer');
+  ('ggma',    'f0000000-0000-0000-0000-000000000024', 'Great-Grandma',    'viewer'),
+  ('sister',     'f0000000-0000-0000-0000-000000000025', 'Mom''s sister', 'viewer');
 grant select on tests.people to authenticated;
 
 create function tests.u(p_k text) returns uuid language sql stable as $$ select id from tests.people where k = p_k $$;
@@ -237,13 +237,13 @@ select tests.ok(to_regprocedure('public.reply_readers(uuid)') is not null
 -- ======================================================================
 insert into auth.users (id, email, raw_user_meta_data)
 select id, k || '@hearth.test', jsonb_build_object('display_name', name) from tests.people;
-insert into public.households (id, name, created_by) values ('11111111-0000-0000-0000-0000000000f0', 'Chase and Danielle', tests.u('chase'));
+insert into public.households (id, name, created_by) values ('11111111-0000-0000-0000-0000000000f0', 'Chase and Mom', tests.u('chase'));
 insert into public.household_members (household_id, user_id, role) values ('11111111-0000-0000-0000-0000000000f0', tests.u('chase'), 'admin');
 insert into public.spaces (id, household_id, name, plan, created_by)
 values (:space_h, '11111111-0000-0000-0000-0000000000f0', 'Hearth family', 'family', tests.u('chase'));
 insert into public.space_members (space_id, user_id, role, invited_by) values
   (:space_h, tests.u('chase'), 'owner', null),
-  (:space_h, tests.u('danielle'), 'adult', tests.u('chase'));
+  (:space_h, tests.u('mom'), 'adult', tests.u('chase'));
 -- One Everyone per space (0011 may create it with the space; if not, make it here)
 select tests.try($$insert into public.circles (space_id, name, kind, created_by)
                    select '22222222-0000-0000-0000-0000000000f0', 'Everyone', 'everyone', 'f0000000-0000-0000-0000-000000000001'
@@ -251,14 +251,14 @@ select tests.try($$insert into public.circles (space_id, name, kind, created_by)
 select tests.setv('all', $$select id from public.circles where space_id = '22222222-0000-0000-0000-0000000000f0' and kind = 'everyone'$$);
 
 select tests.level('g_chase', 'group', 'Chase''s side');
-select tests.level('g_dan',   'group', 'Danielle''s side');
+select tests.level('g_dan',   'group', 'Mom''s side');
 select tests.level('h_gammy', 'household', 'Gammy''s house');
 select tests.level('h_gg',    'household', 'Grandaddy and Grandmomma''s house');
 select tests.level('h_gigi',  'household', 'Gigi and Bebar''s house');
 select tests.level('h_memaw', 'household', 'Memaw''s house');
 select tests.level('h_pg',    'household', 'Pawpaw and Granny''s house');
-select tests.level('h_phyl',  'household', 'Grandma Phyllis''s house');
-select tests.level('h_sis',   'household', 'Danielle''s sister''s house');
+select tests.level('h_phyl',  'household', 'Great-Grandma''s house');
+select tests.level('h_sis',   'household', 'Mom''s sister''s house');
 select tests.level('e_chs',   'event', 'Charleston trip');
 select tests.level('e_bday',  'event', 'Birthday at Gigi''s');
 select tests.link('g_chase', 'h_gammy'); select tests.link('g_chase', 'h_gg'); select tests.link('g_chase', 'h_gigi');
@@ -274,7 +274,7 @@ select tests.join('gigi', 'h_gigi', 'new');       -- "Only new photos": T = her 
 select tests.join('memaw', 'h_memaw', 'all');
 select tests.join('pawpaw', 'h_pg', 'all');
 select tests.join('granny', 'h_pg', 'all');
-select tests.join('phyllis', 'h_phyl', 'all');
+select tests.join('ggma', 'h_phyl', 'all');
 select tests.join('sister', 'h_memaw', 'all');
 select tests.place('h_pg', 'sister');            -- the sibling workaround: in both of her parents' houses
 select tests.place('h_sis', 'sister');
@@ -289,7 +289,7 @@ select tests.post('p_memaw', array['h_memaw']);
 select tests.post('p_chs',   array['e_chs']);
 select tests.post('p_bday',  array['e_bday']);
 select tests.post('p_mixed', array['all', 'e_chs']);
-select tests.post('p_dpost', array['all'], 'danielle');
+select tests.post('p_dpost', array['all'], 'mom');
 select tests.post('p_old',      array['all'],    'chase', coalesce(tests.v('t_gigi')::timestamptz, now()) - interval '30 days');
 select tests.post('p_old_gigi', array['h_gigi'], 'chase', coalesce(tests.v('t_gigi')::timestamptz, now()) - interval '29 days');
 select tests.post('p_bulk',     array['h_gigi'], 'chase', null, '2024-07-04 15:00Z');   -- old photo, bulk-imported after T
@@ -299,7 +299,7 @@ select tests.say('c_gammy',  'gammy',  'p_ev');   select tests.heart('gammy', 'p
 select tests.say('c_sis',    'sister', 'p_ev');
 select tests.say('c_memaw',  'memaw',  'p_ev');
 select tests.say('c_pawpaw', 'pawpaw', 'p_ev'); select tests.heart('pawpaw', 'p_ev');
-select tests.say('c_dan',    'danielle', 'p_ev'); select tests.heart('danielle', 'p_ev');
+select tests.say('c_dan',    'mom', 'p_ev'); select tests.heart('mom', 'p_ev');
 select tests.say('c_granny_chs', 'granny', 'p_chs');
 select tests.say('c_sis_chs',    'sister', 'p_chs');
 select tests.say('c_gd_bday',    'grandaddy', 'p_bday');
@@ -309,12 +309,12 @@ select tests.say('c_gammy_dp',   'gammy', 'p_dpost');
 select tests.say('c_bebar_old',  'bebar', 'p_old_gigi');
 
 -- ======================================================================
--- BETA-AUD-11: a post to Danielle's side reaches everyone placed under it, and nobody only under Chase's side
+-- BETA-AUD-11: a post to Mom's side reaches everyone placed under it, and nobody only under Chase's side
 -- ======================================================================
 select tests.ok(tests.sees('memaw', 'p_dan') and tests.sees('pawpaw', 'p_dan') and tests.sees('granny', 'p_dan')
-                and tests.sees('phyllis', 'p_dan') and tests.sees('sister', 'p_dan'),
-                'BETA-AUD-11 allowed: Memaw, Pawpaw, Granny, Grandma Phyllis and Danielle''s sister see the Danielle''s side post');
-select tests.ok(tests.sees('chase', 'p_dan') and tests.sees('danielle', 'p_dan'),
+                and tests.sees('ggma', 'p_dan') and tests.sees('sister', 'p_dan'),
+                'BETA-AUD-11 allowed: Memaw, Pawpaw, Granny, Great-Grandma and Mom''s sister see the Mom''s side post');
+select tests.ok(tests.sees('chase', 'p_dan') and tests.sees('mom', 'p_dan'),
                 'BETA-AUD-11 allowed: both parents see it');
 select tests.ok(not (tests.sees('gammy', 'p_dan') or tests.sees('grandaddy', 'p_dan') or tests.sees('grandmomma', 'p_dan')
                      or tests.sees('gigi', 'p_dan') or tests.sees('bebar', 'p_dan')),
@@ -322,25 +322,25 @@ select tests.ok(not (tests.sees('gammy', 'p_dan') or tests.sees('grandaddy', 'p_
 select tests.ok(tests.times(tests.feed('gammy'), 'p_dan') = 0 and tests.times(tests.feed('grandaddy'), 'p_dan') = 0
                 and tests.times(tests.feed('memaw'), 'p_dan') = 1,
                 'BETA-AUD-11 feed: Memaw gets it once; Gammy and Grandaddy never do');
-select tests.ok(tests.times(tests.tl('bebar'), 'p_dan') = 0 and tests.times(tests.tl('phyllis'), 'p_dan') = 1,
-                'BETA-AUD-11 timeline: Grandma Phyllis gets it; Bebar never does');
+select tests.ok(tests.times(tests.tl('bebar'), 'p_dan') = 0 and tests.times(tests.tl('ggma'), 'p_dan') = 1,
+                'BETA-AUD-11 timeline: Great-Grandma gets it; Bebar never does');
 :as_gammy
 select tests.ok_sql(format($$select count(*) = 0 from public.media_items where post_id = %L$$, tests.v('p_dan')),
-                    'BETA-AUD-11 media signer: Gammy can read no media row (no key, no URL) of the Danielle''s side post');
+                    'BETA-AUD-11 media signer: Gammy can read no media row (no key, no URL) of the Mom''s side post');
 :as_admin
 select tests.ok((select array_agg(o.recipient_id order by o.recipient_id) from public.notification_outbox o
                  where o.post_id = tests.c('p_dan') and o.kind = 'post')
-                = (select array_agg(id order by id) from tests.people where k in ('danielle', 'memaw', 'pawpaw', 'granny', 'phyllis', 'sister')),
-                'BETA-AUD-11 push and email: the post notice is queued for Danielle, Memaw, Pawpaw, Granny, Grandma Phyllis and the sister only (once each)');
+                = (select array_agg(id order by id) from tests.people where k in ('mom', 'memaw', 'pawpaw', 'granny', 'ggma', 'sister')),
+                'BETA-AUD-11 push and email: the post notice is queued for Mom, Memaw, Pawpaw, Granny, Great-Grandma and the sister only (once each)');
 select tests.ok(tests.sees('gammy', 'p_chase') and tests.sees('gigi', 'p_chase') and not tests.sees('memaw', 'p_chase') and not tests.sees('sister', 'p_chase'),
                 'BETA-AUD-11 both directions: the Chase''s side post reaches Gammy and Gigi, never Memaw or the sister');
 
 -- ======================================================================
--- BETA-AUD-12: Danielle's sister (two households) sees each post exactly once
+-- BETA-AUD-12: Mom's sister (two households) sees each post exactly once
 -- ======================================================================
 select tests.ok(tests.times(tests.feed('sister'), 'p_dan') = 1 and tests.times(tests.feed('sister'), 'p_pg') = 1
                 and tests.times(tests.feed('sister'), 'p_memaw') = 1 and tests.times(tests.feed('sister'), 'p_ev') = 1,
-                'BETA-AUD-12 feed: the sister gets the Danielle''s side, Pawpaw and Granny''s house, Memaw''s house and Everyone posts once each');
+                'BETA-AUD-12 feed: the sister gets the Mom''s side, Pawpaw and Granny''s house, Memaw''s house and Everyone posts once each');
 select tests.ok(tests.times(tests.tl('sister'), 'p_dan') = 1 and tests.times(tests.tl('sister'), 'p_pg') = 1
                 and tests.times(tests.tl('sister'), 'p_memaw') = 1 and tests.times(tests.tl('sister'), 'p_ev') = 1,
                 'BETA-AUD-12 timeline: the same four posts once each');
@@ -353,12 +353,12 @@ select tests.ok(tests.sees('memaw', 'p_memaw') and not tests.sees('pawpaw', 'p_m
 -- BETA-AUD-18: the Charleston trip event
 -- ======================================================================
 select tests.ok(tests.sees('pawpaw', 'p_chs') and tests.sees('granny', 'p_chs') and tests.sees('sister', 'p_chs')
-                and tests.sees('chase', 'p_chs') and tests.sees('danielle', 'p_chs'),
-                'BETA-AUD-18 allowed: John (Pawpaw), Anna (Granny), the sister and both parents see the Charleston trip post');
-select tests.ok(not (tests.sees('memaw', 'p_chs') or tests.sees('gammy', 'p_chs') or tests.sees('phyllis', 'p_chs')),
-                'BETA-AUD-18 excluded: Memaw, Gammy and Grandma Phyllis don''t');
+                and tests.sees('chase', 'p_chs') and tests.sees('mom', 'p_chs'),
+                'BETA-AUD-18 allowed: Pawpaw, Granny, the sister and both parents see the Charleston trip post');
+select tests.ok(not (tests.sees('memaw', 'p_chs') or tests.sees('gammy', 'p_chs') or tests.sees('ggma', 'p_chs')),
+                'BETA-AUD-18 excluded: Memaw, Gammy and Great-Grandma don''t');
 select tests.ok(tests.sees('pawpaw', 'p_dan') and tests.sees('pawpaw', 'p_ev') and tests.sees('sister', 'p_dan'),
-                'BETA-AUD-18: the same people still get Danielle''s side and Everyone posts');
+                'BETA-AUD-18: the same people still get Mom''s side and Everyone posts');
 select tests.ok(tests.sees('grandaddy', 'p_bday') and tests.sees('gigi', 'p_bday') and tests.sees('granny', 'p_bday')
                 and not tests.sees('gammy', 'p_bday') and not tests.sees('memaw', 'p_bday'),
                 'BETA-AUD-18 Birthday at Gigi''s: Grandaddy, Gigi and Granny see it; Gammy and Memaw never do');
@@ -447,21 +447,21 @@ select tests.ok(not exists (select 1 from tests.claimed where recipient_id = tes
 -- ======================================================================
 -- BETA-REPLY-7: household rule. Post to Everyone; Gammy comments and hearts.
 -- ======================================================================
-select tests.ok(tests.reads('chase', 'c_gammy') and tests.reads('danielle', 'c_gammy') and tests.reads('gammy', 'c_gammy'),
-                'BETA-REPLY-7 allowed: Chase (author, parent), Danielle (parent) and Gammy''s household (Gammy) read her comment');
+select tests.ok(tests.reads('chase', 'c_gammy') and tests.reads('mom', 'c_gammy') and tests.reads('gammy', 'c_gammy'),
+                'BETA-REPLY-7 allowed: Chase (author, parent), Mom (parent) and Gammy''s household (Gammy) read her comment');
 select tests.ok(not tests.reads('grandaddy', 'c_gammy') and not tests.reads('grandmomma', 'c_gammy') and not tests.reads('memaw', 'c_gammy'),
                 'BETA-REPLY-7 excluded: Grandaddy, Grandmomma (and Memaw) don''t read Gammy''s comment');
-select tests.ok(tests.reads_heart('chase', 'p_ev', 'gammy') and tests.reads_heart('danielle', 'p_ev', 'gammy')
+select tests.ok(tests.reads_heart('chase', 'p_ev', 'gammy') and tests.reads_heart('mom', 'p_ev', 'gammy')
                 and not tests.reads_heart('grandaddy', 'p_ev', 'gammy') and not tests.reads_heart('grandmomma', 'p_ev', 'gammy'),
                 'BETA-REPLY-7 hearts: the parents see Gammy''s heart; Grandaddy and Grandmomma don''t');
 select tests.ok(tests.counts('grandaddy', 'p_ev') = '1:1' and tests.counts('gammy', 'p_ev') = '2:2' and tests.counts('chase', 'p_ev') = '3:5',
-                'BETA-REPLY-7 counts leave hidden replies out: Grandaddy 1 heart 1 comment (Danielle''s), Gammy 2:2, Chase 3:5');
+                'BETA-REPLY-7 counts leave hidden replies out: Grandaddy 1 heart 1 comment (Mom''s), Gammy 2:2, Chase 3:5');
 
 -- ======================================================================
 -- BETA-REPLY-8: event rule (Event, SPEC-GROUPS question 1)
 -- ======================================================================
 select tests.ok(tests.reads('pawpaw', 'c_granny_chs') and tests.reads('sister', 'c_granny_chs')
-                and tests.reads('chase', 'c_granny_chs') and tests.reads('danielle', 'c_granny_chs'),
+                and tests.reads('chase', 'c_granny_chs') and tests.reads('mom', 'c_granny_chs'),
                 'BETA-REPLY-8 allowed: Granny''s comment on the Charleston trip reaches Pawpaw, the sister (event rule), the parents and the author');
 select tests.ok(not coalesce(tests.reads('memaw', 'c_granny_chs'), true),
                 'BETA-REPLY-8 excluded: Memaw (can''t see the post at all) doesn''t read it');
@@ -470,7 +470,7 @@ select tests.ok(tests.reads('grandmomma', 'c_gd_bday') and tests.reads('gigi', '
                 'BETA-REPLY-8 Birthday at Gigi''s: Grandaddy''s comment reaches Grandmomma, Gigi, Bebar, Pawpaw and Granny (everyone in the event)');
 select tests.ok(not coalesce(tests.reads('gammy', 'c_gd_bday'), true) and not coalesce(tests.reads('memaw', 'c_gd_bday'), true),
                 'BETA-REPLY-8 Birthday at Gigi''s: Gammy and Memaw never read it');
-select tests.ok(tests.reads('pawpaw', 'c_granny_mix') and tests.reads('sister', 'c_granny_mix') and tests.reads('danielle', 'c_granny_mix'),
+select tests.ok(tests.reads('pawpaw', 'c_granny_mix') and tests.reads('sister', 'c_granny_mix') and tests.reads('mom', 'c_granny_mix'),
                 'BETA-REPLY-8 mixed audience (Everyone + Charleston trip): Granny''s comment reaches the event (Pawpaw, the sister) and the parents');
 select tests.ok(tests.sees('memaw', 'p_mixed') and not tests.reads('memaw', 'c_granny_mix') and not tests.reads('gammy', 'c_granny_mix'),
                 'BETA-REPLY-8 mixed audience: Memaw sees the photo but not Granny''s comment; nor does Gammy');
@@ -479,29 +479,29 @@ select tests.ok(tests.sees('memaw', 'p_mixed') and not tests.reads('memaw', 'c_g
 -- BETA-REPLY-9: the sibling table (no relay); privacy item 4: direct placements only
 -- ======================================================================
 select tests.ok(tests.reads('memaw', 'c_sis') and tests.reads('pawpaw', 'c_sis') and tests.reads('granny', 'c_sis')
-                and tests.reads('chase', 'c_sis') and tests.reads('danielle', 'c_sis'),
-                'BETA-REPLY-9: the sister''s comment reaches Memaw, Pawpaw, Granny, Chase and Danielle');
-select tests.ok(not tests.reads('gammy', 'c_sis') and not tests.reads('grandaddy', 'c_sis') and not tests.reads('phyllis', 'c_sis'),
-                'BETA-REPLY-9: ... and not Gammy, Grandaddy or Grandma Phyllis');
-select tests.ok(tests.reads('sister', 'c_memaw') and tests.reads('chase', 'c_memaw') and tests.reads('danielle', 'c_memaw'),
-                'BETA-REPLY-9: Memaw''s comment reaches the sister, Chase and Danielle');
+                and tests.reads('chase', 'c_sis') and tests.reads('mom', 'c_sis'),
+                'BETA-REPLY-9: the sister''s comment reaches Memaw, Pawpaw, Granny, Chase and Mom');
+select tests.ok(not tests.reads('gammy', 'c_sis') and not tests.reads('grandaddy', 'c_sis') and not tests.reads('ggma', 'c_sis'),
+                'BETA-REPLY-9: ... and not Gammy, Grandaddy or Great-Grandma');
+select tests.ok(tests.reads('sister', 'c_memaw') and tests.reads('chase', 'c_memaw') and tests.reads('mom', 'c_memaw'),
+                'BETA-REPLY-9: Memaw''s comment reaches the sister, Chase and Mom');
 select tests.ok(not tests.reads('pawpaw', 'c_memaw') and not tests.reads('granny', 'c_memaw'),
                 'BETA-REPLY-9 no relay: Memaw''s comment does NOT reach Pawpaw or Granny (the sister doesn''t bridge the houses)');
 select tests.ok(tests.reads('granny', 'c_pawpaw') and tests.reads('sister', 'c_pawpaw') and not tests.reads('memaw', 'c_pawpaw'),
                 'BETA-REPLY-9 no relay: Pawpaw''s comment reaches Granny and the sister, but not Memaw');
 select tests.ok(tests.reads_heart('granny', 'p_ev', 'pawpaw') and tests.reads_heart('sister', 'p_ev', 'pawpaw') and not tests.reads_heart('memaw', 'p_ev', 'pawpaw'),
                 'BETA-REPLY-9 hearts: Pawpaw''s heart reaches Granny and the sister, not Memaw');
-select tests.ok(tests.reads('sister', 'c_memaw_dan') and not tests.reads('phyllis', 'c_memaw_dan') and not tests.reads('pawpaw', 'c_memaw_dan'),
-                'privacy item 4: on a Danielle''s side post, Memaw''s comment does not reach Grandma Phyllis or Pawpaw (a group never passes replies along)');
+select tests.ok(tests.reads('sister', 'c_memaw_dan') and not tests.reads('ggma', 'c_memaw_dan') and not tests.reads('pawpaw', 'c_memaw_dan'),
+                'privacy item 4: on a Mom''s side post, Memaw''s comment does not reach Great-Grandma or Pawpaw (a group never passes replies along)');
 
 -- ======================================================================
 -- BETA-REPLY-10: parents
 -- ======================================================================
-select tests.ok(tests.reads('gammy', 'c_dan') and tests.reads('grandaddy', 'c_dan') and tests.reads('phyllis', 'c_dan')
-                and tests.reads('gigi', 'c_dan') and tests.reads_heart('grandmomma', 'p_ev', 'danielle'),
-                'BETA-REPLY-10: Danielle''s comment and heart on an Everyone post reach everyone who can see it');
-select tests.ok(tests.reads('chase', 'c_gammy_dp') and tests.reads('danielle', 'c_gammy_dp') and not tests.reads('memaw', 'c_gammy_dp'),
-                'BETA-REPLY-10 / rule 4: on Danielle''s post, Gammy''s comment reaches Danielle (author) and Chase, not Memaw');
+select tests.ok(tests.reads('gammy', 'c_dan') and tests.reads('grandaddy', 'c_dan') and tests.reads('ggma', 'c_dan')
+                and tests.reads('gigi', 'c_dan') and tests.reads_heart('grandmomma', 'p_ev', 'mom'),
+                'BETA-REPLY-10: Mom''s comment and heart on an Everyone post reach everyone who can see it');
+select tests.ok(tests.reads('chase', 'c_gammy_dp') and tests.reads('mom', 'c_gammy_dp') and not tests.reads('memaw', 'c_gammy_dp'),
+                'BETA-REPLY-10 / rule 4: on Mom''s post, Gammy''s comment reaches Mom (author) and Chase, not Memaw');
 create function tests.parent_reads_all(p_who text) returns boolean language plpgsql as $$
 declare ok boolean;
 begin
@@ -511,24 +511,24 @@ begin
   where p.space_id = '22222222-0000-0000-0000-0000000000f0' and c.deleted_at is null and public.can_view_post(c.post_id);
   return ok;
 end $$;
-select tests.ok(tests.parent_reads_all('chase') and tests.parent_reads_all('danielle'),
-                'BETA-REPLY-10: a parent reads every reply on every post they can see (Chase and Danielle)');
+select tests.ok(tests.parent_reads_all('chase') and tests.parent_reads_all('mom'),
+                'BETA-REPLY-10: a parent reads every reply on every post they can see (Chase and Mom)');
 
 -- ======================================================================
 -- BETA-REPLY-11: reply_readers names exactly who the server allows
 -- ======================================================================
-select tests.ok(tests.readers('sister', 'p_ev') = tests.names(array['Memaw', 'Pawpaw', 'Granny', 'Chase', 'Danielle']),
-                'BETA-REPLY-11 sibling: reply_readers for the sister on an Everyone post = Memaw, Pawpaw, Granny, Chase, Danielle');
-select tests.ok(tests.readers('gammy', 'p_ev') = tests.names(array['Chase', 'Danielle']),
-                'BETA-REPLY-11 household of one: Gammy''s readers on an Everyone post = Chase, Danielle');
-select tests.ok(tests.readers('granny', 'p_chs') = tests.names(array['Pawpaw', 'Danielle''s sister', 'Chase', 'Danielle']),
-                'BETA-REPLY-11 event: Granny''s readers on the Charleston trip = Pawpaw, the sister, Chase, Danielle');
-select tests.ok(tests.readers('pawpaw', 'p_ev') = tests.names(array['Granny', 'Danielle''s sister', 'Chase', 'Danielle']),
-                'BETA-REPLY-11 household: Pawpaw''s readers on an Everyone post = Granny, the sister, Chase, Danielle');
-select tests.ok(cardinality(tests.readers('danielle', 'p_ev')) = 11
-                and not ('Danielle' = any (tests.readers('danielle', 'p_ev')))
-                and not ('Gigi' = any (tests.readers('danielle', 'p_old'))),
-                'BETA-REPLY-11 parent: Danielle''s readers on an Everyone post = all 11 others; on a pre-T post, not Gigi (privacy item 7)');
+select tests.ok(tests.readers('sister', 'p_ev') = tests.names(array['Memaw', 'Pawpaw', 'Granny', 'Chase', 'Mom']),
+                'BETA-REPLY-11 sibling: reply_readers for the sister on an Everyone post = Memaw, Pawpaw, Granny, Chase, Mom');
+select tests.ok(tests.readers('gammy', 'p_ev') = tests.names(array['Chase', 'Mom']),
+                'BETA-REPLY-11 household of one: Gammy''s readers on an Everyone post = Chase, Mom');
+select tests.ok(tests.readers('granny', 'p_chs') = tests.names(array['Pawpaw', 'Mom''s sister', 'Chase', 'Mom']),
+                'BETA-REPLY-11 event: Granny''s readers on the Charleston trip = Pawpaw, the sister, Chase, Mom');
+select tests.ok(tests.readers('pawpaw', 'p_ev') = tests.names(array['Granny', 'Mom''s sister', 'Chase', 'Mom']),
+                'BETA-REPLY-11 household: Pawpaw''s readers on an Everyone post = Granny, the sister, Chase, Mom');
+select tests.ok(cardinality(tests.readers('mom', 'p_ev')) = 11
+                and not ('Mom' = any (tests.readers('mom', 'p_ev')))
+                and not ('Gigi' = any (tests.readers('mom', 'p_old'))),
+                'BETA-REPLY-11 parent: Mom''s readers on an Everyone post = all 11 others; on a pre-T post, not Gigi (privacy item 7)');
 select tests.ok(tests.qb('memaw', format('select public.reply_readers(%L) is null', tests.v('p_chs'))),
                 'BETA-REPLY-11 / privacy item 7: reply_readers on a post Memaw can''t see is null ("not found")');
 create function tests.readers_match(p_who text, p_post uuid) returns boolean language plpgsql as $$
@@ -576,8 +576,8 @@ select tests.ok(tests.v('p_gpost') is not null, 'BETA-REPLY-13: Gammy (relative,
 -- ======================================================================
 select tests.ok(tests.qb('chase', $$select public.can('22222222-0000-0000-0000-0000000000f0', 'send_to_everyone')$$),
                     'BETA-AUD-21: can(space, send_to_everyone) is true for Chase (owner)');
-select tests.ok(tests.qb('danielle', $$select public.can('22222222-0000-0000-0000-0000000000f0', 'send_to_everyone')$$),
-                    'BETA-AUD-21: ... and for Danielle (parent)');
+select tests.ok(tests.qb('mom', $$select public.can('22222222-0000-0000-0000-0000000000f0', 'send_to_everyone')$$),
+                    'BETA-AUD-21: ... and for Mom (parent)');
 select tests.ok(tests.qb('gammy', $$select not public.can('22222222-0000-0000-0000-0000000000f0', 'send_to_everyone')
                              and public.can('22222222-0000-0000-0000-0000000000f0', 'post')$$),
                     'BETA-AUD-21: Gammy (relative) can post (family switch on) but can''t send to Everyone');
@@ -589,9 +589,9 @@ select tests.ok(exists (select 1 from pg_policies where schemaname = 'public' an
                 'privacy item 2: the post_audiences insert policy calls can_send_to');
 select tests.ok(exists (select 1 from pg_proc where proname = 'can_send_to' and prosrc ~ 'public\.can\('),
                 'BETA-AUD-21: can_send_to goes through can(space, capability)');
-select tests.ok(tests.qb('danielle', $$select public.create_post(p_client_id => gen_random_uuid(), p_space => '22222222-0000-0000-0000-0000000000f0',
+select tests.ok(tests.qb('mom', $$select public.create_post(p_client_id => gen_random_uuid(), p_space => '22222222-0000-0000-0000-0000000000f0',
                              p_caption => 'to everyone', p_circle_ids => array[(select v::uuid from tests.vars where k = 'all')]) is not null$$),
-                    'BETA-AUD-21 allowed: Danielle (parent) sends to Everyone through create_post');
+                    'BETA-AUD-21 allowed: Mom (parent) sends to Everyone through create_post');
 select tests.ok(tests.qb('chase', $$select public.create_post(p_client_id => gen_random_uuid(), p_space => '22222222-0000-0000-0000-0000000000f0',
                              p_caption => 'to everyone', p_circle_ids => array[(select v::uuid from tests.vars where k = 'all')]) is not null$$),
                     'BETA-AUD-21 allowed: Chase (owner) sends to Everyone through create_post');
@@ -605,7 +605,7 @@ select tests.as_throws('gammy', format($$select public.create_post(p_client_id =
                        'BETA-AUD-21 excluded: Gammy to Everyone by create_post is 42501', array['42501']);
 select tests.as_throws('gammy', format($$select public.create_post(p_client_id => gen_random_uuid(), p_space => %L, p_caption => 'x', p_circle_ids => array[%L]::uuid[])$$,
                        :space_h, tests.v('g_dan')),
-                       'privacy item 2: Gammy to Danielle''s side (not hers) is refused', array['42501', '23514']);
+                       'privacy item 2: Gammy to Mom''s side (not hers) is refused', array['42501', '23514']);
 select tests.as_throws('gammy', format($$select public.create_post(p_client_id => gen_random_uuid(), p_space => %L, p_caption => 'x', p_circle_ids => array[%L]::uuid[])$$,
                        :space_h, tests.v('e_bday')),
                        'privacy item 2: Gammy to Birthday at Gigi''s (an event she isn''t in) is refused', array['42501', '23514']);
@@ -632,15 +632,15 @@ select tests.try(format($$update public.media_items set upload_status = 'ready' 
 select tests.as_throws('gammy', format($$select public.publish_post(%L)$$, tests.v('gdraft')),
                        'BETA-AUD-21 excluded: publish_post of a draft naming Everyone is 42501 for a relative', array['42501']);
 -- a parent demoted after drafting to Everyone can't publish it
-select tests.setq('ddraft', 'danielle', $$select public.create_post(p_client_id => gen_random_uuid(), p_space => '22222222-0000-0000-0000-0000000000f0',
+select tests.setq('ddraft', 'mom', $$select public.create_post(p_client_id => gen_random_uuid(), p_space => '22222222-0000-0000-0000-0000000000f0',
                                 p_caption => 'draft to everyone', p_circle_ids => array[(select v::uuid from tests.vars where k = 'all')])$$);
 select tests.try(format($$insert into public.media_items (post_id, space_id, uploader_id, position, kind, mime_type, display_key, thumb_key, width, height, byte_size, thumb_byte_size, exif_stripped)
-                          values (%L, %L, %L, 0, 'photo', 'image/jpeg', 'k', 't', 100, 100, 1000, 100, true)$$, tests.v('ddraft'), :space_h, tests.u('danielle')));
+                          values (%L, %L, %L, 0, 'photo', 'image/jpeg', 'k', 't', 100, 100, 1000, 100, true)$$, tests.v('ddraft'), :space_h, tests.u('mom')));
 select tests.try(format($$update public.media_items set upload_status = 'ready' where post_id = %L$$, tests.v('ddraft')));
-update public.space_members set role = 'viewer' where space_id = :space_h and user_id = tests.u('danielle');
-select tests.as_throws('danielle', format($$select public.publish_post(%L)$$, coalesce(tests.v('ddraft'), '00000000-0000-0000-0000-000000000000')),
-                       'privacy item 2: Danielle, demoted to relative after drafting to Everyone, can''t publish it (42501)', array['42501']);
-update public.space_members set role = 'adult' where space_id = :space_h and user_id = tests.u('danielle');
+update public.space_members set role = 'viewer' where space_id = :space_h and user_id = tests.u('mom');
+select tests.as_throws('mom', format($$select public.publish_post(%L)$$, coalesce(tests.v('ddraft'), '00000000-0000-0000-0000-000000000000')),
+                       'privacy item 2: Mom, demoted to relative after drafting to Everyone, can''t publish it (42501)', array['42501']);
+update public.space_members set role = 'adult' where space_id = :space_h and user_id = tests.u('mom');
 update public.spaces set viewers_can_post = false where id = :space_h;
 select tests.as_throws('gammy', format($$select public.create_post(p_client_id => gen_random_uuid(), p_space => %L, p_caption => 'x', p_circle_ids => array[%L]::uuid[])$$,
                        :space_h, tests.v('h_gammy')),
@@ -651,7 +651,7 @@ select tests.as_throws('gammy', format($$select public.create_post(p_client_id =
 -- ======================================================================
 :as_gammy
 select tests.ok_sql(format($$select coalesce(bool_and(name in ('Everyone', 'Chase''s side', 'Gammy''s house')
-                                                      and member_names <@ array['Gammy', 'Chase', 'Danielle']), true)
+                                                      and member_names <@ array['Gammy', 'Chase', 'Mom']), true)
                              from public.my_circles(%L)$$, :space_h),
                     'BETA-AUD-14: my_circles gives Gammy no other household, group or event, and no other household''s member names');
 select tests.ok_sql(format($$select count(*) = 0 from public.circles where space_id = %L
@@ -732,7 +732,7 @@ select tests.chase_throws(format('select public.link_level(%L, %L, null)', tests
                           'BETA-AUD-19: link_level with no history is 23514', '23514');
 select tests.chase_throws(format('select public.link_level(%L, %L, ''some'')', tests.v('g_dan'), tests.v('h_test')),
                           'BETA-AUD-19: link_level with a made-up history is 23514', '23514');
-select tests.chase_throws(format('select public.place_person(%L, %L, null)', tests.v('h_test'), tests.u('phyllis')),
+select tests.chase_throws(format('select public.place_person(%L, %L, null)', tests.v('h_test'), tests.u('ggma')),
                           'BETA-AUD-19: place_person with no history is 23514', '23514');
 select tests.chase_throws(format($$select public.create_invite(p_space => %L, p_role => 'viewer', p_circle_ids => array[%L]::uuid[], p_name => 'Grandma June')$$,
                                  :space_h, tests.v('h_test')),
@@ -782,8 +782,8 @@ select tests.ok(not tests.reads('memaw', 'c_pawpaw') and not tests.reads_heart('
 select tests.say('c_memaw2', 'memaw', 'p_ev');
 select tests.ok(tests.reads('pawpaw', 'c_memaw2') and tests.reads('granny', 'c_memaw2'),
                 'privacy item 5: a comment Memaw writes after the move reaches Pawpaw and Granny');
-select tests.ok(tests.readers('memaw', 'p_ev') = tests.names(array['Danielle''s sister', 'Pawpaw', 'Granny', 'Chase', 'Danielle']),
-                'privacy item 5 / REPLY-11: Memaw''s comment box now names the sister, Pawpaw, Granny, Chase and Danielle');
+select tests.ok(tests.readers('memaw', 'p_ev') = tests.names(array['Mom''s sister', 'Pawpaw', 'Granny', 'Chase', 'Mom']),
+                'privacy item 5 / REPLY-11: Memaw''s comment box now names the sister, Pawpaw, Granny, Chase and Mom');
 -- A household added to an event with "Share all past photos": sees old photos, not old comments.
 select tests.link('e_chs', 'h_memaw', 'all');
 select tests.ok(tests.sees('memaw', 'p_chs'),
@@ -795,10 +795,10 @@ select tests.ok(tests.reads('memaw', 'c_granny_chs2'),
                 'privacy item 5: Granny''s next comment on the trip reaches Memaw (event rule, now that she''s in it)');
 -- "Only new photos" for an event add
 select tests.link('e_chs', 'h_phyl', 'new');
-select tests.ok(not tests.sees('phyllis', 'p_chs'),
-                'BETA-AUD-20: Grandma Phyllis''s house added to the trip with "Only new photos": she can''t open its earlier post');
+select tests.ok(not tests.sees('ggma', 'p_chs'),
+                'BETA-AUD-20: Great-Grandma''s house added to the trip with "Only new photos": she can''t open its earlier post');
 select tests.post('p_chs2', array['e_chs']);
-select tests.ok(tests.sees('phyllis', 'p_chs2'), 'BETA-AUD-20: ... and does see the next trip post');
+select tests.ok(tests.sees('ggma', 'p_chs2'), 'BETA-AUD-20: ... and does see the next trip post');
 -- Narrowing stays read-time
 select tests.q('chase', format('select public.unplace_person(%L, %L)', tests.v('h_pg'), tests.u('sister')));
 select tests.ok(not tests.reads('pawpaw', 'c_sis') and not tests.reads('granny', 'c_sis') and tests.reads('memaw', 'c_sis'),
@@ -814,8 +814,8 @@ begin
   return tests.sees(p_who, p_post);
 exception when others then return null;
 end $$;
-select tests.ok(tests.unplace_then_sees('h_phyl', 'phyllis', 'p_dan') = false,
-                'BETA-AUD-15: Grandma Phyllis removed from her house loses the Danielle''s side post in the same transaction');
+select tests.ok(tests.unplace_then_sees('h_phyl', 'ggma', 'p_dan') = false,
+                'BETA-AUD-15: Great-Grandma removed from her house loses the Mom''s side post in the same transaction');
 create function tests.unlink_then_sees(p_parent text, p_child text, p_who text, p_post text) returns boolean language plpgsql as $$
 begin
   perform tests.act('chase');
@@ -855,8 +855,8 @@ select tests.ok(tests.sees('gigi', 'p_old_gigi') and tests.sees('gigi', 'p_old')
 select tests.post('p_aud', array['h_sis']);
 select tests.say('c_sis_aud', 'sister', 'p_aud');
 select tests.heart('sister', 'p_aud');
-select tests.ok(tests.readers('sister', 'p_aud') = tests.names(array['Chase', 'Danielle']),
-                'S-0011-1 setup: the sister''s comment box names only Chase and Danielle');
+select tests.ok(tests.readers('sister', 'p_aud') = tests.names(array['Chase', 'Mom']),
+                'S-0011-1 setup: the sister''s comment box names only Chase and Mom');
 select tests.q('chase', format('select public.set_post_audience(%L, array[%L, %L]::uuid[])', tests.v('p_aud'), tests.v('h_sis'), tests.v('h_memaw')));
 select tests.ok(tests.sees('memaw', 'p_aud'), 'S-0011-1 allowed: Memaw''s house added to the post: Memaw sees the photo');
 select tests.ok(not tests.reads('memaw', 'c_sis_aud') and not tests.reads_heart('memaw', 'p_aud', 'sister'),
@@ -883,16 +883,16 @@ begin
   end loop;
 end $$;
 select tests.ok(tests.q('memaw', format('select public.retire_level(%L)', tests.v('h_pg'))) is null
-                and tests.q('danielle', format('select public.retire_level(%L)', tests.v('h_other'))) is null
+                and tests.q('mom', format('select public.retire_level(%L)', tests.v('h_other'))) is null
                 and exists (select 1 from public.circles where id = tests.c('h_pg') and deleted_at is null),
                 'S-0011-2 excluded: a relative (Memaw, her own house) and a parent of another family can''t retire a container');
 select tests.ok(tests.q('chase', format('select public.retire_level(%L)', tests.v('all'))) is null
                 and exists (select 1 from public.circles where id = tests.c('all') and deleted_at is null),
                 'S-0011-2: Everyone can''t be retired');
-select tests.q('danielle', format('select public.retire_level(%L)', tests.v('h_pg')));
+select tests.q('mom', format('select public.retire_level(%L)', tests.v('h_pg')));
 select tests.ok(not tests.sees('pawpaw', 'p_pg') and not tests.sees('granny', 'p_pg'),
-                'S-0011-2 allowed: Danielle (parent) retires Pawpaw and Granny''s house: they lose its posts at once');
-select tests.ok(tests.sees('chase', 'p_pg') and tests.sees('danielle', 'p_pg') and not tests.sees('memaw', 'p_pg') and not tests.sees('gammy', 'p_pg'),
+                'S-0011-2 allowed: Mom (parent) retires Pawpaw and Granny''s house: they lose its posts at once');
+select tests.ok(tests.sees('chase', 'p_pg') and tests.sees('mom', 'p_pg') and not tests.sees('memaw', 'p_pg') and not tests.sees('gammy', 'p_pg'),
                 'S-0011-2: the house''s posts stay with the parents and the author only (no one else picks them up)');
 create table tests.after_retire (k text, post_id uuid);
 do $$
@@ -975,8 +975,8 @@ select tests.ok(tests.redeem_as('f0000000-0000-0000-0000-000000000033', tests.v(
 
 -- S-0011-6 (privacy item 5): widening someone's share history in place must not let them read replies written
 -- while they couldn't see the post. Cousin Lu joins her house with "Only new photos"; her housemate Jo (all past
--- photos) comments on an older Danielle's side post Lu can't see. Chase then also places Lu in Grandma Phyllis's
--- house with "Share all past photos": her Danielle's side membership is widened in place. Lu now sees the post,
+-- photos) comments on an older Mom's side post Lu can't see. Chase then also places Lu in Great-Grandma's
+-- house with "Share all past photos": her Mom's side membership is widened in place. Lu now sees the post,
 -- but not Jo's comment or heart from before; Jo's next comment reaches her.
 insert into auth.users (id, email, raw_user_meta_data) values
   ('f0000000-0000-0000-0000-000000000034', 'jo@hearth.test', '{"display_name":"Cousin Jo"}');

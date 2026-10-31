@@ -368,7 +368,7 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 NOTIFY RESULT: 60 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
 Test viewer invite (milestone 1, account B):
-Danielle's poster invite (milestone 2; she can post to every group):
+Mom's poster invite (milestone 2; she can post to every group):
  ok 
 ----
  
@@ -390,7 +390,7 @@ Danielle's poster invite (milestone 2; she can post to every group):
 (1 row)
 
 Test viewer invite (milestone 1, account B):
-Danielle's poster invite (milestone 2; she can post to every group):
+Mom's poster invite (milestone 2; she can post to every group):
  ok 
 ----
  
@@ -401,7 +401,7 @@ Danielle's poster invite (milestone 2; she can post to every group):
  1 | ok     | M1 setup: Chase owns one space
  2 | ok     | M1 setup: the starter groups exist (Chase can rename them in the app)
  3 | ok     | M1 setup: one viewer invite for the test account
- 4 | ok     | M2 setup: one poster (adult) invite for Danielle
+ 4 | ok     | M2 setup: one poster (adult) invite for Mom
  5 | ok     | setup: running it again reuses the space and groups (no duplicates)
 (5 rows)
 
@@ -506,7 +506,7 @@ psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already
 TIMELINE RESULT: 38 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
 psql:tests/groups_test.sql:886: WARNING:  as memaw: P0002 not found (select public.retire_level('4f1beb20-2d3e-4a27-aa75-da8650e8dc94'))
-psql:tests/groups_test.sql:886: WARNING:  as danielle: P0002 not found (select public.retire_level('e3428062-e8fc-45bc-ad43-2784b827e69e'))
+psql:tests/groups_test.sql:886: WARNING:  as mom: P0002 not found (select public.retire_level('e3428062-e8fc-45bc-ad43-2784b827e69e'))
 psql:tests/groups_test.sql:889: WARNING:  as chase: 23514 Everyone stays (select public.retire_level('d47f0ffc-2f3a-4401-a14f-d0fd4b6ef331'))
 psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a command that cannot return data (update public.circles set name = name where id = '26c05589-80b5-47cf-aed0-6bb11c64b8be')
   n  | result |                                                                                  description                                                                                   
@@ -516,21 +516,21 @@ psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a comm
    3 | ok     | BETA-AUD-20 shape: space_members.sees_from, invites.history and circle_members.sees_from exist
    4 | ok     | BETA-AUD-13/21 shape: can, can_send_to, link_allowed, create_level, link_level, unlink_level, place_person, unplace_person, reply_readers exist
    5 | ok     | BETA-REPLY-11 shape: anon cannot call reply_readers
-   6 | ok     | BETA-AUD-11 allowed: Memaw, Pawpaw, Granny, Grandma Phyllis and Danielle's sister see the Danielle's side post
+   6 | ok     | BETA-AUD-11 allowed: Memaw, Pawpaw, Granny, Great-Grandma and Mom's sister see the Mom's side post
    7 | ok     | BETA-AUD-11 allowed: both parents see it
    8 | ok     | BETA-AUD-11 excluded: nobody placed only under Chase's side can open it by ID (can_view_post)
    9 | ok     | BETA-AUD-11 feed: Memaw gets it once; Gammy and Grandaddy never do
-  10 | ok     | BETA-AUD-11 timeline: Grandma Phyllis gets it; Bebar never does
-  11 | ok     | BETA-AUD-11 media signer: Gammy can read no media row (no key, no URL) of the Danielle's side post
-  12 | ok     | BETA-AUD-11 push and email: the post notice is queued for Danielle, Memaw, Pawpaw, Granny, Grandma Phyllis and the sister only (once each)
+  10 | ok     | BETA-AUD-11 timeline: Great-Grandma gets it; Bebar never does
+  11 | ok     | BETA-AUD-11 media signer: Gammy can read no media row (no key, no URL) of the Mom's side post
+  12 | ok     | BETA-AUD-11 push and email: the post notice is queued for Mom, Memaw, Pawpaw, Granny, Great-Grandma and the sister only (once each)
   13 | ok     | BETA-AUD-11 both directions: the Chase's side post reaches Gammy and Gigi, never Memaw or the sister
-  14 | ok     | BETA-AUD-12 feed: the sister gets the Danielle's side, Pawpaw and Granny's house, Memaw's house and Everyone posts once each
+  14 | ok     | BETA-AUD-12 feed: the sister gets the Mom's side, Pawpaw and Granny's house, Memaw's house and Everyone posts once each
   15 | ok     | BETA-AUD-12 timeline: the same four posts once each
   16 | ok     | BETA-AUD-12 excluded: the sister never gets a Chase's side post
   17 | ok     | BETA-AUD-12 a person in two households does not bridge them: Pawpaw can't see the Memaw's house post, Memaw can't see Pawpaw and Granny's
-  18 | ok     | BETA-AUD-18 allowed: John (Pawpaw), Anna (Granny), the sister and both parents see the Charleston trip post
-  19 | ok     | BETA-AUD-18 excluded: Memaw, Gammy and Grandma Phyllis don't
-  20 | ok     | BETA-AUD-18: the same people still get Danielle's side and Everyone posts
+  18 | ok     | BETA-AUD-18 allowed: Pawpaw, Granny, the sister and both parents see the Charleston trip post
+  19 | ok     | BETA-AUD-18 excluded: Memaw, Gammy and Great-Grandma don't
+  20 | ok     | BETA-AUD-18: the same people still get Mom's side and Everyone posts
   21 | ok     | BETA-AUD-18 Birthday at Gigi's: Grandaddy, Gigi and Granny see it; Gammy and Memaw never do
   22 | ok     | BETA-AUD-20: Gigi's invite records history = new
   23 | ok     | BETA-AUD-20: redeeming copies the choice: Gigi's sees_from = her invite's creation time, Bebar's is null (all)
@@ -546,52 +546,52 @@ psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a comm
   33 | ok     | BETA-AUD-20 parity: for all 12 people x every post, can_view_post = get_feed = get_timeline = get_comments = media rows (sign-media)
   34 | ok     | BETA-AUD-20 / privacy item 9: claim_notification_batches no longer copies the visibility rule (it calls the one shared predicate)
   35 | ok     | BETA-AUD-20 push and email: no claimed notice names a post its recipient can't open (Gigi's pre-T post included)
-  36 | ok     | BETA-REPLY-7 allowed: Chase (author, parent), Danielle (parent) and Gammy's household (Gammy) read her comment
+  36 | ok     | BETA-REPLY-7 allowed: Chase (author, parent), Mom (parent) and Gammy's household (Gammy) read her comment
   37 | ok     | BETA-REPLY-7 excluded: Grandaddy, Grandmomma (and Memaw) don't read Gammy's comment
   38 | ok     | BETA-REPLY-7 hearts: the parents see Gammy's heart; Grandaddy and Grandmomma don't
-  39 | ok     | BETA-REPLY-7 counts leave hidden replies out: Grandaddy 1 heart 1 comment (Danielle's), Gammy 2:2, Chase 3:5
+  39 | ok     | BETA-REPLY-7 counts leave hidden replies out: Grandaddy 1 heart 1 comment (Mom's), Gammy 2:2, Chase 3:5
   40 | ok     | BETA-REPLY-8 allowed: Granny's comment on the Charleston trip reaches Pawpaw, the sister (event rule), the parents and the author
   41 | ok     | BETA-REPLY-8 excluded: Memaw (can't see the post at all) doesn't read it
   42 | ok     | BETA-REPLY-8 Birthday at Gigi's: Grandaddy's comment reaches Grandmomma, Gigi, Bebar, Pawpaw and Granny (everyone in the event)
   43 | ok     | BETA-REPLY-8 Birthday at Gigi's: Gammy and Memaw never read it
   44 | ok     | BETA-REPLY-8 mixed audience (Everyone + Charleston trip): Granny's comment reaches the event (Pawpaw, the sister) and the parents
   45 | ok     | BETA-REPLY-8 mixed audience: Memaw sees the photo but not Granny's comment; nor does Gammy
-  46 | ok     | BETA-REPLY-9: the sister's comment reaches Memaw, Pawpaw, Granny, Chase and Danielle
-  47 | ok     | BETA-REPLY-9: ... and not Gammy, Grandaddy or Grandma Phyllis
-  48 | ok     | BETA-REPLY-9: Memaw's comment reaches the sister, Chase and Danielle
+  46 | ok     | BETA-REPLY-9: the sister's comment reaches Memaw, Pawpaw, Granny, Chase and Mom
+  47 | ok     | BETA-REPLY-9: ... and not Gammy, Grandaddy or Great-Grandma
+  48 | ok     | BETA-REPLY-9: Memaw's comment reaches the sister, Chase and Mom
   49 | ok     | BETA-REPLY-9 no relay: Memaw's comment does NOT reach Pawpaw or Granny (the sister doesn't bridge the houses)
   50 | ok     | BETA-REPLY-9 no relay: Pawpaw's comment reaches Granny and the sister, but not Memaw
   51 | ok     | BETA-REPLY-9 hearts: Pawpaw's heart reaches Granny and the sister, not Memaw
-  52 | ok     | privacy item 4: on a Danielle's side post, Memaw's comment does not reach Grandma Phyllis or Pawpaw (a group never passes replies along)
-  53 | ok     | BETA-REPLY-10: Danielle's comment and heart on an Everyone post reach everyone who can see it
-  54 | ok     | BETA-REPLY-10 / rule 4: on Danielle's post, Gammy's comment reaches Danielle (author) and Chase, not Memaw
-  55 | ok     | BETA-REPLY-10: a parent reads every reply on every post they can see (Chase and Danielle)
-  56 | ok     | BETA-REPLY-11 sibling: reply_readers for the sister on an Everyone post = Memaw, Pawpaw, Granny, Chase, Danielle
-  57 | ok     | BETA-REPLY-11 household of one: Gammy's readers on an Everyone post = Chase, Danielle
-  58 | ok     | BETA-REPLY-11 event: Granny's readers on the Charleston trip = Pawpaw, the sister, Chase, Danielle
-  59 | ok     | BETA-REPLY-11 household: Pawpaw's readers on an Everyone post = Granny, the sister, Chase, Danielle
-  60 | ok     | BETA-REPLY-11 parent: Danielle's readers on an Everyone post = all 11 others; on a pre-T post, not Gigi (privacy item 7)
+  52 | ok     | privacy item 4: on a Mom's side post, Memaw's comment does not reach Great-Grandma or Pawpaw (a group never passes replies along)
+  53 | ok     | BETA-REPLY-10: Mom's comment and heart on an Everyone post reach everyone who can see it
+  54 | ok     | BETA-REPLY-10 / rule 4: on Mom's post, Gammy's comment reaches Mom (author) and Chase, not Memaw
+  55 | ok     | BETA-REPLY-10: a parent reads every reply on every post they can see (Chase and Mom)
+  56 | ok     | BETA-REPLY-11 sibling: reply_readers for the sister on an Everyone post = Memaw, Pawpaw, Granny, Chase, Mom
+  57 | ok     | BETA-REPLY-11 household of one: Gammy's readers on an Everyone post = Chase, Mom
+  58 | ok     | BETA-REPLY-11 event: Granny's readers on the Charleston trip = Pawpaw, the sister, Chase, Mom
+  59 | ok     | BETA-REPLY-11 household: Pawpaw's readers on an Everyone post = Granny, the sister, Chase, Mom
+  60 | ok     | BETA-REPLY-11 parent: Mom's readers on an Everyone post = all 11 others; on a pre-T post, not Gigi (privacy item 7)
   61 | ok     | BETA-REPLY-11 / privacy item 7: reply_readers on a post Memaw can't see is null ("not found")
   62 | ok     | BETA-REPLY-11 parity: for every person and post, reply_readers = exactly the members for whom can_see_reply(post, caller) is true
   63 | ok     | privacy item 7 parity: feed heart and comment counts equal can_see_reply for every person (household and event rules)
   64 | ok     | BETA-REPLY-13: Gammy (relative, posting on) can post to her own group, Chase's side
   65 | ok     | BETA-AUD-21: can(space, send_to_everyone) is true for Chase (owner)
-  66 | ok     | BETA-AUD-21: ... and for Danielle (parent)
+  66 | ok     | BETA-AUD-21: ... and for Mom (parent)
   67 | ok     | BETA-AUD-21: Gammy (relative) can post (family switch on) but can't send to Everyone
   68 | ok     | privacy item 2: create_post and publish_post both call can_send_to (publish re-checks)
   69 | ok     | privacy item 2: the post_audiences insert policy calls can_send_to
   70 | ok     | BETA-AUD-21: can_send_to goes through can(space, capability)
-  71 | ok     | BETA-AUD-21 allowed: Danielle (parent) sends to Everyone through create_post
+  71 | ok     | BETA-AUD-21 allowed: Mom (parent) sends to Everyone through create_post
   72 | ok     | BETA-AUD-21 allowed: Chase (owner) sends to Everyone through create_post
   73 | ok     | BETA-AUD-21 excluded: Gammy to Everyone by create_post is 42501  [42501 you can't send there]
-  74 | ok     | privacy item 2: Gammy to Danielle's side (not hers) is refused  [23514 circle not found in this space]
+  74 | ok     | privacy item 2: Gammy to Mom's side (not hers) is refused  [23514 circle not found in this space]
   75 | ok     | privacy item 2: Gammy to Birthday at Gigi's (an event she isn't in) is refused  [23514 circle not found in this space]
   76 | ok     | privacy item 2: Gammy to Memaw's house is refused  [23514 circle not found in this space]
   77 | ok     | privacy item 2 allowed: Gammy may send to her own household
   78 | ok     | BETA-AUD-21 excluded: Gammy's direct post_audiences insert of Everyone is 42501 (insert policy)  [42501 new row violates row-level security policy for table "post_audiences"]
   79 | ok     | BETA-AUD-21 excluded: set_post_audience adding Everyone is 42501 for Gammy  [42501 new row violates row-level security policy for table "post_audiences"]
   80 | ok     | BETA-AUD-21 excluded: publish_post of a draft naming Everyone is 42501 for a relative  [42501 you can't send there]
-  81 | ok     | privacy item 2: Danielle, demoted to relative after drafting to Everyone, can't publish it (42501)  [42501 you can't send there]
+  81 | ok     | privacy item 2: Mom, demoted to relative after drafting to Everyone, can't publish it (42501)  [42501 you can't send there]
   82 | ok     | privacy item 2: with posting off, Gammy can't send even to her own house (can(space, post) is false)  [42501 you cannot post in this space]
   83 | ok     | BETA-AUD-14: my_circles gives Gammy no other household, group or event, and no other household's member names
   84 | ok     | BETA-AUD-14: reading circles directly, Gammy sees no other container's name or kind
@@ -634,21 +634,21 @@ psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a comm
  121 | ok     | privacy item 5: after Memaw joins Pawpaw and Granny's house, they still don't read the comment she wrote before
  122 | ok     | privacy item 5: ... and Memaw doesn't read Pawpaw's earlier comment or heart (written for Granny, the sister and the parents)
  123 | ok     | privacy item 5: a comment Memaw writes after the move reaches Pawpaw and Granny
- 124 | ok     | privacy item 5 / REPLY-11: Memaw's comment box now names the sister, Pawpaw, Granny, Chase and Danielle
+ 124 | ok     | privacy item 5 / REPLY-11: Memaw's comment box now names the sister, Pawpaw, Granny, Chase and Mom
  125 | ok     | BETA-AUD-20: Memaw's house added to the Charleston trip with "Share all past photos": Memaw sees the trip's earlier post
  126 | ok     | privacy item 5: ... but not the trip comments written before her house was added (Granny's, and even the sister's, whose box never named Memaw)
  127 | ok     | privacy item 5: Granny's next comment on the trip reaches Memaw (event rule, now that she's in it)
- 128 | ok     | BETA-AUD-20: Grandma Phyllis's house added to the trip with "Only new photos": she can't open its earlier post
+ 128 | ok     | BETA-AUD-20: Great-Grandma's house added to the trip with "Only new photos": she can't open its earlier post
  129 | ok     | BETA-AUD-20: ... and does see the next trip post
  130 | ok     | privacy item 5 narrowing: once the sister leaves Pawpaw and Granny's house, they stop reading her old comment; Memaw (still her house) keeps it
- 131 | ok     | BETA-AUD-15: Grandma Phyllis removed from her house loses the Danielle's side post in the same transaction
+ 131 | ok     | BETA-AUD-15: Great-Grandma removed from her house loses the Mom's side post in the same transaction
  132 | ok     | BETA-AUD-15: Gammy's house unlinked from Chase's side: Gammy loses its posts in the same transaction
  133 | ok     | BETA-AUD-15: Pawpaw and Granny's house unlinked from the birthday event: Granny loses the event post at once
  134 | ok     | BETA-AUD-15 allowed: everyone else keeps theirs (Grandaddy keeps Chase's side and the birthday; Gammy keeps Everyone)
  135 | ok     | BETA-AUD-15: Gammy can no longer read the media rows (sign-media refuses new URLs)
  136 | ok     | privacy item 10: removing Gigi from the family removes her placements and derived memberships
  137 | ok     | privacy item 10: re-invited with "Share all past photos", Gigi now sees the posts from before her first invite
- 138 | ok     | S-0011-1 setup: the sister's comment box names only Chase and Danielle
+ 138 | ok     | S-0011-1 setup: the sister's comment box names only Chase and Mom
  139 | ok     | S-0011-1 allowed: Memaw's house added to the post: Memaw sees the photo
  140 | ok     | S-0011-1 excluded: ... but not the sister's comment or heart written before her house was added
  141 | ok     | S-0011-1 counts: Memaw's feed counts leave them out too (0 hearts, 0 comments)
@@ -656,7 +656,7 @@ psql:tests/groups_test.sql:1019: WARNING:  as chase: 42601 INTO used with a comm
  143 | ok     | S-0011-1: app users can't choose post_audiences.added_at (the time that fixes who reads replies)
  144 | ok     | S-0011-2 excluded: a relative (Memaw, her own house) and a parent of another family can't retire a container
  145 | ok     | S-0011-2: Everyone can't be retired
- 146 | ok     | S-0011-2 allowed: Danielle (parent) retires Pawpaw and Granny's house: they lose its posts at once
+ 146 | ok     | S-0011-2 allowed: Mom (parent) retires Pawpaw and Granny's house: they lose its posts at once
  147 | ok     | S-0011-2: the house's posts stay with the parents and the author only (no one else picks them up)
  148 | ok     | S-0011-2: retiring widens nobody: no (person, post) pair is visible after that wasn't before
  149 | ok     | S-0011-3 allowed: an invite to an old group with nothing under it still works until 0012 (Aunt Bea joins)
@@ -718,16 +718,16 @@ PRIVACY-AUDIT RESULT: 15 passed, 0 failed
 psql:supabase/migrations/0001_init.sql:25: NOTICE:  extension "pgcrypto" already exists, skipping
 psql:tests/groups_v2_test.sql:283: WARNING:  place_person joe in g_chase failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
 psql:tests/groups_v2_test.sql:284: WARNING:  place_person rachel in g_chase failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
-psql:tests/groups_v2_test.sql:285: WARNING:  place_person susan in g_dan failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:285: WARNING:  place_person sue in g_dan failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
 psql:tests/groups_v2_test.sql:286: WARNING:  place_person rachel in g_dan failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
 psql:tests/groups_v2_test.sql:287: WARNING:  place_person linda in g_dan failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
-psql:tests/groups_v2_test.sql:288: WARNING:  place_person susan in g_meemaw failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
+psql:tests/groups_v2_test.sql:288: WARNING:  place_person sue in g_meemaw failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
 psql:tests/groups_v2_test.sql:289: WARNING:  place_person rachel in g_meemaw failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
 psql:tests/groups_v2_test.sql:290: WARNING:  place_person opal in g_meemaw failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
 psql:tests/groups_v2_test.sql:291: WARNING:  place_person joe in g_porch failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
 psql:tests/groups_v2_test.sql:292: WARNING:  place_person linda in g_porch failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
 psql:tests/groups_v2_test.sql:295: WARNING:  setup failed: people go only in households (insert into public.circle_people (circle_id, user_id, added_by)
-                   values (tests.c('g_dan'), tests.u('danielle'), tests.u('chase')))
+                   values (tests.c('g_dan'), tests.u('mom'), tests.u('chase')))
 psql:tests/groups_v2_test.sql:296: WARNING:  set_comment_mode g_meemaw always failed: 42883 function public.set_comment_mode(p_circle => uuid, p_mode => text) does not exist
 psql:tests/groups_v2_test.sql:317: WARNING:  place_person ray in g_chase failed: 42883 function public.place_person(p_group => uuid, p_user => uuid, p_history => text) does not exist
 psql:tests/groups_v2_test.sql:401: WARNING:  comment c4 failed: P0002 post not found
@@ -770,8 +770,8 @@ psql:tests/groups_v2_test.sql:726: WARNING:  feature_flags write failed: 42P01 r
    8 | NOT OK | GRP-2 every seed circle (Everyone and groups) is Private after 0013  [42703 column "comment_mode" does not exist]
    9 | NOT OK | GRP-2 comment_mode_log backfill: exactly one row per existing circle, set_at = circles.created_at, same mode  [42P01 relation "public.comment_mode_log" does not exist]
   10 | NOT OK | GRP-11 a parent copies everyone in Chase's side into Chase's birthday  [42883 function public.add_people_from(p_target => unknown, p_source => unknown, p_history => unknown) does not exist]
-  11 | NOT OK | GRP-11 ...and everyone in Danielle's side (Auntie Rachel, in both, does not make it fail)  [42883 function public.add_people_from(p_target => unknown, p_source => unknown, p_history => unknown) does not exist]
-  12 | NOT OK | GRP-11 the birthday holds exactly Pop Joe, Auntie Rachel, Meemaw Susan and Aunt Linda, each once (no parent copied)
+  11 | NOT OK | GRP-11 ...and everyone in Mom's side (Auntie Rachel, in both, does not make it fail)  [42883 function public.add_people_from(p_target => unknown, p_source => unknown, p_history => unknown) does not exist]
+  12 | NOT OK | GRP-11 the birthday holds exactly Pop Joe, Auntie Rachel, Meemaw Sue and Aunt Linda, each once (no parent copied)
   13 | ok     | GRP-11 copied, not linked: no circle_links row for the birthday
   14 | NOT OK | GRP-11 no share-history choice is refused  [42883 function public.add_people_from(p_target => unknown, p_source => unknown, p_history => unknown) does not exist]
   15 | NOT OK | GRP-11 a relative calling add_people_from gets "not found"  [42883 function public.add_people_from(p_target => unknown, p_source => unknown, p_history => unknown) does not exist]
@@ -797,19 +797,19 @@ psql:tests/groups_v2_test.sql:726: WARNING:  feature_flags write failed: 42P01 r
   35 | NOT OK | GRP-10 an unknown share-history choice is refused  [42883 function public.place_person(p_group => unknown, p_user => unknown, p_history => unknown) does not exist]
   36 | NOT OK | GRP-10 a relative calling place_person gets "not found"  [42883 function public.place_person(p_group => unknown, p_user => unknown, p_history => unknown) does not exist]
   37 | ok     | GRP-10 the refused placements left Porch unchanged
-  38 | NOT OK | GRP-3 Chase, Danielle and Auntie Rachel (Meemaw's, Always shared) read Meemaw's comment on the Everyone post
+  38 | NOT OK | GRP-3 Chase, Mom and Auntie Rachel (Meemaw's, Always shared) read Meemaw's comment on the Everyone post
   39 | NOT OK | GRP-3 ...and her heart
   40 | ok     | GRP-3 everyone else who sees the post (Linda, Joe, Ann, Beth, Ray) does not read her comment
   41 | ok     | GRP-3 ...nor her heart
-  42 | NOT OK | GRP-3 reply_readers for Meemaw names exactly Chase, Danielle and Auntie Rachel (got {Chase,Danielle})
+  42 | NOT OK | GRP-3 reply_readers for Meemaw names exactly Chase, Mom and Auntie Rachel (got {Chase,Mom})
   43 | NOT OK | GRP-4 every birthday member reads Pop Joe's comment on a post sent to the birthday
   44 | NOT OK | GRP-4 ...and Aunt Linda's
   45 | NOT OK | GRP-4 people outside the birthday (who can't see the post) read nothing
   46 | NOT OK | GRP-4 reply_readers for Pop Joe on the birthday post names the parents and every other member (got {})
   47 | ok     | GRP-5 birthday members Joe and Linda don't read Meemaw's comment on an Everyone-only post
   48 | NOT OK | GRP-5 ...unless another rule allows it (Rachel shares the Always-shared Meemaw's)
-  49 | NOT OK | GRP-5 same for a post sent to another group: Linda (birthday + Danielle's side, both with Meemaw) doesn't read her comment on the Danielle's side post
-  50 | NOT OK | GRP-5 reply_readers for Meemaw on the Danielle's side post leaves out Aunt Linda (got {})
+  49 | NOT OK | GRP-5 same for a post sent to another group: Linda (birthday + Mom's side, both with Meemaw) doesn't read her comment on the Mom's side post
+  50 | NOT OK | GRP-5 reply_readers for Meemaw on the Mom's side post leaves out Aunt Linda (got {})
   51 | NOT OK | GRP-6 Rachel (Meemaw's, Always shared) reads Meemaw's comment on a post not sent to Meemaw's
   52 | NOT OK | GRP-6 Great-aunt Opal (Meemaw's, can't see that post) reads nothing: get_comments says not found, RLS hides it
   53 | ok     | GRP-6 ...and can't read Meemaw's heart on a post she can't see
@@ -960,11 +960,11 @@ ok      setup v2 dry run: runs without error
 ok      setup v2 dry run: changes nothing (groups, members, placements, links, audiences, invites identical)
 ok      setup v2 dry run: says "DRY RUN: nothing was changed"
 ok      setup v2 dry run: one "<name>: gains N posts, loses M posts" line for every member of the family
-ok      S-0011-4 / privacy item 14: the dry run counts what 0011 gives a Parent (Danielle gains the 3 posts outside her v1 groups) and says why
+ok      S-0011-4 / privacy item 14: the dry run counts what 0011 gives a Parent (Mom gains the 3 posts outside her v1 groups) and says why
 ok      setup v2 apply=yes: runs without error
 ok      setup v2: the dry-run report equals each person's real posts gained and lost after apply
 ok      setup v2 apply: one Everyone
-ok      setup v2 apply: the set groups are Chase's side and Danielle's side (legacy groups retired)
+ok      setup v2 apply: the set groups are Chase's side and Mom's side (legacy groups retired)
 ok      setup v2 apply: Gammy is placed in Gammy's house, under Chase's side
 ok      setup v2 apply: Pawpaw and Granny share one house
 ok      setup v2 apply: the Charleston trip and Birthday at Gigi's events exist
@@ -978,20 +978,20 @@ ok      SETUP-API: without --chase-email it stops and says what's missing
 ok      SETUP-API: before Chase has an account it says "sign in once in the app" and fails
 ok      SETUP-API: ... and changes nothing
 ok      SETUP-API: fresh setup runs without error
-        | Family "Chase's kids" is ready: Everyone, Chase's side, Danielle's side, 7 houses, 2 events.
+        | Family "Chase's kids" is ready: Everyone, Chase's side, Mom's side, 7 houses, 2 events.
         | Test viewer invite (account B): code ME7PTME8ZN, works once until Oct 25, link https://hearth.family/i/95157b8d179d9b72e3e9e8b932b49aba391bec37
-        | Danielle's poster invite: code K3MKDAA2KY, works once until Oct 25, only for danielle@example.com, link https://hearth.family/i/948351fc8d6b5a99039f6fdc5df17c4f2fbc5001
+        | Mom's poster invite: code K3MKDAA2KY, works once until Oct 25, only for mom@example.com, link https://hearth.family/i/948351fc8d6b5a99039f6fdc5df17c4f2fbc5001
 ok      SETUP-API: Chase owns one family, named as given (an apostrophe in the name is kept, not a SQL error)
 ok      SETUP-API: one Everyone
-ok      SETUP-API: the set groups are Chase's side and Danielle's side (no v1 groups to retire later)
+ok      SETUP-API: the set groups are Chase's side and Mom's side (no v1 groups to retire later)
 ok      SETUP-API: the family's houses (SPEC-GROUPS section 2) plus a Test house for account B
 ok      SETUP-API: the Charleston trip and Birthday at Gigi's events
 ok      SETUP-API: Chase's parents' houses sit under Chase's side
 ok      SETUP-API: the Test house is under no group or event (account B sees only Everyone and Test house posts)
 ok      SETUP-API: everything is made as Chase (through the app's RPCs, not as the database owner)
 ok      SETUP-API: prints the test viewer's 10-letter invite code
-ok      SETUP-API: prints Danielle's poster invite code when --danielle-email is given
-ok      SETUP-API: Danielle's invite is a poster (adult) invite for her email
+ok      SETUP-API: prints Mom's poster invite code when --mom-email is given
+ok      SETUP-API: Mom's invite is a poster (adult) invite for her email
 ok      SETUP-API: the test viewer's invite names the Test house and says "all past photos"
 ok      SETUP-API: says the family is ready
 ok      SETUP-API: one Management API request (got 1)
@@ -1001,7 +1001,7 @@ ok      SETUP-API: psql is never called
 ok      SETUP-API: re-running runs without error
 ok      SETUP-API: re-running adds no family, group, house or event
 ok      SETUP-API: re-running prints a fresh test viewer code
-ok      SETUP-API: no Danielle invite unless --danielle-email is given
+ok      SETUP-API: no Mom invite unless --mom-email is given
 ok      SETUP-API: account B's code places it in the Test house
 ok      SETUP-API: account B sees a Test house post and not a Gammy's house post
 ok      SETUP-API: once someone else has joined, it stops and points to family-setup-v2.sql's dry run
