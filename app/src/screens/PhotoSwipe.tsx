@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // SWIPE-1..5: a post's photos, one at a time at the card's full width. A swipe moves through
 // them, and so do labeled "◀ Back" / "Next ▶" buttons (no gesture-only actions), with "2 of 7"
 // words a screen reader hears. Plain FlatList paging: no native dependency (Expo Go, web).

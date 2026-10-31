@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Persistent upload queue (BETA-SHARE-4).
 //
 //   draft ──create_post──▶ uploading ──sign/encrypt/PUT──▶ finalizing ──finalize+publish──▶ published

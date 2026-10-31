@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Invite link → "Chase invited you" → email → code → Photos (BETA-JOIN-1/-3, UX-REVIEW #16/#17).
 import React, { useEffect, useRef, useState } from 'react';
 import { isApiError, type InvitePreview } from '../api/HearthApi';

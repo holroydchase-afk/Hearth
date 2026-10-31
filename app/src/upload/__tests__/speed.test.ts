@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // PERF-UP-1..3 (review RV-P1, decision A2): sending overlaps work instead of doing one thing at a time.
 import type { HearthApi, UploadItemSpec } from '../../api/HearthApi';
 import { FakeBackend, FIXTURE } from '../../api/fake/FakeBackend';

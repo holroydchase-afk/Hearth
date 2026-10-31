@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-TIME-1..4 on screen: Photos stays newest-shared-first, old photos go in an
 // "Added from earlier" card, "Show by date" opens the timeline, "Jump to year" lists years.
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react-native';

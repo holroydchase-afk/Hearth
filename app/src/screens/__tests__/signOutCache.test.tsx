@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // HARD-13 (privacy review, Oct 28): the feed cache (captions, names, reactions) leaves the phone with the person.
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';

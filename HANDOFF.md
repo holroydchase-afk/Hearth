@@ -1,5 +1,14 @@
 # Handoff
 
+## Oct 31: open PRs merged, 0020 and 0021 deployed, AGPL headers (branch claude/project-thread-rmj7at, PR)
+- **Chase's ask:** "fix all issues, determine the correct order including merge 73, deploy 0020", then "also do the AGPL work".
+- **CI:** Actions started no jobs while the repo was private (no runner, no logs: the billing limit). Public again Oct 31, so CI runs; every PR below was green before it merged.
+- **Merged in order:** #70 (bug sweep), #73 (video part 1, 0020), #74 (change the words, 0021), #75 (bulk title), #76 (words pass), #78 (HARD-16), #71 (root LICENSE). Conflicts were docs only (HANDOFF, TRACKER, the Test Log seed); the video row became TRACKER R27 (R25 is the agent re-sync, R26 the demo scrub); a real first name in DEC-43 became "the least-savvy grandparent".
+- **Deployed (Chase's word):** migrations 0020 and 0021 (smoke 9/9, 21 migrations); functions unchanged. Expo preview republished from main 89a5864 (group d84933ed, iOS 01a1903e-...-063598d9f5d6), verified on the standing link. Video stays off.
+- **AGPL follow-up (this PR):** DEC-44, every source file in `app/src`, the edge functions and the messenger carries `SPDX-License-Identifier: AGPL-3.0-or-later`; `app/package.json` license; `scripts/check-spdx.sh` plus LIC-1..3 in `test-all.sh`.
+- **#77** (scrub real-family details) merged Oct 31 by its own thread before this PR; old commits still hold the names until the history cleanup ("Host the Hearth demo publicly").
+- **Next exact step:** Chase says "merge" for this PR; check "Change the words" and a bulk title on the phone.
+
 ## Oct 30: demo parent rename kept as "Kai" (main, PR #81); PR #77 brought up to date
 - PR #77 had renamed the parent to "Max" in parallel; that commit is reverted and main (458236e) merged in, so the demo says Kai. Product Studio uses `portfolio/hearth-demo-site-2026-10-30-kai.tgz` (issue #79). App Jest 677 + 1 skipped and typecheck, 3 runs, local (Actions is off while private).
 
@@ -13,7 +22,6 @@
 - **Portfolio / public presence:** INTAKE for Product Studio at `/mnt/project-files/portfolio/INTAKE-2026-10-29-demo-host.md`, with a fresh build tarball beside it. To update once Pages is live: Pages URL instead of /demo/hearth/.
 - **Next exact step:** Chase picks how to clean the old commits (card; recommended: rewrite in place right after #70-#77 merge, then one GitHub Support form to purge cached PR pages). Then the repo goes public, the workflow gains a Pages deploy at chaseholroyd.com/Hearth/, and the INTAKE gets that URL.
 
-## Oct 29: studio agents re-synced (TRACKER R25, branch claude/project-thread-jt1p84, PR)
 ## Oct 29: repo public, root LICENSE added (branch claude/project-thread-l5pj6x, PR)
 - Chase made the repo public Oct 29 (it also unblocked GitHub Actions, which had stopped on the private repo's billing limit). A read-only scan of every branch's history found no secrets (only AWS's documentation example key and a dummy test JWT). The web app URL is in the code because invite links use it; invites still gate sign-in.
 - Added the root `LICENSE` (AGPL-3.0 text, copied from `packages/messenger/LICENSE`) so the public code is under the license Chase picked (DEC-7). DEC-7 planned going public after milestone 1 and a final name; Chase went public earlier, so the name "Hearth" is now more visible, and the README says so. Still open: whether Hearth's notices say AGPL-3.0-only or -or-later (the messenger library uses -or-later); SPDX headers on Hearth's own files.

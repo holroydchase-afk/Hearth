@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // EXPO-3: milestone 1 runs in Expo Go (Chase, Oct 17), so the app reaches Chase's iPhone as an EAS Update
 // opened in Expo Go, with no laptop dev server. Expo Go only loads an update whose runtime version is its
 // SDK ("exposdk:57.0.0"), so the policy must be sdkVersion until the first real build (milestone 2).

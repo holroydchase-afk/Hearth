@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Feed cache: keyset pagination over get_feed, a per-user cached first page for instant opens,
 // and optimistic hearts, comments and deletes. Framework-free; React reads it through useFeed().
 import type { CommentRow, FeedPost, HearthApi, Reaction, ReactionCounts } from '../api/HearthApi';

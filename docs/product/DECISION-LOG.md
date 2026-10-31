@@ -317,5 +317,12 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** every "who sees it" line must be true (A1), and a refusal must not make the least-savvy grandparent think they broke something.
 - **Source:** `docs/product/decisions/2026-10-29-words-pass.md`
 
+### DEC-44 · Hearth's files say AGPL-3.0-or-later (LIC-1..3)
+- **When / status:** Oct 31 · Claude's default on Chase's "also do the AGPL work"; Chase can switch to -only before the first outside contribution
+- **Chose:** `SPDX-License-Identifier: AGPL-3.0-or-later` plus Chase's copyright on every source file, and in `app/package.json`, matching the messenger library (DEC-42). Persona check `decisions/2026-10-31-license-or-later.md`.
+- **Over:** AGPL-3.0-only (would differ from the library in the same repo) and no per-file headers (the license only in the root file).
+- **Because:** one license string everywhere is clearer for tech readers and tools; -or-later is the FSF's recommended form; Chase still owns all the code, so dual licensing stays possible (DEC-7).
+- **Source:** `docs/product/decisions/2026-10-31-license-or-later.md`
+
 ---
-Last updated: Oct 29, 2026 (DEC-43)
+Last updated: Oct 31, 2026 (DEC-44)

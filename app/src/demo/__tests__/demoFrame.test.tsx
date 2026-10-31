@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DEMO-6 (RR-6): on a laptop the demo shows the app in a phone-width column beside a short panel that
 // tells a hiring manager what Hearth is and what to try; on a phone it's just the app.
 import { render, screen } from '@testing-library/react-native';

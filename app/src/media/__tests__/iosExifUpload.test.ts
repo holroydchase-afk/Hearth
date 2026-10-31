@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MEDIA-1 (UAT item 6, Oct 19): Chase's first iPhone photo showed "Didn't send". create_post
 // returned 200, sign-media was never called. Cause under test: iOS UIImage.jpegData writes a
 // small APP1 Exif block (ColorSpace + pixel size), and the pipeline refused any Exif. The photo

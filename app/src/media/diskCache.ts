@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // A3 (DEC-29): encrypted photo files kept on the phone so Photos opens instantly and offline.
 // Files hold exactly the ciphertext from B2 (aes-256-gcm-chunked-v1); the keys to open them live in a
 // separate keychain-backed store (platform/secureSession.ts) and are wiped at sign-out.

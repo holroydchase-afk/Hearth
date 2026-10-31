@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import * as ImagePicker from 'expo-image-picker';
 // SDK 57 moved these functions to /legacy; the root import now throws on them at runtime.
 import * as MediaLibrary from 'expo-media-library/legacy';

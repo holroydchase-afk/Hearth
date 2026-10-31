@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // RR-15: the demo opens photos at /viewer?postId=…, a folder a static host can serve on reload
 // (/viewer/<id> has no file behind it). Same screen as viewer/[postId].
 import { Redirect, useLocalSearchParams } from 'expo-router';

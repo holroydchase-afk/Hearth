@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Test helpers: put real (encrypted) media into a FakeBackend the same way the app does.
 import type { FakeBackend } from '../api/fake/FakeBackend';
 import { FIXTURE } from '../api/fake/FakeBackend';

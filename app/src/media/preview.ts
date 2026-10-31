@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R15 photo helpers: a 160 px JPEG of a picked photo, for the look-alike and blur arithmetic
 // (share/helpers.ts). Made and read on the phone; never sent or kept (HELP-R2).
 import { fitLongEdge, type Manipulator } from './pipeline';

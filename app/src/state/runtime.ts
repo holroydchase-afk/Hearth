@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Builds the app's dependencies. EXPO_PUBLIC_HEARTH_FAKE=1 → in-memory FakeApi (web smoke test,
 // demos); otherwise SupabaseApi against EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY.
 import { createClient } from '@supabase/supabase-js';

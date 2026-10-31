@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-BULK-1 (grandparent-ux finding, Oct 17): a capture date more than 1 day in the future is wrong
 // (a phone with a bad clock, an edited EXIF date). The phone ignores it, so the photo never lands in
 // "2027" on the timeline. The server also clamps taken_at to published_at (backend/tests/timeline_future_test.sql).

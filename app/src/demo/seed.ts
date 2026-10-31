@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // The no-login sample-data demo (RR-1..3, RR-10 in docs/reviews/2026-10-22-recruiter-ready.md).
 // Fills the in-memory FakeBackend with a made-up family's posts, signs the visitor in as the parent,
 // and lets them switch to Grandma Jo's view. Everything stays in the browser; no real backend.

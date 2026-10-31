@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-BULK-2/3/5: plan a bulk pick into posts, on the phone.
 // Up to 100 photos per pick, grouped by the day taken (phone's time zone) into posts of at
 // most 10 (the BETA-SHARE-1 limit). Videos are skipped with a plain line. Only the date read

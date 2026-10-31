@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // UI-3..4 (release M1.1 phase 3, docs/reviews/2026-10-28-ui-8.md): one solid button per screen, and the
 // demo's Me screen names the made-up person instead of a placeholder email.
 import { fireEvent, screen } from '@testing-library/react-native';

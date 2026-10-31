@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R15 photo helpers: the small preview each helper reads (HELP-R2: on the phone, never sent or kept).
 import { PREVIEW_LONG_EDGE, makePreviewBytes } from '../preview';
 import type { Manipulator } from '../pipeline';

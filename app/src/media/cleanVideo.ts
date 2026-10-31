@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Pure-TS QuickTime / MP4 metadata cleaner and verifier (FLAG-7; SPEC-MEDIA 3.3, section "Video"). No native code
 // and no re-encode, so it runs in Expo Go, on Android and on the web.
 //

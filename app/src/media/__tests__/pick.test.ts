@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-BULK-1/2: the bulk picker asks for up to 100 items with EXIF (read on the phone, never sent).
 jest.mock('expo-image-picker', () => ({
   VideoExportPreset: { Passthrough: 0, H264_1280x720: 6 },

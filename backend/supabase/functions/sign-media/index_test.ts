@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // deno test --allow-env supabase/functions/sign-media/
 // Smoke test of the handler against a mocked PostgREST (no network).
 import { handler } from "./index.ts";

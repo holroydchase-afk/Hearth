@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // notify: sends queued notices (migration 0003). Run every minute by pg_cron/pg_net
 // (or Supabase Scheduled Functions) with the service role key as the bearer.
 //

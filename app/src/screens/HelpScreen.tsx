@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Help tab for viewers (UX-REVIEW #11-#15): Call Chase first, Bigger text on by default.
 import React from 'react';
 import { useApp } from '../state/AppContext';

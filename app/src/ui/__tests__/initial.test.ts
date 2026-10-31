@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // UI-27: the avatar letter skips a leading "The", so "The Holroyds" shows "H", not "T".
 import { initialOf } from '../format';
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Viewing media: GET sign-media (10-minute URLs + per-item key), fetch ciphertext, decrypt in
 // memory, hand <Image> a data: URI. Decrypted bytes never touch disk except "Save to my phone".
 // A3 (DEC-29): with `disk`, the ciphertext is also kept on the phone and its key in the keychain-backed

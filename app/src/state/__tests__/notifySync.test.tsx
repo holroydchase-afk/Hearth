@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // AE-2: the app tells the server where to send notices (push token + choice per space).
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';

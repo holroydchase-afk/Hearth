@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Hearth's side of the messenger (docs/product/SPEC-MESSENGER.md). The MLS engine is the shared library in
 // packages/messenger (@holroyd/messenger); this file plugs in what is Hearth's own:
 //   * the relay and roster are migration 0015's RPCs (a chat is a group or event; its people are the group's

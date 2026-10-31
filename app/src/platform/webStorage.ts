@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // HARD-7: a browser with storage blocked (private window, strict cookie settings, some embeds) throws on
 // window.localStorage itself. Callers get undefined instead and keep things in memory for this visit.
 export function webStorage(): Storage | undefined {

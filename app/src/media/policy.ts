@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Media policy (SPEC-MEDIA D1-D7, section 1). ONE typed, frozen, code-level object: there is no
 // remote switch, so a changed server can't turn location on. How a change is made: SPEC-MEDIA 1.5
 // (staff-pm call, privacy-security review, Chase's word for any keep/extract; bump `version`).

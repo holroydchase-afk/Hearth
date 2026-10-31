@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // "Save to my phone" (BETA-SEE-5): write the decrypted 2048 px JPEG (already stripped of
 // location data before upload) to a temp file, hand it to the photo library, delete the temp.
 import { File, Paths } from 'expo-file-system';

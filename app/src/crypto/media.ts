@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // aes-256-gcm-chunked-v1: the client-side format for media bytes stored in B2.
 //
 // The backend never decrypts, so only clients must agree on this layout:

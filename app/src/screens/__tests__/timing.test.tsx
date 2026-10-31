@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // AE-10 / BETA-NOTIFY-1: posters can see and copy how fast notices reached this phone.
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';

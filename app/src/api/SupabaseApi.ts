@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // HearthApi over supabase-js (PostgREST RPCs) + the sign-media edge function.
 // Privacy: nothing here logs keys, URLs or captions.
 import type { SupabaseClient } from '@supabase/supabase-js';

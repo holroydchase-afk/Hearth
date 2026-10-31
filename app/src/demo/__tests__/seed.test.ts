@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DEMO-1..3, DEMO-10 (docs/reviews/2026-10-22-recruiter-ready.md RR-1..3, RR-10): the no-login
 // sample-data demo. A visitor lands in a family with photos already in it, as the parent, with no
 // sign-in, and can switch to Grandma Jo's view to see that she gets only what was shared with her.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // A3: kept photo files (ciphertext only) in the app's cache folder. The phone may clear it when space is low;
 // that is fine, the photo is fetched again. Names are `<media_id>.<thumb|display>`.
 import { Directory, File, Paths } from 'expo-file-system';

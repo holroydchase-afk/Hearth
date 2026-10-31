@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-BULK-1 fallback: a photo with no EXIF date (a screenshot, a saved or forwarded photo) gets its
 // date from the photo library's creation time, read on the phone. No new permission prompt: we only
 // read when the Photos access the picker already asked for is granted. Only a number comes back;

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // FLAG-5 (SPEC-GROUPS v2 section 5): the app reads my_features(space) at start; video posting is a server
 // switch now, not a constant in the app. Written first: red until the app catches up.
 import { readFileSync } from 'fs';

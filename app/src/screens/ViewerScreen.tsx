@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Full-screen viewer (BETA-SEE-3/-5): Back / Next buttons AND swipe, labeled Close,
 // "From Chase · Sun, Oct 11", caption under the photo, "Save to my phone".
 import React, { useEffect, useMemo, useRef, useState } from 'react';

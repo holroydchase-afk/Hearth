@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R15 photo helpers (SPEC-PHOTO-HELPERS): plain arithmetic on a small grayscale picture, on the phone.
 // No trained model. dHash finds near-duplicates; the variance of the Laplacian scores sharpness.
 // Nothing computed here is sent or stored (HELP-R2).

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Per-user, on-this-phone choices. Viewers start with Bigger text ON (UX-REVIEW #3, #15).
 import type { Role } from '../api/HearthApi';
 import type { NotificationPrefs } from '../api/types';

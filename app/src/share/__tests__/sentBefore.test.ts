@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R15 HELP-DUP-2: photos this person already sent in the last 30 days, kept on the phone only.
 import { memoryKV } from '../../platform/kv';
 import { SENT_KEEP_DAYS, loadSent, recordSent } from '../sentBefore';

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Minimal AWS Signature V4 query-string presigner (S3-compatible: Backblaze B2, R2).
 // Web Crypto only — no SDK. Verified against the AWS documented example in sigv4_test.ts.
 

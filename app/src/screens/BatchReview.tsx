@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-BULK-3: the one review screen before a bulk pick sends.
 // "48 photos from 3 days. Send to: Everyone [Change]. Send". The audience is picked once, in
 // words, for the whole batch; the default is the last group used, never a silent Everyone.

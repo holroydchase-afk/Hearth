@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Push wiring. Without an EAS projectId (no credentials here) every call is a no-op.
 // Payloads never carry captions, names of children or image URLs (BETA-NOTIFY-2):
 // the only field we read is data.post_id.

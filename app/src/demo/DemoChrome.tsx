@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // The demo build's frame around the app (web only): the demo bar above every screen, and on a
 // laptop the phone-width column beside the story panel (DemoFrame).
 import React, { type ReactNode } from 'react';

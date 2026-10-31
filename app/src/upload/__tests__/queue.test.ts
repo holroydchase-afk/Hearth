@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-SHARE-4: the upload queue survives an app kill, retries with backoff, never duplicates.
 import { ApiError, type HearthApi, type UploadItemSpec } from '../../api/HearthApi';
 import { FakeBackend, FIXTURE } from '../../api/fake/FakeBackend';

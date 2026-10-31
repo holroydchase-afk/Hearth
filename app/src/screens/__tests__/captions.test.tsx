@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // CAP-1, CAP-3..5 (docs/product/SPEC-CAPTIONS.md, DEC-39): an optional title for the whole set, shown as the
 // card's heading above the caption; a long caption folds to 4 lines behind a worded Read more.
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';

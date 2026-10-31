@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R11 (RV-U3, design note docs/product/decisions/2026-10-21-photos-header.md): fewer stacked buttons before the
 // first photo. The four header buttons sit two to a row; with Bigger text a row wraps instead of squeezing.
 import { screen, within } from '@testing-library/react-native';

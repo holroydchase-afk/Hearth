@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // AE-10 / BETA-NOTIFY-1: how fast notices reached this phone, for the milestone 2 check.
 // Read from this phone only; "Copy the report" is the only way it leaves, and only by choice.
 import React, { useState } from 'react';

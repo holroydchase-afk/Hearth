@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // EVT-6..9: inside an event, every member's photos as one timeline by when they were taken. Oldest first (an event
 // reads like a story), a header per local day, 1-hour moments, an optional filter to one person, and photos with no
 // capture time last under "Added later" (by when they were shared). Computed on the phone from the event's posts this
