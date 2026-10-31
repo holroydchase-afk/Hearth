@@ -560,8 +560,8 @@ export class FakeBackend {
   setReaction(user: string | null, post: string, emoji: Reaction): ReactionState {
     const me = this.requireUser(user);
     if (!(['❤️', '😂', '👍'] as string[]).includes(emoji)) throw new ApiError('22023', 'unknown reaction');
-    const p = this.visiblePost(me, post);
-    if (p.status !== 'published') throw new ApiError('P0002', 'not found');
+    const p = this.visiblePost(me, post); // HARD-15: like 0017, the author may react to their own unsent post
+    if (p.deleted) throw new ApiError('P0002', 'not found');
     const i = this.state.hearts.findIndex((h) => h.post === post && h.user === me);
     const had = i >= 0 ? (this.state.hearts[i]!.emoji ?? '❤️') : null;
     if (had === emoji) this.state.hearts.splice(i, 1);
@@ -582,7 +582,7 @@ export class FakeBackend {
       } catch {
         continue;
       }
-      if (p.status === 'published' && !p.deleted) out.push({ post_id: id, ...this.reactionsOf(me, p) });
+      if (!p.deleted) out.push({ post_id: id, ...this.reactionsOf(me, p) });
     }
     return out;
   }
