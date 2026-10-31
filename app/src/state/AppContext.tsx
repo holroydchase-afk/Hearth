@@ -50,6 +50,8 @@ export interface AppValue {
   features: string[];
   setPrefs: (p: Partial<Prefs>) => void;
   saveNotify: (notify: NotifyChoice) => Promise<boolean>;
+  /** HELP-R6: the owner turns a family feature on or off, then features are read again. False if it didn't save. */
+  setFamilyFeature: (feature: string, enabled: boolean) => Promise<boolean>;
   /** Re-read session + spaces (after sign-in or joining). */
   reload: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -201,6 +203,19 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
     }
   }, [deps.api, setPrefs]);
 
+  const setFamilyFeature = useCallback(async (feature: string, enabled: boolean): Promise<boolean> => {
+    const space = live.current.space?.space_id;
+    if (!space) return false;
+    try {
+      await deps.api.setFamilyFeature(space, feature, enabled);
+    } catch {
+      return false;
+    }
+    const features = await deps.api.myFeatures(space).catch(() => null);
+    if (features) setS((cur) => (cur.space?.space_id === space ? { ...cur, features } : cur));
+    return true;
+  }, [deps.api]);
+
   const signOut = useCallback(async () => {
     live.current.queue?.stop();
     unlisten.current?.();
@@ -220,9 +235,10 @@ export function AppProvider({ deps, children }: { deps: AppDeps; children: React
     helper: s.space ? (s.space.role === 'owner' ? null : s.space.inviter_name) : null,
     setPrefs,
     saveNotify,
+    setFamilyFeature,
     reload: load,
     signOut,
-  }), [s, deps, setPrefs, saveNotify, load, signOut]);
+  }), [s, deps, setPrefs, saveNotify, setFamilyFeature, load, signOut]);
 
   return (
     <Ctx.Provider value={value}>

@@ -132,6 +132,9 @@ export interface HearthApi {
   familyPeople(space: string): Promise<Person[]>;
   /** my_features (FLAG-5): the features on for the caller in this family. Default none. */
   myFeatures(space: string): Promise<string[]>;
+  /** space_features (HELP-R6): the family's owner turns a feature on or off for the family (RLS: family_settings,
+   *  owner only, 42501). Hearth's global switch still wins, so re-read myFeatures after. */
+  setFamilyFeature(space: string, feature: string, enabled: boolean): Promise<void>;
 
   // --- messenger relay (SPEC-MESSENGER, 0015): opaque base64 MLS bytes ---
   chatList(space: string): Promise<ChatSummary[]>;

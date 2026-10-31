@@ -324,5 +324,12 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **Because:** one license string everywhere is clearer for tech readers and tools; -or-later is the FSF's recommended form; Chase still owns all the code, so dual licensing stays possible (DEC-7).
 - **Source:** `docs/product/decisions/2026-10-31-license-or-later.md`
 
+### DEC-45 · The family's owner turns the photo helpers off and on from Me (HELP-R6)
+- **When / status:** Oct 31 · Night shift, under "Decisions to review" (Chase to confirm)
+- **Chose:** a "Photo helpers" card on Me, owner only, with two family-wide switches in grandparent-ux's words. No migration: the owner already had write access to `space_features` (0013). Persona check `decisions/2026-10-31-photo-helpers-switch.md`.
+- **Over:** leaving it as a database row (Chase can't change it from his phone), and a per-person switch (more to explain; the spec's control model is family-wide, DEC-18).
+- **Because:** the helpers set photos aside, so the person who set the family up must be able to stop that in one tap (A1, A2).
+- **Source:** `docs/product/decisions/2026-10-31-photo-helpers-switch.md`
+
 ---
-Last updated: Oct 31, 2026 (DEC-44)
+Last updated: Oct 31, 2026 (DEC-45)

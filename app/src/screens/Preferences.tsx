@@ -3,6 +3,7 @@
 // Blocks shared by Help (viewers) and Me (posters): Bigger text, notice choice, privacy, sign out.
 import React, { useState } from 'react';
 import { useApp } from '../state/AppContext';
+import { HELPER_FEATURES } from '../share/helpers';
 import type { NotifyChoice } from '../state/prefs';
 import { Button, Card, Choice, Confirm, Notice, Txt } from '../ui/kit';
 
@@ -50,6 +51,48 @@ export function HowToTell() {
         />
       ))}
       {saved ? <Notice text={saved.text} tone={saved.good ? 'good' : 'info'} /> : null}
+    </Card>
+  );
+}
+
+const HELPERS = [
+  { feature: HELPER_FEATURES.duplicates, title: 'Set aside repeats', detail: 'The same photo twice, look-alikes, and photos sent in the last 30 days.' },
+  { feature: HELPER_FEATURES.screensBlur, title: 'Set aside screenshots and blurry photos', detail: "Pictures of a phone's screen, and photos that came out blurry." },
+];
+
+/** HELP-R6 (R17): the family's owner turns the photo helpers off and on for everyone who shares (DEC-18). */
+export function PhotoHelpers() {
+  const { space, features, setFamilyFeature } = useApp();
+  const [note, setNote] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  if (!space || space.role !== 'owner') return null;
+  return (
+    <Card>
+      <Txt variant="title" role="header">Photo helpers</Txt>
+      <Txt variant="muted">When anyone picks 4 or more photos to send, Hearth can set some aside first. Each one has a Put back button. Nothing is deleted from the phone. These switches are for the whole family.</Txt>
+      {HELPERS.map((h) => {
+        const on = features.includes(h.feature);
+        return (
+          <Choice
+            key={h.feature}
+            kind="switch"
+            label={h.title}
+            title={h.title}
+            detail={h.detail}
+            checked={on}
+            onPress={() => {
+              if (busy) return;
+              setBusy(true);
+              setNote(null);
+              void setFamilyFeature(h.feature, !on).then((ok) => {
+                setBusy(false);
+                if (!ok) setNote("Didn't save. Check your signal, then tap the switch again.");
+              });
+            }}
+          />
+        );
+      })}
+      {note ? <Notice text={note} tone="info" /> : null}
     </Card>
   );
 }
