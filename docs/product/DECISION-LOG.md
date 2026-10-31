@@ -314,7 +314,7 @@ Status: **Built** (in `main`), **Decided** (agreed, not built yet), **Replaced**
 - **When / status:** Oct 29 · Night shift, under "Decisions to review" (Chase to confirm)
 - **Chose:** grandparent-ux's four word fixes: the caption hint names "the groups you pick", a refused edit says the old words are kept, "Not even Hearth can read it" in Messages, and the group count moves onto the names line. Persona check `decisions/2026-10-29-words-pass.md`.
 - **Over:** keeping "(Grandma will see this)" (untrue for one-side posts), the generic "You can't do that here.", and "Name · 3 people" titles that wrap at large text.
-- **Because:** every "who sees it" line must be true (A1), and a refusal must not make Scott think he broke something.
+- **Because:** every "who sees it" line must be true (A1), and a refusal must not make the least-savvy grandparent think they broke something.
 - **Source:** `docs/product/decisions/2026-10-29-words-pass.md`
 
 ---

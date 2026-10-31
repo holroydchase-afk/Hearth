@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 29: repo public, root LICENSE added (branch claude/project-thread-l5pj6x, PR)
+- Chase made the repo public Oct 29 (it also unblocked GitHub Actions, which had stopped on the private repo's billing limit). A read-only scan of every branch's history found no secrets (only AWS's documentation example key and a dummy test JWT). The web app URL is in the code because invite links use it; invites still gate sign-in.
+- Added the root `LICENSE` (AGPL-3.0 text, copied from `packages/messenger/LICENSE`) so the public code is under the license Chase picked (DEC-7). DEC-7 planned going public after milestone 1 and a final name; Chase went public earlier, so the name "Hearth" is now more visible, and the README says so. Still open: whether Hearth's notices say AGPL-3.0-only or -or-later (the messenger library uses -or-later); SPDX headers on Hearth's own files.
+- Also Oct 29 in thread "Check all open PRs": #69, #58 and #57 merged (decisions renumbered DEC-41 and DEC-42).
+- Next exact step: Chase says "merge" for this PR.
+
 ## Oct 30, night shift: HARD-16, Haha or Like never takes away a heart (branch claude/project-thread-kzt7by-n1030, draft PR, stacked on #76)
 - **Fixed, test-first (B12):** on a server before 0017 (no `set_reaction`), the app's fallback flipped the heart, so Haha or Like on a hearted post removed the heart. Now only Love takes a heart back; a non-heart tap that flipped it off flips it back. `SupabaseApi.test.ts` HARD-16 ×2. App only; the hosted server has 0017, so this guards older or self-hosted servers.
 - **Also tonight:** #74-#76 brought up to date with main (#72's HANDOFF/TRACKER conflicts resolved, R25 marked merged) and given the new required `Agents:` line.

@@ -165,6 +165,7 @@ The plan with priorities and refactors is `AI-FEATURES.md` "Build plan". Milesto
 
 ## Done (latest first)
 
+- Oct 29: repo public (Chase); history scanned, no secrets; root `LICENSE` (AGPL-3.0) added. PR, not merged.
 - Oct 29 (bug sweep): B11 (HARD-14, an old reaction summary hid a confirmed reaction) and T11 (HARD-15, the fake now lets an author react to their own unsent post, like 0017; real-API contract covers it) fixed test-first. Milestone 1 sequence and Missing table brought up to date (steps 3-6 and 8 done; step 7's email notice left); R16, R20, R22 marked merged.
 - Oct 26: the messenger moved into the shared library `packages/messenger` (`@holroyd/messenger`), licensed AGPL-3.0-or-later with Chase as copyright holder (DEC-42, Product Studio STU-DEC-1). Hearth's chat is a thin adapter over it with no behavior change; PKG-1..6 and the relay template's RELAY-1..9 run in the suites. Crew Clock is the next user. Merged Oct 29 (PR #57).
 - Oct 26: Photos screen UI review, 5/10 → 6/10 (`docs/reviews/2026-10-26-photos-screen.md`). UI-26 no refresh button, one header row with the sort icon (DEC-41); UI-27 avatar letter skips "The". Merged Oct 29 (PR #58).
