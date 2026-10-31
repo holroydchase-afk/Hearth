@@ -128,8 +128,9 @@ select tests.throws(format('select public.set_post_audience(%L, array[%L]::uuid[
                     'Non-author cannot change a post''s audience', 'only the author');
 with d as (delete from post_audiences where post_id = :p_a_co returning 1)
 select tests.ok((select count(*) from d) = 0, 'Non-author delete on post_audiences affects 0 rows');
-with d as (update posts set caption = 'hacked' where id = :p_a_co returning 1)
-select tests.ok((select count(*) from d) = 0, 'Non-author cannot edit post');
+-- HARD-18 (0021): nobody updates posts.caption directly any more; the sender uses edit_post_words.
+select tests.throws(format('update posts set caption = %L where id = %L', 'hacked', :p_a_co),
+                    'Non-author cannot edit post', 'permission denied');
 select tests.throws(format('select public.create_invite(%L, %L, array[%L]::uuid[])', :space_a, 'viewer', :c_a_co),
                     'Co-parent (viewer) cannot create invites in the other space', 'only space owners');
 reset role;
@@ -333,7 +334,8 @@ select tests.ok((public.space_upload_quota(:space_a)->>'videos_this_month') is n
 select tests.ok_sql(format('select exists (select id, name, plan from spaces where id = %L)', :space_a),
                     'Members can still read the space''s name and plan');
 select set_config('request.jwt.claim.sub', :alex, false);
-select tests.ok((public.space_upload_quota(:space_a)->>'videos_this_month')::int = 7, 'Owner still sees the upload count');
+-- S14 (0020): the count shown is the poster's own videos this month across free families (10 from section 6), not the space's counter.
+select tests.ok((public.space_upload_quota(:space_a)->>'videos_this_month')::int = 10, 'Owner still sees the upload count (their own, S14)');
 reset role;
 
 -- 9b. Free-tier cap: a video cannot be smuggled in as kind=photo.

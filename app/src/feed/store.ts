@@ -133,14 +133,20 @@ export class FeedStore {
    *  (no reaction_summary) or a failed call leaves the hearts-only view. */
   private async addReactions(rows: FeedPost[]): Promise<FeedPost[]> {
     if (!rows.length) return rows;
+    // HARD-14: a summary read before a tap is older than that tap's answer, so it never overwrites it.
+    const taps = new Map(rows.map((r) => [r.post_id, this.heartSeq.get(r.post_id) ?? 0]));
     try {
       const sums = new Map((await this.o.api.reactionSummary(rows.map((r) => r.post_id))).map((s) => [s.post_id, s]));
+      const fresh = (id: string) => !this.pendingHearts.has(id) && (this.heartSeq.get(id) ?? 0) === taps.get(id);
       for (const [id, s] of sums) {
-        if (!this.pendingHearts.has(id)) this.patchPost(id, { my_reaction: s.my_reaction, reaction_counts: s.counts });
+        if (fresh(id)) this.patchPost(id, { my_reaction: s.my_reaction, reaction_counts: s.counts });
       }
       return rows.map((r) => {
         const s = sums.get(r.post_id);
-        return s ? { ...r, my_reaction: s.my_reaction, reaction_counts: s.counts } : r;
+        if (!s) return r;
+        const now = this.find(r.post_id);
+        return fresh(r.post_id) || !now ? { ...r, my_reaction: s.my_reaction, reaction_counts: s.counts }
+          : { ...r, i_hearted: now.i_hearted, heart_count: now.heart_count, my_reaction: now.my_reaction, reaction_counts: now.reaction_counts };
       });
     } catch {
       return rows;
@@ -277,6 +283,20 @@ export class FeedStore {
       this.set({ posts: before });
       this.notice(e);
       return false;
+    }
+  }
+
+  /** CAP-6..8: the sender changes the title and caption. Waits for the server (no guess on screen); on a refusal
+   *  the card keeps its words and the plain-words reason comes back for the sheet to show. */
+  async editWords(id: string, title: string, caption: string): Promise<string | null> {
+    const t = title.trim() || null;
+    const c = caption.trim() || null;
+    try {
+      const at = await this.o.api.editPostWords(id, t, c);
+      this.set({ posts: this.state.posts.map((p) => (p.post_id === id ? { ...p, title: t, caption: c, words_edited_at: at } : p)) });
+      return null;
+    } catch (e) {
+      return messageFor(e, { inviter: this.o.inviter, action: 'edit' });
     }
   }
 

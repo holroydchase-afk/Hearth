@@ -132,3 +132,22 @@ Each phase adds to the last; none replaces stored data or a screen.
 **Storage cost:** a Live item stores a .mov beside each still, probably several times a 2048 px JPEG. Measure on 10 of Chase's Live Photos in L1 before turning it on; the free-tier video cap (`free_video_cap_reached`) should count Live items too.
 
 **Cut:** video compression in Expo Go and HEIC output are out until a dev build (ideas log). Full-quality originals are not cut by the build, only by size: one policy value (D7), with its own persona check before it's turned on.
+
+## 4. Video (FLAG-7, built Oct 29)
+**What changed.** BETA-SPEC said iOS video location "can't be stripped without a transcoder". That was too strong: the location sits in metadata boxes, not in the picture, so it can be removed by rewriting boxes, in TypeScript, in Expo Go. `app/src/media/cleanVideo.ts` does that; nothing is re-encoded by us.
+
+**How.** On iPhone the picker re-encodes the pick to 720p H.264 MP4 first (`videoExportPreset: H264_1280x720`, Apple's AVAssetExportSession inside expo-image-picker 58.0.10; BETA-SHARE-6's 720p). Android hands over the camera file. Then `cleanVideo` keeps `ftyp`, and in `moov` only `mvhd`, the picture (`vide`) and sound (`soun`) tracks and, in each, `tkhd`, `edts`, `mdia` (`mdhd`, `hdlr`, `minf`: `vmhd`/`smhd`, `hdlr`, `dinf`, `stbl` with its sample tables). Every other box (`udta` with `©xyz`, make, model, software; `meta` with `com.apple.quicktime.location.ISO6709`; `uuid` XMP; `loci`; unknown) becomes a zero-filled `free` box of the same size, so no offset moves. A track that isn't picture or sound (timed metadata, which is how GoPro and drones store GPS; timecode; text) is freed and its samples in `mdat` are zeroed through its own tables. Creation and change dates in `mvhd`, `tkhd`, `mdhd`, and the vendor and compressor name in each sample description, are zeroed. Bytes after the last box (Samsung's SEF trailer) are zeroed. `verifyVideoClean` then fails closed: `META_LOCATION`, `META_DATETIME`, `META_SOFTWARE`, `META_OTHER`; an unreadable file is `EXIF`.
+
+**Left inside on purpose.** The picture and sound samples, byte for byte. A video encoded by software that writes text into the picture stream itself (x264's settings banner) keeps it; phone cameras and Apple's exporter don't write one. Size: the whole file is read into memory once and copied once (about 2 × 40 MB for 60 s at 720p).
+
+**Not built yet (TRACKER R27):** the poster frame (thumbnail), the player on Photos, words from grandparent-ux, the manual FLAG-7 check (a real iPhone and Android video, posted and downloaded, through exiftool), then turning `video_posting` on. Live Photo motion (L1) reuses this cleaner.
+
+| ID | Type | Given / When / Then |
+|---|---|---|
+| VID-1..4 | auto · **Built Oct 29** | **Given** iPhone-like and Android-like files (moov first or last, 64-bit offsets, a Samsung trailer, a timed-metadata track), **When** cleaned, **Then** no location, make, model, software, XMP, face box, timecode or date survives anywhere in the file, the length is unchanged and the picture and sound samples are byte-identical where the tables point. |
+| VID-5, 11 | auto · **Built Oct 29** | **Given** a file with a location box, a date, a vendor name or an unknown box left, **When** verified, **Then** `META_LOCATION`, `META_DATETIME`, `META_SOFTWARE` or `META_OTHER`. |
+| VID-6, 7 | auto · **Built Oct 29** | **Given** a non-video, no `moov`, two `moov`s, a cut-short `mdat` or a sample table pointing outside the file, **When** cleaned, **Then** `EXIF`, never a pass-through. |
+| VID-8..10 | auto · **Built Oct 29** | Input unchanged and cleaning is idempotent; the mime type comes from the file's brand; two real ffmpeg-made files (`app/src/test/fixtures/`) come out clean and still decode (ffprobe and a full ffmpeg decode, by hand, Oct 29; how: `app/src/test/fixtures/README.md`). |
+| VID-12, 13 | auto · **Built Oct 29** | `processVideo` checks the 60 s limit before reading, cleans and verifies; the picker asks iPhone for 720p H.264 when videos are offered. |
+| FLAG-7 | manual | **Given** a video from Chase's iPhone (location on) and one from an Android phone, **When** posted and downloaded, **Then** exiftool shows no location, make, model or date. Needs the poster frame and player first. |
+

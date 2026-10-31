@@ -40,6 +40,8 @@ interface PostRow {
   taken_at?: string | null; batch_id?: string | null; batch_size?: number | null;
   /** 0019 (CAP-1): optional title, null when blank. */
   title?: string | null;
+  /** 0021 (CAP-6): when the sender last changed the words. */
+  words_edited_at?: string | null;
 }
 interface MediaRow {
   id: string; post: string; position: number; kind: MediaKind; mime: string; width: number; height: number;
@@ -472,6 +474,7 @@ export class FakeBackend {
         author_name: this.state.users[p.author]?.name ?? '',
         caption: p.caption,
         title: p.title ?? null,
+        words_edited_at: p.words_edited_at ?? null,
         published_at: p.published_at!,
         media: Object.values(this.state.media).filter((m) => m.post === p.id).sort((x, y) => x.position - y.position)
           .map((m) => ({ media_id: m.id, kind: m.kind, width: m.width, height: m.height, duration_ms: m.duration_ms, status: m.status })),
@@ -545,6 +548,22 @@ export class FakeBackend {
     this.changed();
   }
 
+  /** edit_post_words (0021, CAP-6..8): the sender only, while they can still post here; no notice. */
+  editPostWords(user: string | null, post: string, title: string | null, caption: string | null): string {
+    const me = this.requireUser(user);
+    const row = this.authorPost(me, post);
+    if (!this.isPoster(row.space, me)) throw new ApiError('42501', 'you can no longer send here');
+    const t = title?.trim() || null;
+    const c = caption?.trim() || null;
+    if (t && [...t].length > 80) throw new ApiError('23514', 'a title is 80 characters at most');
+    if (c && [...c].length > 2000) throw new ApiError('23514', 'a caption is 2000 characters at most');
+    row.title = t;
+    row.caption = c;
+    row.words_edited_at = this.now();
+    this.changed();
+    return row.words_edited_at;
+  }
+
   toggleHeart(user: string | null, post: string): HeartState {
     const me = this.requireUser(user);
     const p = this.visiblePost(me, post);
@@ -560,8 +579,8 @@ export class FakeBackend {
   setReaction(user: string | null, post: string, emoji: Reaction): ReactionState {
     const me = this.requireUser(user);
     if (!(['❤️', '😂', '👍'] as string[]).includes(emoji)) throw new ApiError('22023', 'unknown reaction');
-    const p = this.visiblePost(me, post);
-    if (p.status !== 'published') throw new ApiError('P0002', 'not found');
+    const p = this.visiblePost(me, post); // HARD-15: like 0017, the author may react to their own unsent post
+    if (p.deleted) throw new ApiError('P0002', 'not found');
     const i = this.state.hearts.findIndex((h) => h.post === post && h.user === me);
     const had = i >= 0 ? (this.state.hearts[i]!.emoji ?? '❤️') : null;
     if (had === emoji) this.state.hearts.splice(i, 1);
@@ -582,7 +601,7 @@ export class FakeBackend {
       } catch {
         continue;
       }
-      if (p.status === 'published' && !p.deleted) out.push({ post_id: id, ...this.reactionsOf(me, p) });
+      if (!p.deleted) out.push({ post_id: id, ...this.reactionsOf(me, p) });
     }
     return out;
   }
@@ -981,6 +1000,7 @@ export class FakeApi implements HearthApi {
   createPost = (a: CreatePostArgs) => this.run(() => this.be.createPost(this.userId, a));
   publishPost = (p: string) => this.run(() => this.be.publishPost(this.userId, p));
   deletePost = (p: string) => this.run(() => this.be.deletePost(this.userId, p));
+  editPostWords = (p: string, title: string | null, caption: string | null) => this.run(() => this.be.editPostWords(this.userId, p, title, caption));
   toggleHeart = (p: string) => this.run(() => this.be.toggleHeart(this.userId, p));
   setReaction = (p: string, emoji: Reaction) => this.run(() => this.be.setReaction(this.userId, p, emoji));
   reactionSummary = (posts: string[]) => this.run(() => this.be.reactionSummary(this.userId, posts));
