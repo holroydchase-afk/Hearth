@@ -202,6 +202,16 @@ export class SupabaseApi implements HearthApi {
     this.rpc<void>('add_people_from', { p_target: target, p_source: source, p_history: history });
   myFeatures = (space: string) =>
     this.rpc<{ feature: string }[] | null>('my_features', { p_space: space }).then((d) => (d ?? []).map((r) => r.feature));
+  /** Update first, insert if there was no row: authenticated may update only `enabled`, so a PostgREST upsert
+   *  (which also sets the key columns) is refused. RLS lets only the owner do either (42501 otherwise). */
+  setFamilyFeature = async (space: string, feature: string, enabled: boolean): Promise<void> => {
+    const t = () => this.o.client.from('space_features');
+    const up = (await t().update({ enabled }).eq('space_id', space).eq('feature', feature).select('feature')) as { data: unknown[] | null; error: unknown };
+    if (up.error) throw toApiError(up.error);
+    if (up.data && up.data.length > 0) return;
+    const ins = (await t().insert({ space_id: space, feature, enabled })) as { error: unknown };
+    if (ins.error) throw toApiError(ins.error);
+  };
   /** Two plain reads under RLS (space_members: parents see the whole family; profiles: can_see_profile). Only names
    *  and roles are selected: never an email. */
   familyPeople = async (space: string): Promise<Person[]> => {

@@ -849,6 +849,14 @@ export class FakeBackend {
     }).sort();
   }
 
+  /** space_features writes (0013 RLS): the owner only (can(space, 'family_settings')); anyone else gets 42501. */
+  setFamilyFeature(user: string | null, space: string, feature: string, enabled: boolean): void {
+    const me = this.requireUser(user);
+    if (this.member(space, me)?.role !== 'owner') throw new ApiError('42501', 'new row violates row-level security policy');
+    this.state.spaceFeatures = { ...this.state.spaceFeatures, [`${space}:${feature}`]: enabled };
+    this.changed();
+  }
+
   // ---------------- sign-media ----------------
   signUpload(user: string | null, post: string, items: UploadItemSpec[]): UploadGrant {
     const me = this.requireUser(user);
@@ -1036,6 +1044,8 @@ export class FakeApi implements HearthApi {
   addPeopleFrom = (t: string, f: string, h: ShareHistory) => this.run(() => this.be.addPeopleFrom(this.userId, t, f, h));
   familyPeople = (space: string) => this.run(() => this.be.familyPeople(this.userId, space));
   myFeatures = (space: string) => this.run(() => this.be.myFeatures(this.userId, space));
+  setFamilyFeature = (space: string, feature: string, enabled: boolean) =>
+    this.run(() => this.be.setFamilyFeature(this.userId, space, feature, enabled));
   chatList = (space: string) => this.run(() => this.be.chatList(this.userId, space));
   chatPublishDevice = (k: string, kps: string[]) => this.run(() => this.be.chatPublishDevice(this.userId, k, kps));
   chatKeyPackageCount = () => this.run(() => this.be.chatKeyPackageCount(this.userId));

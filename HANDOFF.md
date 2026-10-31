@@ -1,5 +1,13 @@
 # Handoff
 
+## Oct 31, night shift: the owner's photo helpers switch (TRACKER R17, branch claude/project-thread-kzt7by-n1031, draft PR)
+- **Where things stood:** the release plan (M1.1) is finished and every PR through #84 is merged; 0020 and 0021 are deployed. So tonight took the next unblocked P2 row that needs nothing from Chase.
+- **Built, test-first (HELP-R6, DEC-45, persona check all Green):** the family's owner gets a "Photo helpers" card on Me with two switches, "Set aside repeats" and "Set aside screenshots and blurry photos", for the whole family. Nobody else sees it. A failed save says so and leaves the switch as it was. The switch shows what `my_features` says, so Hearth's global kill switch still wins. Words from grandparent-ux (7/10 first draft; its replacement lines are what was built).
+- **App only, no migration or deploy:** the owner could already write `space_features` under RLS (0013). `setFamilyFeature` updates, then inserts if there was no row (a PostgREST upsert also sets the key columns, which authenticated can't update).
+- **Tests:** contract HELP-R6 (fake and the real PostgREST harness: off, viewer refused 42501, back on), `helperSwitch.test.tsx` ×5. Docs: API.md, architecture 05 (Last checked), SPEC-PHOTO-HELPERS HELP-R6, TRACKER R17.
+- **Decisions to review:** DEC-45.
+- **Next exact step:** Chase says "merge" for this PR, then republish the Expo preview and look at Me as the owner.
+
 ## Oct 31: open PRs merged, 0020 and 0021 deployed, AGPL headers (branch claude/project-thread-rmj7at, PR)
 - **Chase's ask:** "fix all issues, determine the correct order including merge 73, deploy 0020", then "also do the AGPL work".
 - **CI:** Actions started no jobs while the repo was private (no runner, no logs: the billing limit). Public again Oct 31, so CI runs; every PR below was green before it merged.

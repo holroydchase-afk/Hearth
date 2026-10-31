@@ -729,5 +729,19 @@ describe.each(factories)('%s contract (API.md)', (_name, factory, caps) => {
       expect(await poster.myFeatures(h.spaceId)).toEqual(expect.arrayContaining(['photo_helpers_duplicates', 'photo_helpers_screens_blur']));
       expect(await viewerIn.myFeatures(h.spaceId)).toEqual([]);
     });
+
+    it('HELP-R6 the owner turns a photo helper off and on for the family; a viewer cannot (42501)', async () => {
+      const f = 'photo_helpers_screens_blur';
+      try {
+        await poster.setFamilyFeature(h.spaceId, f, false);
+        expect(await poster.myFeatures(h.spaceId)).not.toContain(f);
+        expect(await poster.myFeatures(h.spaceId)).toContain('photo_helpers_duplicates');
+        expect(await code(viewerIn.setFamilyFeature(h.spaceId, f, true))).toBe('42501');
+        expect(await poster.myFeatures(h.spaceId)).not.toContain(f);
+      } finally {
+        await poster.setFamilyFeature(h.spaceId, f, true);
+      }
+      expect(await poster.myFeatures(h.spaceId)).toContain(f);
+    });
   });
 });
