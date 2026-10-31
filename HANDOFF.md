@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 31: old commits cleaned of real-family details (TRACKER R26)
+- **Chase's call:** rewrite history in place. Chase ran the prepared git-filter-repo script from a Codespace (the cloud session can't force-push main). All branches are rewritten: main is now `5e5c338`, and its files are byte-identical to before (same tree). A fresh mirror shows 0 real names across all 64 branches and every commit message.
+- **Every clone or branch from before Oct 31 15:35Z is stale.** Re-clone or `git reset --hard origin/<branch>` before pushing, and never push old-history commits: that brings the names back.
+- **Left:** GitHub Support purge of the cached old PR pages (Chase, one form). After that, Pages for the demo (R26).
+- **Portfolio / public presence:** the repo is public with clean history once the purge is done.
+
 ## Oct 31: open PRs merged, 0020 and 0021 deployed, AGPL headers (branch claude/project-thread-rmj7at, PR)
 - **Chase's ask:** "fix all issues, determine the correct order including merge 73, deploy 0020", then "also do the AGPL work".
 - **CI:** Actions started no jobs while the repo was private (no runner, no logs: the billing limit). Public again Oct 31, so CI runs; every PR below was green before it merged.
