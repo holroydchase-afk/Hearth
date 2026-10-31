@@ -148,6 +148,23 @@ describe('BETA-REPLY-1 optimistic hearts', () => {
     d.resolve({ my_reaction: '❤️', heart_count: 1, counts: { '❤️': 1 } });
     await p;
   });
+
+  it('HARD-14 (B11) a reaction summary read before a tap never hides the confirmed reaction', async () => {
+    const be = FakeBackend.withFixture();
+    const [id] = await seed(be, 1);
+    const api = be.clientFor(jo.id);
+    const s = make(api);
+    await s.refresh();
+    const stale = deferred<Awaited<ReturnType<HearthApi['reactionSummary']>>>();
+    jest.spyOn(api, 'reactionSummary').mockImplementationOnce(() => stale.promise);
+    const r = s.refresh(); // its summary is read before the tap
+    await new Promise((res) => setTimeout(res, 0));
+    await s.react(id!, '😂'); // confirmed by the server
+    expect(s.getState().posts[0]).toMatchObject({ my_reaction: '😂', reaction_counts: { '😂': 1 } });
+    stale.resolve([{ post_id: id!, my_reaction: null, counts: {} }]);
+    await r;
+    expect(s.getState().posts[0]).toMatchObject({ my_reaction: '😂', reaction_counts: { '😂': 1 } });
+  });
 });
 
 describe('BETA-REPLY-2 comments', () => {
