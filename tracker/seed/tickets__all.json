@@ -893,8 +893,8 @@
    "status": "fixed",
    "title": "HARD-12: members could write reactions straight through PostgREST, skipping the three-emoji list and 'replies off' (a free-text side channel). Migration 0018",
    "tests": [],
-   "found": "2026-10-15",
-   "fixed": "2026-10-15"
+   "found": "2026-10-28",
+   "fixed": "2026-10-28"
   },
   {
    "id": "S22",
@@ -904,30 +904,30 @@
    "status": "fixed",
    "title": "HARD-13: the cached feed (captions, names, reactions) stayed on the phone after sign out",
    "tests": [],
-   "found": "2026-10-15",
-   "fixed": "2026-10-15"
+   "found": "2026-10-28",
+   "fixed": "2026-10-28"
   },
   {
    "id": "B11",
    "kind": "bug",
    "layer": "app",
    "severity": "Medium",
-   "status": "open",
+   "status": "fixed",
    "title": "HARD-14: a reaction summary read before a tap can land after it and hide the confirmed reaction until the next refresh",
    "tests": [],
-   "found": "2026-10-15",
-   "fixed": null
+   "found": "2026-10-28",
+   "fixed": "2026-10-29"
   },
   {
    "id": "T11",
    "kind": "test fix",
    "layer": "app",
    "severity": "Low",
-   "status": "open",
+   "status": "fixed",
    "title": "HARD-15: Fake and Supabase disagree on reacting to your own unpublished post (the contract doesn't cover it)",
    "tests": [],
-   "found": "2026-10-15",
-   "fixed": null
+   "found": "2026-10-28",
+   "fixed": "2026-10-29"
   },
   {
    "id": "B13",
@@ -937,8 +937,8 @@
    "status": "fixed",
    "title": "HARD-17: Postgres JIT-compiled feed_rows once a family had a few dozen posts: 1.5-2 s per Photos or By date page instead of 20-50 ms. Migration 0018 turns JIT off for it",
    "tests": [],
-   "found": "2026-10-15",
-   "fixed": "2026-10-15"
+   "found": "2026-10-28",
+   "fixed": "2026-10-28"
   },
   {
    "id": "B12",
@@ -948,7 +948,7 @@
    "status": "open",
    "title": "HARD-16: on a server before 0017, Haha or Like takes away an existing heart (the hosted server has 0017)",
    "tests": [],
-   "found": "2026-10-15",
+   "found": "2026-10-28",
    "fixed": null
   }
  ]

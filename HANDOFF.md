@@ -1,5 +1,12 @@
 # Handoff
 
+## Oct 29, bug sweep: B11 and T11 fixed, TRACKER brought up to date (branch claude/project-thread-ewmmb7, PR)
+- **Chase's ask:** list every known bug, then "fix whatever you think is priority". Open list was 7 tickets, none High: S19, S20, S18, B11 (Medium); S14, B12, T11 (Low). No open GitHub issues; every UAT item is fixed or is a feature ask.
+- **Fixed, test-first:** B11 (HARD-14): a reaction summary read before a tap no longer hides the confirmed reaction (`store.test.ts`). T11 (HARD-15): the fake now matches 0017, so an author can react to their own unsent post and nobody else sees it; the contract test passes on the fake and on the real API (PostgREST harness, 66/66).
+- **TRACKER:** milestone 1 steps 3-6 and 8 marked done with evidence; step 7 left open (one email notice, and confirm `HEARTH_KEYS_PENDING` is gone). R16, R20 and R22 marked merged. App-only change, so no migration or deploy.
+- **Left, needs Chase or bigger work:** S18 means clearing the test bucket before real photos (can't be undone, needs Chase's word, and B2 isn't reachable from the cloud). S19 safety numbers is day 3 of the vault plan (R24). S20 needs an outside reviewer. S14 and B12 don't matter today (video is off, hosted has 0017).
+- **Next exact step:** Chase says "merge".
+
 ## Oct 29: studio agents re-synced (TRACKER R25, branch claude/project-thread-jt1p84, PR)
 - **Why:** Chase, Oct 29: re-sync from studio-agents main (b6a9a8b) to get the upgraded ux-reviewer and the ux tools; keep project-only agents.
 - **Done:** ran studio-agents `scripts/sync.sh`, `sync-tools.sh` and `install-rules.sh` on this repo, then `scripts/sync-agents.sh` to put the Hearth notes back (sync.sh had dropped them from all 7). ux-reviewer is now the visual critic (Layer V, 0-10 score, 8 is the bar) and preloads the `review-rounds` skill; `.claude/design-rules.md` is the studio rules (incl. older-adult rules A1-A6). New `scripts/ux-shots.mjs` and `scripts/ux-rules.mjs` (need Playwright). New PR checks `agents-check.yml` (Agents: line, qa-tdd on code PRs, run log) and `handoff-check.yml`, plus `scripts/log-agent-run.sh` and `check-agent-runs.sh`. `.claude/settings.json` hand-merged: Expo plugin kept, SessionStart HANDOFF hook and Agent-run log hook added. `studio-checks.json` set to Hearth's log roots, `caption` and `kek` banned, and a light verify command. Hearth's own `check-agents.sh` and `check-logs.mjs` kept (install-rules never overwrites; ours also checks the notes). `grandparent-ux` untouched. Only privacy-security and ux-reviewer actually changed text.

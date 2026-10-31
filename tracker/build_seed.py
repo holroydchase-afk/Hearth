@@ -228,8 +228,8 @@ tickets = [
  # privacy-security review, Oct 28 (docs/reviews/2026-10-28-harden.md)
  ("S21", "bug", B, "High", "fixed", "HARD-12: members could write reactions straight through PostgREST, skipping the three-emoji list and 'replies off' (a free-text side channel). Migration 0018", []),
  ("S22", "bug", "app", "Medium", "fixed", "HARD-13: the cached feed (captions, names, reactions) stayed on the phone after sign out", []),
- ("B11", "bug", "app", "Medium", "open", "HARD-14: a reaction summary read before a tap can land after it and hide the confirmed reaction until the next refresh", []),
- ("T11", "test fix", "app", "Low", "open", "HARD-15: Fake and Supabase disagree on reacting to your own unpublished post (the contract doesn't cover it)", []),
+ ("B11", "bug", "app", "Medium", "fixed", "HARD-14: a reaction summary read before a tap can land after it and hide the confirmed reaction until the next refresh", []),
+ ("T11", "test fix", "app", "Low", "fixed", "HARD-15: Fake and Supabase disagree on reacting to your own unpublished post (the contract doesn't cover it)", []),
  ("B13", "bug", B, "High", "fixed", "HARD-17: Postgres JIT-compiled feed_rows once a family had a few dozen posts: 1.5-2 s per Photos or By date page instead of 20-50 ms. Migration 0018 turns JIT off for it", []),
  ("B12", "bug", "app", "Low", "open", "HARD-16: on a server before 0017, Haha or Like takes away an existing heart (the hosted server has 0017)", []),
 ]
@@ -240,7 +240,7 @@ DATES = {"S9": ("2026-10-15", "2026-10-16"), "S10": ("2026-10-15", "2026-10-16")
          "AE-5": ("2026-10-16", "2026-10-16"), "AE-6": ("2026-10-16", None), "AE-7": ("2026-10-16", "2026-10-16"),
          "AE-8": ("2026-10-16", "2026-10-16"), "V1": ("2026-10-16", None), "REPLY-1": ("2026-10-16", None),
          **{t: ("2026-10-18", "2026-10-18") for t in ("PRIV-1", "PRIV-2", "QA-3", "QA-2", "BULK-1F", "T6", "T7")},
-         "S17": ("2026-10-19", "2026-10-19"), **{t: ("2026-10-19", None) for t in ("S18", "S19", "S20")}, **{t: ("2026-10-19", "2026-10-21") for t in ("T8", "T9", "T10")}}
+         "S17": ("2026-10-19", "2026-10-19"), "B11": ("2026-10-28", "2026-10-29"), "T11": ("2026-10-28", "2026-10-29"), "B12": ("2026-10-28", None), **{t: ("2026-10-28", "2026-10-28") for t in ("S21", "S22", "B13")}, **{t: ("2026-10-19", None) for t in ("S18", "S19", "S20")}, **{t: ("2026-10-19", "2026-10-21") for t in ("T8", "T9", "T10")}}
 # link backend tickets to SQL tests
 for c in sql_cases:
     for t in c["tickets"]:
