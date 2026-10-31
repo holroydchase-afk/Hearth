@@ -115,7 +115,7 @@ export function ShareScreen() {
     try {
       await saveLastAudience(app.deps.kv, userId, chosen);
       await app.queue.enqueueBatch({
-        space: app.space!.space_id, circleIds: chosen,
+        space: app.space!.space_id, circleIds: chosen, title,
         posts: plan.posts.map((p) => ({ takenAt: p.takenAt, items: p.items })),
       });
       // HELP-DUP-2: remember what went, by preview fingerprint, on this phone only.
@@ -151,7 +151,7 @@ export function ShareScreen() {
   if (plan && helped) {
     const bringBack = (uris: string[]) => setPutBack((cur) => new Set([...cur, ...uris]));
     return (
-      <BatchReview plan={plan} circles={circles} chosen={chosen} onToggle={toggle} busy={busy}
+      <BatchReview plan={plan} circles={circles} chosen={chosen} onToggle={toggle} busy={busy} title={title} onTitle={setTitle}
         onSend={() => void sendBatch()} onCancel={() => setPlan(null)}
         helpers={{
           lines: helperLines(helped),
