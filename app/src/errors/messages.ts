@@ -6,7 +6,7 @@ export interface MessageContext {
   /** Name of the person who invited this user ("Chase"). */
   inviter?: string | null;
   /** What the person was doing, to pick the right 23514 message. */
-  action?: 'post' | 'comment' | 'join' | 'invite' | 'group' | 'other';
+  action?: 'post' | 'comment' | 'join' | 'invite' | 'group' | 'edit' | 'other';
 }
 
 const KNOWN: ApiErrorCode[] = ['23514', '23505', '42501', 'P0002', '22023', '54000'];
@@ -33,6 +33,8 @@ export function messageFor(e: unknown, ctx: MessageContext = {}): string {
       if (ctx.action === 'group') return 'Give the group a name first.';
       return "That didn't work. Please check what you typed and try again.";
     case '42501':
+      // WORDS-2: say nothing was lost, so nobody thinks they broke it.
+      if (ctx.action === 'edit') return "These words can't be changed now. Your old words are kept.";
       return "You can't do that here.";
     case 'P0002':
       return 'This was removed.';

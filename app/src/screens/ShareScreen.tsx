@@ -188,7 +188,7 @@ export function ShareScreen() {
 
       {/* CAP-1: optional, shown (CAP-D4), 80 characters; nothing asks for it (CAP-R1). */}
       <Field label="Title (optional)" placeholder="Give it a name, like Lily's 5th birthday" value={title} onChangeText={setTitle} maxLength={80} />
-      <Field label="What's happening?" placeholder="Say what's happening (Grandma will see this)" value={caption} onChangeText={setCaption} multiline maxLength={2000} />
+      <Field label="What's happening?" placeholder="Say what's happening. The groups you pick will see it." value={caption} onChangeText={setCaption} multiline maxLength={2000} />
 
       <Card>
         <Txt variant="title" role="header">Who can see it</Txt>
@@ -207,8 +207,8 @@ export function ShareScreen() {
           <Choice
             kind="checkbox"
             label={`${g.name}, ${people(g.member_count)}`}
-            title={`${g.name} · ${people(g.member_count)}`}
-            detail={g.member_names.join(', ')}
+            title={g.name}
+            detail={`${people(g.member_count)}: ${g.member_names.join(', ')}`}
             checked={chosen.includes(g.circle_id)}
             onPress={() => toggle(g.circle_id)}
           />
