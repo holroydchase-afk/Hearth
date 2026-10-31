@@ -7,7 +7,7 @@ import { Image, View } from 'react-native';
 import type { Circle } from '../api/HearthApi';
 import { overLimitLine, reviewSummary, skippedVideosLine, type BatchPlan, type PickedAsset } from '../share/bulk';
 import type { HelperLine, SetAsideReason } from '../share/helpers';
-import { Button, Card, Choice, Loading, Screen, Txt } from '../ui/kit';
+import { Button, Card, Choice, Field, Loading, Screen, Txt } from '../ui/kit';
 import { people, photos } from '../ui/format';
 
 /** R15 photo helpers: what was set aside, in words, each one button from coming back (HELP-R1, HELP-R3). */
@@ -18,7 +18,7 @@ export interface ReviewHelpers {
   onPutBack: (uri: string) => void;
 }
 
-export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel, busy, helpers }: {
+export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel, busy, helpers, title, onTitle }: {
   plan: BatchPlan;
   circles: Circle[] | null;
   chosen: string[];
@@ -27,6 +27,9 @@ export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel,
   onCancel: () => void;
   busy: boolean;
   helpers?: ReviewHelpers;
+  /** CAP-9: one optional title for the whole batch (no caption box: one box, nothing else). */
+  title?: string;
+  onTitle?: (t: string) => void;
 }) {
   // grandparent-ux: with nobody picked yet, the choices are already open (no hidden step).
   const [changing, setChanging] = useState(chosen.length === 0);
@@ -70,6 +73,9 @@ export function BatchReview({ plan, circles, chosen, onToggle, onSend, onCancel,
             ))
             : null}
         </Card>
+      )}
+      {nothing || !onTitle ? null : (
+        <Field label="Title (optional)" placeholder="Give them a name, like Beach week" value={title ?? ''} onChangeText={onTitle} maxLength={80} />
       )}
       {helpers?.lines.length ? (
         // HELP-ALL-1: every helper line together, under "Send to".
