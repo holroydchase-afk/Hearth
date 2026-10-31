@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 30, night shift: HARD-16, Haha or Like never takes away a heart (branch claude/project-thread-kzt7by-n1030, draft PR, stacked on #76)
+- **Fixed, test-first (B12):** on a server before 0017 (no `set_reaction`), the app's fallback flipped the heart, so Haha or Like on a hearted post removed the heart. Now only Love takes a heart back; a non-heart tap that flipped it off flips it back. `SupabaseApi.test.ts` HARD-16 ×2. App only; the hosted server has 0017, so this guards older or self-hosted servers.
+- **Also tonight:** #74-#76 brought up to date with main (#72's HANDOFF/TRACKER conflicts resolved, R25 marked merged) and given the new required `Agents:` line.
+- **Test Log:** B12 marked fixed in `tracker/build_seed.py`; the found/fixed dates and the seed JSON wait for #70 (which adds B12's dates) to avoid a conflict.
+- **Next exact step:** Chase says "merge #74 to #78" in order, then "deploy 0021" and an app update.
+
 ## Oct 29, night shift: grandparent-ux words pass (branch claude/project-thread-kzt7by-n1029c, draft PR, stacked on CAP-9)
 - **Score:** grandparent-ux (reading the code) 7/10 for the new title and change-the-words flows, 8.5/10 with these fixes. It confirmed "What's happening?" without "(optional)", plus "Change the words", "Edited" and Read more.
 - **Built, test-first (WORDS-1..4, DEC-43, persona check all Green):** the caption hint says "The groups you pick will see it." (it said "Grandma will see this", untrue for a one-side post); a refused edit says "These words can't be changed now. Your old words are kept."; Messages says "Not even Hearth can read it: …"; on Share and the bulk review a group shows its name alone and the count starts the names line. Spoken labels unchanged.
