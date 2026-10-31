@@ -1,5 +1,6 @@
 // BETA-BULK-1/2: the bulk picker asks for up to 100 items with EXIF (read on the phone, never sent).
 jest.mock('expo-image-picker', () => ({
+  VideoExportPreset: { Passthrough: 0, H264_1280x720: 6 },
   requestMediaLibraryPermissionsAsync: jest.fn(async () => ({ granted: true })),
   launchImageLibraryAsync: jest.fn(async () => ({
     canceled: false,
@@ -24,5 +25,14 @@ describe('BETA-BULK-1 pickBulk', () => {
   it('BETA-BULK-1 the existing 1-10 photo picker still asks for no EXIF', async () => {
     await pickPhotos();
     expect(ImagePicker.launchImageLibraryAsync).toHaveBeenLastCalledWith(expect.objectContaining({ exif: false, selectionLimit: 10 }));
+  });
+});
+
+describe('FLAG-7 video picks', () => {
+  it('VID-13 when videos are offered, iPhone hands them over as 720p H.264 MP4 (BETA-SHARE-6: 720p or below)', async () => {
+    await pickPhotos(10, { videos: true });
+    expect(ImagePicker.launchImageLibraryAsync).toHaveBeenLastCalledWith(expect.objectContaining({
+      mediaTypes: ['images', 'videos'], videoExportPreset: ImagePicker.VideoExportPreset.H264_1280x720,
+    }));
   });
 });

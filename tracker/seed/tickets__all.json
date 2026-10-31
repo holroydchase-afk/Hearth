@@ -504,11 +504,11 @@
    "kind": "bug",
    "layer": "backend",
    "severity": "Low",
-   "status": "open",
-   "title": "Free-tier video cap is per space; someone can make extra spaces",
+   "status": "fixed",
+   "title": "Free-tier video cap is per space; someone can make extra spaces (fixed Oct 29: counted per person, migration 0020)",
    "tests": [],
    "found": "2026-10-15",
-   "fixed": null
+   "fixed": "2026-10-29"
   },
   {
    "id": "S15",
@@ -707,7 +707,7 @@
    "layer": "app",
    "severity": "Medium",
    "status": "deferred",
-   "title": "Video posting: off until location can be stripped from video too (BETA-SPEC)",
+   "title": "Video posting: off until location can be stripped from video too (BETA-SPEC). Oct 29: stripping built (FLAG-7 auto); poster frame, player and iPhone check left (TRACKER R27)",
    "tests": [],
    "found": "2026-10-16",
    "fixed": null
