@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // HARD-7: a browser that blocks storage must not stop the web build; values live in memory for the visit.
 import { webKV, webStorage } from '../webStorage';
 

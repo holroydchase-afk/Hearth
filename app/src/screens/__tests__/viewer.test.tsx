@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';
 import { FakeBackend } from '../../api/fake/FakeBackend';

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-OPS-1: our own error reports, with no user content and no third-party SDK.
 import { render, screen } from '@testing-library/react-native';
 import React from 'react';

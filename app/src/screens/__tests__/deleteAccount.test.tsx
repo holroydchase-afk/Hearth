@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-JOIN-7: in-app account deletion (Beta App Review expects it).
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';

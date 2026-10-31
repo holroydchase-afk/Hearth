@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-NOTIFY-7: posters set the name their family knows them by, once. Notices and
 // invites say "From Chase on Hearth", never an email-address placeholder.
 import React, { useEffect, useState } from 'react';

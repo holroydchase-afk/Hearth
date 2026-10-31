@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Web build is a test harness only (no web viewer in the beta): download the file.
 export type SaveResult = 'saved' | 'denied';
 

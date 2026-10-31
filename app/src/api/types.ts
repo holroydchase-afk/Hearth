@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Row shapes from API.md (v1, beta). snake_case on purpose: these are the wire shapes.
 
 export type Role = 'owner' | 'adult' | 'viewer';

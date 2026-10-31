@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // EVT-6..9 (Chase, Oct 18 "Yes build both"): inside an event, one timeline of everyone's photos by when they were
 // taken (oldest first), a header per day, 1-hour moments with "From Rachel" on each photo, name buttons to see one
 // person's photos, and "Added later" for photos with no capture time. Written first: red until EventsScreen catches up.

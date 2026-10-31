@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // SPEC-GROUPS first build on screen (BETA-AUD-19, BETA-REPLY-11, BETA-REPLY-12) plus the Oct 17
 // decisions for bulk + timeline: only parents get "Pick lots of photos", and a timeline card opens
 // the full post (hearts and replies). Written first (qa-tdd, Oct 17): red until the app catches up.

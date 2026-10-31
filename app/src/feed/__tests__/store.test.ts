@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Feed cache with keyset pagination + optimistic hearts and comments (BETA-REPLY-1/2, B6, SEE-2).
 import { ApiError, type HearthApi, type ReactionState } from '../../api/HearthApi';
 import { FakeBackend, FIXTURE } from '../../api/fake/FakeBackend';

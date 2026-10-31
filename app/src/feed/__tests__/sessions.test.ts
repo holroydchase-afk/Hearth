@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // SESS-1..2 (Chase, Oct 18 "Yes build both"): a 1-hour session in Photos, display only.
 // Consecutive posts by one sender, to the same groups, each within 1 hour of the one before, on one local day,
 // show as one entry with one swipe through all their photos. Written first: red until src/feed/sessions.ts exists.

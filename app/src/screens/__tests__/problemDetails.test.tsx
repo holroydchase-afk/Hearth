@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DBG-3 / DBG-4: "Show details" under a failed upload and "Problem details" in Help and Me, each
 // with "Copy for Claude" (one plain-text block). Only in Chase's debug builds, never for relatives.
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DEMO-2: the sample pictures ship in public/demo-pictures/ (web export only, so phone builds don't
 // carry them) and are read like a picked photo would be. Drawn by scripts/make-demo-pictures.py.
 import type { DemoPicture } from './seed';

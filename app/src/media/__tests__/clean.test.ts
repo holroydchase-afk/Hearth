@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MEDIA-1, MEDIA-2, MEDIA-3 (SPEC-MEDIA 1.3): the pure-TS cleaner copies a JPEG segment by
 // segment, keeping only JFIF, the ICC profile (when the policy keeps it), the image tables and
 // the scan. The verifier fails closed with META_<GROUP> only if a stripped group survives.

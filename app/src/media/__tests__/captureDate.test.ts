@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-BULK-1: the capture date is read on the phone; only taken_at leaves it.
 // The phone is in Eastern time for these tests (passed explicitly: Jest sandboxes process.env.TZ).
 import { takenAtFromAsset } from '../captureDate';

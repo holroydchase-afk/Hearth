@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { ViewerScreen } from '../../screens/ViewerScreen';

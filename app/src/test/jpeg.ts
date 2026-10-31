@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Small synthetic JPEG builders for the media-policy tests (MEDIA-1..3). No real photos:
 // every block is built byte by byte so a test can name exactly what is in the file.
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Tabs: the phone's own tab bar on iPhone and Android (see app/(tabs)/_layout.tsx), this bar on the web.
 // Every tab has a system symbol and a word (HIG Tab bars; DS-3), 17 pt labels (DS-2), labels that never
 // hide (DS-5) and 48 pt+ targets (DS-1). Viewers: Photos + Help only.

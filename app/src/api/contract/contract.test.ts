@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // API.md contract tests. They run against every HearthApi implementation we can reach:
 // FakeApi always; SupabaseApi when HEARTH_API_URL/HEARTH_ANON_KEY/HEARTH_USERS_JSON are set.
 import { ApiError, type HearthApi } from '../HearthApi';

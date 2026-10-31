@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MEDIA-3 + BETA-SHARE-4 (UAT item 6): a photo that couldn't be made private shows "Didn't send"
 // with a short reason line in plain words (not "Something went wrong"), Try again and Remove,
 // and one code-only error report reaches client_errors.

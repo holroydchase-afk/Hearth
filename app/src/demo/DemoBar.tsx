@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DEMO-3 / DEMO-10 (RR-3, RR-10): the bar on every screen of the public demo. It says the family is
 // made up and stays in the browser, switches between the parent's and Grandma Jo's view, starts over,
 // and leads back to the portfolio. Only rendered in the demo build.

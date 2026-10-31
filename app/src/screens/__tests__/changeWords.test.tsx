@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // CAP-6..8 (docs/product/SPEC-CAPTIONS.md, DEC-39 CAP-D2): the sender changes the title and caption from More;
 // the card says "Edited" after the date; nobody else gets the button; a refusal keeps the old words.
 import { fireEvent, screen, waitFor, within } from '@testing-library/react-native';

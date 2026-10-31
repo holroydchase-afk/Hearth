@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Plain-language messages for API.md error codes. Server text is NEVER shown:
 // it can contain SQL, table names or words June doesn't use.
 import { ApiError, type ApiErrorCode } from '../api/HearthApi';

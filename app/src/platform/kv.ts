@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 /** AsyncStorage-compatible key/value store. Injected so tests can simulate an app kill. */
 export interface KV {
   getItem(key: string): Promise<string | null>;

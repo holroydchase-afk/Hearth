@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // deno test supabase/functions/sign-media/sigv4_test.ts
 // Uses the presigned-URL example in the AWS S3 docs ("Authenticating Requests: Using Query Parameters").
 import { presign, uriEncode } from "./sigv4.ts";

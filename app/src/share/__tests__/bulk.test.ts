@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-BULK-2, -3, -5: plan a bulk pick into posts on the phone.
 import { hasExif, processPhoto, type Manipulator } from '../../media/pipeline';
 import { iosReencode } from '../../test/jpeg';

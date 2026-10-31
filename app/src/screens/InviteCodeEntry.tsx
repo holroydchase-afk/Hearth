@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-JOIN-8: the way in when a link opens in a browser, or someone reads the code out loud.
 // Any case, spaces or dashes; the code is 10 letters and numbers (no 0/O/1/I/L/U).
 import React, { useState } from 'react';

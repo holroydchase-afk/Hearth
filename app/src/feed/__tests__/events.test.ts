@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // SPEC-GROUPS v2, EVT-2..4 (app-now): how event posts sit in Photos and the Events list.
 // Written first (Oct 18): red until src/feed/events.ts exists.
 import type { FeedPost } from '../../api/HearthApi';

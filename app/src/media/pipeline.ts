@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // On-device media pipeline (BETA-SHARE-2, -5, -6; SPEC-MEDIA 1.3).
 // Pure logic; the native image work is behind the Manipulator interface
 // (expoManipulator.ts on device/web, a mock in unit tests).

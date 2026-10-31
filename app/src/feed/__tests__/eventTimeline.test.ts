@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // EVT-6..9 (Chase, Oct 18 "Yes build both"): inside an event, everyone's photos as one timeline by when they were
 // taken (oldest first: an event reads like a story), a header per local day, 1-hour moments, a filter per person,
 // and photos with no capture time last under "Added later". Written first: red until src/feed/eventTimeline.ts exists.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // UI-1..2 (release M1.1 phase 3, docs/reviews/2026-10-28-ui-8.md): the demo bar takes one short line plus
 // one row of short chips, and the laptop frame centres the phone with a clear next step for a recruiter.
 import { fireEvent, render, screen } from '@testing-library/react-native';

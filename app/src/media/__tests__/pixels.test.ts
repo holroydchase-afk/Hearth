@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R15 photo helpers (SPEC-PHOTO-HELPERS): plain image arithmetic on a grayscale thumbnail. No model.
 import { blur, dark, edges, img, other, scene, toJpeg } from '../../test/pictures';
 import { dHash64, grayFromJpeg, hamming, isDark, meanLuma, nearDuplicateGroups, sharpness } from '../pixels';

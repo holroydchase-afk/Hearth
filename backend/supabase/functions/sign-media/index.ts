@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // sign-media: the ONLY way to get bytes in or out of the B2 bucket.
 //
 //   GET  /sign-media?post_id=<uuid>

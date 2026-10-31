@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // SPEC-GROUPS v2, EVT-2..4 (app-now): event card and update line in Photos, and the Events section
 // (a labeled button at the top of Photos, not a new tab). Written first (Oct 18): red until PhotosScreen catches up.
 import { fireEvent, screen, within } from '@testing-library/react-native';

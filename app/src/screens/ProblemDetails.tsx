@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DBG-3/4: Chase's "dev tools, but straightforward" (Oct 19). Shows the on-device problem log and
 // copies it as one plain-text block to paste to Claude. Only in debug builds
 // (EXPO_PUBLIC_HEARTH_DEBUG=1); relatives never see it (anchor A1).

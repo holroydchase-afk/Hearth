@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R15 photo helpers (SPEC-PHOTO-HELPERS), run on a bulk pick before planBatch. They only set photos
 // aside for this send (HELP-R1): nothing is deleted, and every set-aside photo is one button from
 // coming back. The same photo picked twice (HELP-DUP-1) and screenshots (HELP-SHOT-1) are known at once;

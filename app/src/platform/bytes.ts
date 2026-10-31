@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Read a local file (picker / manipulator output) as bytes, on iOS and Android.
 import { File } from 'expo-file-system';
 

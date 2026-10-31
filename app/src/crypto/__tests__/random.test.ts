@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MS4 (privacy-security review, PR #29): expo-crypto's getRandomBytes quietly falls back to Math.random in dev
 // builds without the old bridge hook, which is Expo Go on RN 0.86. Keys must only ever come from getRandomValues.
 const zeros = (n: number) => new Uint8Array(n); // stands in for the predictable Math.random fallback

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Wire-level checks for SupabaseApi (the real stack isn't reachable here): every call uses the
 // RPC name and p_* argument names from API.md, errors keep their PostgREST code, and sign-media
 // HTTP statuses map to the same codes FakeApi uses.

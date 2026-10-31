@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import { FakeBackend, FIXTURE } from '../../api/fake/FakeBackend';
 import { toBase64 } from '../../crypto/base64';
 import { seedPost } from '../../test/seed';

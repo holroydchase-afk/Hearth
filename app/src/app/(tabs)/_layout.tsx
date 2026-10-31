@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // The phone's own tab bar on iPhone and Android (DESIGN-SYSTEM.md), Hearth's bar on the web.
 import { Redirect, Tabs } from 'expo-router';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';

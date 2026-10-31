@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import React from 'react';
 import { View } from 'react-native';
 import { ApiError } from '../api/HearthApi';

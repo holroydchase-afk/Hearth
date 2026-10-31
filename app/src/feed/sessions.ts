@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // SESS-1..2: a 1-hour session in Photos, display only. Computed on the phone from the posts this person can already
 // see; nothing is sent or stored. Consecutive ordinary post rows by one sender, to the same groups (as this person's
 // row shows them: the sender sees the groups, everyone else sees "Shared with you"), in the same event or none, each

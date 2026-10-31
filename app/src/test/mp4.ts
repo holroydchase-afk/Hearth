@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Test fixtures for the video cleaner (VID-*): tiny but structurally real QuickTime / MP4 files, built box by
 // box, carrying every kind of metadata a phone writes: iPhone's moov/meta location key, udta ©xyz, make, model and
 // software, an XMP uuid box, a timed-metadata track whose samples hold a location, a timecode track, creation dates

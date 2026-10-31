@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import { FakeBackend, FIXTURE } from '../fake/FakeBackend';
 import { encryptMedia, encryptedSize } from '../../crypto/media';
 import type { ContractHarness, ContractUser } from './harness';

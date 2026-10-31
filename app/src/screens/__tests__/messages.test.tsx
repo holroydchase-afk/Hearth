@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MSG-1, MSG-9 (screen half): Messages opens in place from a labeled button at the top of Photos, like Events.
 // Grandma Jo (a relative) sees chats titled by their people (AUD-14), waits to be let in, then writes and reads.
 // No read receipts, typing dots or "seen" anywhere (A2).

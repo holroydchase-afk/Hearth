@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DBG-1/2/4: Chase's on-device problem log. The last 20 problems, in memory only: nothing is
 // written to storage or sent anywhere. Only on when EXPO_PUBLIC_HEARTH_DEBUG=1 (Chase's preview
 // builds), so relatives never see it (anchor A1). Each message is redacted before it is kept:

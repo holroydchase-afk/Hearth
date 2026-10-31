@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-BULK-3/4/5: the one review screen before a bulk pick sends, and its progress.
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';

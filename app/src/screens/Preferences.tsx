@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Blocks shared by Help (viewers) and Me (posters): Bigger text, notice choice, privacy, sign out.
 import React, { useState } from 'react';
 import { useApp } from '../state/AppContext';

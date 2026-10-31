@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 import * as ExpoCrypto from 'expo-crypto';
 
 // Only getRandomValues: expo-crypto's getRandomBytes falls back to Math.random in dev builds without the old

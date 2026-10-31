@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-BULK-1: read when a photo was taken, on the phone. Only the resulting ISO instant
 // (`taken_at`) ever leaves the device; GPS, maker and every other EXIF field stay here and
 // are stripped by the pipeline as today (pipeline.ts).

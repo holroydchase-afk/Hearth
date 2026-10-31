@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Pure-TS JPEG metadata cleaner and verifier (SPEC-MEDIA 1.3, MEDIA-1/2/3). No native code, so it
 // runs in Expo Go, on Android and on the web.
 //

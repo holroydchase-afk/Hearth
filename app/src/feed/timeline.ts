@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-TIME-1..4: Photos' "Older photos" card and the "by date" timeline.
 // Months and years are the phone's local time, with plain Date math (no Intl dependency,
 // like ui/format.ts). The server decides what the caller may see (get_timeline uses the same

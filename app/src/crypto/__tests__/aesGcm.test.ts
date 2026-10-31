@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // R4 / A1 (DEC-29): media encryption runs on the fastest AES-GCM the runtime has, and every provider
 // produces the same bytes. Expo Go (Hermes, no crypto.subtle) keeps the JavaScript cipher.
 import { webcrypto } from 'crypto';

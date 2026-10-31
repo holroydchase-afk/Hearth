@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DEMO-3 / DEMO-10 (RR-3, RR-10): the demo bar on every screen labels the sample data, switches
 // between the parent's and Grandma Jo's view, starts over, and links back to the portfolio.
 import { fireEvent, render, screen } from '@testing-library/react-native';

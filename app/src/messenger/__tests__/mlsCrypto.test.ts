@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MSG-4: MLS runs with no WebCrypto (Expo Go / Hermes has no crypto.subtle), and Hearth's noble-only
 // ciphersuite talks to ts-mls's own WebCrypto one, so it is real RFC 9420 / RFC 9180 and not a private dialect.
 import {

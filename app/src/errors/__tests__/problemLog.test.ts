@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DBG-1 / DBG-2 / DBG-4: Chase's on-device problem log (Oct 19). The last 20 problems, in memory
 // only, with just what Claude needs to help: when, where, code, retryable, a short safe message,
 // app version, Expo update id, platform + OS, Expo SDK. Never URLs, keys, emails, captions,

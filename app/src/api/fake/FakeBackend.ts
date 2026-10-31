@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // In-memory Hearth backend for tests, the web smoke test and offline demos.
 // It enforces the same rules API.md promises: visibility via can_view_post, idempotency on
 // p_client_id, author-only fields, the error codes, invite rules and the S10 rate limit.

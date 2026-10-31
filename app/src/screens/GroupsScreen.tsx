@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Groups (parents only): see groups and who is in them; make a group (GRP-15/16); each group's comment setting
 // (GRP-17); basic rename; invite someone to one or more groups (GRP-18). Relatives never see any of this.
 import React, { useCallback, useEffect, useState } from 'react';

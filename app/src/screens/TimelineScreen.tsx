@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-TIME-2..4: photos by the date they were taken, with big month headers ("July 2024"),
 // a "Pick a year" list, and "Show older photos". Every action is a labeled button: no
 // scrubber, no gesture-only control. Opened from Photos ("Show by date" or a card's "See them").

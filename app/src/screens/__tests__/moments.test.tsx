@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // MOMENT-1..8 (Chase, UAT 9, Oct 19 and Oct 24): a moment is one upload shown as one compact card,
 // like a standard photo feed: who and when, a photo collage, one row of actions, the newest comment and a
 // one-row reply box (DEC-30 keeps the box on the card); older comments, who can see it and Delete are one

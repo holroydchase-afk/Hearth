@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DEMO-6 (RR-6): on a laptop, the demo shows the app at phone width beside a short panel for the
 // hiring manager: what Hearth is, who it's for, what to try. On a phone it's just the app.
 // UI-2: the phone sits centred with a soft shadow, and the panel ends in proof points and one link.

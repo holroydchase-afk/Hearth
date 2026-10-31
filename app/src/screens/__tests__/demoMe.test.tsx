@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // DEMO-8 (RR-8): the public demo hides test tools and dead ends on the Me screen: notice timing,
 // problem details ("Paste it to Claude"), and sign out / delete account (no way back in without a code).
 import { screen } from '@testing-library/react-native';

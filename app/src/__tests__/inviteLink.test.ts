@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // ONB-3 / ONB-4 (docs/product onboarding review, Oct 18): an invite link opens the hosted web build on the
 // "X invited you" join screen, and nothing points at hearth.family (not bought: docs/product/ACCOUNTS.md).
 // The server builds the link from private.secrets.invite_link_base; the app's fallback and the Fake must agree.

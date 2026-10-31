@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // BETA-OPS-1: build an error report that cannot carry user content. Only the error's
 // type and API code leave the phone; the message (which may hold a caption, URL or
 // email) never does. Same field rules as report_client_error in migration 0006.

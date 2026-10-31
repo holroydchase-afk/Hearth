@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Chase Holroyd
 // Groups v2 (SPEC-GROUPS v2, migration 0013): the new calls use the exact RPC names and p_* args from
 // API.md, and the FakeBackend keeps the same rules (the contract run holds both to them).
 import { FIXTURE, FakeBackend } from '../fake/FakeBackend';
