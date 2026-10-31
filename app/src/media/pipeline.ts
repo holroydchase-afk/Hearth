@@ -12,6 +12,7 @@
 import { ApiError, type UploadItemSpec } from '../api/HearthApi';
 import { encryptedSize } from '../crypto/media';
 import { cleanImage, verifyClean } from './clean';
+import { cleanVideo, verifyVideoClean, videoMimeType } from './cleanVideo';
 import { MEDIA_POLICY, type MediaPolicy } from './policy';
 
 const DEFAULT_EDGE = MEDIA_POLICY.compression.long_edge;
@@ -115,6 +116,19 @@ export function checkVideo(a: { durationMs: number | null | undefined }): void {
   if (a.durationMs == null || !(a.durationMs <= VIDEO_MAX_MS)) {
     throw new ApiError('VIDEO_TOO_LONG');
   }
+}
+
+export interface ProcessedVideo { kind: 'video'; mime_type: 'video/mp4' | 'video/quicktime'; bytes: Uint8Array; duration_ms: number }
+
+/**
+ * FLAG-7: a picked video, cleaned on the phone (cleanVideo.ts: no location, dates or software names; no re-encode)
+ * and verified, so `exif_stripped: true` is a verified claim for video too. The length is checked before reading.
+ */
+export async function processVideo(src: { uri: string; durationMs: number | null | undefined }, deps: Pick<PipelineDeps, 'readBytes'>): Promise<ProcessedVideo> {
+  checkVideo({ durationMs: src.durationMs });
+  const bytes = cleanVideo(await deps.readBytes(src.uri));
+  verifyVideoClean(bytes);
+  return { kind: 'video', mime_type: videoMimeType(bytes), bytes, duration_ms: src.durationMs! };
 }
 
 export function buildUploadSpec(p: ProcessedPhoto): UploadItemSpec {

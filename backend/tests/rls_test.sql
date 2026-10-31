@@ -333,7 +333,8 @@ select tests.ok((public.space_upload_quota(:space_a)->>'videos_this_month') is n
 select tests.ok_sql(format('select exists (select id, name, plan from spaces where id = %L)', :space_a),
                     'Members can still read the space''s name and plan');
 select set_config('request.jwt.claim.sub', :alex, false);
-select tests.ok((public.space_upload_quota(:space_a)->>'videos_this_month')::int = 7, 'Owner still sees the upload count');
+-- S14 (0020): the count shown is the poster's own videos this month across free families (10 from section 6), not the space's counter.
+select tests.ok((public.space_upload_quota(:space_a)->>'videos_this_month')::int = 10, 'Owner still sees the upload count (their own, S14)');
 reset role;
 
 -- 9b. Free-tier cap: a video cannot be smuggled in as kind=photo.

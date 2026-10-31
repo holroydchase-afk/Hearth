@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 29: video, part 1: location stripping and a fair video limit (branch claude/project-thread-ponhs5, PR)
+- **Why:** Chase, Oct 29: "build video". Video was "in v1" (Oct 18) but blocked on stripping location from video on the phone (FLAG-7), plus S14 (the free cap reset per family space).
+- **Built, test-first:** `app/src/media/cleanVideo.ts`, a pure-TypeScript QuickTime/MP4 cleaner and verifier that runs in Expo Go with no re-encode: location boxes (Apple's ISO6709 key, `©xyz`), make, model, software, XMP, face boxes, metadata and timecode tracks (their samples too), dates, vendor names and trailers are zeroed in place; picture and sound bytes stay identical (VID-1..11, plus two real ffmpeg-made files that still decode). `processVideo` in `pipeline.ts` (VID-12); iPhone picks come as 720p H.264 MP4 (VID-13, BETA-SHARE-6). Migration **0020** counts the 10 free videos a month per person across every free family (`private.video_usage`; S14-1..7 in `backend/tests/video_cap_test.sql`). Test Log: S14 fixed. Spec: SPEC-MEDIA section 4.
+- **Still off:** `video_posting` stays off and `prepare.ts` still stops videos: no poster frame or player yet (TRACKER R27).
+- **Next exact step:** Chase says "merge", then "deploy 0020". Then part 2: poster frame, player, grandparent-ux words, the FLAG-7 check on Chase's iPhone, and turning video on.
+
 ## Oct 29, bug sweep: B11 and T11 fixed, TRACKER brought up to date (branch claude/project-thread-ewmmb7, PR)
 - **Chase's ask:** list every known bug, then "fix whatever you think is priority". Open list was 7 tickets, none High: S19, S20, S18, B11 (Medium); S14, B12, T11 (Low). No open GitHub issues; every UAT item is fixed or is a feature ask.
 - **Fixed, test-first:** B11 (HARD-14): a reaction summary read before a tap no longer hides the confirmed reaction (`store.test.ts`). T11 (HARD-15): the fake now matches 0017, so an author can react to their own unsent post and nobody else sees it; the contract test passes on the fake and on the real API (PostgREST harness, 66/66).
