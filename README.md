@@ -56,4 +56,4 @@ bash test-all.sh                        # everything
 
 ## Status
 
-Milestone 1 (the founder using it end to end on his own phone) is in testing. Next is milestone 2, his spouse. Then come relatives, in order of how comfortable they are with tech. Beta target: about 12 grandparents in West Virginia. License: AGPL-3.0 is planned for when the repo goes public.
+Milestone 1 (the founder using it end to end on his own phone) is in testing. Next is milestone 2, his spouse. Then come relatives, in order of how comfortable they are with tech. Beta target: about 12 grandparents in West Virginia. License: AGPL-3.0 ([LICENSE](LICENSE)). The repo is public since Oct 29, 2026.
