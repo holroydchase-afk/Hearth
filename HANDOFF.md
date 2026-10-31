@@ -1,5 +1,11 @@
 # Handoff
 
+## Oct 31: the demo goes on GitHub Pages at chaseholroyd.com/Hearth/ (TRACKER R26, issue #83 step 2)
+- **Privacy scan re-run on the rewritten history (all branches):** 0 real-family names, gitleaks clean, only made-up test emails and one public office phone number.
+- **Built, test-first (PAGES-1):** the static-site e2e takes `SITE_BASE`. Under `/Hearth` it failed on the old `/demo/hearth` build (red) and passes 8/8 on a `/Hearth` build (3 runs). The default `/demo/hearth` still passes 8/8.
+- **`demo-site.yml`** now builds with base `/Hearth` on every push to main that touches the app (or by hand) and deploys to Pages (`upload-pages-artifact@v5`, `deploy-pages@v4`, versions from GitHub's releases pages via web search).
+- **Next exact step:** Chase sets Settings → Pages → Source: GitHub Actions and merges. Then check https://chaseholroyd.com/Hearth/ and reply on #83 with the URL. **Portfolio / public presence:** Product Studio then points the portfolio at that URL and drops its demo/hearth/ copy.
+
 ## Oct 31: old commits cleaned of real-family details (TRACKER R26)
 - **Chase's call:** rewrite history in place. Chase ran the prepared git-filter-repo script from a Codespace (the cloud session can't force-push main). All branches are rewritten: main is now `5e5c338`, and its files are byte-identical to before (same tree). A fresh mirror shows 0 real names across all 64 branches and every commit message.
 - **Every clone or branch from before Oct 31 15:35Z is stale.** Re-clone or `git reset --hard origin/<branch>` before pushing, and never push old-history commits: that brings the names back.

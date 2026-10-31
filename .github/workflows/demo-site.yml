@@ -1,15 +1,17 @@
 name: demo-site
-# Builds the no-login demo (made-up family, no backend) with scripts/build-demo.sh and keeps it as a
-# downloadable artifact for the portfolio site to host at chaseholroyd.com/demo/hearth/.
-# Manual only: nothing is published from here, and nothing in it depends on the app's final name.
+# Builds the no-login demo (made-up family, no backend) with scripts/build-demo.sh and publishes it on
+# GitHub Pages at chaseholroyd.com/Hearth/ (TRACKER R26). Runs on every push to main that touches the app,
+# or by hand. Needs Settings > Pages > Source: GitHub Actions.
 on:
+  push:
+    branches: [main]
+    paths: ['app/**', 'packages/**', '.github/workflows/demo-site.yml']
   workflow_dispatch:
-    inputs:
-      base:
-        description: Sub-path the site serves the demo from
-        default: /demo/hearth
 permissions:
   contents: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -17,6 +19,8 @@ jobs:
     defaults:
       run:
         working-directory: app
+    env:
+      BASE: /Hearth
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -26,15 +30,23 @@ jobs:
           cache-dependency-path: app/package-lock.json
       - run: npm ci
       - run: bash scripts/build-demo.sh "$BASE"
-        env:
-          BASE: ${{ inputs.base }}
       - name: The demo never points at a real backend
         run: |
           if grep -rlE '[a-z]{20}\.supabase\.co|sb_(secret|publishable)_[A-Za-z0-9_-]{10,}|eyJ[A-Za-z0-9_-]{10,}\.eyJ' dist-demo-site; then
             echo "::error::The demo build contains a Supabase address or key"; exit 1
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
-          name: hearth-demo-site
           path: app/dist-demo-site
-          retention-days: 30
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
